@@ -14,20 +14,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { navigate, RouteComponentProps } from "@reach/router";
 
-// strings
-// TODO these should be moved to an admin configurable store
-const companyName = "The Clive Davis Institute of Recorded Music";
-const appName = "Booking";
-const emailLabel = "NYU NetID";
-const passwordLabel = "NetID password";
-const helpText = "Need help?";
-const helpUrl =
-  "https://docs.google.com/a/nyu.edu/forms/d/e/1FAIpQLSd2bv5rnNigUneaSbdRNUuJFRtqMmEMTnrH_-G5eRsKW84CNQ/viewform";
-const moreInfoText = "Guide to the studios";
-const moreInfoUrl =
-  "https://wikis.nyu.edu/pages/viewpage.action?title=home&spaceKey=remuproduction";
-// end strings
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -65,10 +51,10 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
           <EventIcon />
         </Avatar>
         <Typography component="h1" variant="subtitle1">
-          {companyName}
+          {process.env.REACT_APP_COMPANY_NAME}
         </Typography>
         <Typography component="h1" variant="h5">
-          {appName}
+          {process.env.REACT_APP_APP_NAME}
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
@@ -77,7 +63,7 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
             required
             fullWidth
             id="email"
-            label={emailLabel}
+            label={process.env.REACT_APP_EMAIL_LABEL}
             name="email"
             autoComplete="email"
             autoFocus
@@ -88,7 +74,7 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
             required
             fullWidth
             name="password"
-            label={passwordLabel}
+            label={process.env.REACT_APP_PASSWORD_LABEL}
             type="password"
             id="password"
             autoComplete="current-password"
@@ -109,13 +95,13 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href={helpUrl} variant="body2">
-                {helpText}
+              <Link href={process.env.REACT_APP_HELP_URL} variant="body2">
+                {process.env.REACT_APP_HELP_TEXT}
               </Link>
             </Grid>
             <Grid item>
-              <Link href={moreInfoUrl} variant="body2">
-                {moreInfoText}
+              <Link href={process.env.REACT_APP_MORE_INFO_URL} variant="body2">
+                {process.env.REACT_APP_MORE_INFO_TEXT}
               </Link>
             </Grid>
           </Grid>
