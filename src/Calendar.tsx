@@ -51,7 +51,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
-  const drawerRef = useRef<FunctionComponent>(null);
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
