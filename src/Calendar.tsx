@@ -49,7 +49,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const [currentStart, setCurrentStart] = useState(new Date());
   const [pickerShowing, setPickerShowing] = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
-  const [viewMenuIsOpen, setViewMenuIsOpen] = useState(false);
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
 
@@ -64,18 +63,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       return;
     }
     setDrawerIsOpen(!drawerIsOpen);
-  };
-  const toggleViewMenu = () => (
-    event: React.KeyboardEvent | React.MouseEvent
-  ) => {
-    if (
-      event.type === "keydown" &&
-      ((event as React.KeyboardEvent).key === "Tab" ||
-        (event as React.KeyboardEvent).key === "Shift")
-    ) {
-      return;
-    }
-    setViewMenuIsOpen(!viewMenuIsOpen)
   };
 
   useEffect(() => {
@@ -117,8 +104,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
         />
-      </div>
-      <div onClick={() => setViewMenuIsOpen(!viewMenuIsOpen)}>
       </div>
       <AppBar position="sticky">
         <List>
