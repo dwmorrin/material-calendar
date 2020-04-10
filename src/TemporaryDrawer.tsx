@@ -9,6 +9,10 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";
+import DateRangeIcon from '@material-ui/icons/DateRange';
+import AssessmentIcon from '@material-ui/icons/Assessment';
+import GroupIcon from '@material-ui/icons/Group';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 
 const useStyles = makeStyles({
   list: {
@@ -40,10 +44,17 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
     >
       <div className={clsx(classes.list)} role="presentation">
         <List>
-          {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
+          {["Calendar", "Projects", "Groups", "Notifications"].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+              {(() => {
+                switch (index) {
+                  case 0:  return <DateRangeIcon />;
+                  case 1:  return <AssessmentIcon />;
+                  case 2:  return <GroupIcon />;
+                  default: return <NotificationsIcon />;
+                }
+              })()}
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItem>

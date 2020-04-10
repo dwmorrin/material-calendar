@@ -14,19 +14,19 @@ import {
   Button,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
 import TodayIcon from "@material-ui/icons/Today";
 import { RouteComponentProps } from "@reach/router";
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import TemporaryDrawer from "./TemporaryDrawer";
+import ViewMenu from "./ViewMenu";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
   menuButton: {
-    marginRIght: theme.spacing(2),
+    marginRight: theme.spacing(2),
   },
   title: {
     flexGrow: 1,
@@ -49,6 +49,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const [currentStart, setCurrentStart] = useState(new Date());
   const [pickerShowing, setPickerShowing] = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
+  const [viewMenuIsOpen, setViewMenuIsOpen] = useState(false);
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
 
@@ -63,6 +64,18 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       return;
     }
     setDrawerIsOpen(!drawerIsOpen);
+  };
+  const toggleViewMenu = () => (
+    event: React.KeyboardEvent | React.MouseEvent
+  ) => {
+    if (
+      event.type === "keydown" &&
+      ((event as React.KeyboardEvent).key === "Tab" ||
+        (event as React.KeyboardEvent).key === "Shift")
+    ) {
+      return;
+    }
+    setViewMenuIsOpen(!viewMenuIsOpen)
   };
 
   useEffect(() => {
@@ -105,6 +118,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           onClose={toggleDrawer}
         />
       </div>
+      <div onClick={() => setViewMenuIsOpen(!viewMenuIsOpen)}>
+      </div>
       <AppBar position="sticky">
         <List>
           <Toolbar>
@@ -125,9 +140,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
             <IconButton onClick={handleClickToday}>
               <TodayIcon />
             </IconButton>
-            <IconButton>
-              <MoreVertIcon />
-            </IconButton>
+            <ViewMenu/>
           </Toolbar>
         </List>
       </AppBar>
