@@ -19,7 +19,23 @@ import TodayIcon from "@material-ui/icons/Today";
 import { RouteComponentProps } from "@reach/router";
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
-import TemporaryDrawer from "./TemporaryDrawer";
+import TemporaryDrawer from "../TemporaryDrawer";
+import Event from "../calendar/Event";
+import Location from "../calendar/Location";
+
+interface HttpResponse<T> extends Response {
+  parsedBody?: T;
+}
+async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
+  const response: HttpResponse<T> = await fetch(request);
+  try {
+    response.parsedBody = await response.json();
+  } catch (exception) {}
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+  return response;
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,11 +50,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const fakeEventDate = (offset: number) => {
-  const date = new Date();
-  date.setHours(date.getHours() + offset);
-  return date;
-};
 const getCurrentTimeString = () => {
   const date = new Date();
   const timeString = date.toTimeString().split(" ")[0];
@@ -49,6 +60,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const [currentStart, setCurrentStart] = useState(new Date());
   const [pickerShowing, setPickerShowing] = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
 
@@ -65,6 +78,48 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     setDrawerIsOpen(!drawerIsOpen);
   };
 
+  async function fetchData() {
+    let response: HttpResponse<Event[]>;
+    try {
+      response = await http<Event[]>("/events");
+      if (!response.parsedBody) {
+        return;
+      }
+      const events = response.parsedBody.map(
+        (event) =>
+          new Event(
+            event.id,
+            event.start,
+            event.end,
+            event.location,
+            event.title
+          )
+      );
+      setEvents(events);
+    } catch (response) {
+      console.error(response);
+    }
+  }
+  async function fetchLocations() {
+    let response: HttpResponse<Location[]>;
+    try {
+      response = await http<Location[]>("/locations");
+      if (!response.parsedBody) {
+        return;
+      }
+      const locations = response.parsedBody.map((location) => {
+        const loc = new Location(location.name, location.name);
+        if (location.eventColor) {
+          loc.eventColor = "blue";
+        }
+        return loc;
+      });
+      setLocations(locations);
+    } catch (response) {
+      console.error(response);
+    }
+  }
+
   useEffect(() => {
     const calendar = calendarRef.current;
     if (!calendar) {
@@ -77,6 +132,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       return;
     }
     calendarApi.scrollToTime(getCurrentTimeString());
+    fetchData();
+    fetchLocations();
   }, []);
 
   const handleClickMonth = () => {
@@ -148,25 +205,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
             height="auto"
             defaultView="resourceTimeGridDay"
             plugins={[resourceTimeGridPlugin]}
-            events={[
-              {
-                resourceId: "a",
-                id: "a",
-                title: "My Event",
-                start: fakeEventDate(0),
-                end: fakeEventDate(3),
-              },
-            ]}
-            resources={[
-              {
-                id: "a",
-                title: "Room A",
-              },
-              {
-                id: "b",
-                title: "Room B",
-              },
-            ]}
+            events={events}
+            resources={locations}
             schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
           />
         </Box>
