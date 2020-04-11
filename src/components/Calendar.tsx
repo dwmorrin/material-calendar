@@ -19,7 +19,7 @@ import TodayIcon from "@material-ui/icons/Today";
 import { RouteComponentProps } from "@reach/router";
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
-import TemporaryDrawer from "../TemporaryDrawer";
+import TemporaryDrawer from "./TemporaryDrawer";
 import Event from "../calendar/Event";
 import Location from "../calendar/Location";
 
