@@ -13,6 +13,9 @@ import DateRangeIcon from '@material-ui/icons/DateRange';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import GroupIcon from '@material-ui/icons/Group';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+import HomeIcon from '@material-ui/icons/Home';
+import ConfirmationNumberIcon from '@material-ui/icons/ConfirmationNumber';
+import { ReactComponent as RND } from './icons8-home.svg';
 
 const useStyles = makeStyles({
   list: {
@@ -62,10 +65,16 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
         </List>
         <Divider />
         <List>
-          {["All mail", "Trash", "Spam"].map((text, index) => (
+          {["Studio 1", "Studio 2", "Studio 3", "Studio 4", "Outside Events"].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+              {(() => {
+              switch (index) {
+                  case 1:  return  <RND />
+                  case 4:  return <ConfirmationNumberIcon />;
+                  default: return <HomeIcon />;
+                }
+              })()}
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItem>
