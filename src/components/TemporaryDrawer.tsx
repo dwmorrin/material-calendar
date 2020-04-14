@@ -75,9 +75,9 @@ const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
         </List>
         <Divider />
         <List>
-          {["Studio 1", "Studio 2"].map((text) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
+          {state.locations.map((location) => (
+            <ListItem button key={location.id}>
+              <ListItemText primary={location.name} />
             </ListItem>
           ))}
         </List>
