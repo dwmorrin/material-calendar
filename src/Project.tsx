@@ -64,7 +64,24 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           open={drawerIsOpen}
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
-          pageContents={["Compression Project St3 Sp20", "Sound-Alike Phase 1 St3 Sp20", "Sound-Alike Phase 2 St3 Sp20", "Sound-Alike Phase 3 St3 Sp20"]}
+          pageContents={[
+            {
+              id: 'Compression Project St3 Sp20',
+              title: 'Compression Project St3 Sp20'
+            },
+            {
+              id: 'Sound-Alike Phase 1 St3 Sp20',
+              title: 'Sound-Alike Phase 1 St3 Sp20'
+            },
+            {
+              id: 'Sound-Alike Phase 2 St3 Sp20',
+              title: 'Sound-Alike Phase 2 St3 Sp20'
+            },
+            {
+              id: 'Sound-Alike Phase 3 St3 Sp20',
+              title: 'Sound-Alike Phase 3 St3 Sp20'
+            }
+          ]}
         />
       </div>
       <AppBar position="sticky">
