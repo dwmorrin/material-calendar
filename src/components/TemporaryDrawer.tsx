@@ -16,15 +16,19 @@ const useStyles = makeStyles({
   },
 });
 
-interface ITemporaryDrawerProps {
+interface TemporaryDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
+  onClick: () => void;
+  onKeyDown: () => void;
 }
-const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
+const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
   open,
   onClose,
   onOpen,
+  onClick,
+  onKeyDown,
 }) => {
   const classes = useStyles();
 
@@ -34,10 +38,12 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
       anchor="left"
       onClose={onClose}
       onOpen={onOpen}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
     >
       <div className={clsx(classes.list)} role="presentation">
         <List>
-          {["Schedule", "Day", "Week", "Month"].map((text, index) => (
+          {["Schedule", "Day", "Week", "Month"].map((text) => (
             <ListItem button key={text}>
               <ListItemText primary={text} />
             </ListItem>
@@ -45,7 +51,7 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
         </List>
         <Divider />
         <List>
-          {["Studio 1", "Studio 2"].map((text, index) => (
+          {["Studio 1", "Studio 2"].map((text) => (
             <ListItem button key={text}>
               <ListItemText primary={text} />
             </ListItem>

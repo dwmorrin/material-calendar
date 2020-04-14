@@ -1,10 +1,4 @@
-import React, {
-  FunctionComponent,
-  useEffect,
-  useRef,
-  useReducer,
-  ChangeEvent,
-} from "react";
+import React, { FunctionComponent, useEffect, useReducer, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import FullCalendar from "@fullcalendar/react";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
@@ -18,6 +12,7 @@ import {
   IconButton,
   Typography,
   Button,
+  CircularProgress,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
@@ -26,9 +21,9 @@ import { RouteComponentProps } from "@reach/router";
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import TemporaryDrawer from "./TemporaryDrawer";
-import Event from "../calendar/Event";
-import Location from "../calendar/Location";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
+import calendarReducer from "../calendar/Reducer";
+import { CalendarAction, CalendarState } from "../calendar/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,158 +38,28 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const getCurrentTimeString = (): string => {
-  const date = new Date();
-  const timeString = date.toTimeString().split(" ")[0];
-  return timeString;
-};
-
-enum CalendarAction {
-  Error,
-  Loading,
-  PickedDate,
-  ReceivedEvents,
-  ReceivedLocations,
-  ToggleDrawer,
-  TogglePicker,
-  ViewToday,
-}
-
-interface CalendarState {
-  currentStart: Date;
-  drawerIsOpen: boolean;
-  events: Event[];
-  locations: Location[];
-  pickerShowing: boolean;
-  ref: React.RefObject<FullCalendar> | null;
-}
-
 const initialState: CalendarState = {
   currentStart: new Date(),
   drawerIsOpen: false,
   events: [],
+  loading: true,
   locations: [],
   pickerShowing: false,
   ref: null,
 };
 
-interface Action {
-  type: CalendarAction;
-  payload?: {
-    error?: Error;
-    currentStart?: Date;
-    drawerIsOpen?: boolean;
-    events?: Event[];
-    locations?: Location[];
-    pickerShowing?: boolean;
-    ref?: React.RefObject<FullCalendar> | null;
-  };
-  error?: boolean;
-}
-
-const reducer = (state: CalendarState, action: Action): CalendarState => {
-  if (action.type === CalendarAction.ViewToday) {
-    if (!state.ref || !state.ref.current) {
-      throw new Error("no calendar reference");
-    }
-    state.ref.current.getApi().today();
-    return { ...state, currentStart: new Date() };
-  }
-
-  if (action.type === CalendarAction.ReceivedEvents) {
-    if (!action.payload || !action.payload.events) {
-      throw new Error("no events in received events");
-    }
-    return {
-      ...state,
-      events: action.payload.events.map(
-        (event) =>
-          new Event(
-            event.id,
-            event.start,
-            event.end,
-            event.location,
-            event.title
-          )
-      ),
-    };
-  }
-
-  if (action.type === CalendarAction.ReceivedLocations) {
-    if (!action.payload || !action.payload.locations) {
-      throw new Error("no locations in received locations");
-    }
-    return {
-      ...state,
-      locations: action.payload.locations.map(
-        (location) => new Location(location.name, location.name)
-      ),
-    };
-  }
-
-  if (action.type === CalendarAction.ToggleDrawer) {
-    return { ...state, drawerIsOpen: !state.drawerIsOpen };
-  }
-
-  if (action.type === CalendarAction.TogglePicker) {
-    return { ...state, pickerShowing: !state.pickerShowing };
-  }
-
-  if (action.type === CalendarAction.PickedDate) {
-    if (!action.payload?.currentStart) {
-      throw new Error("no date returned from picker");
-    }
-    const currentStart = action.payload.currentStart;
-    return { ...state, currentStart, pickerShowing: !state.pickerShowing };
-  }
-
-  if (action.type === CalendarAction.Error) {
-    if (action.payload && action.payload.error) {
-      console.error(action.payload.error);
-    }
-  }
-  // CalendarAction.Loading
-  return state;
-};
-
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
-  const [state, dispatch] = useReducer(reducer, {
+  const [state, dispatch] = useReducer(calendarReducer, {
     ...initialState,
     ref: calendarRef,
   });
-  const toggleDrawer = () => (
-    event: React.KeyboardEvent | React.MouseEvent
-  ): void => {
-    if (
-      event.type === "keydown" &&
-      ((event as React.KeyboardEvent).key === "Tab" ||
-        (event as React.KeyboardEvent).key === "Shift")
-    ) {
-      return;
-    }
-    dispatch({
-      type: CalendarAction.ToggleDrawer,
-      payload: { drawerIsOpen: !state.drawerIsOpen },
-    });
-  };
 
   useEffect(() => {
-    const calendar = calendarRef.current;
-    if (!calendar) {
-      console.error("Calendar unavailable");
-      return;
-    }
-    const calendarApi = calendar.getApi();
-    if (!calendarApi) {
-      console.error("Calendar unavailable");
-      return;
-    }
     dispatch({
       type: CalendarAction.Loading,
     });
-    calendarApi.scrollToTime(getCurrentTimeString());
     fetch("/events")
       .then((response) => response.json())
       .then((events) =>
@@ -227,31 +92,17 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       );
   }, []);
 
-  const handleClickMonth = (): void => {
-    dispatch({ type: CalendarAction.TogglePicker });
-  };
-  const handleClickToday = (): void => {
-    dispatch({ type: CalendarAction.ViewToday });
-  };
-  const handleClickPicker = (date: MaterialUiPickersDate): void => {
-    dispatch({
-      type: CalendarAction.PickedDate,
-      payload: {
-        currentStart: date?.toDate(),
-      },
-    });
-  };
   return (
     <div className={classes.root}>
       <div>
         <TemporaryDrawer
           onClick={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
+          onOpen={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
+          onClose={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
           onKeyDown={(): void =>
-            console.log("TODO: add key handler for TemporaryDrawer")
+            dispatch({ type: CalendarAction.ToggleDrawer })
           }
           open={state.drawerIsOpen}
-          onOpen={toggleDrawer}
-          onClose={toggleDrawer}
         />
       </div>
       <AppBar position="sticky">
@@ -262,18 +113,30 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
               className={classes.menuButton}
               color="inherit"
               aria-label="menu"
-              onClick={toggleDrawer()}
+              onClick={(): void =>
+                dispatch({ type: CalendarAction.ToggleDrawer })
+              }
             >
               <MenuIcon />
             </IconButton>
-            <Button className={classes.title} onClick={handleClickMonth}>
+            <Button
+              className={classes.title}
+              onClick={(): void => {
+                dispatch({ type: CalendarAction.TogglePicker });
+              }}
+            >
               <Typography component="h6">
                 {state.currentStart.toLocaleString("default", {
                   month: "long",
+                  day: "numeric",
                 })}
               </Typography>
             </Button>
-            <IconButton onClick={handleClickToday}>
+            <IconButton
+              onClick={(): void => {
+                dispatch({ type: CalendarAction.ViewToday });
+              }}
+            >
               <TodayIcon />
             </IconButton>
             <IconButton>
@@ -287,27 +150,40 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <DatePicker
               value={state.currentStart}
-              onChange={handleClickPicker}
+              onChange={(date: MaterialUiPickersDate): void => {
+                dispatch({
+                  type: CalendarAction.PickedDate,
+                  payload: { currentStart: date?.toDate() },
+                });
+              }}
               variant="static"
             />
           </MuiPickersUtilsProvider>
         </Box>
       )}
       {!state.pickerShowing && (
-        <Box>
-          <FullCalendar
-            ref={calendarRef}
-            defaultDate={state.currentStart}
-            header={false}
-            allDaySlot={false}
-            nowIndicator={true}
-            height="auto"
-            defaultView="resourceTimeGridDay"
-            plugins={[resourceTimeGridPlugin]}
-            events={state.events}
-            resources={state.locations}
-            schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
-          />
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          flex="1"
+        >
+          {state.loading && <CircularProgress />}
+          {!state.loading && (
+            <FullCalendar
+              ref={calendarRef}
+              defaultDate={state.currentStart}
+              header={false}
+              allDaySlot={false}
+              nowIndicator={true}
+              height="auto"
+              defaultView="resourceTimeGridDay"
+              plugins={[resourceTimeGridPlugin]}
+              events={state.events}
+              resources={state.locations}
+              schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
+            />
+          )}
         </Box>
       )}
     </div>
