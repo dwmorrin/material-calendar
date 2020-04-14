@@ -5,7 +5,6 @@ import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import "@fullcalendar/core/main.css";
 import "@fullcalendar/timegrid/main.css";
 import { Box, CircularProgress } from "@material-ui/core";
-
 import { RouteComponentProps } from "@reach/router";
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
@@ -14,6 +13,7 @@ import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 import calendarReducer from "../calendar/Reducer";
 import { CalendarAction, CalendarState } from "../calendar/types";
 import CalendarBar from "./CalendarBar";
+import { fetchCalendarData } from "../calendar/Fetch";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -40,39 +40,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   });
 
   useEffect(() => {
-    dispatch({
-      type: CalendarAction.Loading,
-    });
-    fetch("/events")
-      .then((response) => response.json())
-      .then((events) =>
-        dispatch({
-          type: CalendarAction.ReceivedEvents,
-          payload: { events },
-        })
-      )
-      .catch((error) =>
-        dispatch({
-          type: CalendarAction.Error,
-          payload: { error },
-          error: true,
-        })
-      );
-    fetch("/locations")
-      .then((response) => response.json())
-      .then((locations) =>
-        dispatch({
-          type: CalendarAction.ReceivedLocations,
-          payload: { locations },
-        })
-      )
-      .catch((error) =>
-        dispatch({
-          type: CalendarAction.Error,
-          payload: { error },
-          error: true,
-        })
-      );
+    fetchCalendarData(dispatch, "/events");
+    fetchCalendarData(dispatch, "/locations");
   }, []);
 
   return (
