@@ -9,6 +9,15 @@ const calendarReducer = (
   if (action.type === CalendarAction.Loading) {
     return { ...state, loading: true };
   }
+  if (action.type === CalendarAction.ChangedView) {
+    if (!action.payload?.currentView) {
+      throw new Error("no view received in view change request");
+    }
+    if (state.ref?.current) {
+      state.ref.current.getApi().changeView(action.payload.currentView);
+    }
+    return { ...state, currentView: action.payload.currentView };
+  }
   if (action.type === CalendarAction.ViewToday) {
     if (state.ref?.current) {
       state.ref.current.getApi().today();

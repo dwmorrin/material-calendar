@@ -1,8 +1,12 @@
 import React, { FunctionComponent, useEffect, useReducer, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import listPlugin from "@fullcalendar/list";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import "@fullcalendar/core/main.css";
+import "@fullcalendar/daygrid/main.css";
+import "@fullcalendar/list/main.css";
 import "@fullcalendar/timegrid/main.css";
 import { Box, CircularProgress } from "@material-ui/core";
 import { RouteComponentProps } from "@reach/router";
@@ -23,6 +27,7 @@ const useStyles = makeStyles(() => ({
 
 const initialState: CalendarState = {
   currentStart: new Date(),
+  currentView: "resourceTimeGridDay",
   drawerIsOpen: false,
   events: [],
   loading: true,
@@ -47,6 +52,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   return (
     <div className={classes.root}>
       <TemporaryDrawer
+        dispatch={dispatch}
+        state={state}
         onClick={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
         onOpen={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
         onClose={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
@@ -87,7 +94,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
               nowIndicator={true}
               height="auto"
               defaultView="resourceTimeGridDay"
-              plugins={[resourceTimeGridPlugin]}
+              plugins={[dayGridPlugin, listPlugin, resourceTimeGridPlugin]}
               events={state.events}
               resources={state.locations}
               schedulerLicenseKey="GPL-My-Project-Is-Open-Source"

@@ -6,6 +6,12 @@ import List from "@material-ui/core/List";
 import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
 import { ListItemText } from "@material-ui/core";
+import {
+  Action,
+  CalendarAction,
+  CalendarState,
+  CalendarView,
+} from "../calendar/types";
 
 const useStyles = makeStyles({
   list: {
@@ -22,6 +28,8 @@ interface TemporaryDrawerProps {
   onOpen: () => void;
   onClick: () => void;
   onKeyDown: () => void;
+  dispatch: (action: Action) => void;
+  state: CalendarState;
 }
 const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
   open,
@@ -29,6 +37,8 @@ const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
   onOpen,
   onClick,
   onKeyDown,
+  dispatch,
+  state,
 }) => {
   const classes = useStyles();
 
@@ -43,9 +53,23 @@ const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
     >
       <div className={clsx(classes.list)} role="presentation">
         <List>
-          {["Schedule", "Day", "Week", "Month"].map((text) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
+          {[
+            ["Schedule", "listWeek"],
+            ["Day", "resourceTimeGridDay"],
+            ["Week", "resourceTimeGridWeek"],
+            ["Month", "dayGridMonth"],
+          ].map((tuple) => (
+            <ListItem
+              button
+              key={tuple[0]}
+              onClick={(): void =>
+                dispatch({
+                  type: CalendarAction.ChangedView,
+                  payload: { currentView: tuple[1] as CalendarView },
+                })
+              }
+            >
+              <ListItemText primary={tuple[0]} />
             </ListItem>
           ))}
         </List>

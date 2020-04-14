@@ -3,6 +3,7 @@ import Location from "./Location";
 import FullCalendar from "@fullcalendar/react";
 export enum CalendarAction {
   Error,
+  ChangedView,
   Loading,
   PickedDate,
   ReceivedEvents,
@@ -12,8 +13,15 @@ export enum CalendarAction {
   ViewToday,
 }
 
+export type CalendarView =
+  | "dayGridMonth"
+  | "listWeek"
+  | "resourceTimeGridDay"
+  | "resourceTimeGridWeek";
+
 export interface CalendarState {
   currentStart: Date;
+  currentView: string;
   drawerIsOpen: boolean;
   events: Event[];
   loading: boolean;
@@ -28,6 +36,7 @@ export interface Action {
   payload?: {
     error?: Error;
     currentStart?: Date;
+    currentView?: CalendarView;
     drawerIsOpen?: boolean;
     events?: Event[];
     locations?: Location[];
