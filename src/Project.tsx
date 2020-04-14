@@ -67,19 +67,38 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           pageContents={[
             {
               id: 'Compression Project St3 Sp20',
+              parentId: 'Engineering the Record',
               title: 'Compression Project St3 Sp20'
             },
             {
               id: 'Sound-Alike Phase 1 St3 Sp20',
+              parentId: 'Engineering the Record',
               title: 'Sound-Alike Phase 1 St3 Sp20'
             },
             {
               id: 'Sound-Alike Phase 2 St3 Sp20',
+              parentId: 'Engineering the Record',
               title: 'Sound-Alike Phase 2 St3 Sp20'
             },
             {
               id: 'Sound-Alike Phase 3 St3 Sp20',
+              parentId: 'Engineering the Record',
               title: 'Sound-Alike Phase 3 St3 Sp20'
+            },
+            {
+              id: 'Production Project 1 Sp20',
+              parentId: 'Producing the Record',
+              title: 'Production Project 1 Sp20'
+            },
+            {
+              id: 'Production Project 2 Sp20',
+              parentId: 'Producing the Record',
+              title: 'Production Project 2 Sp20'
+            },
+            {
+              id: 'PTR Mix Project Sp20',
+              parentId: 'Producing the Record',
+              title: 'PTR Mix Project Sp20'
             }
           ]}
         />

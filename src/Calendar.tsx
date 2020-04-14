@@ -105,10 +105,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           onClose={toggleDrawer}
           pageContents={[
             {
-              id: 'Studios',
-              title: 'Studios'
-            },
-            {
               id: 'Studio 1',
               parentId: 'Studios',
               title: 'Studio 1'
@@ -130,6 +126,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
             },
             {
               id: 'Outside Events',
+              parentId: 'Other',
               title: 'Outside Events'
             }
           ]}

@@ -14,6 +14,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import HomeIcon from '@material-ui/icons/Home';
 import ConfirmationNumberIcon from '@material-ui/icons/ConfirmationNumber';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import StudioPanel from "./StudioPanel";
 
 
 const useStyles = makeStyles({
@@ -29,7 +30,7 @@ interface ITemporaryDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
-  pageContents: ({ id: string; title: string } | { id: string; parentId: string; title: string })[];
+  pageContents: ({ id: string; parentId: string; title: string })[];
 }
 const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
   open,
@@ -44,6 +45,7 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
       anchor="left"
       onClose={onClose}
       onOpen={onOpen}
+      onClick={(event) => event.stopPropagation()}
     >
       <div className={clsx(classes.list)} role="presentation">
         <List>
@@ -65,7 +67,8 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
         </List>
         <Divider />
         <List>
-        {pageContents.map((item) => (
+        <StudioPanel pageContents={pageContents}/>
+        {/* {pageContents.map((item) => (
           <ListItem button key={item.id}>
           <ListItemIcon>
             {(() => {
@@ -82,7 +85,7 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
             </ListItemIcon>
           <ListItemText primary={item.title} />
         </ListItem>
-        ))}
+        ))} */}
         </ List>
       </div>
     </SwipeableDrawer>

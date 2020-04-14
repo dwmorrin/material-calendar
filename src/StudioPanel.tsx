@@ -24,7 +24,6 @@ const useStyles = makeStyles({
     pageContents,
   }) => {
     const parents = [... new Set(pageContents.map(items => items.parentId))];
-    console.log(parents);
     const classes = useStyles();
     return (
     <div className={classes.root}>
@@ -56,9 +55,7 @@ const useStyles = makeStyles({
               <ListItemText primary={location.title} />
             </ListItem>
             :
-            <ListItem button key="placeholder">
-              <ListItemText primary="placeholder" />
-            </ListItem>
+            void(0)
           ))}
         </List>
         </ExpansionPanelDetails>
