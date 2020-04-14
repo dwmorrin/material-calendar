@@ -5,7 +5,7 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import List from "@material-ui/core/List";
 import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
-import { ListItemText } from "@material-ui/core";
+import { ListItemText, Checkbox } from "@material-ui/core";
 import {
   Action,
   CalendarAction,
@@ -26,7 +26,7 @@ interface TemporaryDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
-  onClick: () => void;
+  onClick: (event: React.SyntheticEvent) => void;
   onKeyDown: () => void;
   dispatch: (action: Action) => void;
   state: CalendarState;
@@ -77,6 +77,24 @@ const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
         <List>
           {state.locations.map((location) => (
             <ListItem button key={location.id}>
+              <Checkbox
+                checked={location.selected}
+                onClick={(event: React.SyntheticEvent): void => {
+                  event.stopPropagation();
+                  dispatch({
+                    type: CalendarAction.SelectedLocation,
+                    payload: {
+                      locations: state.locations.map((loc) => {
+                        if (loc.id !== location.id) {
+                          return loc;
+                        }
+                        loc.selected = !loc.selected;
+                        return loc;
+                      }),
+                    },
+                  });
+                }}
+              />
               <ListItemText primary={location.name} />
             </ListItem>
           ))}

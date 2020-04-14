@@ -58,6 +58,13 @@ const calendarReducer = (
     };
   }
 
+  if (action.type === CalendarAction.SelectedLocation) {
+    if (!action.payload?.locations) {
+      throw new Error("no locations in selected location");
+    }
+    return { ...state, locations: action.payload.locations };
+  }
+
   if (action.type === CalendarAction.ToggleDrawer) {
     return { ...state, drawerIsOpen: !state.drawerIsOpen };
   }

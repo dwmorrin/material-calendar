@@ -54,7 +54,9 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       <TemporaryDrawer
         dispatch={dispatch}
         state={state}
-        onClick={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
+        onClick={(): void => {
+          dispatch({ type: CalendarAction.ToggleDrawer });
+        }}
         onOpen={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
         onClose={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
         onKeyDown={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
@@ -96,7 +98,9 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
               defaultView="resourceTimeGridDay"
               plugins={[dayGridPlugin, listPlugin, resourceTimeGridPlugin]}
               events={state.events}
-              resources={state.locations}
+              resources={state.locations.filter(
+                (location) => location.selected
+              )}
               schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
             />
           )}
