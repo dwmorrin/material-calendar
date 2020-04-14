@@ -29,7 +29,7 @@ interface ITemporaryDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
-  pageContents: string [];
+  pageContents: ({ id: string; title: string } | { id: string; parentId: string; title: string })[];
 }
 const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
   open,
@@ -38,7 +38,6 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
   pageContents,
 }) => {
   const classes = useStyles();
-
   return (
     <SwipeableDrawer
       open={open}
@@ -66,24 +65,25 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
         </List>
         <Divider />
         <List>
-          {pageContents.map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-              {(() => {
-              switch (text) {
-                  case "Studio 1":  return <HomeIcon />;
-                  case "Studio 2":  return <HomeIcon />;
-                  case "Studio 3":  return <HomeIcon />;
-                  case "Studio 4":  return <HomeIcon />;
-                  case "Outside Events":  return <ConfirmationNumberIcon />;
-                  default: return <AssignmentIcon />;
-                }
-              })()}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
+        {pageContents.map((item) => (
+          <ListItem button key={item.id}>
+          <ListItemIcon>
+            {(() => {
+              switch (item.id) {
+                case "Studios":   return <HomeIcon />;
+                case "Studio 1":  return <HomeIcon />;
+                case "Studio 2":  return <HomeIcon />;
+                case "Studio 3":  return <HomeIcon />;
+                case "Studio 4":  return <HomeIcon />;
+                case "Outside Events":  return <ConfirmationNumberIcon />;
+                default: return <AssignmentIcon />;
+              }
+            })()}
+            </ListItemIcon>
+          <ListItemText primary={item.title} />
+        </ListItem>
+        ))}
+        </ List>
       </div>
     </SwipeableDrawer>
   );

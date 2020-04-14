@@ -103,7 +103,36 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           open={drawerIsOpen}
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
-          pageContents={["Studio 1", "Studio 2", "Studio 3", "Studio 4", "Outside Events"]}
+          pageContents={[
+            {
+              id: 'Studios',
+              title: 'Studios'
+            },
+            {
+              id: 'Studio 1',
+              parentId: 'Studios',
+              title: 'Studio 1'
+            },
+            {
+              id: 'Studio 2',
+              parentId: 'Studios',
+              title: 'Studio 2'
+            },
+            {
+              id: 'Studio 3',
+              parentId: 'Studios',
+              title: 'Studio 3'
+            },
+            {
+              id: 'Studio 4',
+              parentId: 'Studios',
+              title: 'Studio 4'
+            },
+            {
+              id: 'Outside Events',
+              title: 'Outside Events'
+            }
+          ]}
         />
       </div>
       <AppBar position="sticky">
