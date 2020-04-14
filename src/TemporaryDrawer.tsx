@@ -13,7 +13,7 @@ import GroupIcon from '@material-ui/icons/Group';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import HomeIcon from '@material-ui/icons/Home';
 import ConfirmationNumberIcon from '@material-ui/icons/ConfirmationNumber';
-import StudioPanel from './StudioPanel';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 
 
 const useStyles = makeStyles({
@@ -29,11 +29,13 @@ interface ITemporaryDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
+  pageContents: string [];
 }
 const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
   open,
   onClose,
   onOpen,
+  pageContents,
 }) => {
   const classes = useStyles();
 
@@ -64,13 +66,17 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
         </List>
         <Divider />
         <List>
-          {["Studio 1", "Studio 2", "Studio 3", "Studio 4", "Outside Events"].map((text, index) => (
+          {pageContents.map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>
               {(() => {
-              switch (index) {
-                  case 4:  return <ConfirmationNumberIcon />;
-                  default: return <HomeIcon />;
+              switch (text) {
+                  case "Studio 1":  return <HomeIcon />;
+                  case "Studio 2":  return <HomeIcon />;
+                  case "Studio 3":  return <HomeIcon />;
+                  case "Studio 4":  return <HomeIcon />;
+                  case "Outside Events":  return <ConfirmationNumberIcon />;
+                  default: return <AssignmentIcon />;
                 }
               })()}
               </ListItemIcon>
