@@ -1,67 +1,70 @@
-import React from 'react';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import React, { FunctionComponent } from "react";
+import { makeStyles } from '@material-ui/core/styles';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import Typography from '@material-ui/core/Typography';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import List from "@material-ui/core/List";
+import Divider from "@material-ui/core/Divider";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
-    },
-    heading: {
-      fontSize: theme.typography.pxToRem(15),
-      fontWeight: theme.typography.fontWeightRegular,
-    },
-  }),
-);
-
-export default function SimpleExpansionPanel() {
-  const classes = useStyles();
-
-  return (
+const useStyles = makeStyles({
+  root: {
+    width: '100%',
+  },
+});
+  interface IStudioPanelProps {
+    pageContents: ( { id: string; parentId: string; title: string })[];
+  }
+  const StudioPanel: FunctionComponent<IStudioPanelProps> = ({
+    pageContents,
+  }) => {
+    const parents = [... new Set(pageContents.map(items => items.parentId))];
+    console.log(parents);
+    const classes = useStyles();
+    return (
     <div className={classes.root}>
+      {parents.map((parent, index) =>
       <ExpansionPanel>
         <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
+          aria-label="Expand"
+          aria-controls="additional-actions1-content"
+          id="additional-actions1-header"
         >
-          <Typography className={classes.heading}>Expansion Panel 1</Typography>
+          <FormControlLabel
+            aria-label="Acknowledge"
+            onClick={(event) => event.stopPropagation()}
+            onFocus={(event) => event.stopPropagation()}
+            control={<Checkbox />}
+            label={parent}
+          />
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-            sit amet blandit leo lobortis eget.
-          </Typography>
+        <List>
+          {pageContents.map(location => (
+            location.parentId===parent ?
+            <ListItem button key={location.id}>
+              <Checkbox
+        size="small"
+        inputProps={{ 'aria-label': 'checkbox with small size' }}
+      />
+              <ListItemText primary={location.title} />
+            </ListItem>
+            :
+            <ListItem button key="placeholder">
+              <ListItemText primary="placeholder" />
+            </ListItem>
+          ))}
+        </List>
         </ExpansionPanelDetails>
       </ExpansionPanel>
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2a-content"
-          id="panel2a-header"
-        >
-          <Typography className={classes.heading}>Expansion Panel 2</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-            sit amet blandit leo lobortis eget.
-          </Typography>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      <ExpansionPanel disabled>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel3a-content"
-          id="panel3a-header"
-        >
-          <Typography className={classes.heading}>Disabled Expansion Panel</Typography>
-        </ExpansionPanelSummary>
-      </ExpansionPanel>
+      )}
     </div>
   );
-}
+};
+export default StudioPanel;
