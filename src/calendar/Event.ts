@@ -11,6 +11,25 @@ class Event implements EventInput {
   ) {
     this.resourceId = location;
   }
+  [extendedProp: string]: unknown;
+  allDay?: boolean | undefined;
+  allow?: import("./Core").AllowFunc | undefined;
+  backgroundColor?: string | undefined;
+  borderColor?: string | undefined;
+  className?: string | string[] | undefined;
+  classNames?: string | string[] | undefined;
+  color?: string | undefined;
+  constraint?: string | EventInput | EventInput[] | undefined;
+  date?: string | number | Date | number[] | undefined;
+  durationEditable?: boolean | undefined;
+  editable?: boolean | undefined;
+  extendedProps?: object | undefined;
+  groupId?: string | number | undefined;
+  overlap?: boolean | undefined;
+  rendering?: "" | "background" | "none" | "inverse-background" | undefined;
+  startEditable?: boolean | undefined;
+  textColor?: string | undefined;
+  url?: string | undefined;
 }
 
 export default Event;

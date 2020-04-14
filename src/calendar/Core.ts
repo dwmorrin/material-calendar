@@ -42,7 +42,7 @@ export interface EventNonDateInput extends UnscopedEventUiInput {
   url?: string;
   rendering?: EventRenderingChoice;
   extendedProps?: object;
-  [extendedProp: string]: any;
+  [extendedProp: string]: unknown;
 }
 export interface EventDateInput {
   start?: DateInput;
