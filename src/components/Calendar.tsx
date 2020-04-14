@@ -1,4 +1,10 @@
-import React, { FunctionComponent, useEffect, useRef, useReducer } from "react";
+import React, {
+  FunctionComponent,
+  useEffect,
+  useRef,
+  useReducer,
+  ChangeEvent,
+} from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import FullCalendar from "@fullcalendar/react";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
@@ -22,6 +28,7 @@ import MomentUtils from "@date-io/moment";
 import TemporaryDrawer from "./TemporaryDrawer";
 import Event from "../calendar/Event";
 import Location from "../calendar/Location";
+import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,6 +52,7 @@ const getCurrentTimeString = (): string => {
 enum CalendarAction {
   Error,
   Loading,
+  PickedDate,
   ReceivedEvents,
   ReceivedLocations,
   ToggleDrawer,
@@ -132,6 +140,14 @@ const reducer = (state: CalendarState, action: Action): CalendarState => {
     return { ...state, pickerShowing: !state.pickerShowing };
   }
 
+  if (action.type === CalendarAction.PickedDate) {
+    if (!action.payload?.currentStart) {
+      throw new Error("no date returned from picker");
+    }
+    const currentStart = action.payload.currentStart;
+    return { ...state, currentStart, pickerShowing: !state.pickerShowing };
+  }
+
   if (action.type === CalendarAction.Error) {
     if (action.payload && action.payload.error) {
       console.error(action.payload.error);
@@ -212,13 +228,18 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   }, []);
 
   const handleClickMonth = (): void => {
-    dispatch({
-      type: CalendarAction.TogglePicker,
-      payload: { pickerShowing: !state.pickerShowing },
-    });
+    dispatch({ type: CalendarAction.TogglePicker });
   };
   const handleClickToday = (): void => {
     dispatch({ type: CalendarAction.ViewToday });
+  };
+  const handleClickPicker = (date: MaterialUiPickersDate): void => {
+    dispatch({
+      type: CalendarAction.PickedDate,
+      payload: {
+        currentStart: date?.toDate(),
+      },
+    });
   };
   return (
     <div className={classes.root}>
@@ -266,7 +287,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <DatePicker
               value={state.currentStart}
-              onChange={handleClickMonth}
+              onChange={handleClickPicker}
+              variant="static"
             />
           </MuiPickersUtilsProvider>
         </Box>
@@ -275,6 +297,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         <Box>
           <FullCalendar
             ref={calendarRef}
+            defaultDate={state.currentStart}
             header={false}
             allDaySlot={false}
             nowIndicator={true}
