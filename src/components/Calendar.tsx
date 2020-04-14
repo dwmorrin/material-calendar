@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState, useRef } from "react";
+import React, { FunctionComponent, useEffect, useRef, useReducer } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import FullCalendar from "@fullcalendar/react";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
@@ -23,20 +23,6 @@ import TemporaryDrawer from "./TemporaryDrawer";
 import Event from "../calendar/Event";
 import Location from "../calendar/Location";
 
-interface HttpResponse<T> extends Response {
-  parsedBody?: T;
-}
-async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
-  const response: HttpResponse<T> = await fetch(request);
-  try {
-    response.parsedBody = await response.json();
-  } catch (exception) {}
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
-  return response;
-}
-
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -50,42 +36,70 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const getCurrentTimeString = () => {
+const getCurrentTimeString = (): string => {
   const date = new Date();
   const timeString = date.toTimeString().split(" ")[0];
   return timeString;
 };
 
-const Calendar: FunctionComponent<RouteComponentProps> = () => {
-  const [currentStart, setCurrentStart] = useState(new Date());
-  const [pickerShowing, setPickerShowing] = useState(false);
-  const [drawerIsOpen, setDrawerIsOpen] = useState(false);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const classes = useStyles();
-  const calendarRef = useRef<FullCalendar>(null);
+enum CalendarAction {
+  Error,
+  Loading,
+  ReceivedEvents,
+  ReceivedLocations,
+  ToggleDrawer,
+  TogglePicker,
+  ViewToday,
+}
 
-  const toggleDrawer = () => (
-    event: React.KeyboardEvent | React.MouseEvent
-  ) => {
-    if (
-      event.type === "keydown" &&
-      ((event as React.KeyboardEvent).key === "Tab" ||
-        (event as React.KeyboardEvent).key === "Shift")
-    ) {
-      return;
-    }
-    setDrawerIsOpen(!drawerIsOpen);
+interface CalendarState {
+  currentStart: Date;
+  drawerIsOpen: boolean;
+  events: Event[];
+  locations: Location[];
+  pickerShowing: boolean;
+  ref: React.RefObject<FullCalendar> | null;
+}
+
+const initialState: CalendarState = {
+  currentStart: new Date(),
+  drawerIsOpen: false,
+  events: [],
+  locations: [],
+  pickerShowing: false,
+  ref: null,
+};
+
+interface Action {
+  type: CalendarAction;
+  payload?: {
+    error?: Error;
+    currentStart?: Date;
+    drawerIsOpen?: boolean;
+    events?: Event[];
+    locations?: Location[];
+    pickerShowing?: boolean;
+    ref?: React.RefObject<FullCalendar> | null;
   };
+  error?: boolean;
+}
 
-  async function fetchData() {
-    let response: HttpResponse<Event[]>;
-    try {
-      response = await http<Event[]>("/events");
-      if (!response.parsedBody) {
-        return;
-      }
-      const events = response.parsedBody.map(
+const reducer = (state: CalendarState, action: Action): CalendarState => {
+  if (action.type === CalendarAction.ViewToday) {
+    if (!state.ref || !state.ref.current) {
+      throw new Error("no calendar reference");
+    }
+    state.ref.current.getApi().today();
+    return { ...state, currentStart: new Date() };
+  }
+
+  if (action.type === CalendarAction.ReceivedEvents) {
+    if (!action.payload || !action.payload.events) {
+      throw new Error("no events in received events");
+    }
+    return {
+      ...state,
+      events: action.payload.events.map(
         (event) =>
           new Event(
             event.id,
@@ -94,31 +108,61 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
             event.location,
             event.title
           )
-      );
-      setEvents(events);
-    } catch (response) {
-      console.error(response);
+      ),
+    };
+  }
+
+  if (action.type === CalendarAction.ReceivedLocations) {
+    if (!action.payload || !action.payload.locations) {
+      throw new Error("no locations in received locations");
+    }
+    return {
+      ...state,
+      locations: action.payload.locations.map(
+        (location) => new Location(location.name, location.name)
+      ),
+    };
+  }
+
+  if (action.type === CalendarAction.ToggleDrawer) {
+    return { ...state, drawerIsOpen: !state.drawerIsOpen };
+  }
+
+  if (action.type === CalendarAction.TogglePicker) {
+    return { ...state, pickerShowing: !state.pickerShowing };
+  }
+
+  if (action.type === CalendarAction.Error) {
+    if (action.payload && action.payload.error) {
+      console.error(action.payload.error);
     }
   }
-  async function fetchLocations() {
-    let response: HttpResponse<Location[]>;
-    try {
-      response = await http<Location[]>("/locations");
-      if (!response.parsedBody) {
-        return;
-      }
-      const locations = response.parsedBody.map((location) => {
-        const loc = new Location(location.name, location.name);
-        if (location.eventColor) {
-          loc.eventColor = "blue";
-        }
-        return loc;
-      });
-      setLocations(locations);
-    } catch (response) {
-      console.error(response);
+  // CalendarAction.Loading
+  return state;
+};
+
+const Calendar: FunctionComponent<RouteComponentProps> = () => {
+  const classes = useStyles();
+  const calendarRef = useRef<FullCalendar>(null);
+  const [state, dispatch] = useReducer(reducer, {
+    ...initialState,
+    ref: calendarRef,
+  });
+  const toggleDrawer = () => (
+    event: React.KeyboardEvent | React.MouseEvent
+  ): void => {
+    if (
+      event.type === "keydown" &&
+      ((event as React.KeyboardEvent).key === "Tab" ||
+        (event as React.KeyboardEvent).key === "Shift")
+    ) {
+      return;
     }
-  }
+    dispatch({
+      type: CalendarAction.ToggleDrawer,
+      payload: { drawerIsOpen: !state.drawerIsOpen },
+    });
+  };
 
   useEffect(() => {
     const calendar = calendarRef.current;
@@ -131,33 +175,60 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       console.error("Calendar unavailable");
       return;
     }
+    dispatch({
+      type: CalendarAction.Loading,
+    });
     calendarApi.scrollToTime(getCurrentTimeString());
-    fetchData();
-    fetchLocations();
+    fetch("/events")
+      .then((response) => response.json())
+      .then((events) =>
+        dispatch({
+          type: CalendarAction.ReceivedEvents,
+          payload: { events },
+        })
+      )
+      .catch((error) =>
+        dispatch({
+          type: CalendarAction.Error,
+          payload: { error },
+          error: true,
+        })
+      );
+    fetch("/locations")
+      .then((response) => response.json())
+      .then((locations) =>
+        dispatch({
+          type: CalendarAction.ReceivedLocations,
+          payload: { locations },
+        })
+      )
+      .catch((error) =>
+        dispatch({
+          type: CalendarAction.Error,
+          payload: { error },
+          error: true,
+        })
+      );
   }, []);
 
-  const handleClickMonth = () => {
-    setPickerShowing(!pickerShowing);
+  const handleClickMonth = (): void => {
+    dispatch({
+      type: CalendarAction.TogglePicker,
+      payload: { pickerShowing: !state.pickerShowing },
+    });
   };
-  const handleClickToday = () => {
-    const calendar = calendarRef.current;
-    if (!calendar) {
-      console.error("Calendar unavailable");
-      return;
-    }
-    const calendarApi = calendar.getApi();
-    if (!calendarApi) {
-      console.error("Calendar unavailable");
-      return;
-    }
-    calendarApi.scrollToTime(getCurrentTimeString());
-    setCurrentStart(calendarApi.view.currentStart);
+  const handleClickToday = (): void => {
+    dispatch({ type: CalendarAction.ViewToday });
   };
   return (
     <div className={classes.root}>
-      <div onClick={() => setDrawerIsOpen(!drawerIsOpen)}>
+      <div>
         <TemporaryDrawer
-          open={drawerIsOpen}
+          onClick={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
+          onKeyDown={(): void =>
+            console.log("TODO: add key handler for TemporaryDrawer")
+          }
+          open={state.drawerIsOpen}
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
         />
@@ -176,7 +247,9 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
             </IconButton>
             <Button className={classes.title} onClick={handleClickMonth}>
               <Typography component="h6">
-                {currentStart.toLocaleString("default", { month: "long" })}
+                {state.currentStart.toLocaleString("default", {
+                  month: "long",
+                })}
               </Typography>
             </Button>
             <IconButton onClick={handleClickToday}>
@@ -188,14 +261,17 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           </Toolbar>
         </List>
       </AppBar>
-      {pickerShowing && (
+      {state.pickerShowing && (
         <Box>
           <MuiPickersUtilsProvider utils={MomentUtils}>
-            <DatePicker value={currentStart} onChange={handleClickMonth} />
+            <DatePicker
+              value={state.currentStart}
+              onChange={handleClickMonth}
+            />
           </MuiPickersUtilsProvider>
         </Box>
       )}
-      {!pickerShowing && (
+      {!state.pickerShowing && (
         <Box>
           <FullCalendar
             ref={calendarRef}
@@ -205,8 +281,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
             height="auto"
             defaultView="resourceTimeGridDay"
             plugins={[resourceTimeGridPlugin]}
-            events={events}
-            resources={locations}
+            events={state.events}
+            resources={state.locations}
             schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
           />
         </Box>
