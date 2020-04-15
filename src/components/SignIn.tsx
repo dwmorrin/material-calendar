@@ -38,7 +38,7 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
   const classes = useStyles();
 
   // TODO this just navigates to /calendar, it should be authenticating the user
-  const submitHandler = (submitEvent: { preventDefault: () => void }) => {
+  const submitHandler = (submitEvent: { preventDefault: () => void }): void => {
     submitEvent.preventDefault();
     navigate("/calendar");
   };
@@ -66,7 +66,6 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
             label={process.env.REACT_APP_EMAIL_LABEL}
             name="email"
             autoComplete="email"
-            autoFocus
           />
           <TextField
             variant="outlined"
