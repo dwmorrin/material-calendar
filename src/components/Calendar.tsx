@@ -18,6 +18,7 @@ import calendarReducer from "../calendar/Reducer";
 import { CalendarAction, CalendarState } from "../calendar/types";
 import CalendarBar from "./CalendarBar";
 import { fetchCalendarData } from "../calendar/Fetch";
+import { makeSelectedLocationDict } from "../calendar/Location";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -97,8 +98,20 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
               nowIndicator={true}
               height="parent"
               defaultView="resourceTimeGridDay"
-              plugins={[dayGridPlugin, listPlugin, resourceTimeGridPlugin]}
-              events={state.events}
+              events={(_, successCallback): void => {
+                if (state.currentView.indexOf("resource") !== 0) {
+                  const selectedLocations = makeSelectedLocationDict(
+                    state.locations
+                  );
+                  successCallback(
+                    state.events.filter(
+                      (event) => selectedLocations[event.resourceId]
+                    )
+                  );
+                } else {
+                  successCallback(state.events);
+                }
+              }}
               resources={state.locations.filter(
                 (location) => location.selected
               )}
