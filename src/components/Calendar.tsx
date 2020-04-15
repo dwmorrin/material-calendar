@@ -85,6 +85,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           justifyContent="center"
           alignItems="center"
           flex="1"
+          height="93vh" // important for FullCalendar sticky header & scrolling
         >
           {state.loading && <CircularProgress />}
           {!state.loading && (
@@ -94,7 +95,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
               header={false}
               allDaySlot={false}
               nowIndicator={true}
-              height="auto"
+              height="parent"
               defaultView="resourceTimeGridDay"
               plugins={[dayGridPlugin, listPlugin, resourceTimeGridPlugin]}
               events={state.events}
