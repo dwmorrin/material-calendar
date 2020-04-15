@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useContext } from "react";
-import { Action, CalendarAction, CalendarState } from "../calendar/types";
+import { CalendarAction, CalendarUIProps } from "../calendar/types";
 import {
   AppBar,
   List,
@@ -24,12 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type CalendarBarProps = {
-  dispatch: (action: Action) => void;
-  state: CalendarState;
-};
-
-const CalendarBar: FunctionComponent<CalendarBarProps> = ({
+const CalendarBar: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {

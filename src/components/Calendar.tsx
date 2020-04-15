@@ -16,16 +16,14 @@ import "@fullcalendar/list/main.css";
 import "@fullcalendar/timegrid/main.css";
 import { Box, CircularProgress } from "@material-ui/core";
 import { RouteComponentProps, Redirect } from "@reach/router";
-import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
 import TemporaryDrawer from "./TemporaryDrawer";
-import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 import calendarReducer from "../calendar/Reducer";
 import { CalendarAction, CalendarState } from "../calendar/types";
 import CalendarBar from "./CalendarBar";
 import { fetchCalendarData } from "../calendar/Fetch";
 import { makeSelectedLocationDict } from "../calendar/Location";
 import { AuthContext } from "./AuthContext";
+import StaticDatePicker from "./DatePicker";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -77,20 +75,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       />
       <CalendarBar dispatch={dispatch} state={state} />
       {state.pickerShowing && (
-        <Box>
-          <MuiPickersUtilsProvider utils={MomentUtils}>
-            <DatePicker
-              value={state.currentStart}
-              onChange={(date: MaterialUiPickersDate): void => {
-                dispatch({
-                  type: CalendarAction.PickedDate,
-                  payload: { currentStart: date?.toDate() },
-                });
-              }}
-              variant="static"
-            />
-          </MuiPickersUtilsProvider>
-        </Box>
+          <StaticDatePicker dispatch={dispatch} state={state} />
       )}
       {!state.pickerShowing && (
         <Box

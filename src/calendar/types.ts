@@ -46,3 +46,8 @@ export interface Action {
   };
   error?: boolean;
 }
+
+export type CalendarUIProps = {
+  dispatch: (action: Action) => void;
+  state: CalendarState;
+};
