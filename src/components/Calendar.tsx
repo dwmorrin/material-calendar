@@ -45,7 +45,7 @@ const initialState: CalendarState = {
 };
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
-  const user = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(calendarReducer, {
@@ -54,13 +54,13 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   });
 
   useEffect(() => {
-    if (!user.id) return;
+    if (!user?.id) return;
     fetchCalendarData(dispatch, "/events");
     fetchCalendarData(dispatch, "/locations");
-  }, [user.id]);
+  }, [user]);
 
   return (
-    (user.id && (
+    (user?.id && (
     <div className={classes.root}>
       <TemporaryDrawer
         dispatch={dispatch}

@@ -1,5 +1,5 @@
 // NOTE this page will not be used if single-sign-on is implemented
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useContext } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -13,6 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { navigate, RouteComponentProps } from "@reach/router";
+import { AuthContext } from "./AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -35,12 +36,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SignIn: FunctionComponent<RouteComponentProps> = () => {
+  const { setUser } = useContext(AuthContext);
   const classes = useStyles();
 
-  // TODO this just navigates to /calendar, it should be authenticating the user
   const submitHandler = (submitEvent: { preventDefault: () => void }): void => {
     submitEvent.preventDefault();
-    navigate("/calendar");
+    fetch("/users")
+      .then((response) => response.json())
+      .then((user) => {
+        if (!setUser) {
+          throw new Error("no method to log in user found");
+        }
+        if (!user.id) {
+          throw new Error("invalid user id");
+        }
+        setUser(user);
+        navigate("/calendar");
+      })
+      .catch((error) => {
+        console.error(error);
+        // rerender this page with error in form
+      });
   };
 
   return (
