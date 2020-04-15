@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useContext } from "react";
 import { Action, CalendarAction, CalendarState } from "../calendar/types";
 import {
   AppBar,
@@ -12,6 +12,8 @@ import {
 import MenuIcon from "@material-ui/icons/Menu";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import TodayIcon from "@material-ui/icons/Today";
+import { AuthContext } from "./AuthContext";
+
 const useStyles = makeStyles((theme) => ({
   menuButton: {
     marginRIght: theme.spacing(2),
@@ -21,14 +23,17 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
   },
 }));
+
 type CalendarBarProps = {
   dispatch: (action: Action) => void;
   state: CalendarState;
 };
+
 const CalendarBar: FunctionComponent<CalendarBarProps> = ({
   dispatch,
   state,
 }) => {
+  const { setUser } = useContext(AuthContext);
   const classes = useStyles();
   return (
     <AppBar position="sticky">
@@ -65,7 +70,14 @@ const CalendarBar: FunctionComponent<CalendarBarProps> = ({
           >
             <TodayIcon />
           </IconButton>
-          <IconButton>
+          <IconButton
+            onClick={(): void => {
+              if (!setUser) {
+                throw new Error("no method to logout user");
+              }
+              setUser({ id: undefined });
+            }}
+          >
             <MoreVertIcon />
           </IconButton>
         </Toolbar>
