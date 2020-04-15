@@ -27,7 +27,8 @@ const useStyles = makeStyles({
     const classes = useStyles();
     return (
     <div className={classes.root}>
-      {parents.map((parent, index) =>
+      {parents.length > 1 ?
+      parents.map((parent, index) =>
       <ExpansionPanel>
         <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
@@ -60,7 +61,15 @@ const useStyles = makeStyles({
         </List>
         </ExpansionPanelDetails>
       </ExpansionPanel>
-      )}
+      )
+      :
+      <List>
+          {pageContents.map(item => (
+            <ListItem button key={item.id}>
+              <ListItemText primary={item.title} />
+            </ListItem>
+          ))}
+        </List>}
     </div>
   );
 };
