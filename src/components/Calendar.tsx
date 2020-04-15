@@ -1,4 +1,10 @@
-import React, { FunctionComponent, useEffect, useReducer, useRef } from "react";
+import React, {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+} from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -9,7 +15,7 @@ import "@fullcalendar/daygrid/main.css";
 import "@fullcalendar/list/main.css";
 import "@fullcalendar/timegrid/main.css";
 import { Box, CircularProgress } from "@material-ui/core";
-import { RouteComponentProps } from "@reach/router";
+import { RouteComponentProps, Redirect } from "@reach/router";
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import TemporaryDrawer from "./TemporaryDrawer";
@@ -19,6 +25,7 @@ import { CalendarAction, CalendarState } from "../calendar/types";
 import CalendarBar from "./CalendarBar";
 import { fetchCalendarData } from "../calendar/Fetch";
 import { makeSelectedLocationDict } from "../calendar/Location";
+import { AuthContext } from "./AuthContext";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -38,6 +45,7 @@ const initialState: CalendarState = {
 };
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
+  const user = useContext(AuthContext);
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(calendarReducer, {
@@ -46,11 +54,13 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   });
 
   useEffect(() => {
+    if (!user.id) return;
     fetchCalendarData(dispatch, "/events");
     fetchCalendarData(dispatch, "/locations");
-  }, []);
+  }, [user.id]);
 
   return (
+    (user.id && (
     <div className={classes.root}>
       <TemporaryDrawer
         dispatch={dispatch}
@@ -60,7 +70,9 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         }}
         onOpen={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
         onClose={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
-        onKeyDown={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
+          onKeyDown={(): void =>
+            dispatch({ type: CalendarAction.ToggleDrawer })
+          }
         open={state.drawerIsOpen}
       />
       <CalendarBar dispatch={dispatch} state={state} />
@@ -121,6 +133,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         </Box>
       )}
     </div>
+    )) || <Redirect to="/" replace={true} noThrow={true} />
   );
 };
 

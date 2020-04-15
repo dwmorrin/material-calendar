@@ -1,15 +1,18 @@
 import React from "react";
 import "typeface-roboto";
 import { Router } from "@reach/router";
+import AuthProvider from "./AuthContext";
 import SignIn from "./SignIn";
 import Calendar from "./Calendar";
 
-function App() {
+function App(): JSX.Element {
   return (
-    <Router>
-      <SignIn path="/" />
-      <Calendar path="/calendar" />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <SignIn path="/" />
+        <Calendar path="/calendar" />
+      </Router>
+    </AuthProvider>
   );
 }
 
