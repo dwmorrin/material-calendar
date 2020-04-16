@@ -12,6 +12,7 @@ import AssessmentIcon from "@material-ui/icons/Assessment";
 import GroupIcon from "@material-ui/icons/Group";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import StudioPanel from "./StudioPanel";
+import { navigate } from "@reach/router";
 
 const useStyles = makeStyles({
   list: {
@@ -21,6 +22,10 @@ const useStyles = makeStyles({
     width: "auto"
   }
 });
+
+function submitHandler(navigateTo: string): void {
+  navigate(navigateTo);
+}
 
 interface TemporaryDrawerProps {
   open: boolean;
@@ -43,13 +48,16 @@ const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
       anchor="left"
       onClose={onClose}
       onOpen={onOpen}
-      onClick={(event): void => event.stopPropagation()}
     >
       <div className={clsx(classes.list)} role="presentation">
         <List>
           {["Calendar", "Projects", "Groups", "Notifications"].map(
             (text, index) => (
-              <ListItem button key={text}>
+              <ListItem
+                button
+                key={text}
+                onClick={(): void => submitHandler(text.toLowerCase())}
+              >
                 <ListItemIcon>
                   {((): JSX.Element => {
                     switch (index) {

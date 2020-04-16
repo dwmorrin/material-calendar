@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const Project: FunctionComponent<RouteComponentProps> = () => {
+const Projects: FunctionComponent<RouteComponentProps> = () => {
   const pickerShowing = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
@@ -100,4 +100,4 @@ const Project: FunctionComponent<RouteComponentProps> = () => {
   );
 };
 
-export default Project;
+export default Projects;
