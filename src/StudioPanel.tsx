@@ -55,9 +55,9 @@ function createStandardList( pageContents: { id: string; parentId: string; title
     return (
     <div className={classes.root}>
       {parents.length > 1 ?
-      parents.map((parent) =>
-      createNestedList(parent, pageContents)
-      )
+      parents.map((parent) => {
+      return pageContents.filter((obj) => obj.parentId === parent).length > 1 ?  createNestedList(parent, pageContents) :  createStandardList(pageContents.filter((obj) => obj.parentId === parent))
+      })
       :
       createStandardList(pageContents)
     }
