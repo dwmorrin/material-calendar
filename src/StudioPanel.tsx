@@ -72,6 +72,7 @@ function createStandardList(
 
 interface StudioPanelProps {
   pageContents: { id: string; parentId: string; title: string }[];
+  panelType: "checkboxes" | "buttons";
 }
 const StudioPanel: FunctionComponent<StudioPanelProps> = ({ pageContents }) => {
   const parents = [...new Set(pageContents.map((items) => items.parentId))];

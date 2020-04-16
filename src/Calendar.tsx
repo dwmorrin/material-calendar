@@ -51,6 +51,78 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
+  const pageContents = [
+    {
+      id: "Studio 1",
+      parentId: "Studios",
+      title: "Studio 1"
+    },
+    {
+      id: "Studio 2",
+      parentId: "Studios",
+      title: "Studio 2"
+    },
+    {
+      id: "Studio 3",
+      parentId: "Studios",
+      title: "Studio 3"
+    },
+    {
+      id: "Studio 4",
+      parentId: "Studios",
+      title: "Studio 4"
+    },
+    {
+      id: "Edit Suite 1",
+      parentId: "Edit Suites",
+      title: "Edit Suite 1"
+    },
+    {
+      id: "Edit Suite 2",
+      parentId: "Edit Suites",
+      title: "Edit Suite 2"
+    },
+    {
+      id: "Edit Suite 3",
+      parentId: "Edit Suites",
+      title: "Edit Suite 3"
+    },
+    {
+      id: "Edit Suite 4",
+      parentId: "Edit Suites",
+      title: "Edit Suite 4"
+    },
+    {
+      id: "Edit Suite 5",
+      parentId: "Edit Suites",
+      title: "Edit Suite 5"
+    },
+    {
+      id: "Production Suite A",
+      parentId: "Production Suites",
+      title: "Production Suite A"
+    },
+    {
+      id: "Production Suite B",
+      parentId: "Production Suites",
+      title: "Production Suite B"
+    },
+    {
+      id: "Rehearsal Room 1",
+      parentId: "Rehearsal Rooms",
+      title: "Rehearsal Room 1"
+    },
+    {
+      id: "Rehearsal Room 2",
+      parentId: "Rehearsal Rooms",
+      title: "Rehearsal Room 2"
+    },
+    {
+      id: "Outside Events",
+      parentId: "Other",
+      title: "Outside Events"
+    }
+  ];
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -103,78 +175,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           open={drawerIsOpen}
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
-          pageContents={[
-            {
-              id: "Studio 1",
-              parentId: "Studios",
-              title: "Studio 1"
-            },
-            {
-              id: "Studio 2",
-              parentId: "Studios",
-              title: "Studio 2"
-            },
-            {
-              id: "Studio 3",
-              parentId: "Studios",
-              title: "Studio 3"
-            },
-            {
-              id: "Studio 4",
-              parentId: "Studios",
-              title: "Studio 4"
-            },
-            {
-              id: "Edit Suite 1",
-              parentId: "Edit Suites",
-              title: "Edit Suite 1"
-            },
-            {
-              id: "Edit Suite 2",
-              parentId: "Edit Suites",
-              title: "Edit Suite 2"
-            },
-            {
-              id: "Edit Suite 3",
-              parentId: "Edit Suites",
-              title: "Edit Suite 3"
-            },
-            {
-              id: "Edit Suite 4",
-              parentId: "Edit Suites",
-              title: "Edit Suite 4"
-            },
-            {
-              id: "Edit Suite 5",
-              parentId: "Edit Suites",
-              title: "Edit Suite 5"
-            },
-            {
-              id: "Production Suite A",
-              parentId: "Production Suites",
-              title: "Production Suite A"
-            },
-            {
-              id: "Production Suite B",
-              parentId: "Production Suites",
-              title: "Production Suite B"
-            },
-            {
-              id: "Rehearsal Room 1",
-              parentId: "Rehearsal Rooms",
-              title: "Rehearsal Room 1"
-            },
-            {
-              id: "Rehearsal Room 2",
-              parentId: "Rehearsal Rooms",
-              title: "Rehearsal Room 2"
-            },
-            {
-              id: "Outside Events",
-              parentId: "Other",
-              title: "Outside Events"
-            }
-          ]}
+          panelType={"checkboxes"}
+          pageContents={pageContents}
         />
       </div>
       <AppBar position="sticky">

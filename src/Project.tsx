@@ -7,7 +7,7 @@ import {
   Toolbar,
   IconButton,
   Typography,
-  Button,
+  Button
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import { RouteComponentProps } from "@reach/router";
@@ -15,21 +15,43 @@ import TemporaryDrawer from "./TemporaryDrawer";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   menuButton: {
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(2)
   },
   title: {
     flexGrow: 1,
-    color: "white",
-  },
+    color: "white"
+  }
 }));
 
 const Project: FunctionComponent<RouteComponentProps> = () => {
   const pickerShowing = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
+  const pageContents = [
+    {
+      id: "Compression Project St3 Sp20",
+      parentId: "Engineering the Record",
+      title: "Compression Project St3 Sp20"
+    },
+    {
+      id: "Sound-Alike Phase 1 St3 Sp20",
+      parentId: "Engineering the Record",
+      title: "Sound-Alike Phase 1 St3 Sp20"
+    },
+    {
+      id: "Sound-Alike Phase 2 St3 Sp20",
+      parentId: "Engineering the Record",
+      title: "Sound-Alike Phase 2 St3 Sp20"
+    },
+    {
+      id: "Sound-Alike Phase 3 St3 Sp20",
+      parentId: "Engineering the Record",
+      title: "Sound-Alike Phase 3 St3 Sp20"
+    }
+  ];
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -50,28 +72,8 @@ const Project: FunctionComponent<RouteComponentProps> = () => {
           open={drawerIsOpen}
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
-          pageContents={[
-            {
-              id: 'Compression Project St3 Sp20',
-              parentId: 'Engineering the Record',
-              title: 'Compression Project St3 Sp20'
-            },
-            {
-              id: 'Sound-Alike Phase 1 St3 Sp20',
-              parentId: 'Engineering the Record',
-              title: 'Sound-Alike Phase 1 St3 Sp20'
-            },
-            {
-              id: 'Sound-Alike Phase 2 St3 Sp20',
-              parentId: 'Engineering the Record',
-              title: 'Sound-Alike Phase 2 St3 Sp20'
-            },
-            {
-              id: 'Sound-Alike Phase 3 St3 Sp20',
-              parentId: 'Engineering the Record',
-              title: 'Sound-Alike Phase 3 St3 Sp20'
-            }
-          ]}
+          pageContents={pageContents}
+          panelType={"checkboxes"}
         />
       </div>
       <AppBar position="sticky">
@@ -87,19 +89,13 @@ const Project: FunctionComponent<RouteComponentProps> = () => {
               <MenuIcon />
             </IconButton>
             <Button className={classes.title}>
-              <Typography component="h6">
-              Compression Project St3 Sp20
-              </Typography>
+              <Typography component="h6">{pageContents[0].title}</Typography>
             </Button>
-            <IconButton>
-            </IconButton>
+            <IconButton></IconButton>
           </Toolbar>
         </List>
       </AppBar>
-      {pickerShowing && (
-        <Box>
-        </Box>
-      )}
+      {pickerShowing && <Box></Box>}
     </div>
   );
 };
