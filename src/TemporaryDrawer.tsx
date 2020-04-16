@@ -23,13 +23,13 @@ const useStyles = makeStyles({
   },
 });
 
-interface ITemporaryDrawerProps {
+interface TemporaryDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
   pageContents: ({ id: string; parentId: string; title: string })[];
 }
-const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
+const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
   open,
   onClose,
   onOpen,
@@ -42,14 +42,14 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
       anchor="left"
       onClose={onClose}
       onOpen={onOpen}
-      onClick={(event) => event.stopPropagation()}
+      onClick={(event): void => event.stopPropagation()}
     >
       <div className={clsx(classes.list)} role="presentation">
         <List>
           {["Calendar", "Projects", "Groups", "Notifications"].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>
-              {(() => {
+              {((): JSX.Element => {
                 switch (index) {
                   case 0:  return <DateRangeIcon />;
                   case 1:  return <AssessmentIcon />;
@@ -65,24 +65,6 @@ const TemporaryDrawer: FunctionComponent<ITemporaryDrawerProps> = ({
         <Divider />
         <List>
         <StudioPanel pageContents={pageContents}/>
-        {/* {pageContents.map((item) => (
-          <ListItem button key={item.id}>
-          <ListItemIcon>
-            {(() => {
-              switch (item.id) {
-                case "Studios":   return <HomeIcon />;
-                case "Studio 1":  return <HomeIcon />;
-                case "Studio 2":  return <HomeIcon />;
-                case "Studio 3":  return <HomeIcon />;
-                case "Studio 4":  return <HomeIcon />;
-                case "Outside Events":  return <ConfirmationNumberIcon />;
-                default: return <AssignmentIcon />;
-              }
-            })()}
-            </ListItemIcon>
-          <ListItemText primary={item.title} />
-        </ListItem>
-        ))} */}
         </ List>
       </div>
     </SwipeableDrawer>

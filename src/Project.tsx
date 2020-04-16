@@ -33,7 +33,7 @@ const Project: FunctionComponent<RouteComponentProps> = () => {
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
-  ) => {
+  ): void => {
     if (
       event.type === "keydown" &&
       ((event as React.KeyboardEvent).key === "Tab" ||
@@ -45,7 +45,7 @@ const Project: FunctionComponent<RouteComponentProps> = () => {
   };
   return (
     <div className={classes.root}>
-      <div onClick={() => setDrawerIsOpen(!drawerIsOpen)}>
+      <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
         <TemporaryDrawer
           open={drawerIsOpen}
           onOpen={toggleDrawer}

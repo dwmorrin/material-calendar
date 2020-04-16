@@ -34,12 +34,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const fakeEventDate = (offset: number) => {
+const fakeEventDate = (offset: number): Date => {
   const date = new Date();
   date.setHours(date.getHours() + offset);
   return date;
 };
-const getCurrentTimeString = () => {
+const getCurrentTimeString = (): string => {
   const date = new Date();
   const timeString = date.toTimeString().split(" ")[0];
   return timeString;
@@ -54,7 +54,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
-  ) => {
+  ): void => {
     if (
       event.type === "keydown" &&
       ((event as React.KeyboardEvent).key === "Tab" ||
@@ -79,10 +79,10 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     calendarApi.scrollToTime(getCurrentTimeString());
   }, []);
 
-  const handleClickMonth = () => {
+  const handleClickMonth = (): void => {
     setPickerShowing(!pickerShowing);
   };
-  const handleClickToday = () => {
+  const handleClickToday = (): void => {
     const calendar = calendarRef.current;
     if (!calendar) {
       console.error("Calendar unavailable");
@@ -98,7 +98,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   };
   return (
     <div className={classes.root}>
-      <div onClick={() => setDrawerIsOpen(!drawerIsOpen)}>
+      <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
         <TemporaryDrawer
           open={drawerIsOpen}
           onOpen={toggleDrawer}
