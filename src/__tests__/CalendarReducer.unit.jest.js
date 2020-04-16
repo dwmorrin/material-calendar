@@ -5,6 +5,7 @@ const now = new Date();
 const later = new Date();
 later.setDate(later.getDate() + 1);
 const initialState = {
+  currentEvent: { id: 1 },
   currentStart: now,
   currentView: "resourceTimeGridDay",
   drawerIsOpen: false,
@@ -16,6 +17,7 @@ const initialState = {
 };
 
 const modifiedState = {
+  currentEvent: { id: 2 },
   currentStart: later,
   currentView: "resourceTimeGridWeek",
   drawerIsOpen: true,

@@ -81,6 +81,13 @@ const calendarReducer = (
     return { ...state, currentStart, pickerShowing: !state.pickerShowing };
   }
 
+  if (action.type === CalendarAction.ViewEventDetail) {
+    if (!action.payload?.currentEvent) {
+      throw new Error("no event received for detail view");
+    }
+    return { ...state, currentEvent: action.payload.currentEvent };
+  }
+
   if (action.type === CalendarAction.Error) {
     if (action.payload && action.payload.error) {
       console.error(action.payload.error);

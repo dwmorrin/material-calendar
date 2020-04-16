@@ -11,6 +11,7 @@ export enum CalendarAction {
   SelectedLocation,
   ToggleDrawer,
   TogglePicker,
+  ViewEventDetail,
   ViewToday,
 }
 
@@ -21,6 +22,7 @@ export type CalendarView =
   | "resourceTimeGridWeek";
 
 export interface CalendarState {
+  currentEvent?: Event;
   currentStart: Date;
   currentView: string;
   drawerIsOpen: boolean;
@@ -36,6 +38,7 @@ export interface Action {
   type: CalendarAction;
   payload?: {
     error?: Error;
+    currentEvent?: Event;
     currentStart?: Date;
     currentView?: CalendarView;
     drawerIsOpen?: boolean;
