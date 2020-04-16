@@ -16,10 +16,10 @@ const useStyles = makeStyles({
   },
 });
 
-function createNestedList(parent: string, pageContents: { id: string; parentId: string; title: string; }[]): JSX.Element {
+function createNestedList(parent: string, pageContents: { id: string; parentId: string; title: string}[]): JSX.Element {
   return <ExpansionPanel>
     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-label="Expand" aria-controls="additional-actions1-content" id="additional-actions1-header">
-      <FormControlLabel aria-label="Acknowledge" onClick={(event) => event.stopPropagation()} onFocus={(event) => event.stopPropagation()} control={<Checkbox />} label={parent} />
+      <FormControlLabel aria-label="Acknowledge" onClick={(event): void => event.stopPropagation()} onFocus={(event): void => event.stopPropagation()} control={<Checkbox />} label={parent} />
     </ExpansionPanelSummary>
     <ExpansionPanelDetails>
       <List>
@@ -34,7 +34,7 @@ function createNestedList(parent: string, pageContents: { id: string; parentId: 
     </ExpansionPanelDetails>
   </ExpansionPanel>;
 }
-function createStandardList( pageContents: { id: string; parentId: string; title: string; }[]): JSX.Element {
+function createStandardList( pageContents: { id: string; parentId: string; title: string}[]): JSX.Element {
   return <List>
   {pageContents.map(item => (
     <ListItem button key={item.id}>
@@ -44,10 +44,10 @@ function createStandardList( pageContents: { id: string; parentId: string; title
 </List>;
 }
 
-  interface IStudioPanelProps {
+  interface StudioPanelProps {
     pageContents: ( { id: string; parentId: string; title: string })[];
   }
-  const StudioPanel: FunctionComponent<IStudioPanelProps> = ({
+  const StudioPanel: FunctionComponent<StudioPanelProps> = ({
     pageContents,
   }) => {
     const parents = [...new Set(pageContents.map(items => items.parentId))];
@@ -56,7 +56,7 @@ function createStandardList( pageContents: { id: string; parentId: string; title
     <div className={classes.root}>
       {parents.length > 1 ?
       parents.map((parent) => {
-      return pageContents.filter((obj) => obj.parentId === parent).length > 1 ?  createNestedList(parent, pageContents) :  createStandardList(pageContents.filter((obj) => obj.parentId === parent))
+      return pageContents.filter((obj) => obj.parentId === parent).length > 1 ?  createNestedList(parent, pageContents) :  createStandardList(pageContents.filter((obj) => obj.parentId === parent));
       })
       :
       createStandardList(pageContents)
