@@ -73,7 +73,7 @@ const Project: FunctionComponent<RouteComponentProps> = () => {
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
           pageContents={pageContents}
-          panelType={"checkboxes"}
+          panelType={"buttons"}
         />
       </div>
       <AppBar position="sticky">
