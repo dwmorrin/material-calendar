@@ -4,6 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 export enum CalendarAction {
   Error,
   ChangedView,
+  CloseEventDetail,
   Loading,
   PickedDate,
   ReceivedEvents,
@@ -25,6 +26,7 @@ export interface CalendarState {
   currentEvent?: Event;
   currentStart: Date;
   currentView: string;
+  detailIsOpen: boolean;
   drawerIsOpen: boolean;
   events: Event[];
   loading: boolean;
@@ -41,6 +43,7 @@ export interface Action {
     currentEvent?: Event;
     currentStart?: Date;
     currentView?: CalendarView;
+    detailIsOpen?: boolean;
     drawerIsOpen?: boolean;
     events?: Event[];
     locations?: Location[];

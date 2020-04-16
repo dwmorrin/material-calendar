@@ -16,6 +16,7 @@ import { AuthContext } from "./AuthContext";
 import { fetchCalendarData } from "../calendar/Fetch";
 import calendarReducer from "../calendar/Reducer";
 import FullCalendarBox from "./FullCalendarBox";
+import EventDetail from "./EventDetail";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -26,6 +27,7 @@ const useStyles = makeStyles(() => ({
 const initialState: CalendarState = {
   currentStart: new Date(),
   currentView: "resourceTimeGridDay",
+  detailIsOpen: false,
   drawerIsOpen: false,
   events: [],
   loading: true,
@@ -63,6 +65,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           onKeyDown={toggleDrawer}
           open={state.drawerIsOpen}
         />
+        <EventDetail dispatch={dispatch} state={state} />
         <CalendarBar dispatch={dispatch} state={state} />
         {state.pickerShowing && (
           <StaticDatePicker dispatch={dispatch} state={state} />

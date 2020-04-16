@@ -85,7 +85,15 @@ const calendarReducer = (
     if (!action.payload?.currentEvent) {
       throw new Error("no event received for detail view");
     }
-    return { ...state, currentEvent: action.payload.currentEvent };
+    return {
+      ...state,
+      detailIsOpen: true,
+      currentEvent: action.payload.currentEvent,
+    };
+  }
+
+  if (action.type === CalendarAction.CloseEventDetail) {
+    return { ...state, detailIsOpen: false };
   }
 
   if (action.type === CalendarAction.Error) {
