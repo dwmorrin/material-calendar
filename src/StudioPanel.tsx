@@ -16,9 +16,24 @@ const useStyles = makeStyles({
   }
 });
 
+function makeCheckbox(location: {
+  id: string;
+  parentId: string;
+  title: string;
+}): JSX.Element {
+  return (
+    <Checkbox
+      size="small"
+      inputProps={{ "aria-label": "checkbox with small size" }}
+      key={location.id}
+    />
+  );
+}
+
 function createNestedList(
   parent: string,
-  pageContents: { id: string; parentId: string; title: string }[]
+  pageContents: { id: string; parentId: string; title: string }[],
+  panelType: "checkboxes" | "buttons"
 ): JSX.Element {
   return (
     <ExpansionPanel>
@@ -42,11 +57,9 @@ function createNestedList(
             .filter((location) => location.parentId === parent)
             .map((location) => (
               <ListItem button key={location.id}>
-                <Checkbox
-                  size="small"
-                  inputProps={{ "aria-label": "checkbox with small size" }}
-                  key={location.id}
-                />
+                {panelType === "checkboxes"
+                  ? makeCheckbox(location)
+                  : undefined}
                 <ListItemText primary={location.title} />
               </ListItem>
             ))}
@@ -55,13 +68,16 @@ function createNestedList(
     </ExpansionPanel>
   );
 }
+
 function createStandardList(
-  pageContents: { id: string; parentId: string; title: string }[]
+  pageContents: { id: string; parentId: string; title: string }[],
+  panelType: "checkboxes" | "buttons"
 ): JSX.Element {
   return (
     <List>
       {pageContents.map((item) => (
         <ListItem button key={item.id}>
+          {panelType === "checkboxes" ? makeCheckbox(item) : undefined}
           <ListItemText primary={item.title} />
         </ListItem>
       ))}
@@ -73,7 +89,10 @@ interface StudioPanelProps {
   pageContents: { id: string; parentId: string; title: string }[];
   panelType: "checkboxes" | "buttons";
 }
-const StudioPanel: FunctionComponent<StudioPanelProps> = ({ pageContents }) => {
+const StudioPanel: FunctionComponent<StudioPanelProps> = ({
+  pageContents,
+  panelType
+}) => {
   const parents = [...new Set(pageContents.map((items) => items.parentId))];
   const classes = useStyles();
   return (
@@ -82,12 +101,13 @@ const StudioPanel: FunctionComponent<StudioPanelProps> = ({ pageContents }) => {
         ? parents.map((parent) => {
             return pageContents.filter((obj) => obj.parentId === parent)
               .length > 1
-              ? createNestedList(parent, pageContents)
+              ? createNestedList(parent, pageContents, panelType)
               : createStandardList(
-                  pageContents.filter((obj) => obj.parentId === parent)
+                  pageContents.filter((obj) => obj.parentId === parent),
+                  panelType
                 );
           })
-        : createStandardList(pageContents)}
+        : createStandardList(pageContents, panelType)}
     </div>
   );
 };
