@@ -38,19 +38,18 @@ function createNestedList(
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         <List>
-          {pageContents.map((location) =>
-            location.parentId === parent ? (
+          {pageContents
+            .filter((location) => location.parentId === parent)
+            .map((location) => (
               <ListItem button key={location.id}>
                 <Checkbox
                   size="small"
                   inputProps={{ "aria-label": "checkbox with small size" }}
+                  key={location.id}
                 />
                 <ListItemText primary={location.title} />
               </ListItem>
-            ) : (
-              void 0
-            )
-          )}
+            ))}
         </List>
       </ExpansionPanelDetails>
     </ExpansionPanel>
