@@ -15,6 +15,35 @@ const useStyles = makeStyles({
     width: '100%',
   },
 });
+
+function createNestedList(parent: string, pageContents: { id: string; parentId: string; title: string; }[]): JSX.Element {
+  return <ExpansionPanel>
+    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-label="Expand" aria-controls="additional-actions1-content" id="additional-actions1-header">
+      <FormControlLabel aria-label="Acknowledge" onClick={(event) => event.stopPropagation()} onFocus={(event) => event.stopPropagation()} control={<Checkbox />} label={parent} />
+    </ExpansionPanelSummary>
+    <ExpansionPanelDetails>
+      <List>
+        {pageContents.map(location => (location.parentId === parent ?
+          <ListItem button key={location.id}>
+            <Checkbox size="small" inputProps={{ 'aria-label': 'checkbox with small size' }} />
+            <ListItemText primary={location.title} />
+          </ListItem>
+          :
+          void (0)))}
+      </List>
+    </ExpansionPanelDetails>
+  </ExpansionPanel>;
+}
+function createStandardList( pageContents: { id: string; parentId: string; title: string; }[]): JSX.Element {
+  return <List>
+  {pageContents.map(item => (
+    <ListItem button key={item.id}>
+      <ListItemText primary={item.title} />
+    </ListItem>
+  ))}
+</List>;
+}
+
   interface IStudioPanelProps {
     pageContents: ( { id: string; parentId: string; title: string })[];
   }
@@ -27,47 +56,11 @@ const useStyles = makeStyles({
     <div className={classes.root}>
       {parents.length > 1 ?
       parents.map((parent) =>
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-label="Expand"
-          aria-controls="additional-actions1-content"
-          id="additional-actions1-header"
-        >
-          <FormControlLabel
-            aria-label="Acknowledge"
-            onClick={(event) => event.stopPropagation()}
-            onFocus={(event) => event.stopPropagation()}
-            control={<Checkbox />}
-            label={parent}
-          />
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-        <List>
-          {pageContents.map(location => (
-            location.parentId===parent ?
-            <ListItem button key={location.id}>
-              <Checkbox
-        size="small"
-        inputProps={{ 'aria-label': 'checkbox with small size' }}
-      />
-              <ListItemText primary={location.title} />
-            </ListItem>
-            :
-            void(0)
-          ))}
-        </List>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
+      createNestedList(parent, pageContents)
       )
       :
-      <List>
-          {pageContents.map(item => (
-            <ListItem button key={item.id}>
-              <ListItemText primary={item.title} />
-            </ListItem>
-          ))}
-        </List>}
+      createStandardList(pageContents)
+    }
     </div>
   );
 };
