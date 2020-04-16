@@ -49,20 +49,18 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     fetchCalendarData(dispatch, "/locations");
   }, [user]);
 
+  const toggleDrawer = (): void =>
+    dispatch({ type: CalendarAction.ToggleDrawer });
   return (
     (user?.id && (
       <div className={classes.root}>
         <TemporaryDrawer
           dispatch={dispatch}
           state={state}
-          onClick={(): void => {
-            dispatch({ type: CalendarAction.ToggleDrawer });
-          }}
-          onOpen={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
-          onClose={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
-          onKeyDown={(): void =>
-            dispatch({ type: CalendarAction.ToggleDrawer })
-          }
+          onClick={toggleDrawer}
+          onOpen={toggleDrawer}
+          onClose={toggleDrawer}
+          onKeyDown={toggleDrawer}
           open={state.drawerIsOpen}
         />
         <CalendarBar dispatch={dispatch} state={state} />
