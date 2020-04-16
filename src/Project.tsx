@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState, useRef } from "react";
+import React, { FunctionComponent, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Box,
@@ -10,10 +10,8 @@ import {
   Button,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-import TodayIcon from "@material-ui/icons/Today";
 import { RouteComponentProps } from "@reach/router";
 import TemporaryDrawer from "./TemporaryDrawer";
-import ViewMenu from "./ViewMenu";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,20 +26,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const fakeEventDate = (offset: number) => {
-  const date = new Date();
-  date.setHours(date.getHours() + offset);
-  return date;
-};
-const getCurrentTimeString = () => {
-  const date = new Date();
-  const timeString = date.toTimeString().split(" ")[0];
-  return timeString;
-};
-
-const Calendar: FunctionComponent<RouteComponentProps> = () => {
-  const [currentStart, setCurrentStart] = useState(new Date());
-  const [pickerShowing, setPickerShowing] = useState(false);
+const Project: FunctionComponent<RouteComponentProps> = () => {
+  const pickerShowing = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
 
@@ -118,4 +104,4 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   );
 };
 
-export default Calendar;
+export default Project;

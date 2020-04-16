@@ -6,9 +6,7 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -23,12 +21,12 @@ const useStyles = makeStyles({
   const StudioPanel: FunctionComponent<IStudioPanelProps> = ({
     pageContents,
   }) => {
-    const parents = [... new Set(pageContents.map(items => items.parentId))];
+    const parents = [...new Set(pageContents.map(items => items.parentId))];
     const classes = useStyles();
     return (
     <div className={classes.root}>
       {parents.length > 1 ?
-      parents.map((parent, index) =>
+      parents.map((parent) =>
       <ExpansionPanel>
         <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}

@@ -11,9 +11,6 @@ import DateRangeIcon from '@material-ui/icons/DateRange';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import GroupIcon from '@material-ui/icons/Group';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import HomeIcon from '@material-ui/icons/Home';
-import ConfirmationNumberIcon from '@material-ui/icons/ConfirmationNumber';
-import AssignmentIcon from '@material-ui/icons/Assignment';
 import StudioPanel from "./StudioPanel";
 
 
