@@ -11,7 +11,7 @@ import {
   Toolbar,
   IconButton,
   Typography,
-  Button,
+  Button
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import TodayIcon from "@material-ui/icons/Today";
@@ -23,15 +23,15 @@ import ViewMenu from "./ViewMenu";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   menuButton: {
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(2)
   },
   title: {
     flexGrow: 1,
-    color: "white",
-  },
+    color: "white"
+  }
 }));
 
 const fakeEventDate = (offset: number): Date => {
@@ -105,74 +105,74 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           onClose={toggleDrawer}
           pageContents={[
             {
-              id: 'Studio 1',
-              parentId: 'Studios',
-              title: 'Studio 1'
+              id: "Studio 1",
+              parentId: "Studios",
+              title: "Studio 1"
             },
             {
-              id: 'Studio 2',
-              parentId: 'Studios',
-              title: 'Studio 2'
+              id: "Studio 2",
+              parentId: "Studios",
+              title: "Studio 2"
             },
             {
-              id: 'Studio 3',
-              parentId: 'Studios',
-              title: 'Studio 3'
+              id: "Studio 3",
+              parentId: "Studios",
+              title: "Studio 3"
             },
             {
-              id: 'Studio 4',
-              parentId: 'Studios',
-              title: 'Studio 4'
+              id: "Studio 4",
+              parentId: "Studios",
+              title: "Studio 4"
             },
             {
-              id: 'Edit Suite 1',
-              parentId: 'Edit Suites',
-              title: 'Edit Suite 1'
+              id: "Edit Suite 1",
+              parentId: "Edit Suites",
+              title: "Edit Suite 1"
             },
             {
-              id: 'Edit Suite 2',
-              parentId: 'Edit Suites',
-              title: 'Edit Suite 2'
+              id: "Edit Suite 2",
+              parentId: "Edit Suites",
+              title: "Edit Suite 2"
             },
             {
-              id: 'Edit Suite 3',
-              parentId: 'Edit Suites',
-              title: 'Edit Suite 3'
+              id: "Edit Suite 3",
+              parentId: "Edit Suites",
+              title: "Edit Suite 3"
             },
             {
-              id: 'Edit Suite 4',
-              parentId: 'Edit Suites',
-              title: 'Edit Suite 4'
+              id: "Edit Suite 4",
+              parentId: "Edit Suites",
+              title: "Edit Suite 4"
             },
             {
-              id: 'Edit Suite 5',
-              parentId: 'Edit Suites',
-              title: 'Edit Suite 5'
+              id: "Edit Suite 5",
+              parentId: "Edit Suites",
+              title: "Edit Suite 5"
             },
             {
-              id: 'Production Suite A',
-              parentId: 'Production Suites',
-              title: 'Production Suite A'
+              id: "Production Suite A",
+              parentId: "Production Suites",
+              title: "Production Suite A"
             },
             {
-              id: 'Production Suite B',
-              parentId: 'Production Suites',
-              title: 'Production Suite B'
+              id: "Production Suite B",
+              parentId: "Production Suites",
+              title: "Production Suite B"
             },
             {
-              id: 'Rehearsal Room 1',
-              parentId: 'Rehearsal Rooms',
-              title: 'Rehearsal Room 1'
+              id: "Rehearsal Room 1",
+              parentId: "Rehearsal Rooms",
+              title: "Rehearsal Room 1"
             },
             {
-              id: 'Rehearsal Room 2',
-              parentId: 'Rehearsal Rooms',
-              title: 'Rehearsal Room 2'
+              id: "Rehearsal Room 2",
+              parentId: "Rehearsal Rooms",
+              title: "Rehearsal Room 2"
             },
             {
-              id: 'Outside Events',
-              parentId: 'Other',
-              title: 'Outside Events'
+              id: "Outside Events",
+              parentId: "Other",
+              title: "Outside Events"
             }
           ]}
         />
@@ -197,7 +197,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
             <IconButton onClick={handleClickToday}>
               <TodayIcon />
             </IconButton>
-            <ViewMenu/>
+            <ViewMenu />
           </Toolbar>
         </List>
       </AppBar>
@@ -224,18 +224,18 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
                 id: "a",
                 title: "My Event",
                 start: fakeEventDate(0),
-                end: fakeEventDate(3),
-              },
+                end: fakeEventDate(3)
+              }
             ]}
             resources={[
               {
                 id: "a",
-                title: "Room A",
+                title: "Room A"
               },
               {
                 id: "b",
-                title: "Room B",
-              },
+                title: "Room B"
+              }
             ]}
             schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
           />

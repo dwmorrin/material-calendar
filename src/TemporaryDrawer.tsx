@@ -7,33 +7,32 @@ import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import DateRangeIcon from '@material-ui/icons/DateRange';
-import AssessmentIcon from '@material-ui/icons/Assessment';
-import GroupIcon from '@material-ui/icons/Group';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import DateRangeIcon from "@material-ui/icons/DateRange";
+import AssessmentIcon from "@material-ui/icons/Assessment";
+import GroupIcon from "@material-ui/icons/Group";
+import NotificationsIcon from "@material-ui/icons/Notifications";
 import StudioPanel from "./StudioPanel";
-
 
 const useStyles = makeStyles({
   list: {
-    width: 250,
+    width: 250
   },
   fullList: {
-    width: "auto",
-  },
+    width: "auto"
+  }
 });
 
 interface TemporaryDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
-  pageContents: ({ id: string; parentId: string; title: string })[];
+  pageContents: { id: string; parentId: string; title: string }[];
 }
 const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
   open,
   onClose,
   onOpen,
-  pageContents,
+  pageContents
 }) => {
   const classes = useStyles();
   return (
@@ -46,26 +45,32 @@ const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
     >
       <div className={clsx(classes.list)} role="presentation">
         <List>
-          {["Calendar", "Projects", "Groups", "Notifications"].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-              {((): JSX.Element => {
-                switch (index) {
-                  case 0:  return <DateRangeIcon />;
-                  case 1:  return <AssessmentIcon />;
-                  case 2:  return <GroupIcon />;
-                  default: return <NotificationsIcon />;
-                }
-              })()}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
+          {["Calendar", "Projects", "Groups", "Notifications"].map(
+            (text, index) => (
+              <ListItem button key={text}>
+                <ListItemIcon>
+                  {((): JSX.Element => {
+                    switch (index) {
+                      case 0:
+                        return <DateRangeIcon />;
+                      case 1:
+                        return <AssessmentIcon />;
+                      case 2:
+                        return <GroupIcon />;
+                      default:
+                        return <NotificationsIcon />;
+                    }
+                  })()}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            )
+          )}
         </List>
         <Divider />
         <List>
-        <StudioPanel pageContents={pageContents}/>
-        </ List>
+          <StudioPanel pageContents={pageContents} />
+        </List>
       </div>
     </SwipeableDrawer>
   );
