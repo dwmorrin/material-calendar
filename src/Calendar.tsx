@@ -125,6 +125,51 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
               title: 'Studio 4'
             },
             {
+              id: 'Edit Suite 1',
+              parentId: 'Edit Suites',
+              title: 'Edit Suite 1'
+            },
+            {
+              id: 'Edit Suite 2',
+              parentId: 'Edit Suites',
+              title: 'Edit Suite 2'
+            },
+            {
+              id: 'Edit Suite 3',
+              parentId: 'Edit Suites',
+              title: 'Edit Suite 3'
+            },
+            {
+              id: 'Edit Suite 4',
+              parentId: 'Edit Suites',
+              title: 'Edit Suite 4'
+            },
+            {
+              id: 'Edit Suite 5',
+              parentId: 'Edit Suites',
+              title: 'Edit Suite 5'
+            },
+            {
+              id: 'Production Suite A',
+              parentId: 'Production Suites',
+              title: 'Production Suite A'
+            },
+            {
+              id: 'Production Suite B',
+              parentId: 'Production Suites',
+              title: 'Production Suite B'
+            },
+            {
+              id: 'Rehearsal Room 1',
+              parentId: 'Rehearsal Rooms',
+              title: 'Rehearsal Room 1'
+            },
+            {
+              id: 'Rehearsal Room 2',
+              parentId: 'Rehearsal Rooms',
+              title: 'Rehearsal Room 2'
+            },
+            {
               id: 'Outside Events',
               parentId: 'Other',
               title: 'Outside Events'
