@@ -67,9 +67,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         {state.pickerShowing && (
           <StaticDatePicker dispatch={dispatch} state={state} />
         )}
-        {!state.pickerShowing && (
-          <FullCalendarBox dispatch={dispatch} state={state} />
-        )}
+        <FullCalendarBox dispatch={dispatch} state={state} />
       </div>
     )) || <Redirect to="/" replace={true} noThrow={true} />
   );
