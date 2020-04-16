@@ -42,6 +42,7 @@ function createNestedList(
         aria-label="Expand"
         aria-controls="additional-actions1-content"
         id="additional-actions1-header"
+        onClick={(event): void => event.stopPropagation()}
       >
         <FormControlLabel
           aria-label="Acknowledge"
@@ -56,7 +57,11 @@ function createNestedList(
           {pageContents
             .filter((location) => location.parentId === parent)
             .map((location) => (
-              <ListItem button key={location.id}>
+              <ListItem
+                button
+                key={location.id}
+                onClick={(event): void => event.stopPropagation()}
+              >
                 {panelType === "checkboxes"
                   ? makeCheckbox(location)
                   : undefined}
@@ -76,7 +81,11 @@ function createStandardList(
   return (
     <List>
       {pageContents.map((item) => (
-        <ListItem button key={item.id}>
+        <ListItem
+          button
+          key={item.id}
+          onClick={(event): void => event.stopPropagation()}
+        >
           {panelType === "checkboxes" ? makeCheckbox(item) : undefined}
           <ListItemText primary={item.title} />
         </ListItem>
