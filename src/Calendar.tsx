@@ -99,12 +99,12 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     },
     {
       id: "Production Suite A",
-      parentId: "Production Suites",
+      parentId: "Studios",
       title: "Production Suite A"
     },
     {
       id: "Production Suite B",
-      parentId: "Production Suites",
+      parentId: "Studios",
       title: "Production Suite B"
     },
     {
@@ -196,9 +196,9 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
                 {currentStart.toLocaleString("default", { month: "long" })}
               </Typography>
             </Button>
-            <IconButton onClick={handleClickToday}>
+            {/* <IconButton color="inherit" onClick={handleClickToday}>
               <TodayIcon />
-            </IconButton>
+            </IconButton> */}
             <ViewMenu />
           </Toolbar>
         </List>

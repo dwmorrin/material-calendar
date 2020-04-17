@@ -1,12 +1,13 @@
 import React from "react";
-import IconButton from "@material-ui/core/IconButton";
+import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import ViewWeekIcon from "@material-ui/icons/ViewWeek";
 import ViewDayIcon from "@material-ui/icons/ViewDay";
 import ViewComfyIcon from "@material-ui/icons/ViewComfy";
+import ViewAgendaIcon from "@material-ui/icons/ViewAgenda";
 
-const options = ["Day", "Week", "Month"];
+const options = ["Schedule View", "Day View", "Week View", "Month View"];
 
 const ITEM_HEIGHT = 48;
 
@@ -24,14 +25,16 @@ export default function ViewMenu(): JSX.Element {
 
   return (
     <div>
-      <IconButton
+      <Button
         aria-label="more"
         aria-controls="view-menu"
         aria-haspopup="true"
         onClick={handleClick}
+        startIcon={<ViewDayIcon />}
+        color="inherit"
       >
-        <ViewDayIcon />
-      </IconButton>
+        Day View
+      </Button>
       <Menu
         id="view-menu"
         anchorEl={anchorEl}
@@ -48,15 +51,17 @@ export default function ViewMenu(): JSX.Element {
         {options.map((option) => (
           <MenuItem
             key={option}
-            selected={option === "Day"}
+            selected={option === "Day View"}
             onClick={handleClose}
           >
             {((): JSX.Element => {
               switch (option) {
-                case "Day":
+                case "Day View":
                   return <ViewDayIcon />;
-                case "Week":
+                case "Week View":
                   return <ViewWeekIcon />;
+                case "Schedule View":
+                  return <ViewAgendaIcon />;
                 default:
                   return <ViewComfyIcon />;
               }
