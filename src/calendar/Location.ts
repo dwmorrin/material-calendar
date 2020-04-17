@@ -3,6 +3,11 @@ import Resource from "./Resource";
 export interface LocationDictionary {
   [k: string]: boolean;
 }
+
+export interface LocationGroups {
+  [k: string]: Location[];
+}
+
 export const makeSelectedLocationDict = (
   locations: Location[]
 ): LocationDictionary => {
@@ -11,6 +16,23 @@ export const makeSelectedLocationDict = (
     dict[location.id] = location.selected;
   });
   return dict;
+};
+
+export const locationGroupReducer = (
+  groups: LocationGroups | undefined,
+  location: Location
+): LocationGroups | undefined => {
+  if (!location.groupId) {
+    return groups;
+  }
+  if (groups) {
+    if (!groups[location.groupId]) {
+      groups[location.groupId] = [location];
+      return groups;
+    }
+    groups[location.groupId].push(location);
+    return groups;
+  }
 };
 
 export interface LocationData {
