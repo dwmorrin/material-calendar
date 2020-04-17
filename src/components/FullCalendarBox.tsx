@@ -36,7 +36,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
           defaultView="resourceTimeGridDay"
           eventClick={(info): void => {
             const event = state.events.find(
-              (event) => event.id === +info.event.id
+              (event) => event.id === info.event.id
             );
             dispatch({
               type: CalendarAction.ViewEventDetail,

@@ -47,8 +47,18 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
 
   useEffect(() => {
     if (!user?.id) return;
-    fetchCalendarData(dispatch, "/events");
-    fetchCalendarData(dispatch, "/locations");
+    fetchCalendarData({
+      url: "/events",
+      dispatch,
+      onSuccessAction: CalendarAction.ReceivedEvents,
+      payloadKey: "eventData",
+    });
+    fetchCalendarData({
+      url: "/locations",
+      dispatch,
+      onSuccessAction: CalendarAction.ReceivedLocations,
+      payloadKey: "locationData",
+    });
   }, [user]);
 
   const toggleDrawer = (): void =>

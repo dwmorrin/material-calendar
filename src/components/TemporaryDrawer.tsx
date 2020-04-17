@@ -95,7 +95,7 @@ const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
                   });
                 }}
               />
-              <ListItemText primary={location.name} />
+              <ListItemText primary={location.title} />
             </ListItem>
           ))}
         </List>

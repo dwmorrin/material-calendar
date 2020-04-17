@@ -1,35 +1,52 @@
 import { EventInput } from "./Core";
 
+export interface EventData {
+  end: string;
+  id: string;
+  location: string;
+  start: string;
+  title: string;
+}
+
 class Event implements EventInput {
+  public allDay?: boolean | undefined;
+  public allow?: import("./Core").AllowFunc | undefined;
+  public backgroundColor?: string | undefined;
+  public borderColor?: string | undefined;
+  public className?: string | string[] | undefined;
+  public classNames?: string | string[] | undefined;
+  public color?: string | undefined;
+  public constraint?: string | EventInput | EventInput[] | undefined;
+  public date?: string | number | Date | number[] | undefined;
+  public durationEditable?: boolean | undefined;
+  public editable?: boolean | undefined;
+  public end: string;
+  public extendedProps?: object | undefined;
+  public groupId?: string | number | undefined;
+  public id: string;
+  public location: string;
+  public overlap?: boolean | undefined;
+  public rendering?:
+    | ""
+    | "background"
+    | "none"
+    | "inverse-background"
+    | undefined;
   public resourceId: string;
-  constructor(
-    readonly id: number,
-    public start: string,
-    public end: string,
-    public location: string,
-    public title: string
-  ) {
-    this.resourceId = location;
-  }
+  public start: string;
+  public startEditable?: boolean | undefined;
+  public textColor?: string | undefined;
+  public title: string;
+  public url?: string | undefined;
   [extendedProp: string]: unknown;
-  allDay?: boolean | undefined;
-  allow?: import("./Core").AllowFunc | undefined;
-  backgroundColor?: string | undefined;
-  borderColor?: string | undefined;
-  className?: string | string[] | undefined;
-  classNames?: string | string[] | undefined;
-  color?: string | undefined;
-  constraint?: string | EventInput | EventInput[] | undefined;
-  date?: string | number | Date | number[] | undefined;
-  durationEditable?: boolean | undefined;
-  editable?: boolean | undefined;
-  extendedProps?: object | undefined;
-  groupId?: string | number | undefined;
-  overlap?: boolean | undefined;
-  rendering?: "" | "background" | "none" | "inverse-background" | undefined;
-  startEditable?: boolean | undefined;
-  textColor?: string | undefined;
-  url?: string | undefined;
+  constructor(data: EventData) {
+    this.id = "" + data.id;
+    this.start = data.start;
+    this.end = data.end;
+    this.title = data.title;
+    this.location = data.location;
+    this.resourceId = data.location;
+  }
 }
 
 export default Event;

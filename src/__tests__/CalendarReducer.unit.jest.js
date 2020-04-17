@@ -9,8 +9,10 @@ const modifiedState = {
   detailIsOpen: true,
   drawerIsOpen: true,
   events: [],
+  eventData: [],
   loading: true,
   locations: [],
+  locationData: [],
   pickerShowing: true,
   ref: true,
 };

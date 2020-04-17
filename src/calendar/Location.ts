@@ -13,10 +13,25 @@ export const makeSelectedLocationDict = (
   return dict;
 };
 
+export interface LocationData {
+  id: string;
+  title: string;
+  eventColor?: string;
+  groupId?: string;
+}
+
 class Location implements Resource {
-  public eventColor?: string;
   public selected = false;
-  constructor(readonly id: string, public name: string) {}
+  public id: string;
+  public title: string;
+  public eventColor: string;
+  public groupId: string;
+  constructor(data: LocationData) {
+    this.id = data.id;
+    this.title = data.title;
+    this.eventColor = data.eventColor || "";
+    this.groupId = data.groupId || "";
+  }
 }
 
 export default Location;

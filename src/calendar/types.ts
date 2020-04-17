@@ -1,10 +1,10 @@
-import Event from "./Event";
-import Location from "./Location";
+import Event, { EventData } from "./Event";
+import Location, { LocationData } from "./Location";
 import FullCalendar from "@fullcalendar/react";
 export enum CalendarAction {
-  Error,
   ChangedView,
   CloseEventDetail,
+  Error,
   Loading,
   PickedDate,
   ReceivedEvents,
@@ -47,6 +47,8 @@ export interface Action {
     drawerIsOpen?: boolean;
     events?: Event[];
     locations?: Location[];
+    eventData?: EventData[];
+    locationData?: LocationData[];
     pickerShowing?: boolean;
     ref?: React.RefObject<FullCalendar> | null;
   };
