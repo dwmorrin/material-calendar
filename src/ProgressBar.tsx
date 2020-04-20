@@ -1,52 +1,47 @@
 import React, { FunctionComponent } from "react";
-import {
-  makeStyles,
-  createStyles,
-  withStyles,
-  Theme
-} from "@material-ui/core/styles";
-import LinearProgress from "@material-ui/core/LinearProgress";
-
-const ProgressBarClass = withStyles({
-  root: {
-    height: 20,
-    backgroundColor: "#03fc1c"
-  },
-  bar: {
-    borderRadius: 20,
-    backgroundColor: "#fc0303"
-  }
-})(LinearProgress);
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      flexGrow: 1
-    },
-    margin: {
-      margin: theme.spacing(1)
-    }
-  })
-);
+import { makeStyles } from "@material-ui/core/styles";
 
 interface ProgressBarProps {
-  value1: number;
-  value2: number;
+  left: { title: string; value: number; color: string };
+  right: { title: string; value: number; color: string };
 }
 
-const ProgressBar: FunctionComponent<ProgressBarProps> = ({
-  value1,
-  value2
-}) => {
+const ProgressBar: FunctionComponent<ProgressBarProps> = ({ left, right }) => {
+  const size1 = (left.value / (left.value + right.value)) * 100;
+  const size2 = (right.value / (left.value + right.value)) * 100;
+  const useStyles = makeStyles({
+    container: {
+      width: "100%"
+    },
+    border: {
+      borderStyle: "solid",
+      borderRadius: "50px",
+      borderColor: "black",
+      height: "20px"
+    },
+    left: {
+      display: "inline-block",
+      borderRadius: "20px 0px 0px 20px",
+      width: size1 + "%",
+      height: "100%",
+      backgroundColor: left.color
+    },
+    right: {
+      display: "inline-block",
+      borderRadius: "0px 20px 20px 0px",
+      width: size2 + "%",
+      height: "100%",
+      backgroundColor: right.color
+    }
+  });
+
   const classes = useStyles();
   return (
-    <div className={classes.root}>
-      <ProgressBarClass
-        className={classes.margin}
-        variant="determinate"
-        color="secondary"
-        value={(value1 / (value1 + value2)) * 100}
-      />
+    <div className={classes.container}>
+      <div className={classes.border}>
+        <div className={classes.left}>{left.title}</div>
+        <div className={classes.right}>{right.title}</div>
+      </div>
     </div>
   );
 };

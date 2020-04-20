@@ -139,7 +139,7 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <Grid container spacing={4}>
+                <Grid container spacing={2}>
                   <Grid item xs={12}>
                     Total Project Hours
                     <br></br>
@@ -192,7 +192,10 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
                     </FormControl>
                   </Grid>
                   <Grid item xs={12}>
-                    <ProgressBar value1={75} value2={25} />{" "}
+                    <ProgressBar
+                      left={{ title: "", value: 9, color: "#fc0303" }}
+                      right={{ title: "", value: 3, color: "#03fc1c" }}
+                    />{" "}
                   </Grid>
                 </Grid>
               </Paper>
@@ -215,7 +218,10 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
                   <p className={classes.text}>My Hours:</p>
                 </Grid>
                 <Grid item xs={12}>
-                  <ProgressBar value1={80} value2={20} />
+                  <ProgressBar
+                    left={{ title: "", value: 12, color: "#fc0303" }}
+                    right={{ title: "", value: 3, color: "#03fc1c" }}
+                  />
                 </Grid>
                 <Grid item xs={12}>
                   <p className={classes.text}>Upcoming Sessions:</p>
