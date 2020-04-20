@@ -7,10 +7,9 @@ import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
 import { ListItemText } from "@material-ui/core";
 import {
-  Action,
   CalendarAction,
-  CalendarState,
   CalendarView,
+  CalendarUIProps,
 } from "../calendar/types";
 import StudioPanel from "./ResourceList";
 
@@ -23,34 +22,42 @@ const useStyles = makeStyles({
   },
 });
 
-interface TemporaryDrawerProps {
-  open: boolean;
-  onClose: () => void;
-  onOpen: () => void;
-  onClick: (event: React.SyntheticEvent) => void;
-  onKeyDown: () => void;
-  dispatch: (action: Action) => void;
-  state: CalendarState;
-}
-const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
-  open,
-  onClose,
-  onOpen,
-  onClick,
-  onKeyDown,
+const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
   const classes = useStyles();
 
+  const onClose = (): void => {
+    // TODO clean up after drawer closes
+  };
+
+  const onOpen = (): void => {
+    // TODO cleanup when drawer opens.  Note: this is only a swipe open.
+  };
+
+  const toggleDrawer = (
+    event: React.KeyboardEvent | React.MouseEvent
+  ): void => {
+    // For a11y.  Make drawer navigable via keyboard.
+    if (
+      event.type === "keydown" &&
+      ((event as React.KeyboardEvent).key === "Tab" ||
+        (event as React.KeyboardEvent).key === "Shift")
+    ) {
+      return;
+    }
+    dispatch({ type: CalendarAction.ToggleDrawer });
+  };
+
   return (
     <SwipeableDrawer
-      open={open}
+      open={state.drawerIsOpen}
       anchor="left"
       onClose={onClose}
       onOpen={onOpen}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
+      onClick={toggleDrawer}
+      onKeyDown={toggleDrawer}
     >
       <div className={clsx(classes.list)} role="presentation">
         <List>

@@ -61,20 +61,10 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     });
   }, [user]);
 
-  const toggleDrawer = (): void =>
-    dispatch({ type: CalendarAction.ToggleDrawer });
   return (
     (user?.id && (
       <div className={classes.root}>
-        <TemporaryDrawer
-          dispatch={dispatch}
-          state={state}
-          onClick={toggleDrawer}
-          onOpen={toggleDrawer}
-          onClose={toggleDrawer}
-          onKeyDown={toggleDrawer}
-          open={state.drawerIsOpen}
-        />
+        <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />
         <CalendarBar dispatch={dispatch} state={state} />
         {state.pickerShowing && (
