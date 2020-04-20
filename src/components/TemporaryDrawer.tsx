@@ -32,15 +32,12 @@ const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
     // TODO clean up after drawer closes
   };
 
-  const onOpen = (): void => {
-    // TODO cleanup when drawer opens.  Note: this is only a swipe open.
-  };
-
   const toggleDrawer = (
-    event: React.KeyboardEvent | React.MouseEvent
+    event: React.KeyboardEvent | React.MouseEvent | React.SyntheticEvent
   ): void => {
     // For a11y.  Make drawer navigable via keyboard.
     if (
+      event &&
       event.type === "keydown" &&
       ((event as React.KeyboardEvent).key === "Tab" ||
         (event as React.KeyboardEvent).key === "Shift")
@@ -55,7 +52,7 @@ const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
       open={state.drawerIsOpen}
       anchor="left"
       onClose={onClose}
-      onOpen={onOpen}
+      onOpen={toggleDrawer}
       onClick={toggleDrawer}
       onKeyDown={toggleDrawer}
     >
