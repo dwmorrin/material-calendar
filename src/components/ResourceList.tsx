@@ -1,9 +1,9 @@
 import React, { FunctionComponent } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { CalendarUIProps } from "../calendar/types";
-import ExpansionList from "./ResourceExpansionList";
 import { locationGroupReducer } from "../calendar/Location";
 import ResourceListItem from "./ResourceListItem";
+import ResourceExpansionList from "./ResourceExpansionList";
 
 const useStyles = makeStyles({
   root: {
@@ -23,7 +23,7 @@ const ResourceList: FunctionComponent<CalendarUIProps> = ({
     <div className={classes.root}>
       {groups &&
         Object.keys(groups).map((key) => (
-          <ExpansionList
+          <ResourceExpansionList
             key={`${key}_exp_list`}
             dispatch={dispatch}
             state={state}

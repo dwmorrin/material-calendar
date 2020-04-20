@@ -14,7 +14,7 @@ import ResourceListItem from "./ResourceListItem";
 interface ResourceExpansionListProps extends CalendarUIProps {
   groupId: string;
 }
-const ExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
+const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
   dispatch,
   state,
   groupId,
@@ -55,4 +55,4 @@ const ExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
   );
 };
 
-export default ExpansionList;
+export default ResourceExpansionList;
