@@ -10,6 +10,13 @@ import {
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ResourceListItem from "./ResourceListItem";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles(() => ({
+  nopadding: {
+    padding: 0,
+  },
+}));
 
 interface ResourceExpansionListProps extends CalendarUIProps {
   groupId: string;
@@ -20,6 +27,7 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
   groupId,
 }) => {
   const { locations } = state;
+  const classes = useStyles();
 
   return (
     <ExpansionPanel>
@@ -56,7 +64,7 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
           }}
         />
       </ExpansionPanelSummary>
-      <ExpansionPanelDetails>
+      <ExpansionPanelDetails classes={{ root: classes.nopadding }}>
         <List>
           {locations
             .filter((location) => location.groupId === groupId)
