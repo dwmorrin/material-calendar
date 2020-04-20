@@ -1,14 +1,30 @@
 import React, { FunctionComponent } from "react";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import {
+  makeStyles,
+  createStyles,
+  withStyles,
+  Theme
+} from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
+
+const ProgressBarClass = withStyles({
+  root: {
+    height: 20,
+    backgroundColor: "#03fc1c"
+  },
+  bar: {
+    borderRadius: 20,
+    backgroundColor: "#fc0303"
+  }
+})(LinearProgress);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: "100%",
-      "& > * + *": {
-        marginTop: theme.spacing(2)
-      }
+      flexGrow: 1
+    },
+    margin: {
+      margin: theme.spacing(1)
     }
   })
 );
@@ -25,7 +41,12 @@ const ProgressBar: FunctionComponent<ProgressBarProps> = ({
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <LinearProgress variant="buffer" value={value1} valueBuffer={value2} />
+      <ProgressBarClass
+        className={classes.margin}
+        variant="determinate"
+        color="secondary"
+        value={(value1 / (value1 + value2)) * 100}
+      />
     </div>
   );
 };
