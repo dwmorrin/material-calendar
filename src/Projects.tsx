@@ -12,14 +12,12 @@ import {
 import MenuIcon from "@material-ui/icons/Menu";
 import { RouteComponentProps } from "@reach/router";
 import TemporaryDrawer from "./TemporaryDrawer";
-import Progress from "./Progress";
+import ProgressBar from "./ProgressBar";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
-import NativeSelect from "@material-ui/core/NativeSelect";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -86,7 +84,7 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
 
   const handleChange = (
     event: React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => {
+  ): void => {
     const name = event.target.name as keyof typeof state;
     setState({
       ...state,
@@ -144,7 +142,8 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
                 <Grid container spacing={4}>
                   <Grid item xs={12}>
                     Total Project Hours
-                    <Progress />{" "}
+                    <br></br>
+                    <ProgressBar value1={85} value2={15} />{" "}
                   </Grid>
                   <Grid item xs={12}>
                     Studio Allotment
@@ -193,7 +192,7 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
                     </FormControl>
                   </Grid>
                   <Grid item xs={12}>
-                    <Progress />{" "}
+                    <ProgressBar value1={75} value2={25} />{" "}
                   </Grid>
                 </Grid>
               </Paper>
@@ -216,7 +215,7 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
                   <p className={classes.text}>My Hours:</p>
                 </Grid>
                 <Grid item xs={12}>
-                  <Progress />
+                  <ProgressBar value1={80} value2={20} />
                 </Grid>
                 <Grid item xs={12}>
                   <p className={classes.text}>Upcoming Sessions:</p>

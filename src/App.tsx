@@ -5,7 +5,7 @@ import SignIn from "./SignIn";
 import Calendar from "./Calendar";
 import Projects from "./Projects";
 
-function App() {
+function App(): JSX.Element {
   return (
     <Router>
       <SignIn path="/" />
