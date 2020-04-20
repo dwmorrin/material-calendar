@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps } from "../calendar/types";
+import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   ExpansionPanel,
   ExpansionPanelSummary,
@@ -33,8 +33,27 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
       >
         <FormControlLabel
           aria-label="Acknowledge"
+          checked={state.locations
+            .filter((location) => location.groupId === groupId)
+            .every((location) => location.selected)}
           control={<Checkbox />}
           label={groupId}
+          onClick={(event): void => event.stopPropagation()}
+          onChange={(event: React.ChangeEvent<{}>, checked): void => {
+            event.stopPropagation();
+            dispatch({
+              type: CalendarAction.SelectedLocation,
+              payload: {
+                locations: state.locations.map((location) => {
+                  if (location.groupId !== groupId) {
+                    return location;
+                  }
+                  location.selected = checked;
+                  return location;
+                }),
+              },
+            });
+          }}
         />
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>

@@ -19,7 +19,8 @@ const ResourceListItem: FunctionComponent<ResourceListItemProps> = ({
         size="small"
         inputProps={{ "aria-label": "checkbox with small size" }}
         key={location.id}
-        onClick={(event: React.SyntheticEvent): void => {
+        onClick={(event): void => event.stopPropagation()}
+        onChange={(event: React.ChangeEvent<{}>, checked): void => {
           event.stopPropagation();
           dispatch({
             type: CalendarAction.SelectedLocation,
@@ -28,7 +29,7 @@ const ResourceListItem: FunctionComponent<ResourceListItemProps> = ({
                 if (loc.id !== location.id) {
                   return loc;
                 }
-                loc.selected = !loc.selected;
+                loc.selected = checked;
                 return loc;
               }),
             },

@@ -11,7 +11,7 @@ import {
   CalendarView,
   CalendarUIProps,
 } from "../calendar/types";
-import StudioPanel from "./ResourceList";
+import ResourceList from "./ResourceList";
 
 const useStyles = makeStyles({
   list: {
@@ -79,7 +79,7 @@ const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
           ))}
         </List>
         <Divider />
-        <StudioPanel dispatch={dispatch} state={state} />
+        <ResourceList dispatch={dispatch} state={state} />
       </div>
     </SwipeableDrawer>
   );
