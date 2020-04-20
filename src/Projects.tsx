@@ -95,7 +95,106 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
           </Toolbar>
         </List>
       </AppBar>
-      {pickerShowing && <Box></Box>}
+      {pickerShowing && (
+        <Box>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Paper className={classes.paper}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    Total Project Hours
+                    <br></br>
+                    <ProgressBar value1={85} value2={15} />{" "}
+                  </Grid>
+                  <Grid item xs={12}>
+                    Studio Allotment
+                  </Grid>
+                  <Grid item xs={5}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel htmlFor="age-native-simple">
+                        Studio 1
+                      </InputLabel>
+                      <Select
+                        native
+                        value={state.age}
+                        onChange={handleChange}
+                        inputProps={{
+                          name: "Studio 1",
+                          id: "age-native-simple"
+                        }}
+                      >
+                        <option aria-label="None" value="" />
+                        <option value={10}>Studio 1</option>
+                        <option value={20}>Studio 2</option>
+                        <option value={30}>Studio 3</option>
+                        <option value={30}>Studio 4</option>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={7}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel htmlFor="age-native-simple">
+                        March 14 - March 22
+                      </InputLabel>
+                      <Select
+                        native
+                        value={state.age}
+                        onChange={handleChange}
+                        inputProps={{
+                          name: "March 14 - March 22",
+                          id: "age-native-simple"
+                        }}
+                      >
+                        <option aria-label="None" value="" />
+                        <option value={10}>March 14 - March 22</option>
+                        <option value={20}>March 22 - March 29</option>
+                        <option value={30}>March 29 - April 5</option>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ProgressBar
+                      left={{ title: "", value: 9, color: "#fc0303" }}
+                      right={{ title: "", value: 3, color: "#03fc1c" }}
+                    />{" "}
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} className={classes.grid}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <b>My Group</b>
+                </Grid>
+                <Grid item xs={5}>
+                  <p className={classes.text}> Group Members:</p>
+                </Grid>
+                <Grid item xs={7}>
+                  <p className={classes.text}>
+                    John Lennon<br></br>Paul McCartney<br></br>George Harrison
+                    <br></br>Ringo Starr
+                  </p>
+                </Grid>
+                <Grid item xs={12}>
+                  <p className={classes.text}>My Hours:</p>
+                </Grid>
+                <Grid item xs={12}>
+                  <ProgressBar
+                    left={{ title: "", value: 12, color: "#fc0303" }}
+                    right={{ title: "", value: 3, color: "#03fc1c" }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <p className={classes.text}>Upcoming Sessions:</p>
+                </Grid>
+                <Grid item xs={12}>
+                  <p className={classes.text}>Previous Sessions:</p>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Box>
+      )}
     </div>
   );
 };
