@@ -31,7 +31,7 @@ interface TemporaryDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
-  pageContents: { id: string; parentId: string; title: string }[];
+  drawerContents: { id: string; parentId: string; title: string }[];
   panelType: "checkboxes" | "buttons";
 }
 const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
@@ -39,7 +39,7 @@ const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
   onClose,
   onOpen,
   panelType,
-  pageContents
+  drawerContents
 }) => {
   const classes = useStyles();
   return (
@@ -79,7 +79,7 @@ const TemporaryDrawer: FunctionComponent<TemporaryDrawerProps> = ({
         </List>
         <Divider />
         <List>
-          <StudioPanel pageContents={pageContents} panelType={panelType} />
+          <StudioPanel drawerContents={drawerContents} panelType={panelType} />
         </List>
       </div>
     </SwipeableDrawer>

@@ -32,7 +32,7 @@ function makeCheckbox(location: {
 
 function createNestedList(
   parent: string,
-  pageContents: { id: string; parentId: string; title: string }[],
+  drawerContents: { id: string; parentId: string; title: string }[],
   panelType: "checkboxes" | "buttons"
 ): JSX.Element {
   return (
@@ -54,7 +54,7 @@ function createNestedList(
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         <List>
-          {pageContents
+          {drawerContents
             .filter((location) => location.parentId === parent)
             .map((location) => (
               <ListItem
@@ -75,12 +75,12 @@ function createNestedList(
 }
 
 function createStandardList(
-  pageContents: { id: string; parentId: string; title: string }[],
+  drawerContents: { id: string; parentId: string; title: string }[],
   panelType: "checkboxes" | "buttons"
 ): JSX.Element {
   return (
     <List>
-      {pageContents.map((item) => (
+      {drawerContents.map((item) => (
         <ListItem
           button
           key={item.id}
@@ -95,28 +95,28 @@ function createStandardList(
 }
 
 interface StudioPanelProps {
-  pageContents: { id: string; parentId: string; title: string }[];
+  drawerContents: { id: string; parentId: string; title: string }[];
   panelType: "checkboxes" | "buttons";
 }
 const StudioPanel: FunctionComponent<StudioPanelProps> = ({
-  pageContents,
+  drawerContents,
   panelType
 }) => {
-  const parents = [...new Set(pageContents.map((items) => items.parentId))];
+  const parents = [...new Set(drawerContents.map((items) => items.parentId))];
   const classes = useStyles();
   return (
     <div className={classes.root}>
       {parents.length > 1
         ? parents.map((parent) => {
-            return pageContents.filter((obj) => obj.parentId === parent)
+            return drawerContents.filter((obj) => obj.parentId === parent)
               .length > 1
-              ? createNestedList(parent, pageContents, panelType)
+              ? createNestedList(parent, drawerContents, panelType)
               : createStandardList(
-                  pageContents.filter((obj) => obj.parentId === parent),
+                  drawerContents.filter((obj) => obj.parentId === parent),
                   panelType
                 );
           })
-        : createStandardList(pageContents, panelType)}
+        : createStandardList(drawerContents, panelType)}
     </div>
   );
 };
