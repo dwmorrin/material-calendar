@@ -12,6 +12,10 @@ import {
 import MenuIcon from "@material-ui/icons/Menu";
 import { RouteComponentProps } from "@reach/router";
 import TemporaryDrawer from "./TemporaryDrawer";
+import ProgressBar from "./ProgressBar";
+import DropDown from "./DropDown";
+import Paper from "@material-ui/core/Paper";
+import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,7 +34,7 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
   const pickerShowing = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
-  const pageContents = [
+  const tempProjects = [
     {
       id: "Compression Project St3 Sp20",
       parentId: "Engineering the Record",
@@ -50,6 +54,87 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
       id: "Sound-Alike Phase 3 St3 Sp20",
       parentId: "Engineering the Record",
       title: "Sound-Alike Phase 3 St3 Sp20"
+    }
+  ];
+  const tempWeeks = [
+    {
+      id: "March 14 - March 22",
+      title: "March 14 - March 22"
+    },
+    {
+      id: "March 22 - March 29",
+      title: "March 22 - March 29"
+    },
+    {
+      id: "March 29 - April 5",
+      title: "March 29 - April 5"
+    }
+  ];
+  const tempLocations = [
+    {
+      id: "Studio 1",
+      parentId: "Studios",
+      title: "Studio 1"
+    },
+    {
+      id: "Studio 2",
+      parentId: "Studios",
+      title: "Studio 2"
+    },
+    {
+      id: "Studio 3",
+      parentId: "Studios",
+      title: "Studio 3"
+    },
+    {
+      id: "Studio 4",
+      parentId: "Studios",
+      title: "Studio 4"
+    },
+    {
+      id: "Edit Suite 1",
+      parentId: "Edit Suites",
+      title: "Edit Suite 1"
+    },
+    {
+      id: "Edit Suite 2",
+      parentId: "Edit Suites",
+      title: "Edit Suite 2"
+    },
+    {
+      id: "Edit Suite 3",
+      parentId: "Edit Suites",
+      title: "Edit Suite 3"
+    },
+    {
+      id: "Edit Suite 4",
+      parentId: "Edit Suites",
+      title: "Edit Suite 4"
+    },
+    {
+      id: "Edit Suite 5",
+      parentId: "Edit Suites",
+      title: "Edit Suite 5"
+    },
+    {
+      id: "Production Suite A",
+      parentId: "Studios",
+      title: "Production Suite A"
+    },
+    {
+      id: "Production Suite B",
+      parentId: "Studios",
+      title: "Production Suite B"
+    },
+    {
+      id: "Rehearsal Room 1",
+      parentId: "Rehearsal Rooms",
+      title: "Rehearsal Room 1"
+    },
+    {
+      id: "Rehearsal Room 2",
+      parentId: "Rehearsal Rooms",
+      title: "Rehearsal Room 2"
     }
   ];
 
@@ -72,7 +157,7 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
           open={drawerIsOpen}
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
-          pageContents={pageContents}
+          drawerContents={tempProjects}
           panelType={"buttons"}
         />
       </div>
@@ -89,7 +174,7 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
               <MenuIcon />
             </IconButton>
             <Button className={classes.title}>
-              <Typography component="h6">{pageContents[0].title}</Typography>
+              <Typography component="h6">{tempProjects[0].title}</Typography>
             </Button>
             <IconButton></IconButton>
           </Toolbar>
@@ -102,55 +187,21 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
               <Paper className={classes.paper}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    Total Project Hours
-                    <br></br>
-                    <ProgressBar value1={85} value2={15} />{" "}
-                  </Grid>
-                  <Grid item xs={12}>
                     Studio Allotment
                   </Grid>
                   <Grid item xs={5}>
-                    <FormControl className={classes.formControl}>
-                      <InputLabel htmlFor="age-native-simple">
-                        Studio 1
-                      </InputLabel>
-                      <Select
-                        native
-                        value={state.age}
-                        onChange={handleChange}
-                        inputProps={{
-                          name: "Studio 1",
-                          id: "age-native-simple"
-                        }}
-                      >
-                        <option aria-label="None" value="" />
-                        <option value={10}>Studio 1</option>
-                        <option value={20}>Studio 2</option>
-                        <option value={30}>Studio 3</option>
-                        <option value={30}>Studio 4</option>
-                      </Select>
-                    </FormControl>
+                    <DropDown
+                      selectName="studios"
+                      selectId="studiosDropDown"
+                      contents={tempLocations}
+                    ></DropDown>
                   </Grid>
                   <Grid item xs={7}>
-                    <FormControl className={classes.formControl}>
-                      <InputLabel htmlFor="age-native-simple">
-                        March 14 - March 22
-                      </InputLabel>
-                      <Select
-                        native
-                        value={state.age}
-                        onChange={handleChange}
-                        inputProps={{
-                          name: "March 14 - March 22",
-                          id: "age-native-simple"
-                        }}
-                      >
-                        <option aria-label="None" value="" />
-                        <option value={10}>March 14 - March 22</option>
-                        <option value={20}>March 22 - March 29</option>
-                        <option value={30}>March 29 - April 5</option>
-                      </Select>
-                    </FormControl>
+                    <DropDown
+                      selectName="dates"
+                      selectId="datesDropDown"
+                      contents={tempWeeks}
+                    ></DropDown>
                   </Grid>
                   <Grid item xs={12}>
                     <ProgressBar
