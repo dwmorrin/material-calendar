@@ -1,5 +1,5 @@
-import Event, { EventData } from "./Event";
-import Location, { LocationData } from "./Location";
+import Event from "./Event";
+import Location from "./Location";
 import FullCalendar from "@fullcalendar/react";
 export enum CalendarAction {
   ChangedView,
@@ -28,6 +28,7 @@ export interface CalendarState {
   currentView: string;
   detailIsOpen: boolean;
   drawerIsOpen: boolean;
+  error?: Error;
   events: Event[];
   loading: boolean;
   locations: Location[];
@@ -38,20 +39,7 @@ export interface CalendarState {
 // https://github.com/redux-utilities/flux-standard-action
 export interface Action {
   type: CalendarAction;
-  payload?: {
-    error?: Error;
-    currentEvent?: Event;
-    currentStart?: Date;
-    currentView?: CalendarView;
-    detailIsOpen?: boolean;
-    drawerIsOpen?: boolean;
-    events?: Event[];
-    locations?: Location[];
-    eventData?: EventData[];
-    locationData?: LocationData[];
-    pickerShowing?: boolean;
-    ref?: React.RefObject<FullCalendar> | null;
-  };
+  payload?: Partial<CalendarState>;
   error?: boolean;
 }
 

@@ -51,13 +51,13 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       url: "/events",
       dispatch,
       onSuccessAction: CalendarAction.ReceivedEvents,
-      payloadKey: "eventData",
+      payloadKey: "events",
     });
     fetchCalendarData({
       url: "/locations",
       dispatch,
       onSuccessAction: CalendarAction.ReceivedLocations,
-      payloadKey: "locationData",
+      payloadKey: "locations",
     });
   }, [user]);
 

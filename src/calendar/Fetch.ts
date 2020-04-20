@@ -1,4 +1,4 @@
-import { Action, CalendarAction } from "./types";
+import { Action, CalendarAction, CalendarState } from "./types";
 
 /**
  * https://google.github.io/styleguide/jsoncstyleguide.xml
@@ -22,7 +22,7 @@ interface FetchOptions {
   onFailureAction?: CalendarAction;
   onLoadingAction?: CalendarAction;
   onSuccessAction: CalendarAction;
-  payloadKey: string;
+  payloadKey: keyof CalendarState;
   url: string;
 }
 

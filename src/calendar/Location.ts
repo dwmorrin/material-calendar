@@ -1,4 +1,4 @@
-import Resource from "./Resource";
+import { ResourceInput } from "@fullcalendar/resource-common/structs/resource";
 
 export interface LocationDictionary {
   [k: string]: boolean;
@@ -35,24 +35,16 @@ export const locationGroupReducer = (
   }
 };
 
-export interface LocationData {
+interface Location extends ResourceInput {
   id: string;
-  title: string;
-  eventColor?: string;
-  groupId?: string;
+  selected: boolean;
+  groupId: string;
 }
 
-class Location implements Resource {
+class Location implements Location {
   public selected = false;
-  public id: string;
-  public title: string;
-  public eventColor: string;
-  public groupId: string;
-  constructor(data: LocationData) {
-    this.id = data.id;
-    this.title = data.title;
-    this.eventColor = data.eventColor || "";
-    this.groupId = data.groupId || "";
+  constructor(location: Location) {
+    Object.assign(this, location);
   }
 }
 

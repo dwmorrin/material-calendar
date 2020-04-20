@@ -46,24 +46,26 @@ const calendarReducer = (
   }
 
   if (action.type === CalendarAction.ReceivedEvents) {
-    if (!action.payload?.eventData) {
+    if (!action.payload?.events) {
       throw new Error("no event data in received events");
     }
     return {
       ...state,
       loading: !state.locations,
-      events: action.payload.eventData.map((data) => new Event(data)),
+      events: action.payload.events.map((event) => new Event(event)),
     };
   }
 
   if (action.type === CalendarAction.ReceivedLocations) {
-    if (!action.payload?.locationData) {
-      throw new Error("no location data in received locations");
+    if (!action.payload?.locations) {
+      throw new Error("no locations in received locations");
     }
     return {
       ...state,
       loading: !state.events,
-      locations: action.payload.locationData.map((data) => new Location(data)),
+      locations: action.payload.locations.map(
+        (location) => new Location(location)
+      ),
     };
   }
 

@@ -1,7 +1,12 @@
-export const getFormattedEventInterval = (
-  start: string,
-  end: string
-): string => {
+import { DateInput } from "@fullcalendar/core/datelib/env";
+
+export function getFormattedEventInterval(
+  start?: DateInput,
+  end?: DateInput
+): string {
+  if (typeof start !== "string" || typeof end !== "string") {
+    return "Oops, error! Unknown date!";
+  }
   const startDate = new Date(start);
   const endDate = new Date(end);
   const dateFormat = { weekday: "long", day: "numeric", month: "long" };
@@ -13,4 +18,4 @@ export const getFormattedEventInterval = (
     "en-US",
     timeFormat
   )} - ${endDate.toLocaleTimeString("en-US", timeFormat)}`;
-};
+}
