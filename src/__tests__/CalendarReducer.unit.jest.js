@@ -1,21 +1,8 @@
 import calendarReducer from "../calendar/Reducer";
 import { CalendarAction } from "../calendar/types";
+import { testModifiedState } from "../calendar/initialCalendarState";
 
 const initialState = {};
-const modifiedState = {
-  currentEvent: true,
-  currentStart: true,
-  currentView: true,
-  detailIsOpen: true,
-  drawerIsOpen: true,
-  events: [],
-  eventData: [],
-  loading: true,
-  locations: [],
-  locationData: [],
-  pickerShowing: true,
-  ref: true,
-};
 
 Object.keys(CalendarAction).forEach((action) => {
   if (!isNaN(+action)) return;
@@ -24,7 +11,7 @@ Object.keys(CalendarAction).forEach((action) => {
     expect(
       calendarReducer(initialState, {
         type: CalendarAction[action],
-        payload: modifiedState,
+        payload: testModifiedState,
       })
     ).not.toStrictEqual(initialState);
   });
