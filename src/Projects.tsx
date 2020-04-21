@@ -50,10 +50,11 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
   const pickerShowing = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
-  const tempProjects = Database.projects;
+
+  const projects = Database.projects;
   const group = Database.group;
-  const tempLocations = Database.locations;
-  const tempWeeks = Database.weeks;
+  const locations = Database.locations;
+  const weeks = Database.weeks;
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -74,7 +75,7 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
           open={drawerIsOpen}
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
-          drawerContents={tempProjects}
+          drawerContents={projects}
           panelType={"buttons"}
         />
       </div>
@@ -91,7 +92,7 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
               <MenuIcon />
             </IconButton>
             <Button className={classes.title}>
-              <Typography component="h6">{tempProjects[0].title}</Typography>
+              <Typography component="h6">{projects[0].title}</Typography>
             </Button>
             <IconButton></IconButton>
           </Toolbar>
@@ -110,14 +111,14 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
                     <DropDown
                       selectName="studios"
                       selectId="studiosDropDown"
-                      contents={tempLocations}
+                      contents={locations}
                     ></DropDown>
                   </Grid>
                   <Grid item xs={7}>
                     <DropDown
                       selectName="dates"
                       selectId="datesDropDown"
-                      contents={tempWeeks}
+                      contents={weeks}
                     ></DropDown>
                   </Grid>
                   <Grid item xs={12}>
