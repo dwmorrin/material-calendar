@@ -43,6 +43,9 @@ const calendarReducer = (
       throw new Error("no date returned from picker");
     }
     const currentStart = action.payload.currentStart;
+    if (state.ref?.current) {
+      state.ref.current.getApi().gotoDate(currentStart);
+    }
     return { ...state, currentStart, pickerShowing: !state.pickerShowing };
   }
 
