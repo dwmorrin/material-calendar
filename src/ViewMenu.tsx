@@ -61,7 +61,7 @@ export default function ViewMenu(): JSX.Element {
                   return <ViewComfyIcon />;
               }
             })()}
-            <MenuItem style={{ float: "right" }}>{option}</MenuItem>
+            <p style={{ paddingLeft: "15px" }}>{option}</p>
           </MenuItem>
         ))}
       </Menu>
