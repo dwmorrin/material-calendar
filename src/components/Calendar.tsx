@@ -8,7 +8,7 @@ import React, {
 import { makeStyles } from "@material-ui/core/styles";
 import { RouteComponentProps, Redirect } from "@reach/router";
 import TemporaryDrawer from "./TemporaryDrawer";
-import { CalendarAction, CalendarState } from "../calendar/types";
+import { CalendarAction } from "../calendar/types";
 import CalendarBar from "./CalendarBar";
 import StaticDatePicker from "./DatePicker";
 import FullCalendar from "@fullcalendar/react";
@@ -17,24 +17,13 @@ import { fetchCalendarData } from "../calendar/Fetch";
 import calendarReducer from "../calendar/Reducer";
 import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
+import initialState from "../calendar/initialCalendarState";
 
 const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
   },
 }));
-
-const initialState: CalendarState = {
-  currentStart: new Date(),
-  currentView: "resourceTimeGridDay",
-  detailIsOpen: false,
-  drawerIsOpen: false,
-  events: [],
-  loading: true,
-  locations: [],
-  pickerShowing: false,
-  ref: null,
-};
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
@@ -58,6 +47,12 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       dispatch,
       onSuccessAction: CalendarAction.ReceivedLocations,
       payloadKey: "locations",
+    });
+    fetchCalendarData({
+      url: "/projects",
+      dispatch,
+      onSuccessAction: CalendarAction.ReceivedProjects,
+      payloadKey: "projects",
     });
   }, [user]);
 

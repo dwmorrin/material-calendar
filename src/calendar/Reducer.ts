@@ -1,6 +1,7 @@
 import { CalendarAction, CalendarState, Action } from "./types";
 import Event from "./Event";
 import Location from "./Location";
+import Project from "./Project";
 
 /**
  * calendarReducer takes all actions from the calendar and handles them
@@ -66,6 +67,17 @@ const calendarReducer = (
       locations: action.payload.locations.map(
         (location) => new Location(location)
       ),
+    };
+  }
+
+  if (action.type === CalendarAction.ReceivedProjects) {
+    if (!action.payload?.projects) {
+      throw new Error("no projects in received projects");
+    }
+    return {
+      ...state,
+      loading: !state.events || !state.locations,
+      projects: action.payload.projects.map((project) => new Project(project)),
     };
   }
 

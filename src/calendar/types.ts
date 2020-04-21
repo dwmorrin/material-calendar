@@ -1,6 +1,8 @@
 import Event from "./Event";
 import Location from "./Location";
+import Project from "./Project";
 import FullCalendar from "@fullcalendar/react";
+
 export enum CalendarAction {
   ChangedView,
   CloseEventDetail,
@@ -9,6 +11,7 @@ export enum CalendarAction {
   PickedDate,
   ReceivedEvents,
   ReceivedLocations,
+  ReceivedProjects,
   SelectedLocation,
   ToggleDrawer,
   TogglePicker,
@@ -33,6 +36,7 @@ export interface CalendarState {
   loading: boolean;
   locations: Location[];
   pickerShowing: boolean;
+  projects: Project[];
   ref: React.RefObject<FullCalendar> | null;
 }
 
