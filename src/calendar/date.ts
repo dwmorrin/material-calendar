@@ -1,5 +1,29 @@
 import { DateInput } from "@fullcalendar/core/datelib/env";
 
+function isDate(date?: DateInput): date is Date {
+  return (
+    !!date &&
+    typeof date !== "string" &&
+    typeof date !== "number" &&
+    !Array.isArray(date) &&
+    date.getTime !== undefined
+  );
+}
+
+function dateInputToNumber(dateInput?: DateInput): number {
+  if (typeof dateInput === "string") return +new Date(dateInput);
+  if (isDate(dateInput)) return +dateInput;
+  if (typeof dateInput === "number") return dateInput;
+  throw new Error(`could not convert date input {${dateInput}} to a number`);
+}
+
+export function compareDateOrder(
+  earlier?: DateInput,
+  later?: DateInput
+): boolean {
+  return dateInputToNumber(earlier) <= dateInputToNumber(later);
+}
+
 export function getFormattedEventInterval(
   start?: DateInput,
   end?: DateInput
