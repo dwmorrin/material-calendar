@@ -28,6 +28,17 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
     color: "white"
+  },
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: "center"
+  },
+  grid: {
+    textAlign: "center"
+  },
+  text: {
+    paddingLeft: "10px",
+    textAlign: "left"
   }
 }));
 
@@ -36,8 +47,9 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
   const tempProjects = Database.projects;
-  const tempWeeks = Database.weeks;
+  const group = Database.group;
   const tempLocations = Database.locations;
+  const tempWeeks = Database.weeks;
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -114,35 +126,65 @@ const Projects: FunctionComponent<RouteComponentProps> = () => {
               </Paper>
             </Grid>
             <Grid item xs={12} className={classes.grid}>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <b>My Group</b>
+              <Paper className={classes.paper}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <b>My Group</b>
+                  </Grid>
+                  <Grid item xs={5}>
+                    <p className={classes.text}>
+                      {" "}
+                      Group Members:
+                      <br />
+                      {group.length < 1 ? undefined : (
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="inherit"
+                          disableElevation
+                        >
+                          Leave Group
+                        </Button>
+                      )}
+                    </p>
+                  </Grid>
+                  <Grid item xs={7}>
+                    <p className={classes.text}>
+                      {group.map((user, key) => {
+                        return (
+                          <span key={key}>
+                            {user.name}
+                            <br />
+                          </span>
+                        );
+                      })}
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="inherit"
+                        disableElevation
+                      >
+                        Add User
+                      </Button>
+                    </p>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <p className={classes.text}>My Hours:</p>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ProgressBar
+                      left={{ title: "", value: 12, color: "#fc0303" }}
+                      right={{ title: "", value: 3, color: "#03fc1c" }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <p className={classes.text}>Upcoming Sessions:</p>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <p className={classes.text}>Previous Sessions:</p>
+                  </Grid>
                 </Grid>
-                <Grid item xs={5}>
-                  <p className={classes.text}> Group Members:</p>
-                </Grid>
-                <Grid item xs={7}>
-                  <p className={classes.text}>
-                    John Lennon<br></br>Paul McCartney<br></br>George Harrison
-                    <br></br>Ringo Starr
-                  </p>
-                </Grid>
-                <Grid item xs={12}>
-                  <p className={classes.text}>My Hours:</p>
-                </Grid>
-                <Grid item xs={12}>
-                  <ProgressBar
-                    left={{ title: "", value: 12, color: "#fc0303" }}
-                    right={{ title: "", value: 3, color: "#03fc1c" }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <p className={classes.text}>Upcoming Sessions:</p>
-                </Grid>
-                <Grid item xs={12}>
-                  <p className={classes.text}>Previous Sessions:</p>
-                </Grid>
-              </Grid>
+              </Paper>
             </Grid>
           </Grid>
         </Box>
