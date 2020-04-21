@@ -110,6 +110,11 @@ const Database = {
       id: "Rehearsal Room 2",
       parentId: "Rehearsal Rooms",
       title: "Rehearsal Room 2"
+    },
+    {
+      id: "Outside Events",
+      parentId: "Other",
+      title: "Outside Events"
     }
   ]
 };

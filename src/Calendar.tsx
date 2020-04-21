@@ -52,7 +52,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
-  const tempLocations = Database.locations;
+  const locations = Database.locations;
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -106,7 +106,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
           panelType={"checkboxes"}
-          drawerContents={tempLocations}
+          drawerContents={locations}
         />
       </div>
       <AppBar position="sticky">
