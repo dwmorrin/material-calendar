@@ -1,5 +1,5 @@
 // NOTE this page will not be used if single-sign-on is implemented
-import React, { FunctionComponent, useContext } from "react";
+import React, { FunctionComponent, useContext, useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -37,20 +37,30 @@ const useStyles = makeStyles((theme) => ({
 
 const SignIn: FunctionComponent<RouteComponentProps> = () => {
   const { setUser } = useContext(AuthContext);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const classes = useStyles();
 
-  const submitHandler = (submitEvent: { preventDefault: () => void }): void => {
+  const handleSubmit = (submitEvent: React.SyntheticEvent): void => {
     submitEvent.preventDefault();
-    fetch("/users")
+    // FOR TESTING ONLY, NOT USED IN PRODUCTION
+    fetch("/api/login", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    })
       .then((response) => response.json())
-      .then((user) => {
+      .then((userData) => {
         if (!setUser) {
           throw new Error("no method to log in user found");
         }
-        if (!user.id) {
-          throw new Error("invalid user id");
+        if (!userData[0]) {
+          throw new Error("not a valid user");
         }
-        setUser(user);
+        setUser({ id: userData[0] });
         navigate("/calendar");
       })
       .catch((error) => {
@@ -72,7 +82,7 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
         <Typography component="h1" variant="h5">
           {process.env.REACT_APP_APP_NAME}
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={handleSubmit}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -82,6 +92,7 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
             label={process.env.REACT_APP_EMAIL_LABEL}
             name="email"
             autoComplete="email"
+            onChange={({ target }): void => setUsername(target.value)}
           />
           <TextField
             variant="outlined"
@@ -93,6 +104,7 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={({ target }): void => setPassword(target.value)}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
@@ -104,7 +116,6 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={submitHandler}
           >
             Sign In
           </Button>
