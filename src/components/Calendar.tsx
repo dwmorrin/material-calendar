@@ -37,19 +37,19 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   useEffect(() => {
     if (!user?.id) return;
     fetchCalendarData({
-      url: "/events",
+      url: "/api/events",
       dispatch,
       onSuccessAction: CalendarAction.ReceivedEvents,
       payloadKey: "events",
     });
     fetchCalendarData({
-      url: "/locations",
+      url: "/api/locations",
       dispatch,
       onSuccessAction: CalendarAction.ReceivedLocations,
       payloadKey: "locations",
     });
     fetchCalendarData({
-      url: "/projects",
+      url: "/api/projects",
       dispatch,
       onSuccessAction: CalendarAction.ReceivedProjects,
       payloadKey: "projects",
