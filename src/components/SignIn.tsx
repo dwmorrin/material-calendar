@@ -1,5 +1,10 @@
 // NOTE this page will not be used if single-sign-on is implemented
-import React, { FunctionComponent, useContext, useState } from "react";
+import React, {
+  FunctionComponent,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -14,6 +19,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { navigate, RouteComponentProps } from "@reach/router";
 import { AuthContext } from "./AuthContext";
+import User from "../user/User";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -35,39 +41,67 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const login = (
+  username: string,
+  setUser?: React.Dispatch<React.SetStateAction<User>>,
+  setErrors?: React.Dispatch<
+    React.SetStateAction<{
+      username: boolean;
+      password: boolean;
+    }>
+  >
+): void => {
+  if (!setUser || !setErrors) return;
+  // FOR TESTING ONLY, NOT USED IN PRODUCTION
+  fetch("/api/login", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username }),
+  })
+    .then((response) => response.json())
+    .then((user) => {
+      if (!setUser) {
+        throw new Error("no method to log in user found");
+      }
+      if (!user) {
+        throw new Error("not a valid user");
+      }
+      if (!user.id) {
+        setErrors({ username: true, password: false });
+        return;
+      }
+      sessionStorage.setItem("id", user.id);
+      setUser(new User(user));
+      navigate("/calendar");
+    })
+    .catch(() => {
+      setErrors({ username: true, password: false });
+    });
+};
+
 const SignIn: FunctionComponent<RouteComponentProps> = () => {
   const { setUser } = useContext(AuthContext);
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({
+    username: false,
+    password: false,
+  });
   const classes = useStyles();
 
   const handleSubmit = (submitEvent: React.SyntheticEvent): void => {
     submitEvent.preventDefault();
-    // FOR TESTING ONLY, NOT USED IN PRODUCTION
-    fetch("/api/login", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    })
-      .then((response) => response.json())
-      .then((userData) => {
-        if (!setUser) {
-          throw new Error("no method to log in user found");
-        }
-        if (!userData[0]) {
-          throw new Error("not a valid user");
-        }
-        setUser({ id: userData[0] });
-        navigate("/calendar");
-      })
-      .catch((error) => {
-        console.error(error);
-        // rerender this page with error in form
-      });
+    login(username, setUser, setErrors);
   };
+
+  useEffect(() => {
+    const username = sessionStorage.getItem("id");
+    if (username) {
+      login(username, setUser, setErrors);
+    }
+  }, [setUser]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -88,10 +122,11 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
             margin="normal"
             required
             fullWidth
-            id="email"
-            label={process.env.REACT_APP_EMAIL_LABEL}
-            name="email"
-            autoComplete="email"
+            error={errors.username}
+            id="username"
+            label={process.env.REACT_APP_USERNAME_LABEL}
+            name="username"
+            autoComplete="username"
             onChange={({ target }): void => setUsername(target.value)}
           />
           <TextField
@@ -99,12 +134,12 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
             margin="normal"
             required
             fullWidth
+            error={errors.password}
             name="password"
             label={process.env.REACT_APP_PASSWORD_LABEL}
             type="password"
             id="password"
             autoComplete="current-password"
-            onChange={({ target }): void => setPassword(target.value)}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}

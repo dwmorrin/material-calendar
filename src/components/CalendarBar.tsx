@@ -28,7 +28,7 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { setUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const classes = useStyles();
   return (
     <AppBar position="sticky">
@@ -67,10 +67,11 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
           </IconButton>
           <IconButton
             onClick={(): void => {
-              if (!setUser) {
+              if (!user || !setUser) {
                 throw new Error("no method to logout user");
               }
-              setUser({ id: undefined });
+              user.id = "";
+              setUser(user);
             }}
           >
             <MoreVertIcon />
