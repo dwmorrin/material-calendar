@@ -1,8 +1,14 @@
 export interface Project {
-  title: string;
-  start: string | Date;
   end: string | Date;
-  locationTitles: string[];
+  id?: string | number;
+  locationId?: string | number;
+  locationTitles?: string[];
+  open?: boolean;
+  reservationEnd?: string | Date;
+  reservationStart?: string | Date;
+  start: string | Date;
+  title: string;
+  userId?: string;
 }
 
 export class Project {
