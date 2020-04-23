@@ -13,6 +13,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import TodayIcon from "@material-ui/icons/Today";
 import { AuthContext } from "./AuthContext";
+import { navigate } from "@reach/router";
 
 const useStyles = makeStyles((theme) => ({
   menuButton: {
@@ -71,7 +72,9 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
                 throw new Error("no method to logout user");
               }
               user.id = "";
+              sessionStorage.clear();
               setUser(user);
+              navigate("/");
             }}
           >
             <MoreVertIcon />
