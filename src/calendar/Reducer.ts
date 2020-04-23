@@ -28,6 +28,10 @@ const calendarReducer = (
     return { ...state, detailIsOpen: false };
   }
 
+  if (action.type === CalendarAction.CloseProjectDashboard) {
+    return { ...state, projectDashboardIsOpen: false };
+  }
+
   if (action.type === CalendarAction.Error) {
     if (action.payload && action.payload.error) {
       console.error(action.payload.error);
@@ -47,6 +51,17 @@ const calendarReducer = (
       state.ref.current.getApi().gotoDate(currentStart);
     }
     return { ...state, currentStart, pickerShowing: !state.pickerShowing };
+  }
+
+  if (action.type === CalendarAction.OpenProjectDashboard) {
+    return {
+      ...state,
+      currentProject: action.payload?.currentProject,
+      detailIsOpen: false,
+      drawerIsOpen: false,
+      pickerShowing: false,
+      projectDashboardIsOpen: true,
+    };
   }
 
   if (action.type === CalendarAction.ReceivedEvents) {

@@ -64,6 +64,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                   (project) =>
                     compareDateOrder(project.start, start) &&
                     compareDateOrder(end, project.end) &&
+                    project.locationTitles &&
                     project.locationTitles.includes(location)
                 )
                 .map((project) => (

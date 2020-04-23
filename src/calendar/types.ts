@@ -6,9 +6,11 @@ import FullCalendar from "@fullcalendar/react";
 export enum CalendarAction {
   ChangedView,
   CloseEventDetail,
+  CloseProjectDashboard,
   Error,
   Loading,
   PickedDate,
+  OpenProjectDashboard,
   ReceivedEvents,
   ReceivedLocations,
   ReceivedProjects,
@@ -27,6 +29,7 @@ export type CalendarView =
 
 export interface CalendarState {
   currentEvent?: Event;
+  currentProject?: Project;
   currentStart: Date;
   currentView: string;
   detailIsOpen: boolean;
@@ -36,6 +39,7 @@ export interface CalendarState {
   loading: boolean;
   locations: Location[];
   pickerShowing: boolean;
+  projectDashboardIsOpen: boolean;
   projects: Project[];
   ref: React.RefObject<FullCalendar> | null;
 }

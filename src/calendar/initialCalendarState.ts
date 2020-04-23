@@ -1,8 +1,15 @@
 import Event from "./Event";
 import { CalendarState } from "./types";
+import Project from "./Project";
 
 export const testModifiedState: CalendarState = {
   currentEvent: new Event({ location: "", open: true }),
+  currentProject: new Project({
+    title: "",
+    start: "",
+    end: "",
+    locationTitles: [],
+  }),
   currentStart: new Date(),
   currentView: "resourceTimeGridDay",
   detailIsOpen: true,
@@ -12,6 +19,7 @@ export const testModifiedState: CalendarState = {
   loading: true,
   locations: [],
   pickerShowing: true,
+  projectDashboardIsOpen: true,
   projects: [],
   ref: null,
 };
@@ -25,6 +33,7 @@ export const initialCalendarState: CalendarState = {
   loading: true,
   locations: [],
   pickerShowing: false,
+  projectDashboardIsOpen: false,
   projects: [],
   ref: null,
 };

@@ -18,6 +18,7 @@ import calendarReducer from "../calendar/Reducer";
 import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
 import initialState from "../calendar/initialCalendarState";
+import ProjectDashboard from "./ProjectDashboard";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -59,6 +60,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   return (
     (user?.id && (
       <div className={classes.root}>
+        <ProjectDashboard dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />
         <CalendarBar dispatch={dispatch} state={state} />
