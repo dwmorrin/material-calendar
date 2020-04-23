@@ -4,7 +4,7 @@ import React, {
   useState,
   SetStateAction,
 } from "react";
-import User from "../user";
+import User from "../user/User";
 
 interface AuthContext {
   user?: User;
@@ -12,9 +12,17 @@ interface AuthContext {
 }
 const initialContext: AuthContext = {};
 export const AuthContext = createContext(initialContext);
-const nullUser: User = {};
 const AuthProvider: FunctionComponent = ({ children }) => {
-  const [user, setUser] = useState(nullUser);
+  const [user, setUser] = useState(
+    new User({
+      id: "",
+      firstName: "",
+      lastName: "",
+      role: -1,
+      groupIds: [],
+      projectIds: [],
+    })
+  );
   const value = { user, setUser };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -18,7 +18,10 @@ export interface DataResponse {
 */
 
 interface FetchOptions {
+  body?: {};
+  credentials?: "same-origin";
   dispatch: (action: Action) => void;
+  method?: "GET" | "POST";
   onFailureAction?: CalendarAction;
   onLoadingAction?: CalendarAction;
   onSuccessAction: CalendarAction;
@@ -28,7 +31,10 @@ interface FetchOptions {
 
 export const fetchCalendarData = (props: FetchOptions): void => {
   const {
+    body = {},
+    credentials = "same-origin",
     dispatch,
+    method = "GET",
     onFailureAction = CalendarAction.Error,
     onLoadingAction = CalendarAction.Loading,
     onSuccessAction,
@@ -36,7 +42,15 @@ export const fetchCalendarData = (props: FetchOptions): void => {
     url,
   } = props;
   dispatch({ type: onLoadingAction });
-  fetch(url)
+  const options: { [k: string]: string | {} } = {
+    method,
+    credentials,
+  };
+  if (method === "POST") {
+    options.headers = { "Content-Type": "application/json" };
+    options.body = body;
+  }
+  fetch(url, options)
     .then((response) => response.json())
     .then((data) => {
       dispatch({
