@@ -48,7 +48,7 @@ export const fetchCalendarData = (props: FetchOptions): void => {
   };
   if (method === "POST") {
     options.headers = { "Content-Type": "application/json" };
-    options.body = body;
+    options.body = JSON.stringify(body);
   }
   fetch(url, options)
     .then((response) => response.json())

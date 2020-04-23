@@ -5,13 +5,13 @@ import {
 
 interface Event extends EventNonDateInput, EventDateInput {
   location: string;
+  locationId: string | number;
   open: boolean | number;
 }
 
 class Event implements Event {
   constructor(event: Event) {
     Object.assign(this, event);
-    this.resourceId = event.location;
     this.open = !!this.open;
   }
 }

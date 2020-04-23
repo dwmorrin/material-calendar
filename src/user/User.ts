@@ -3,8 +3,8 @@ interface User {
   firstName: string;
   lastName: string;
   role: number;
-  groupIds: number[];
-  projectIds: number[];
+  groupIds: (string | number)[];
+  projectIds: (string | number)[];
 }
 
 class User {
