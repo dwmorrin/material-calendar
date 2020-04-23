@@ -1,8 +1,8 @@
 import React, {
   FunctionComponent,
-  // useEffect,
-  // useContext,
-  // useState,
+  useEffect,
+  useContext,
+  useState,
 } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
@@ -13,12 +13,14 @@ import {
   Dialog,
   Toolbar,
   Typography,
+  Button,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import Select from "./Select";
 import ProgressBar from "./ProgressBar";
-// import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
+import UserGroup from "../user/UserGroup";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -49,21 +51,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const transition = makeTransition("right");
+const initialGroups: UserGroup[] = [];
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  // const { user } = useContext(AuthContext);
-  // const [projects, setProjects] = useState([]);
+  const { user } = useContext(AuthContext);
+  const [groups, setGroups] = useState(initialGroups);
+  const { currentProject } = state;
 
-  // useEffect(() => {
-  //   if (!state.currentProject?.id) return;
-  //   fetch(`/api/groups/${state.currentProject.id}`)
-  //     .then((response) => response.json())
-  //     .then(setProjects)
-  //     .catch(console.error);
-  // }, [user]);
+  useEffect(() => {
+    fetch(`/api/project_groups/${currentProject?.id}`)
+      .then((response) => response.json())
+      .then((groups) => {
+        const usergroups = groups.map(
+          (group: UserGroup) => new UserGroup(group)
+        );
+        setGroups(usergroups);
+      })
+      .catch(console.error);
+  }, [currentProject, user]);
 
   const classes = useStyles();
   return (
@@ -101,15 +109,15 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                   contents={state.locations}
                 ></Select>
               </Grid>
-              {/* <Grid item xs={7}>
+              <Grid item xs={7}>
                 <Select
                   dispatch={dispatch}
                   state={state}
-                  selectName="dates"
-                  selectId="datesDropDown"
-                  //contents={projects}
+                  selectName="groups"
+                  selectId="groupsSelect"
+                  contents={groups}
                 ></Select>
-              </Grid> */}
+              </Grid>
               <Grid item xs={12}>
                 <ProgressBar
                   left={{ title: "", value: 9, color: "#fc0303" }}
@@ -143,15 +151,17 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                 </p>
               </Grid> */}
               <Grid item xs={7}>
-                {/* <p className={classes.text}>
-                  {group.map((user, key) => {
-                    return (
-                      <span key={key}>
-                        {user.name}
-                        <br />
-                      </span>
-                    );
-                  })}
+                <p className={classes.text}>
+                  {groups
+                    .filter((group) => user?.groupIds.includes(group.id))
+                    .map((group) => {
+                      return (
+                        <span key={group.id}>
+                          {group.title}
+                          <br />
+                        </span>
+                      );
+                    })}
                   <Button
                     size="small"
                     variant="contained"
@@ -160,7 +170,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                   >
                     Add User
                   </Button>
-                </p> */}
+                </p>
               </Grid>
               <Grid item xs={12}>
                 <p className={classes.text}>My Hours:</p>

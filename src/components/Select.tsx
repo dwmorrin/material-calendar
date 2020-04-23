@@ -3,6 +3,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import { NativeSelect } from "@material-ui/core";
 import { CalendarUIProps } from "../calendar/types";
+import Location from "../calendar/Location";
+import Project from "../calendar/Project";
+import UserGroup from "../user/UserGroup";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -14,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
 interface SelectProps extends CalendarUIProps {
   selectName: string;
   selectId: string;
-  contents: { id: string; title?: string }[];
+  contents: (Location | Project | UserGroup)[];
 }
 
 const Select: FunctionComponent<SelectProps> = ({
