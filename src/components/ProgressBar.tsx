@@ -12,12 +12,13 @@ const ProgressBar: FunctionComponent<ProgressBarProps> = ({ left, right }) => {
   const useStyles = makeStyles({
     container: {
       width: "100%",
+      height: "100%"
     },
     border: {
       borderStyle: "solid",
-      borderRadius: "50px",
+      borderRadius: "20px",
       borderColor: "black",
-      height: "20px",
+      height: "100%",
     },
     left: {
       display: "inline-block",
