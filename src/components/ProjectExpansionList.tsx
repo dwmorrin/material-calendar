@@ -40,6 +40,7 @@ const ProjectExpansionList: FunctionComponent<CalendarUIProps> = ({
       .then(setProjects)
       .catch(console.error);
   }, [user]);
+
   return (
     <ExpansionPanel>
       <ExpansionPanelSummary
