@@ -3,7 +3,7 @@ import { CalendarState } from "./types";
 import Project from "./Project";
 
 export const testModifiedState: CalendarState = {
-  currentEvent: new Event({ location: "", locationId: "", open: true }),
+  currentEvent: new Event({ location: "", open: true }),
   currentProject: new Project({
     end: "",
     id: "",
