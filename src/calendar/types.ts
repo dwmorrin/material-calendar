@@ -15,6 +15,7 @@ export enum CalendarAction {
   ReceivedLocations,
   ReceivedProjects,
   SelectedLocation,
+  SelectedProject,
   ToggleDrawer,
   TogglePicker,
   ViewEventDetail,

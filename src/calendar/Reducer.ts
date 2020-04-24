@@ -106,6 +106,13 @@ const calendarReducer = (
     return { ...state, locations: action.payload.locations };
   }
 
+  if (action.type === CalendarAction.SelectedProject) {
+    if (!action.payload?.projects) {
+      throw new Error("no user projects in selected projects");
+    }
+    return { ...state, projects: action.payload.projects };
+  }
+
   if (action.type === CalendarAction.ToggleDrawer) {
     return { ...state, drawerIsOpen: !state.drawerIsOpen };
   }

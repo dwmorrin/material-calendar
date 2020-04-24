@@ -3,12 +3,17 @@ import { CalendarState } from "./types";
 import Project from "./Project";
 
 export const testModifiedState: CalendarState = {
-  currentEvent: new Event({ location: "", open: true }),
+  currentEvent: new Event({ location: "", locationId: "", open: true }),
   currentProject: new Project({
-    title: "",
-    start: "",
     end: "",
-    locationTitles: [],
+    id: "",
+    locationIds: [],
+    parentId: "",
+    reservationEnd: "",
+    reservationStart: "",
+    selected: false,
+    start: "",
+    title: "",
   }),
   currentStart: new Date(),
   currentView: "resourceTimeGridDay",

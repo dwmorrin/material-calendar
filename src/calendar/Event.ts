@@ -5,6 +5,7 @@ import {
 
 interface Event extends EventNonDateInput, EventDateInput {
   location: string;
+  locationId: string | number;
   open: boolean | number;
 }
 
