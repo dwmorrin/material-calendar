@@ -71,7 +71,10 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
               if (!user || !setUser) {
                 throw new Error("no method to logout user");
               }
-              fetch("/api/logout");
+              fetch("/api/logout", {
+                method: "POST",
+                credentials: "include",
+              });
               user.id = "";
               sessionStorage.clear();
               setUser(user);
