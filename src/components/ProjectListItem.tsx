@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
-import { ListItem, ListItemText } from "@material-ui/core";
+import { ListItem, ListItemText, Checkbox } from "@material-ui/core";
 import Project from "../calendar/Project";
 
 interface ProjectListItemProps extends CalendarUIProps {
@@ -23,6 +23,28 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
         })
       }
     >
+      <Checkbox
+        checked={project.selected}
+        size="small"
+        inputProps={{ "aria-label": "checkbox with small size" }}
+        key={project.title}
+        onClick={(event): void => event.stopPropagation()}
+        onChange={(event: React.ChangeEvent<{}>, checked): void => {
+          event.stopPropagation();
+          dispatch({
+            type: CalendarAction.SelectedProject,
+            payload: {
+              projects: state.projects.map((proj) => {
+                if (proj.id !== project.id) {
+                  return proj;
+                }
+                proj.selected = checked;
+                return proj;
+              }),
+            },
+          });
+        }}
+      />
       <ListItemText primary={project.title} />
     </ListItem>
   );

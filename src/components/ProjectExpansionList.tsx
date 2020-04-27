@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useEffect,
-  useContext,
-  useState,
-} from "react";
+import React, { FunctionComponent, useContext } from "react";
 import { CalendarUIProps } from "../calendar/types";
 import {
   ExpansionPanel,
@@ -14,9 +9,8 @@ import {
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/core/styles";
-import { AuthContext } from "./AuthContext";
-import Project from "../calendar/Project";
 import ProjectListItem from "./ProjectListItem";
+import { AuthContext } from "./AuthContext";
 
 const useStyles = makeStyles(() => ({
   nopadding: {
@@ -28,18 +22,8 @@ const ProjectExpansionList: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const initalProjects: Project[] = [];
   const { user } = useContext(AuthContext);
-  const [projects, setProjects] = useState(initalProjects);
   const classes = useStyles();
-
-  useEffect(() => {
-    if (!user?.projectIds) return;
-    fetch(`/api/projects/${user.id}`)
-      .then((response) => response.json())
-      .then(setProjects)
-      .catch(console.error);
-  }, [user]);
   return (
     <ExpansionPanel>
       <ExpansionPanelSummary
@@ -54,14 +38,16 @@ const ProjectExpansionList: FunctionComponent<CalendarUIProps> = ({
       </ExpansionPanelSummary>
       <ExpansionPanelDetails classes={{ root: classes.nopadding }}>
         <List>
-          {projects.map((project) => (
-            <ProjectListItem
-              key={project.id}
-              dispatch={dispatch}
-              state={state}
-              project={project}
-            />
-          ))}
+          {state.projects
+            .filter((project) => user?.projectIds.includes(project.id))
+            .map((project) => (
+              <ProjectListItem
+                key={project.id}
+                dispatch={dispatch}
+                state={state}
+                project={project}
+              />
+            ))}
         </List>
       </ExpansionPanelDetails>
     </ExpansionPanel>
