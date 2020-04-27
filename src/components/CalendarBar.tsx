@@ -14,15 +14,22 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import TodayIcon from "@material-ui/icons/Today";
 import { AuthContext } from "./AuthContext";
 import { navigate } from "@reach/router";
+import ViewMenu from "./ViewMenu";
 
 const useStyles = makeStyles((theme) => ({
   menuButton: {
-    marginRIght: theme.spacing(2),
+    marginRight: theme.spacing(2),
   },
   title: {
     flexGrow: 1,
+    marginRight: theme.spacing(2),
     color: "white",
   },
+  centered: {
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+  centered2: {},
 }));
 
 const CalendarBar: FunctionComponent<CalendarUIProps> = ({
@@ -46,39 +53,44 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
           >
             <MenuIcon />
           </IconButton>
-          <Button
-            className={classes.title}
-            onClick={(): void => {
-              dispatch({ type: CalendarAction.TogglePicker });
-            }}
-          >
-            <Typography component="h6">
-              {state.currentStart.toLocaleString("default", {
-                month: "long",
-                day: "numeric",
-              })}
-            </Typography>
-          </Button>
+          <div className={classes.centered}>
+            <Button
+              className={classes.title}
+              onClick={(): void => {
+                dispatch({ type: CalendarAction.TogglePicker });
+              }}
+            >
+              <Typography component="h6">
+                {state.currentStart.toLocaleString("default", {
+                  month: "long",
+                  day: "numeric",
+                })}
+              </Typography>
+            </Button>
+
+            <IconButton
+              color="inherit"
+              onClick={(): void => {
+                dispatch({ type: CalendarAction.ViewToday });
+              }}
+            >
+              <TodayIcon />
+            </IconButton>
+          </div>
+          <ViewMenu dispatch={dispatch} state={state} />
           <IconButton
-            onClick={(): void => {
-              dispatch({ type: CalendarAction.ViewToday });
-            }}
-          >
-            <TodayIcon />
-          </IconButton>
-          <IconButton
+            color="inherit"
             onClick={(): void => {
               if (!user || !setUser) {
                 throw new Error("no method to logout user");
               }
-              fetch("/api/logout");
               user.id = "";
               sessionStorage.clear();
               setUser(user);
               navigate("/");
             }}
           >
-            <MoreVertIcon />
+            <MoreVertIcon color="inherit" />
           </IconButton>
         </Toolbar>
       </List>
