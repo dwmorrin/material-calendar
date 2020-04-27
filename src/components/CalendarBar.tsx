@@ -78,18 +78,21 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
           </div>
           <ViewMenu dispatch={dispatch} state={state} />
           <IconButton
-            color="inherit"
             onClick={(): void => {
               if (!user || !setUser) {
                 throw new Error("no method to logout user");
               }
+              fetch("/api/logout", {
+                method: "POST",
+                credentials: "include",
+              });
               user.id = "";
               sessionStorage.clear();
               setUser(user);
               navigate("/");
             }}
           >
-            <MoreVertIcon color="inherit" />
+            <MoreVertIcon />
           </IconButton>
         </Toolbar>
       </List>
