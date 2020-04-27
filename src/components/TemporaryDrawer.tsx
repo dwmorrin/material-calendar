@@ -12,7 +12,7 @@ import {
   CalendarUIProps,
 } from "../calendar/types";
 import ResourceList from "./ResourceList";
-import ProjectExpansionList from "./ProjectExpansionList";
+import ProjectList from "./ProjectList";
 
 const useStyles = makeStyles({
   list: {
@@ -80,7 +80,7 @@ const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
           ))}
         </List>
         <Divider />
-        <ProjectExpansionList dispatch={dispatch} state={state} />
+        <ProjectList dispatch={dispatch} state={state} />
         <Divider />
         <ResourceList dispatch={dispatch} state={state} />
       </div>

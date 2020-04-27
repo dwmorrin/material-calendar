@@ -13,6 +13,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/core/styles";
 import ProjectListItem from "./ProjectListItem";
 import { AuthContext } from "./AuthContext";
+import Project from "../calendar/Project";
 
 const useStyles = makeStyles(() => ({
   nopadding: {
@@ -20,18 +21,22 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ProjectExpansionList: FunctionComponent<CalendarUIProps> = ({
+interface ProjectExpansionListProps extends CalendarUIProps {
+  parentId: string | number;
+  projects: Project[];
+}
+
+const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
   dispatch,
   state,
+  parentId,
+  projects,
 }) => {
   const { user } = useContext(AuthContext);
   const classes = useStyles();
-  const userProjects = state.projects.filter((project) =>
-    user?.projectIds.includes(project.id)
-  );
-  const checked = userProjects.every((project) => project.selected);
+  const checked = projects.every((project) => project.selected);
   const indeterminate =
-    !checked && userProjects.some((project) => project.selected);
+    !checked && projects.some((project) => project.selected);
 
   return (
     <ExpansionPanel>
@@ -47,7 +52,7 @@ const ProjectExpansionList: FunctionComponent<CalendarUIProps> = ({
           aria-label="Acknowledge"
           checked={checked}
           control={<Checkbox indeterminate={indeterminate} />}
-          label={<ListItemText primary="Projects" />}
+          label={<ListItemText primary={parentId} />}
           onClick={(event): void => event.stopPropagation()}
           onChange={(event: React.ChangeEvent<{}>, checked): void => {
             event.stopPropagation();
@@ -55,7 +60,10 @@ const ProjectExpansionList: FunctionComponent<CalendarUIProps> = ({
               type: CalendarAction.SelectedProject,
               payload: {
                 projects: state.projects.map((project) => {
-                  if (user?.projectIds.includes(project.id)) {
+                  if (
+                    user?.projectIds.includes(project.id) &&
+                    project.parentId === parentId
+                  ) {
                     project.selected = checked;
                   }
                   return project;
@@ -67,16 +75,14 @@ const ProjectExpansionList: FunctionComponent<CalendarUIProps> = ({
       </ExpansionPanelSummary>
       <ExpansionPanelDetails classes={{ root: classes.nopadding }}>
         <List>
-          {state.projects
-            .filter((project) => user?.projectIds.includes(project.id))
-            .map((project) => (
-              <ProjectListItem
-                key={project.id}
-                dispatch={dispatch}
-                state={state}
-                project={project}
-              />
-            ))}
+          {projects.map((project) => (
+            <ProjectListItem
+              key={project.id}
+              dispatch={dispatch}
+              state={state}
+              project={project}
+            />
+          ))}
         </List>
       </ExpansionPanelDetails>
     </ExpansionPanel>

@@ -21,4 +21,26 @@ export class Project {
     }
   }
 }
+
+export interface ProjectGroups {
+  [k: string]: Project[];
+}
+
+export const projectGroupReducer = (
+  groups: ProjectGroups | undefined,
+  project: Project
+): ProjectGroups | undefined => {
+  if (!project.parentId) {
+    return groups;
+  }
+  if (groups) {
+    if (!groups[project.parentId]) {
+      groups[project.parentId] = [project];
+      return groups;
+    }
+    groups[project.parentId].push(project);
+    return groups;
+  }
+};
+
 export default Project;
