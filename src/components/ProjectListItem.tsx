@@ -1,7 +1,21 @@
 import React, { FunctionComponent } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
-import { ListItem, ListItemText, Checkbox } from "@material-ui/core";
+import {
+  ListItem,
+  ListItemText,
+  Checkbox,
+  makeStyles,
+  IconButton,
+} from "@material-ui/core";
 import Project from "../calendar/Project";
+import InfoIcon from "@material-ui/icons/Info";
+import Divider from "@material-ui/core/Divider";
+
+const useStyles = makeStyles((theme) => ({
+  space: {
+    margin: theme.spacing(0),
+  },
+}));
 
 interface ProjectListItemProps extends CalendarUIProps {
   project: Project;
@@ -12,6 +26,7 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
   state,
   project,
 }) => {
+  const classes = useStyles();
   return (
     <ListItem
       button
@@ -46,6 +61,10 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
         }}
       />
       <ListItemText primary={project.title} />
+      <Divider orientation="vertical" flexItem />
+      <IconButton className={classes.space}>
+        <InfoIcon />
+      </IconButton>
     </ListItem>
   );
 };
