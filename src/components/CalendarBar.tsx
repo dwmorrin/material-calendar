@@ -28,8 +28,7 @@ const useStyles = makeStyles((theme) => ({
   centered: {
     marginLeft: "auto",
     marginRight: "auto",
-  },
-  centered2: {},
+  }
 }));
 
 const CalendarBar: FunctionComponent<CalendarUIProps> = ({
