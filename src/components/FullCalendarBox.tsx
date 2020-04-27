@@ -16,6 +16,12 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
+  const selectedProjects = state.projects.filter((project) => project.selected);
+  const projectLocations = new Set();
+  selectedProjects.forEach((project) =>
+    project.locationIds.forEach((id) => projectLocations.add(id))
+  );
+
   return (
     <Box
       display="flex"
@@ -50,20 +56,25 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
             resourceTimeGridPlugin,
           ]}
           events={(_, successCallback): void => {
+            // https://fullcalendar.io/docs/events-function
             if (state.currentView.indexOf("resource") !== 0) {
               const selectedLocations = makeSelectedLocationDict(
                 state.locations
               );
               successCallback(
                 state.events.filter(
-                  (event) => selectedLocations[event.resourceId]
+                  (event) =>
+                    projectLocations.has(event.locationId) ||
+                    selectedLocations[event.resourceId]
                 )
               );
             } else {
               successCallback(state.events);
             }
           }}
-          resources={state.locations.filter((location) => location.selected)}
+          resources={state.locations.filter(
+            (location) => projectLocations.has(location.id) || location.selected
+          )}
           schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         />
       )}

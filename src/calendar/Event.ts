@@ -11,7 +11,6 @@ interface Event extends EventNonDateInput, EventDateInput {
 class Event implements Event {
   constructor(event: Event) {
     Object.assign(this, event);
-    this.resourceId = event.location;
     this.open = !!this.open;
   }
 }
