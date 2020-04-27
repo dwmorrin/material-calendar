@@ -8,7 +8,6 @@ import ViewComfyIcon from "@material-ui/icons/ViewComfy";
 import ViewAgendaIcon from "@material-ui/icons/ViewAgenda";
 import {
   CalendarAction,
-  CalendarView,
   CalendarUIProps,
 } from "../calendar/types";
 
@@ -49,6 +48,10 @@ const ViewMenu: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
     setAnchorEl(null);
   };
 
+  const currentOption = options.find(
+    (option) => option.view === state.currentView
+  );
+
   return (
     <div>
       <Button
@@ -56,10 +59,12 @@ const ViewMenu: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
         aria-controls="view-menu"
         aria-haspopup="true"
         onClick={handleClick}
-        startIcon={<ViewDayIcon />}
+        startIcon={currentOption?.icon}
         color="inherit"
       >
-        Day View
+        <p>
+        {currentOption?.label}
+        </p>
       </Button>
       <Menu
         id="view-menu"
@@ -80,7 +85,7 @@ const ViewMenu: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
             onClick={(): void =>
               dispatch({
                 type: CalendarAction.ChangedView,
-                payload: { currentView: view as CalendarView },
+                payload: { currentView: view },
               })
             }
           >
