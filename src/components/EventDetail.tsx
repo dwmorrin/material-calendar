@@ -31,7 +31,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   if (!state.currentEvent || !state.currentEvent.location) {
     return null;
   }
-  const { location, title, start, end, open } = state.currentEvent;
+  const { location, resourceId, title, start, end, open } = state.currentEvent;
 
   return (
     <div className={classes.paper}>
@@ -64,8 +64,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                   (project) =>
                     compareDateOrder(project.start, start) &&
                     compareDateOrder(end, project.end) &&
-                    project.locationTitles &&
-                    project.locationTitles.includes(location)
+                    project.locationIds &&
+                    project.locationIds.includes(resourceId)
                 )
                 .map((project) => (
                   <ListItem key={`${project.title}_list_item`}>
