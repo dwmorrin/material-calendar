@@ -24,7 +24,7 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
       }
     >
       <Checkbox
-        checked={project.selected}
+        checked={project.selected || false}
         size="small"
         inputProps={{ "aria-label": "checkbox with small size" }}
         key={project.title}
