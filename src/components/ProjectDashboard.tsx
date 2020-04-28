@@ -62,6 +62,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   const { currentProject } = state;
 
   useEffect(() => {
+    if (!currentProject?.id) return;
     fetch(`/api/project_groups/${currentProject?.id}`)
       .then((response) => response.json())
       .then((groups) => {
