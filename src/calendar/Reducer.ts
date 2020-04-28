@@ -57,9 +57,6 @@ const calendarReducer = (
     return {
       ...state,
       currentProject: action.payload?.currentProject,
-      detailIsOpen: false,
-      drawerIsOpen: false,
-      pickerShowing: false,
       projectDashboardIsOpen: true,
     };
   }
