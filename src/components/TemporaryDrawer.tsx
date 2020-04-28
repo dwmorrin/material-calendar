@@ -1,26 +1,13 @@
 import React, { FunctionComponent } from "react";
-import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import { SwipeableDrawer, Typography } from "@material-ui/core";
 import { CalendarAction, CalendarUIProps } from "../calendar/types";
 import ResourceList from "./ResourceList";
 import ProjectList from "./ProjectList";
-
-const useStyles = makeStyles({
-  list: {
-    width: 250,
-  },
-  fullList: {
-    width: "auto",
-  },
-});
 
 const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const classes = useStyles();
-
   const onClose = (): void => {
     // TODO clean up after drawer closes
   };
@@ -49,7 +36,10 @@ const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
       onClick={toggleDrawer}
       onKeyDown={toggleDrawer}
     >
-      <div className={clsx(classes.list)} role="presentation">
+      <div role="navigation">
+        <Typography variant="h5">
+          {process.env.REACT_APP_DRAWER_TITLE}
+        </Typography>
         <ProjectList dispatch={dispatch} state={state} />
         <ResourceList dispatch={dispatch} state={state} />
       </div>
