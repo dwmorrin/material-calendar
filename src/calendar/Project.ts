@@ -1,3 +1,5 @@
+import inflate from "../util/inflate";
+
 export interface Project {
   end: string | Date;
   id: string | number;
@@ -16,9 +18,7 @@ export class Project {
     Object.assign(this, project);
     this.start = new Date(this.start);
     this.end = new Date(this.end);
-    if (typeof this.locationIds === "string") {
-      this.locationIds = JSON.parse(this.locationIds);
-    }
+    this.locationIds = inflate(this.locationIds);
   }
 }
 
