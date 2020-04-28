@@ -6,6 +6,7 @@ import {
 interface Event extends EventNonDateInput, EventDateInput {
   location: string;
   open: boolean | number;
+  reservationId: number | null;
 }
 
 class Event implements Event {

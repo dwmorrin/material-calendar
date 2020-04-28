@@ -57,9 +57,6 @@ const calendarReducer = (
     return {
       ...state,
       currentProject: action.payload?.currentProject,
-      detailIsOpen: false,
-      drawerIsOpen: false,
-      pickerShowing: false,
       projectDashboardIsOpen: true,
     };
   }
@@ -78,6 +75,25 @@ const calendarReducer = (
   if (action.type === CalendarAction.ReceivedLocations) {
     if (!action.payload?.locations) {
       throw new Error("no locations in received locations");
+    }
+    if (!state.locations.length) {
+      let savedLocations = sessionStorage.getItem("locations");
+      if (savedLocations) {
+        try {
+          savedLocations = JSON.parse(savedLocations);
+          // loop over payload with saved, updating selected
+          if (Array.isArray(savedLocations)) {
+            savedLocations.forEach((savedLocation) => {
+              const location = action.payload?.locations?.find(
+                (l) => l.id === savedLocation.id
+              );
+              if (location) location.selected = savedLocation.selected;
+            });
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
     }
     return {
       ...state,
@@ -103,6 +119,10 @@ const calendarReducer = (
     if (!action.payload?.locations) {
       throw new Error("no locations in selected location");
     }
+    sessionStorage.setItem(
+      "locations",
+      JSON.stringify(action.payload.locations)
+    );
     return { ...state, locations: action.payload.locations };
   }
 
