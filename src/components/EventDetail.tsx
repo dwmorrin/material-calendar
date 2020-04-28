@@ -7,6 +7,8 @@ import {
   makeStyles,
   ListItem,
   List,
+  Button,
+  Paper,
 } from "@material-ui/core";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import CloseIcon from "@material-ui/icons/Close";
@@ -31,7 +33,25 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   if (!state.currentEvent || !state.currentEvent.location) {
     return null;
   }
-  const { location, resourceId, title, start, end, open } = state.currentEvent;
+  const {
+    end,
+    location,
+    open,
+    reservationId,
+    resourceId,
+    start,
+    title,
+  } = state.currentEvent;
+
+  const projects = state.projects.filter(
+    (project) =>
+      compareDateOrder(project.start, start) &&
+      compareDateOrder(end, project.end) &&
+      project.locationIds &&
+      project.locationIds.includes(resourceId)
+  );
+
+  const reservable = open && !reservationId;
 
   return (
     <div className={classes.paper}>
@@ -52,29 +72,35 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             <CloseIcon />
           </IconButton>
         </Toolbar>
-        <Typography component="h1">{location}</Typography>
-        <Typography component="h2">{title}</Typography>
-        <p>{getFormattedEventInterval(start, end)}</p>
-        {open && (
-          <Fragment>
-            <Typography component="h3">Projects</Typography>
-            <List>
-              {state.projects
-                .filter(
-                  (project) =>
-                    compareDateOrder(project.start, start) &&
-                    compareDateOrder(end, project.end) &&
-                    project.locationIds &&
-                    project.locationIds.includes(resourceId)
-                )
-                .map((project) => (
+        <Paper
+          style={{
+            display: "flex",
+            flexGrow: 1,
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
+          <section>
+            <Typography variant="h6">{location}</Typography>
+            <Typography variant="h5">{title}</Typography>
+            <Typography variant="body2">
+              {getFormattedEventInterval(start, end)}
+            </Typography>
+          </section>
+          {reservable && (
+            <section>
+              <Button variant="contained">Book Me</Button>
+              <Typography component="h3">Available to</Typography>
+              <List>
+                {projects.map((project) => (
                   <ListItem key={`${project.title}_list_item`}>
                     {project.title}
                   </ListItem>
                 ))}
-            </List>
-          </Fragment>
-        )}
+              </List>
+            </section>
+          )}
+        </Paper>
       </Dialog>
     </div>
   );
