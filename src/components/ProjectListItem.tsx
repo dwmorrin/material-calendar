@@ -1,6 +1,13 @@
 import React, { FunctionComponent } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
-import { ListItem, ListItemText, Checkbox } from "@material-ui/core";
+import {
+  Checkbox,
+  IconButton,
+  ListItem,
+  ListItemText,
+  Divider,
+} from "@material-ui/core";
+import InfoIcon from "@material-ui/icons/Info";
 import Project from "../calendar/Project";
 
 interface ProjectListItemProps extends CalendarUIProps {
@@ -16,12 +23,21 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
     <ListItem
       button
       key={project.id}
-      onClick={(): void =>
+      onClick={(event): void => {
+        event.stopPropagation();
         dispatch({
-          type: CalendarAction.OpenProjectDashboard,
-          payload: { ...state, currentProject: project },
-        })
-      }
+          type: CalendarAction.SelectedProject,
+          payload: {
+            projects: state.projects.map((proj) => {
+              if (proj.id !== project.id) {
+                return proj;
+              }
+              proj.selected = !proj.selected;
+              return proj;
+            }),
+          },
+        });
+      }}
     >
       <Checkbox
         checked={project.selected || false}
@@ -46,6 +62,19 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
         }}
       />
       <ListItemText primary={project.title} />
+      <Divider orientation="vertical" flexItem />
+      <IconButton
+        key={project.id}
+        onClick={(event): void => {
+          event.stopPropagation();
+          dispatch({
+            type: CalendarAction.OpenProjectDashboard,
+            payload: { ...state, currentProject: project },
+          });
+        }}
+      >
+        <InfoIcon />
+      </IconButton>
     </ListItem>
   );
 };
