@@ -31,11 +31,21 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
     <ListItem
       button
       key={project.id}
-      onClick={(): void =>
+      onClick={(event): void => {
+        event.stopPropagation();
         dispatch({
-          type: CalendarAction.OpenProjectDashboard,
-          payload: { ...state, currentProject: project },
-        })
+          type: CalendarAction.SelectedProject,
+            payload: {
+              projects: state.projects.map((proj) => {
+                if (proj.id !== project.id) {
+                  return proj;
+                }
+                proj.selected = true;
+                return proj;
+              }),
+            },
+        });
+      }
       }
     >
       <Checkbox
@@ -62,7 +72,15 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
       />
       <ListItemText primary={project.title} />
       <Divider orientation="vertical" flexItem />
-      <IconButton className={classes.space}>
+      <IconButton className={classes.space}
+      key={project.id}
+      onClick={(event): void => {
+        event.stopPropagation();
+        dispatch({
+          type: CalendarAction.OpenProjectDashboard,
+          payload: { ...state, currentProject: project },
+        });
+      }}>
         <InfoIcon />
       </IconButton>
     </ListItem>
