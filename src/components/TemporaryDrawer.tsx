@@ -2,15 +2,7 @@ import React, { FunctionComponent } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import ListItem from "@material-ui/core/ListItem";
-import { ListItemText } from "@material-ui/core";
-import {
-  CalendarAction,
-  CalendarView,
-  CalendarUIProps,
-} from "../calendar/types";
+import { CalendarAction, CalendarUIProps } from "../calendar/types";
 import ResourceList from "./ResourceList";
 
 const useStyles = makeStyles({
@@ -57,28 +49,6 @@ const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
       onKeyDown={toggleDrawer}
     >
       <div className={clsx(classes.list)} role="presentation">
-        <List>
-          {[
-            ["Schedule", "listWeek"],
-            ["Day", "resourceTimeGridDay"],
-            ["Week", "resourceTimeGridWeek"],
-            ["Month", "dayGridMonth"],
-          ].map((tuple) => (
-            <ListItem
-              button
-              key={tuple[0]}
-              onClick={(): void =>
-                dispatch({
-                  type: CalendarAction.ChangedView,
-                  payload: { currentView: tuple[1] as CalendarView },
-                })
-              }
-            >
-              <ListItemText primary={tuple[0]} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
         <ResourceList dispatch={dispatch} state={state} />
       </div>
     </SwipeableDrawer>
