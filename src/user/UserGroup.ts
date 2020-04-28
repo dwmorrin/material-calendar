@@ -17,3 +17,5 @@ class UserGroup implements UserGroup {
     this.title = this.memberNames.join(", ");
   }
 }
+
+export default UserGroup;
