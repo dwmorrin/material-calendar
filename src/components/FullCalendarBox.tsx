@@ -64,7 +64,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
               successCallback(
                 state.events.filter(
                   (event) =>
-                    projectLocations.has(event.locationId) ||
+                    projectLocations.has(event.resourceId) ||
                     selectedLocations[event.resourceId]
                 )
               );
