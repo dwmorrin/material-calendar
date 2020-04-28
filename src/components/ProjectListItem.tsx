@@ -40,7 +40,7 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
                 if (proj.id !== project.id) {
                   return proj;
                 }
-                proj.selected = true;
+                proj.selected = !proj.selected;
                 return proj;
               }),
             },
