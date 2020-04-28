@@ -1,8 +1,10 @@
+import inflate from "../util/inflate";
+
 interface UserGroup {
   id: number;
   projectId: number;
-  memberIds: string | string[];
-  memberNames: string | string[];
+  memberIds: string | (string | number)[];
+  memberNames: string | (string | number)[];
 }
 
 class UserGroup implements UserGroup {
@@ -10,19 +12,9 @@ class UserGroup implements UserGroup {
   constructor(group: UserGroup) {
     this.id = group.id;
     this.projectId = group.projectId;
-    this.memberIds = this.inflate(group.memberIds);
-    this.memberNames = this.inflate(group.memberNames);
+    this.memberIds = inflate(group.memberIds);
+    this.memberNames = inflate(group.memberNames);
     this.title = this.memberNames.join(", ");
-  }
-
-  inflate(s?: string | string[]): string[] {
-    if (!s) return [];
-    if (Array.isArray(s)) return s;
-    try {
-      return JSON.parse(s);
-    } catch (error) {
-      return [];
-    }
   }
 }
 
