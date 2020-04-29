@@ -84,7 +84,10 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             <Typography variant="h6">{location}</Typography>
             <Typography variant="h5">{title}</Typography>
             <Typography variant="body2">
-              {getFormattedEventInterval(start, end)}
+              {getFormattedEventInterval(
+                start as string | Date,
+                end as string | Date
+              )}
             </Typography>
           </section>
           {reservable && (

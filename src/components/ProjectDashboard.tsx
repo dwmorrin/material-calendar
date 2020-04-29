@@ -20,6 +20,9 @@ import CloseIcon from "@material-ui/icons/Close";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
 import UserGroup from "../user/UserGroup";
+import { getFormattedEventInterval } from "../calendar/date";
+import { ProjectLocationAllotment } from "../calendar/Project";
+import ProjectLocationHours from "./ProjectLocationHours";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
 
 const transition = makeTransition("right");
 const initialGroups: UserGroup[] = [];
+const initialAllotments: { [k: number]: ProjectLocationAllotment[] } = {};
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -41,6 +45,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   const classes = useStyles();
   const { user } = useContext(AuthContext);
   const [groups, setGroups] = useState(initialGroups);
+  const [allotments, setAllotments] = useState(initialAllotments);
   const { currentProject } = state;
   const locations = state.locations.filter((location) =>
     currentProject?.locationIds.includes(location.id)
@@ -53,10 +58,10 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   );
 
   useEffect(() => {
-    if (!currentProject?.id) {
+    if (!currentProject) {
       return;
     }
-    fetch(`/api/project_groups/${currentProject?.id}`)
+    fetch(`/api/project_groups/${currentProject.id}`)
       .then((response) => response.json())
       .then((groups) => {
         const usergroups = groups.map(
@@ -67,6 +72,27 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
       .catch(console.error);
   }, [currentProject, user]);
 
+  useEffect(() => {
+    if (!currentProject) {
+      return;
+    }
+    currentProject.childrenIds.forEach((id) => {
+      fetch(`/api/project_location_allotment/${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((d: ProjectLocationAllotment) => {
+            d.start = new Date(d.start);
+            d.end = new Date(d.end);
+          });
+          setAllotments({
+            ...allotments,
+            [data[0].locationId]: data,
+          });
+        })
+        .catch(console.error);
+    });
+  }, [currentProject]);
+  console.log("rendering with", { locations });
   return (
     <Dialog
       className={classes.root}
@@ -96,15 +122,20 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         }}
       >
         <section>
+          <Typography variant="body2">
+            {currentProject &&
+              getFormattedEventInterval(
+                currentProject?.start as string | Date,
+                currentProject?.end as string | Date
+              )}
+          </Typography>
+        </section>
+        <section>
           <Typography variant="h5">Locations</Typography>
           {locations.map((location) => (
-            <Fragment key={location.title}>
-              <Typography>{location.title}</Typography>
-              <LinearProgress // TODO remove hardcoded mock
-                className={classes.hoursBar}
-                variant="determinate"
-                value={40}
-              />
+            <Fragment key={location.id}>
+              <Typography variant="h6">{location.title}</Typography>
+              <ProjectLocationHours data={allotments[+location.id]} />
             </Fragment>
           ))}
         </section>
