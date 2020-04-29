@@ -92,7 +92,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         .catch(console.error);
     });
   }, [currentProject]);
-  console.log("rendering with", { locations });
+
   return (
     <Dialog
       className={classes.root}
