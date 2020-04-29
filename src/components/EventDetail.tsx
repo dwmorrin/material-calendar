@@ -1,4 +1,4 @@
-import React, { FunctionComponent, Fragment } from "react";
+import React, { FunctionComponent } from "react";
 import {
   Dialog,
   IconButton,
@@ -89,7 +89,9 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           </section>
           {reservable && (
             <section>
-              <Button variant="contained">Book Me</Button>
+              <Button variant="contained" style={{ marginBottom: 30 }}>
+                Book Me
+              </Button>
               <Typography component="h3">Available to</Typography>
               <List>
                 {projects.map((project) => (
