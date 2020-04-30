@@ -7,10 +7,12 @@ export enum CalendarAction {
   ChangedView,
   CloseEventDetail,
   CloseProjectDashboard,
+  CloseReservationPage,
   Error,
   Loading,
   PickedDate,
   OpenProjectDashboard,
+  OpenReservationPage,
   ReceivedEvents,
   ReceivedLocations,
   ReceivedProjects,
@@ -41,6 +43,7 @@ export interface CalendarState {
   locations: Location[];
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
+  reservationPageIsOpen: boolean;
   projects: Project[];
   ref: React.RefObject<FullCalendar> | null;
 }

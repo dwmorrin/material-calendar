@@ -32,6 +32,10 @@ const calendarReducer = (
     return { ...state, projectDashboardIsOpen: false };
   }
 
+  if (action.type === CalendarAction.CloseReservationPage) {
+    return { ...state, reservationPageIsOpen: false };
+  }
+
   if (action.type === CalendarAction.Error) {
     if (action.payload && action.payload.error) {
       console.error(action.payload.error);
@@ -61,6 +65,13 @@ const calendarReducer = (
       drawerIsOpen: false,
       pickerShowing: false,
       projectDashboardIsOpen: true,
+    };
+  }
+
+  if (action.type === CalendarAction.OpenReservationPage) {
+    return {
+      ...state,
+      reservationPageIsOpen: true,
     };
   }
 

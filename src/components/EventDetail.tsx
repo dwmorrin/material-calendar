@@ -2,6 +2,7 @@ import React, { FunctionComponent, Fragment } from "react";
 import {
   Dialog,
   IconButton,
+  Button,
   Toolbar,
   Typography,
   makeStyles,
@@ -73,6 +74,18 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                   </ListItem>
                 ))}
             </List>
+            <Button
+              key="MakeBooking"
+              onClick={(event): void => {
+                event.stopPropagation();
+                dispatch({
+                  type: CalendarAction.OpenReservationPage,
+                  payload: { currentEvent: state.currentEvent },
+                });
+              }}
+            >
+              Reserve Block
+            </Button>
           </Fragment>
         )}
       </Dialog>
