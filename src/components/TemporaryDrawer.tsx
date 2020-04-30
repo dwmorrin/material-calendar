@@ -41,6 +41,7 @@ const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
           {process.env.REACT_APP_DRAWER_TITLE}
         </Typography>
         <ProjectList dispatch={dispatch} state={state} />
+        <Typography variant="body1">Rooms</Typography>
         <ResourceList dispatch={dispatch} state={state} />
       </div>
     </SwipeableDrawer>
