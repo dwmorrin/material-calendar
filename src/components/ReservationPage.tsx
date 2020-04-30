@@ -150,7 +150,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({ dispatch, state }
         >
           <CloseIcon />
         </IconButton>
-        <Typography>Projects</Typography>
+        <Typography>Make Reservation</Typography>
       </Toolbar>
       <div>
         {" "}
@@ -259,7 +259,13 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({ dispatch, state }
           </RadioGroup>
         </FormControl>
         <div id="gearInput" className={classes.gear}>
-          <TextField id="phoneNumber" label="Phone Number" />
+          <TextField
+            id="gearList"
+            label="What gear would you like to reserve?"
+            style={{ minWidth: 300 }}
+            multiline
+            rows={8}
+          />
         </div>
         <br />
         <Button
