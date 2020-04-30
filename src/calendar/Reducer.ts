@@ -2,6 +2,7 @@ import { CalendarAction, CalendarState, Action } from "./types";
 import Event from "./Event";
 import Location from "./Location";
 import Project from "./Project";
+import UserGroup from "../user/UserGroup";
 
 /**
  * calendarReducer takes all actions from the calendar and handles them
@@ -32,6 +33,10 @@ const calendarReducer = (
     return { ...state, projectDashboardIsOpen: false };
   }
 
+  if (action.type === CalendarAction.CloseGroupDashboard) {
+    return { ...state, groupDashboardIsOpen: false };
+  }
+
   if (action.type === CalendarAction.Error) {
     if (action.payload && action.payload.error) {
       console.error(action.payload.error);
@@ -53,6 +58,14 @@ const calendarReducer = (
     return { ...state, currentStart, pickerShowing: !state.pickerShowing };
   }
 
+  if (action.type === CalendarAction.OpenGroupDashboard) {
+    return {
+      ...state,
+      // currentProject: action.payload?.currentProject,
+      groupDashboardIsOpen: true,
+    };
+  }
+
   if (action.type === CalendarAction.OpenProjectDashboard) {
     return {
       ...state,
@@ -69,6 +82,19 @@ const calendarReducer = (
       ...state,
       loading: !state.locations,
       events: action.payload.events.map((event) => new Event(event)),
+    };
+  }
+
+  if (action.type === CalendarAction.ReceivedGroups) {
+    if (!action.payload?.currentProjectGroups) {
+      throw new Error("no groups in received groups");
+    }
+    return {
+      ...state,
+      loading: false, // ! need to evaluate the `loading` handling
+      currentProjectGroups: action.payload.currentProjectGroups.map(
+        (group: UserGroup) => new UserGroup(group)
+      ),
     };
   }
 
@@ -113,6 +139,13 @@ const calendarReducer = (
       loading: !state.events || !state.locations,
       projects: action.payload.projects.map((project) => new Project(project)),
     };
+  }
+
+  if (action.type === CalendarAction.SelectedGroup) {
+    if (!action.payload?.currentGroup) {
+      throw new Error("no group in selected group");
+    }
+    return { ...state, currentGroup: action.payload.currentGroup };
   }
 
   if (action.type === CalendarAction.SelectedLocation) {

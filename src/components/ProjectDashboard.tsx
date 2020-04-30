@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useContext,
   useState,
-  Fragment,
 } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
@@ -12,17 +11,20 @@ import {
   Dialog,
   Toolbar,
   Typography,
-  Button,
-  LinearProgress,
   Paper,
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  ExpansionPanelDetails,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
-import UserGroup from "../user/UserGroup";
 import { getFormattedEventInterval } from "../calendar/date";
 import { ProjectLocationAllotment } from "../calendar/Project";
 import ProjectLocationHours from "./ProjectLocationHours";
+import { fetchCalendarData } from "../calendar/Fetch";
+import ProjectDashboardGroup from "./ProjectDashboardGroup";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,7 +37,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const transition = makeTransition("right");
-const initialGroups: UserGroup[] = [];
+// ! pick one
+// const initialAllotments: ProjectLocationAllotment[][] = [];
 const initialAllotments: { [k: number]: ProjectLocationAllotment[] } = {};
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
@@ -44,38 +47,41 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const classes = useStyles();
   const { user } = useContext(AuthContext);
-  const [groups, setGroups] = useState(initialGroups);
   const [allotments, setAllotments] = useState(initialAllotments);
   const { currentProject } = state;
   const locations = state.locations.filter((location) =>
     currentProject?.locationIds.includes(location.id)
   );
-  const projectGroups = groups.filter((group) =>
-    user?.groupIds.includes(group.id)
-  );
-  const group = projectGroups.find(
-    (group) => group.projectId === currentProject?.id
-  );
 
   useEffect(() => {
     if (!currentProject) {
       return;
     }
-    fetch(`/api/project_groups/${currentProject.id}`)
-      .then((response) => response.json())
-      .then((groups) => {
-        const usergroups = groups.map(
-          (group: UserGroup) => new UserGroup(group)
-        );
-        setGroups(usergroups);
-      })
-      .catch(console.error);
-  }, [currentProject, user]);
+    fetchCalendarData({
+      dispatch,
+      onSuccessAction: CalendarAction.ReceivedGroups,
+      payloadKey: "currentProjectGroups",
+      url: `/api/project_groups/${currentProject.id}`,
+    });
+  }, [currentProject, dispatch, user]);
 
   useEffect(() => {
     if (!currentProject) {
       return;
     }
+    // ! this Promise.all doesn't cause the D3 stuff to render...
+    // const requests = currentProject.childrenIds.map((id) =>
+    //   fetch(`/api/project_location_allotment/${id}`)
+    // );
+    // Promise.all(requests).then((responses) => {
+    //   Promise.all(responses.map((res) => res.json()))
+    //     .then((locations) => {
+    //       console.log("setAllotments", { locations });
+    //       setAllotments(locations);
+    //     })
+    //     .catch(console.error);
+    // });
+    // ! this has bug where 2nd visit to D3 stuff, only first shows...
     currentProject.childrenIds.forEach((id) => {
       fetch(`/api/project_location_allotment/${id}`)
         .then((response) => response.json())
@@ -93,6 +99,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
     });
   }, [currentProject]);
 
+  // console.log({ allotments });
   return (
     <Dialog
       className={classes.root}
@@ -118,41 +125,42 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
+          // justifyContent: "space-between",
         }}
       >
-        <section>
-          <Typography variant="body2">
-            {currentProject &&
-              getFormattedEventInterval(
-                currentProject?.start as string | Date,
-                currentProject?.end as string | Date
-              )}
-          </Typography>
-        </section>
-        <section>
-          <Typography variant="h5">Locations</Typography>
+        <Typography variant="body2">
+          {currentProject &&
+            getFormattedEventInterval(
+              currentProject?.start as string | Date,
+              currentProject?.end as string | Date
+            )}
+        </Typography>
+        <ExpansionPanel defaultExpanded={locations.length === 1}>
+          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="body1">Location Hours</Typography>
+          </ExpansionPanelSummary>
           {locations.map((location) => (
-            <Fragment key={location.id}>
-              <Typography variant="h6">{location.title}</Typography>
-              <ProjectLocationHours data={allotments[+location.id]} />
-            </Fragment>
+            <ExpansionPanelDetails
+              key={`${location.id}`}
+              style={{ display: "flex", flexDirection: "column" }}
+            >
+              <Typography variant="body2">{location.title}</Typography>
+              <ProjectLocationHours
+                // ! pick one data depending on above choices
+                // data={allotments.find((a) => a[0].locationId === location.id)}
+                data={allotments[+location.id]}
+              />
+            </ExpansionPanelDetails>
           ))}
-        </section>
-        <section>
-          <Typography variant="h5">Group</Typography>
-          <Typography variant="h6">Hours</Typography>
-          <LinearProgress // TODO remove hardcoded mock
-            className={classes.hoursBar}
-            variant="determinate"
-            value={20}
-          />
-          <Typography variant="h6">Members</Typography>
-          <Typography>{group?.title}</Typography>
-          <Button size="small" variant="contained" color="inherit">
-            Manage group
-          </Button>
-        </section>
+        </ExpansionPanel>
+        <ExpansionPanel defaultExpanded>
+          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="body1">Group Info</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <ProjectDashboardGroup dispatch={dispatch} state={state} />
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
         <Typography>Upcoming Sessions</Typography>
         <Typography>Previous Sessions</Typography>
       </Paper>

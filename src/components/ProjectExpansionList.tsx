@@ -39,7 +39,7 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
     !checked && projects.some((project) => project.selected);
 
   return (
-    <ExpansionPanel>
+    <ExpansionPanel defaultExpanded={projects.length === 1}>
       <ExpansionPanelSummary
         expandIcon={<ExpandMoreIcon />}
         aria-label="Expand"

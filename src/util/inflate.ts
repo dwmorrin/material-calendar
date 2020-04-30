@@ -1,4 +1,4 @@
-function inflate(s?: string | (string | number)[]): (string | number)[] {
+function inflate<T>(s?: string | T[]): T[] {
   if (!s) return [];
   if (Array.isArray(s)) return s;
   try {
