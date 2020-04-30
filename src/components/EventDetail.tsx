@@ -91,10 +91,15 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             </Typography>
           </section>
           {reservable && (
+            <Button
+              variant="contained"
+              style={{ marginBottom: 30, alignSelf: "center" }}
+            >
+              Book Me
+            </Button>
+          )}
+          {reservable && (
             <section>
-              <Button variant="contained" style={{ marginBottom: 30 }}>
-                Book Me
-              </Button>
               <Typography component="h3">Available to</Typography>
               <List>
                 {projects.map((project) => (
