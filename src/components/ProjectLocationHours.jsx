@@ -71,7 +71,6 @@ const ProjectLocationHours = ({ data }) => {
     d3.select(yAxisRef.current).call(yAxis);
   }, [data]);
 
-  console.log("rendering", { data });
   return (
     <svg width={width} height={height} ref={container}>
       <g
