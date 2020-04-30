@@ -5,6 +5,7 @@ import { projectGroupReducer } from "../calendar/Project";
 import ProjectExpansionList from "./ProjectExpansionList";
 import ProjectListItem from "./ProjectListItem";
 import { AuthContext } from "./AuthContext";
+import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
   root: {
@@ -25,6 +26,7 @@ const ProjectList: FunctionComponent<CalendarUIProps> = ({
   const classes = useStyles();
   return (
     <div className={classes.root}>
+      {projects.length ? <Typography variant="body1">Projects</Typography> : ""}
       {groups &&
         Object.keys(groups).map((key) => (
           <ProjectExpansionList
