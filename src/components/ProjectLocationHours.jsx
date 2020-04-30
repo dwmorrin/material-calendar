@@ -3,7 +3,7 @@ import * as d3 from "d3";
 
 const height = 90;
 const width = 300;
-const margin = { left: 20, right: 20, top: 20, bottom: 20 };
+const margin = { left: 30, right: 20, top: 20, bottom: 20 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const ProjectLocationHours = ({ data }) => {
@@ -29,6 +29,10 @@ const ProjectLocationHours = ({ data }) => {
       .scaleLinear()
       .domain([0, maxHours])
       .range([height - margin.bottom, margin.top]);
+    const color = d3
+      .scaleSequential()
+      .domain([0, maxHours])
+      .interpolator(d3.interpolateRdYlGn);
     const bars = data.map((a) => {
       const _x = x(a.start);
       const _y = y(a.hours);
@@ -39,7 +43,7 @@ const ProjectLocationHours = ({ data }) => {
         y: _y,
         width: dx,
         height: dy,
-        fill: "steelblue",
+        fill: color(a.hours),
       };
     });
     const today = new Date();
@@ -61,12 +65,13 @@ const ProjectLocationHours = ({ data }) => {
       .attr("height", (d) => d.height)
       .attr("fill", (d) => d.fill);
     update.exit().remove();
-    const xAxis = d3.axisBottom(x).ticks(d3.timeWeek.every(1));
+    const xAxis = d3.axisBottom(x).ticks(4);
     const yAxis = d3.axisLeft(y).ticks(3);
     d3.select(xAxisRef.current).call(xAxis);
     d3.select(yAxisRef.current).call(yAxis);
   }, [data]);
 
+  console.log("rendering", { data });
   return (
     <svg width={width} height={height} ref={container}>
       <g
