@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, ChangeEvent } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import { NativeSelect } from "@material-ui/core";
@@ -18,6 +18,7 @@ interface SelectProps extends CalendarUIProps {
   selectName: string;
   selectId: string;
   contents: (Location | Project | UserGroup)[];
+  onChange: (event: any) => void;
 }
 
 const Select: FunctionComponent<SelectProps> = ({
@@ -26,6 +27,7 @@ const Select: FunctionComponent<SelectProps> = ({
   selectName,
   selectId,
   contents,
+  onChange,
 }) => {
   const classes = useStyles();
   return (
@@ -35,7 +37,7 @@ const Select: FunctionComponent<SelectProps> = ({
           name: selectName,
           id: selectId,
         }}
-        onChange={(): void => console.log("select changed")}
+        onChange={onChange}
       >
         {contents.map((choice) => {
           return choice === contents[0] ? (

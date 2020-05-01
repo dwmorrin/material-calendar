@@ -59,7 +59,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const [groups, setGroups] = useState(initialGroups);
-  const { currentProject } = state;
+  let { currentProject } = state;
 
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
@@ -107,6 +107,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                   selectName="studios"
                   selectId="studiosDropDown"
                   contents={state.locations}
+                  onChange={(): void => console.log("boop")}
                 ></Select>
               </Grid>
               <Grid item xs={7}>
@@ -116,6 +117,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                   selectName="groups"
                   selectId="groupsSelect"
                   contents={groups}
+                  onChange={(): void => console.log("boop")}
                 ></Select>
               </Grid>
               <Grid item xs={12}>

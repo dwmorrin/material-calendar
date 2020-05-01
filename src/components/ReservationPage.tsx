@@ -84,7 +84,22 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
   const projects = state.projects.filter((project) =>
     user?.projectIds.includes(project.id)
   );
-  const currentProject = projects[0];
+  let currentProject = projects[0];
+  console.log(currentProject);
+
+  const refreshGroups: FunctionComponent = (projectId: number): void => {
+    useEffect(() => {
+      fetch(`/api/project_groups/${projectId}`)
+        .then((response) => response.json())
+        .then((groups) => {
+          const usergroups = groups.map(
+            (group: UserGroup) => new UserGroup(group)
+          );
+          setGroups(usergroups);
+        })
+        .catch(console.error);
+    }, [currentProject, user]);
+  };
 
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
@@ -169,6 +184,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
               selectName="projects"
               selectId="projectsDropDown"
               contents={projects}
+              onChange={(event): void => console.log(event?.target.value)}
             ></Select>
           </div>
         </div>
