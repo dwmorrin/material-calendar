@@ -1,8 +1,6 @@
-/**
-
- */
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, FunctionComponent } from "react";
 import * as d3 from "d3";
+import { ProjectLocationAllotment } from "../calendar/Project";
 
 const height = 90; // height of the total bar chart area in px
 const width = 300; // width of the totla bar char area in px
@@ -10,37 +8,52 @@ const margin = { left: 30, right: 20, top: 20, bottom: 20 }; // for axes
 const hourColorInterpolator = d3.interpolateRdYlGn; // color scale
 const today = new Date(); // for "now" indicator
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const getExtent = (allotments) => {
-  const extent = {
-    hours: d3.max(allotments, (a) => a.hours),
-    start: d3.min(allotments, (a) => new Date(a.start)),
-    end: d3.max(allotments, (a) => new Date(a.end)),
+interface AllotmentExtent {
+  hours: number;
+  start: Date;
+  end: Date;
+}
+
+const getExtent = (allotments: ProjectLocationAllotment[]): AllotmentExtent => {
+  return {
+    hours: d3.max(allotments, (a) => a.hours) || 0,
+    start: d3.min(allotments, (a) => new Date(a.start)) || new Date(),
+    end: d3.max(allotments, (a) => new Date(a.end)) || new Date(),
   };
-  extent.timeDomain = [extent.start, extent.end];
-  return extent;
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const getScales = (extent) => {
+interface AllotmentScales {
+  x: d3.ScaleTime<number, number>;
+  y: d3.ScaleLinear<number, number>;
+  color: d3.ScaleSequential<string>;
+}
+
+const getScales = (extent: AllotmentExtent): AllotmentScales => {
   return {
     x: d3
       .scaleTime()
-      .domain(extent.timeDomain)
+      .domain([extent.start, extent.end])
       .range([margin.left, width - margin.right]),
     y: d3
       .scaleLinear()
       .domain([0, extent.hours])
       .range([height - margin.bottom, margin.top]),
-    color: d3
-      .scaleSequential()
-      .domain([0, extent.hours])
-      .interpolator(hourColorInterpolator),
+    color: d3.scaleSequential(hourColorInterpolator).domain([0, extent.hours]),
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const bars = (allotments, scales) => {
+interface AllotmentBar {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+}
+
+const bars = (
+  allotments: ProjectLocationAllotment[],
+  scales: AllotmentScales
+): AllotmentBar[] => {
   const b = allotments.map((a) => {
     const x = scales.x(new Date(a.start));
     const y = scales.y(a.hours);
@@ -62,11 +75,16 @@ const bars = (allotments, scales) => {
   return b;
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const ProjectLocationHours = ({ allotments }) => {
+interface ProjectLocationHoursProps {
+  allotments: ProjectLocationAllotment[];
+}
+const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
+  allotments,
+}) => {
   const container = useRef(null);
   const xAxisRef = useRef(null);
   const yAxisRef = useRef(null);
+
   useEffect(() => {
     if (!allotments || !container.current) {
       return;
@@ -87,7 +105,11 @@ const ProjectLocationHours = ({ allotments }) => {
     update.exit().remove();
     const xAxis = d3.axisBottom(scales.x).ticks(4);
     const yAxis = d3.axisLeft(scales.y).ticks(3);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore: Not assignable error
     d3.select(xAxisRef.current).call(xAxis);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore: Not assignable error
     d3.select(yAxisRef.current).call(yAxis);
   }, [allotments]);
 

@@ -143,7 +143,12 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
               style={{ display: "flex", flexDirection: "column" }}
             >
               <Typography variant="body2">{location.title}</Typography>
-              <ProjectLocationHours allotments={allotments[+location.id]} />
+              <ProjectLocationHours
+                // extracts one allotments[] from allotments[][]
+                allotments={
+                  allotments.filter((a) => a[0].locationId === location.id)[0]
+                }
+              />
             </ExpansionPanelDetails>
           ))}
         </ExpansionPanel>
