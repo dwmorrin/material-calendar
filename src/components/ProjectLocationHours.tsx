@@ -5,7 +5,8 @@ import { ProjectLocationAllotment } from "../calendar/Project";
 const height = 90; // height of the total bar chart area in px
 const width = 300; // width of the totla bar char area in px
 const margin = { left: 30, right: 20, top: 20, bottom: 20 }; // for axes
-const hourColorInterpolator = d3.interpolateRdYlGn; // color scale
+const hourColorInterpolator = d3.interpolateRdYlBu; // color scale
+const goodHourThreshold = 6; // sets the color scaling for good = green
 const today = new Date(); // for "now" indicator
 
 interface AllotmentExtent {
@@ -13,6 +14,12 @@ interface AllotmentExtent {
   start: Date;
   end: Date;
 }
+
+const goodHourAmount = (extent: AllotmentExtent): number => {
+  // the "hours" are based on a "week" not always equal to 7 days
+  // so we might try to scale our color guide accordlingly
+  return (goodHourThreshold * d3.timeDay.count(extent.start, extent.end)) / 7;
+};
 
 const getExtent = (allotments: ProjectLocationAllotment[]): AllotmentExtent => {
   return {
@@ -38,7 +45,9 @@ const getScales = (extent: AllotmentExtent): AllotmentScales => {
       .scaleLinear()
       .domain([0, extent.hours])
       .range([height - margin.bottom, margin.top]),
-    color: d3.scaleSequential(hourColorInterpolator).domain([0, extent.hours]),
+    color: d3
+      .scaleSequential(hourColorInterpolator)
+      .domain([0, goodHourAmount(extent)]),
   };
 };
 
