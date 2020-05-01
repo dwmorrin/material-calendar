@@ -7,6 +7,8 @@ interface Event extends EventNonDateInput, EventDateInput {
   location: string;
   open: boolean | number;
   reservationId: number | null;
+  projectGroupId: number | null;
+  equipment: string | null;
 }
 
 class Event implements Event {

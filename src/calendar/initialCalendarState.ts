@@ -4,7 +4,13 @@ import Project from "./Project";
 import UserGroup from "../user/UserGroup";
 
 export const testModifiedState: CalendarState = {
-  currentEvent: new Event({ location: "", open: true, reservationId: null }),
+  currentEvent: new Event({
+    location: "",
+    open: true,
+    reservationId: null,
+    projectGroupId: 0,
+    equipment: "",
+  }),
   currentGroup: new UserGroup({
     id: 0,
     projectId: 0,

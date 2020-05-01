@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useContext } from "react";
 import {
   Dialog,
   IconButton,
@@ -14,6 +14,7 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import CloseIcon from "@material-ui/icons/Close";
 import { compareDateOrder, getFormattedEventInterval } from "../calendar/date";
 import { makeTransition } from "./Transition";
+import { AuthContext } from "./AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -30,6 +31,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const classes = useStyles();
+  const { user } = useContext(AuthContext);
   if (!state.currentEvent || !state.currentEvent.location) {
     return null;
   }
@@ -41,6 +43,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     resourceId,
     start,
     title,
+    projectGroupId,
+    equipment,
   } = state.currentEvent;
 
   const projects = state.projects.filter(
@@ -50,8 +54,12 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       project.locationIds &&
       project.locationIds.includes(resourceId)
   );
-
+  const userOwns = projectGroupId && user?.groupIds.includes(projectGroupId);
+  const future = new Date(start as string).getTime() > Date.now();
   const reservable = open && !reservationId;
+  const equipmentList = equipment
+    ? equipment.split(",").map((item) => item.split(";"))
+    : null;
 
   return (
     <div className={classes.paper}>
@@ -90,6 +98,15 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               )}
             </Typography>
           </section>
+          {equipmentList && (
+            <List>
+              {equipmentList.map((item) => (
+                <ListItem
+                  key={item[1]}
+                >{`${item[0]} ${item[1]} ${item[2]}`}</ListItem>
+              ))}
+            </List>
+          )}
           {reservable && (
             <Button
               variant="contained"
@@ -97,6 +114,22 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             >
               Book Me
             </Button>
+          )}
+          {userOwns && future && (
+            <div>
+              <Button
+                variant="contained"
+                style={{ marginBottom: 30, alignSelf: "center" }}
+              >
+                Reserve equipment
+              </Button>
+              <Button
+                variant="contained"
+                style={{ marginBottom: 30, alignSelf: "center" }}
+              >
+                Cancel this reservation
+              </Button>
+            </div>
           )}
           {reservable && (
             <section>
