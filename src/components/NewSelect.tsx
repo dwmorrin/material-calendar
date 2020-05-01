@@ -14,33 +14,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface SelectProps {
+interface NewSelectProps extends CalendarUIProps {
   selectName: string;
   selectId: string;
   contents: (Location | Project | UserGroup)[];
   selected: Location | Project | UserGroup;
   onChange: () => void;
-  state: { curProject: Project };
-  setState: { curProject: Project };
 }
 
-const Select: FunctionComponent<SelectProps> = ({
-  setState,
-  state,
+const NewSelect: FunctionComponent<NewSelectProps> = ({
+  // dispatch,
+  // state,
   selectName,
   selectId,
   contents,
   onChange,
   selected,
 }) => {
-  const handleChange = (event: React.ChangeEvent<{ curProject?: unknown }>) => {
-    const curProject = event.target.curProject as keyof typeof state;
-    setState({
-      ...state,
-      [curProject]: event.target.curProject,
-    });
-  };
-
   const classes = useStyles();
   return (
     <FormControl className={classes.formControl}>
@@ -49,7 +39,7 @@ const Select: FunctionComponent<SelectProps> = ({
           name: selectName,
           id: selectId,
         }}
-        onChange={handleChange}
+        onChange={onChange}
         value={selected}
       >
         {contents.map((choice) => {
@@ -65,4 +55,4 @@ const Select: FunctionComponent<SelectProps> = ({
     </FormControl>
   );
 };
-export default Select;
+export default NewSelect;

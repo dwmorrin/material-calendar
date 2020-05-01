@@ -16,7 +16,7 @@ import {
   Button,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import Select from "./Select";
+import NewSelect from "./NewSelect";
 import ProgressBar from "./ProgressBar";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
@@ -101,22 +101,26 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                 Studio Allotment
               </Grid>
               <Grid item xs={5}>
-                <Select
+                <NewSelect
                   dispatch={dispatch}
                   state={state}
                   selectName="studios"
                   selectId="studiosDropDown"
                   contents={state.locations}
-                ></Select>
+                  selected={state.locations[0]}
+                  onChange={(): void => console.log("select changed")}
+                ></NewSelect>
               </Grid>
               <Grid item xs={7}>
-                <Select
+                <NewSelect
                   dispatch={dispatch}
                   state={state}
                   selectName="groups"
                   selectId="groupsSelect"
                   contents={groups}
-                ></Select>
+                  selected={groups[0]}
+                  onChange={(): void => console.log("select changed")}
+                ></NewSelect>
               </Grid>
               <Grid item xs={12}>
                 <ProgressBar

@@ -25,6 +25,7 @@ import Select from "./Select";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
 import UserGroup from "../user/UserGroup";
+import Project from "../calendar/Project";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -81,10 +82,17 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const [groups, setGroups] = useState(initialGroups);
+
   const projects = state.projects.filter((project) =>
     user?.projectIds.includes(project.id)
   );
   const currentProject = projects[0];
+
+  const [projectState, projectSetState] = React.useState<{
+    curProject: Project;
+  }>({
+    curProject: currentProject,
+  });
 
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
@@ -138,7 +146,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
       }
     }
   };
-
+  console.log(state);
   return (
     <Dialog
       fullScreen
@@ -164,11 +172,13 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
           <div style={{ paddingTop: 6 }}>Project:</div>
           <div style={{ paddingLeft: 5 }}>
             <Select
-              dispatch={dispatch}
-              state={state}
+              state={projectState}
+              setState={projectState}
               selectName="projects"
               selectId="projectsDropDown"
               contents={projects}
+              selected={currentProject}
+              onChange={(): void => console.log(currentProject)}
             ></Select>
           </div>
         </div>
