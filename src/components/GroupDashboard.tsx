@@ -60,7 +60,9 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
               )}
           </Typography>
         </section>
-        <Typography variant="body1">My Group</Typography>
+        <Typography variant="body1" style={{ marginLeft: 20, marginTop: 20 }}>
+          My Group
+        </Typography>
         <Box
           style={{
             padding: "8px 16px",
