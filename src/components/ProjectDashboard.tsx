@@ -15,6 +15,8 @@ import {
   ExpansionPanel,
   ExpansionPanelSummary,
   ExpansionPanelDetails,
+  List,
+  ListItem,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -75,10 +77,8 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
     // );
     // Promise.all(requests).then((responses) => {
     //   Promise.all(responses.map((res) => res.json()))
-    //     .then((locations) => {
-    //       console.log("setAllotments", { locations });
-    //       setAllotments(locations);
-    //     })
+    //     .then((locations) => setAllotments(locations))
+    //      })
     //     .catch(console.error);
     // });
     // ! this has bug where 2nd visit to D3 stuff, only first shows...
@@ -99,7 +99,22 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
     });
   }, [currentProject]);
 
-  // console.log({ allotments });
+  const groupEvents = state.events.filter(
+    (event) => event.projectGroupId === state.currentGroup?.id
+  );
+  groupEvents.sort((a, b) => {
+    if (typeof a.start !== "string" || typeof b.start !== "string") return 0;
+    const _a = new Date(a.start).getTime();
+    const _b = new Date(b.start).getTime();
+    if (_a < _b) return 1;
+    if (_a > _b) return -1;
+    return 0;
+  });
+  const now = Date.now();
+  const splitPoint = groupEvents.findIndex((event) => {
+    if (typeof event.start !== "string") return false;
+    return new Date(event.start).getTime() < now;
+  });
   return (
     <Dialog
       className={classes.root}
@@ -162,7 +177,45 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           </ExpansionPanelDetails>
         </ExpansionPanel>
         <Typography>Upcoming Sessions</Typography>
+        {groupEvents.slice(0, splitPoint).map((event) => (
+          <List
+            key={`group_event_listing_${event.id}`}
+            onClick={(): void =>
+              dispatch({
+                type: CalendarAction.ViewEventDetail,
+                payload: { currentEvent: event },
+              })
+            }
+          >
+            <ListItem>{event.title}</ListItem>
+            <ListItem>
+              {getFormattedEventInterval(
+                event.start as string,
+                event.end as string
+              )}
+            </ListItem>
+          </List>
+        ))}
         <Typography>Previous Sessions</Typography>
+        {groupEvents.slice(splitPoint).map((event) => (
+          <List
+            key={`group_event_listing_${event.id}`}
+            onClick={(): void =>
+              dispatch({
+                type: CalendarAction.ViewEventDetail,
+                payload: { currentEvent: event },
+              })
+            }
+          >
+            <ListItem>{event.title}</ListItem>
+            <ListItem>
+              {getFormattedEventInterval(
+                event.start as string,
+                event.end as string
+              )}
+            </ListItem>
+          </List>
+        ))}
       </Paper>
     </Dialog>
   );
