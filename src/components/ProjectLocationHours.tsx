@@ -106,6 +106,8 @@ const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
     update
       .enter()
       .append("rect")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .merge(update as any)
       .attr("x", (d) => d.x)
       .attr("y", (d) => d.y)
       .attr("width", (d) => d.width)
