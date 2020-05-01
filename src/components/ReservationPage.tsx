@@ -82,7 +82,6 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const [groups, setGroups] = useState(initialGroups);
-
   const projects = state.projects.filter((project) =>
     user?.projectIds.includes(project.id)
   );
@@ -147,7 +146,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
       }
     }
   };
-  console.log(state);
+
   return (
     <Dialog
       fullScreen
@@ -158,7 +157,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
         <IconButton
           edge="start"
           color="inherit"
-          aria-label="close"
+          aria-label="close1"
           onClick={(): void =>
             dispatch({ type: CalendarAction.CloseReservationPage })
           }

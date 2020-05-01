@@ -10,11 +10,11 @@ import UserGroup from "../user/UserGroup";
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120,
+    minWidth: 125,
   },
 }));
 
-interface SelectProps {
+interface SelectProps extends CalendarUIProps {
   selectName: string;
   selectId: string;
   contents: (Location | Project | UserGroup)[];
@@ -22,21 +22,13 @@ interface SelectProps {
 }
 
 const Select: FunctionComponent<SelectProps> = ({
-  setState,
-  state,
+  // dispatch,
+  // state,
   selectName,
   selectId,
   contents,
   onChange,
 }) => {
-  const handleChange = (event: React.ChangeEvent<{ curProject?: unknown }>) => {
-    const curProject = event.target.curProject as keyof typeof state;
-    setState({
-      ...state,
-      [curProject]: event.target.curProject,
-    });
-  };
-
   const classes = useStyles();
   return (
     <FormControl className={classes.formControl}>
