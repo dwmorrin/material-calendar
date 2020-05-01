@@ -75,10 +75,16 @@ const useStyles = makeStyles(() => ({
 const transition = makeTransition("left");
 const initialGroups: UserGroup[] = [];
 
-const ReservationPage: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
+const ReservationPage: FunctionComponent<CalendarUIProps> = ({
+  dispatch,
+  state,
+}) => {
   const { user } = useContext(AuthContext);
   const [groups, setGroups] = useState(initialGroups);
-  const { currentProject } = state;
+  const projects = state.projects.filter((project) =>
+    user?.projectIds.includes(project.id)
+  );
+  const currentProject = projects[0];
 
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
@@ -162,7 +168,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({ dispatch, state }
               state={state}
               selectName="projects"
               selectId="projectsDropDown"
-              contents={state.projects}
+              contents={projects}
             ></Select>
           </div>
         </div>
@@ -219,8 +225,8 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({ dispatch, state }
         <div>
           <TextField
             id="standard-basic"
-            label="What will you be doing?"
-            style={{ minWidth: 180 }}
+            label="Brief Description of what you will be doing"
+            style={{ minWidth: 320 }}
           />
         </div>
         <br />
@@ -273,6 +279,9 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({ dispatch, state }
           variant="contained"
           disableElevation
           style={{ backgroundColor: "Green", color: "white" }}
+          onClick={(): void =>
+            dispatch({ type: CalendarAction.CloseReservationPage })
+          }
         >
           Confirm Reservation
         </Button>

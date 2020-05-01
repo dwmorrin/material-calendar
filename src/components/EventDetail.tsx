@@ -58,7 +58,24 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         <p>{getFormattedEventInterval(start, end)}</p>
         {open && (
           <Fragment>
-            <Typography component="h3">Projects</Typography>
+            <Button
+              key="MakeBooking"
+              style={{
+                backgroundColor: "Green",
+                color: "white",
+                maxWidth: "400px",
+              }}
+              onClick={(event): void => {
+                event.stopPropagation();
+                dispatch({
+                  type: CalendarAction.OpenReservationPage,
+                  payload: { currentEvent: state.currentEvent },
+                });
+              }}
+            >
+              Reserve Block
+            </Button>
+            <Typography component="h3">Available to Projects:</Typography>
             <List>
               {state.projects
                 .filter(
@@ -74,18 +91,6 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                   </ListItem>
                 ))}
             </List>
-            <Button
-              key="MakeBooking"
-              onClick={(event): void => {
-                event.stopPropagation();
-                dispatch({
-                  type: CalendarAction.OpenReservationPage,
-                  payload: { currentEvent: state.currentEvent },
-                });
-              }}
-            >
-              Reserve Block
-            </Button>
           </Fragment>
         )}
       </Dialog>
