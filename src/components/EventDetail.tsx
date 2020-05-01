@@ -54,7 +54,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         </Toolbar>
         <Typography component="h1">{location}</Typography>
         <Typography component="h2">{title}</Typography>
-        <p>{getFormattedEventInterval(start, end)}</p>
+        <p>{getFormattedEventInterval(start as string, end as string)}</p>
         {open && (
           <Fragment>
             <Typography component="h3">Projects</Typography>
