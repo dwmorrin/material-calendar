@@ -25,6 +25,7 @@ import Select from "./Select";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
 import UserGroup from "../user/UserGroup";
+import Project from "../calendar/Project";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -84,23 +85,8 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
   const projects = state.projects.filter((project) =>
     user?.projectIds.includes(project.id)
   );
-  let currentProject = projects[0];
-  console.log(currentProject);
-
-  const refreshGroups: FunctionComponent = (projectId: number): void => {
-    useEffect(() => {
-      fetch(`/api/project_groups/${projectId}`)
-        .then((response) => response.json())
-        .then((groups) => {
-          const usergroups = groups.map(
-            (group: UserGroup) => new UserGroup(group)
-          );
-          setGroups(usergroups);
-        })
-        .catch(console.error);
-    }, [currentProject, user]);
-  };
-
+  const initialProject: Project = projects[0];
+  const [currentProject, setCurrentProject] = useState(initialProject);
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
       .then((response) => response.json())
@@ -119,6 +105,13 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
   const [guestToggle, setGuestValue] = React.useState("no");
   const [gearToggle, setGearValue] = React.useState("no");
   const [tapeToggle, setTapeValue] = React.useState("no");
+
+  const changeProject = (id: number): void => {
+    const proj = state.projects.filter(function (project) {
+      return project.id == id;
+    });
+    setCurrentProject(proj[0]);
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setLiveValue((event.target as HTMLInputElement).value);
@@ -181,10 +174,11 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
             <Select
               dispatch={dispatch}
               state={state}
+              //value={currentProject.id}
               selectName="projects"
               selectId="projectsDropDown"
               contents={projects}
-              onChange={(event): void => console.log(event?.target.value)}
+              onChange={(event): void => changeProject(event?.target.value)}
             ></Select>
           </div>
         </div>
