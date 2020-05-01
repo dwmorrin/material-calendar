@@ -19,7 +19,6 @@ import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
 import initialState from "../calendar/initialCalendarState";
 import ProjectDashboard from "./ProjectDashboard";
-import GroupDashboard from "./GroupDashboard";
 
 const useStyles = makeStyles(() => ({
   root: {
