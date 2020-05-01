@@ -4,7 +4,7 @@ interface UserGroup {
   id: number;
   projectId: number;
   memberIds: string | (string | number)[];
-  memberNames: string | (string | number)[];
+  memberNames: string | string[];
 }
 
 class UserGroup implements UserGroup {
