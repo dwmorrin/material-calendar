@@ -1,61 +1,81 @@
+/**
+
+ */
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 
-const height = 90;
-const width = 300;
-const margin = { left: 30, right: 20, top: 20, bottom: 20 };
+const height = 90; // height of the total bar chart area in px
+const width = 300; // width of the totla bar char area in px
+const margin = { left: 30, right: 20, top: 20, bottom: 20 }; // for axes
+const hourColorInterpolator = d3.interpolateRdYlGn; // color scale
+const today = new Date(); // for "now" indicator
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const ProjectLocationHours = ({ data }) => {
+const getExtent = (allotments) => {
+  const extent = {
+    hours: d3.max(allotments, (a) => a.hours),
+    start: d3.min(allotments, (a) => new Date(a.start)),
+    end: d3.max(allotments, (a) => new Date(a.end)),
+  };
+  extent.timeDomain = [extent.start, extent.end];
+  return extent;
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const getScales = (extent) => {
+  return {
+    x: d3
+      .scaleTime()
+      .domain(extent.timeDomain)
+      .range([margin.left, width - margin.right]),
+    y: d3
+      .scaleLinear()
+      .domain([0, extent.hours])
+      .range([height - margin.bottom, margin.top]),
+    color: d3
+      .scaleSequential()
+      .domain([0, extent.hours])
+      .interpolator(hourColorInterpolator),
+  };
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const bars = (allotments, scales) => {
+  const b = allotments.map((a) => {
+    const x = scales.x(new Date(a.start));
+    const y = scales.y(a.hours);
+    return {
+      x,
+      y,
+      width: scales.x(new Date(a.end)) - x,
+      height: scales.y(0) - y,
+      color: scales.color(a.hours),
+    };
+  });
+  b.push({
+    x: scales.x(today),
+    y: margin.top / 2,
+    width: 2,
+    height: height - margin.bottom,
+    color: "red",
+  });
+  return b;
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const ProjectLocationHours = ({ allotments }) => {
   const container = useRef(null);
   const xAxisRef = useRef(null);
   const yAxisRef = useRef(null);
-
   useEffect(() => {
-    if (!data || !container.current) {
+    if (!allotments || !container.current) {
       return;
     }
-    const start = d3.min(data, (a) => a.start);
-    const end = d3.max(data, (a) => a.end);
-    const maxHours = d3.max(data, (a) => a.hours);
-    if (start === undefined || end === undefined || maxHours === undefined) {
-      return;
-    }
-    const x = d3
-      .scaleTime()
-      .domain([start, end])
-      .range([margin.left, width - margin.right]);
-    const y = d3
-      .scaleLinear()
-      .domain([0, maxHours])
-      .range([height - margin.bottom, margin.top]);
-    const color = d3
-      .scaleSequential()
-      .domain([0, maxHours])
-      .interpolator(d3.interpolateRdYlGn);
-    const bars = data.map((a) => {
-      const _x = x(a.start);
-      const _y = y(a.hours);
-      const dx = x(a.end) - _x;
-      const dy = y(0) - _y;
-      return {
-        x: _x,
-        y: _y,
-        width: dx,
-        height: dy,
-        fill: color(a.hours),
-      };
-    });
-    const today = new Date();
-    bars.push({
-      x: x(today),
-      y: margin.top / 2,
-      width: 2,
-      height: height - margin.bottom,
-      fill: "red",
-    });
+    const extent = getExtent(allotments);
+    const scales = getScales(extent);
+    const allotmentBars = bars(allotments, scales);
     const svg = d3.select(container.current);
-    const update = svg.selectAll("rect").data(bars);
+    const update = svg.selectAll("rect").data(allotmentBars);
     update
       .enter()
       .append("rect")
@@ -63,13 +83,13 @@ const ProjectLocationHours = ({ data }) => {
       .attr("y", (d) => d.y)
       .attr("width", (d) => d.width)
       .attr("height", (d) => d.height)
-      .attr("fill", (d) => d.fill);
+      .attr("fill", (d) => d.color);
     update.exit().remove();
-    const xAxis = d3.axisBottom(x).ticks(4);
-    const yAxis = d3.axisLeft(y).ticks(3);
+    const xAxis = d3.axisBottom(scales.x).ticks(4);
+    const yAxis = d3.axisLeft(scales.y).ticks(3);
     d3.select(xAxisRef.current).call(xAxis);
     d3.select(yAxisRef.current).call(yAxis);
-  }, [data]);
+  }, [allotments]);
 
   return (
     <svg width={width} height={height} ref={container}>

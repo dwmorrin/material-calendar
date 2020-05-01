@@ -39,9 +39,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const transition = makeTransition("right");
-// ! pick one
-// const initialAllotments: ProjectLocationAllotment[][] = [];
-const initialAllotments: { [k: number]: ProjectLocationAllotment[] } = {};
+const initialAllotments: ProjectLocationAllotment[][] = [];
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -71,32 +69,16 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
     if (!currentProject) {
       return;
     }
-    // ! this Promise.all doesn't cause the D3 stuff to render...
-    // const requests = currentProject.childrenIds.map((id) =>
-    //   fetch(`/api/project_location_allotment/${id}`)
-    // );
-    // Promise.all(requests).then((responses) => {
-    //   Promise.all(responses.map((res) => res.json()))
-    //     .then((locations) => setAllotments(locations))
-    //      })
-    //     .catch(console.error);
-    // });
-    // ! this has bug where 2nd visit to D3 stuff, only first shows...
-    currentProject.childrenIds.forEach((id) => {
+    const requests = currentProject.childrenIds.map((id) =>
       fetch(`/api/project_location_allotment/${id}`)
-        .then((response) => response.json())
-        .then((data) => {
-          data.forEach((d: ProjectLocationAllotment) => {
-            d.start = new Date(d.start);
-            d.end = new Date(d.end);
-          });
-          setAllotments({
-            ...allotments,
-            [data[0].locationId]: data,
-          });
-        })
-        .catch(console.error);
-    });
+    );
+    Promise.all(requests)
+      .then((responses) => {
+        Promise.all(responses.map((res) => res.json()))
+          .then((locations) => setAllotments(locations))
+          .catch(console.error);
+      })
+      .catch(console.error);
   }, [currentProject]);
 
   const groupEvents = state.events.filter(
@@ -115,6 +97,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
     if (typeof event.start !== "string") return false;
     return new Date(event.start).getTime() < now;
   });
+
   return (
     <Dialog
       className={classes.root}
@@ -160,11 +143,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
               style={{ display: "flex", flexDirection: "column" }}
             >
               <Typography variant="body2">{location.title}</Typography>
-              <ProjectLocationHours
-                // ! pick one data depending on above choices
-                // data={allotments.find((a) => a[0].locationId === location.id)}
-                data={allotments[+location.id]}
-              />
+              <ProjectLocationHours allotments={allotments[+location.id]} />
             </ExpansionPanelDetails>
           ))}
         </ExpansionPanel>
