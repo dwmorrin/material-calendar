@@ -90,7 +90,10 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
             {currentProjectGroups
               ?.filter((group) => group.id !== currentGroup?.id)
               .map((group) => (
-                <ListItem style={{ justifyContent: "space-between" }}>
+                <ListItem
+                  key={`projectGroup${group.id}`}
+                  style={{ justifyContent: "space-between" }}
+                >
                   {group.title}
                   <Button
                     size="small"
