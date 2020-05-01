@@ -61,7 +61,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   return (
     (user?.id && (
       <div className={classes.root}>
-        <GroupDashboard dispatch={dispatch} state={state} />
         <ProjectDashboard dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />

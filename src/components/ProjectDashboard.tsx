@@ -27,6 +27,7 @@ import { ProjectLocationAllotment } from "../calendar/Project";
 import ProjectLocationHours from "./ProjectLocationHours";
 import { fetchCalendarData } from "../calendar/Fetch";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
+import GroupDashboard from "./GroupDashboard";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -105,6 +106,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
       open={state.projectDashboardIsOpen}
       TransitionComponent={transition}
     >
+      <GroupDashboard state={state} dispatch={dispatch} />
       <Toolbar>
         <IconButton
           edge="start"
