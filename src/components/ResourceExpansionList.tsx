@@ -28,7 +28,12 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
 }) => {
   const { locations } = state;
   const classes = useStyles();
-
+  const groupLocations = state.locations.filter(
+    (location) => location.groupId === groupId
+  );
+  const checked = groupLocations.every((location) => location.selected);
+  const indeterminate =
+    !checked && groupLocations.some((location) => location.selected);
   return (
     <ExpansionPanel>
       <ExpansionPanelSummary
@@ -41,10 +46,8 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
       >
         <FormControlLabel
           aria-label="Acknowledge"
-          checked={state.locations
-            .filter((location) => location.groupId === groupId)
-            .every((location) => location.selected)}
-          control={<Checkbox />}
+          checked={checked}
+          control={<Checkbox indeterminate={indeterminate} />}
           label={groupId}
           onClick={(event): void => event.stopPropagation()}
           onChange={(event: React.ChangeEvent<{}>, checked): void => {
