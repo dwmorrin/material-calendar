@@ -86,14 +86,8 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
   const projects = state.projects.filter((project) =>
     user?.projectIds.includes(project.id)
   );
-  const currentProject = projects[0];
-
-  const [projectState, projectSetState] = React.useState<{
-    curProject: Project;
-  }>({
-    curProject: currentProject,
-  });
-
+  const initialProject: Project = projects[0];
+  const [currentProject, setCurrentProject] = useState(initialProject);
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
       .then((response) => response.json())
@@ -112,6 +106,13 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
   const [guestToggle, setGuestValue] = React.useState("no");
   const [gearToggle, setGearValue] = React.useState("no");
   const [tapeToggle, setTapeValue] = React.useState("no");
+
+  const changeProject = (id: number): void => {
+    const proj = state.projects.filter(function (project) {
+      return project.id == id;
+    });
+    setCurrentProject(proj[0]);
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setLiveValue((event.target as HTMLInputElement).value);
@@ -172,13 +173,13 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
           <div style={{ paddingTop: 6 }}>Project:</div>
           <div style={{ paddingLeft: 5 }}>
             <Select
-              state={projectState}
-              setState={projectState}
+              dispatch={dispatch}
+              state={state}
+              //value={currentProject.id}
               selectName="projects"
               selectId="projectsDropDown"
               contents={projects}
-              selected={currentProject}
-              onChange={(): void => console.log(currentProject)}
+              onChange={(event): void => changeProject(event?.target.value)}
             ></Select>
           </div>
         </div>

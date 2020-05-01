@@ -18,10 +18,7 @@ interface SelectProps {
   selectName: string;
   selectId: string;
   contents: (Location | Project | UserGroup)[];
-  selected: Location | Project | UserGroup;
-  onChange: () => void;
-  state: { curProject: Project };
-  setState: { curProject: Project };
+  onChange: (event: any) => void;
 }
 
 const Select: FunctionComponent<SelectProps> = ({
@@ -31,7 +28,6 @@ const Select: FunctionComponent<SelectProps> = ({
   selectId,
   contents,
   onChange,
-  selected,
 }) => {
   const handleChange = (event: React.ChangeEvent<{ curProject?: unknown }>) => {
     const curProject = event.target.curProject as keyof typeof state;
@@ -49,8 +45,7 @@ const Select: FunctionComponent<SelectProps> = ({
           name: selectName,
           id: selectId,
         }}
-        onChange={handleChange}
-        value={selected}
+        onChange={onChange}
       >
         {contents.map((choice) => {
           return choice === contents[0] ? (

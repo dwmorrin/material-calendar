@@ -16,7 +16,7 @@ import {
   Button,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import NewSelect from "./NewSelect";
+import Select from "./Select";
 import ProgressBar from "./ProgressBar";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
@@ -59,7 +59,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const [groups, setGroups] = useState(initialGroups);
-  const { currentProject } = state;
+  let { currentProject } = state;
 
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
@@ -101,26 +101,24 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                 Studio Allotment
               </Grid>
               <Grid item xs={5}>
-                <NewSelect
+                <Select
                   dispatch={dispatch}
                   state={state}
                   selectName="studios"
                   selectId="studiosDropDown"
                   contents={state.locations}
-                  selected={state.locations[0]}
-                  onChange={(): void => console.log("select changed")}
-                ></NewSelect>
+                  onChange={(): void => console.log("boop")}
+                ></Select>
               </Grid>
               <Grid item xs={7}>
-                <NewSelect
+                <Select
                   dispatch={dispatch}
                   state={state}
                   selectName="groups"
                   selectId="groupsSelect"
                   contents={groups}
-                  selected={groups[0]}
-                  onChange={(): void => console.log("select changed")}
-                ></NewSelect>
+                  onChange={(): void => console.log("boop")}
+                ></Select>
               </Grid>
               <Grid item xs={12}>
                 <ProgressBar
