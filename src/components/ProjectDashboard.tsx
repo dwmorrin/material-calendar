@@ -100,26 +100,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
               <Grid item xs={12}>
                 Studio Allotment
               </Grid>
-              <Grid item xs={5}>
-                <Select
-                  dispatch={dispatch}
-                  state={state}
-                  selectName="studios"
-                  selectId="studiosDropDown"
-                  contents={state.locations}
-                  onChange={(): void => console.log("boop")}
-                ></Select>
-              </Grid>
-              <Grid item xs={7}>
-                <Select
-                  dispatch={dispatch}
-                  state={state}
-                  selectName="groups"
-                  selectId="groupsSelect"
-                  contents={groups}
-                  onChange={(): void => console.log("boop")}
-                ></Select>
-              </Grid>
+              <Grid item xs={5}></Grid>
               <Grid item xs={12}>
                 <ProgressBar
                   left={{ title: "", value: 9, color: "#fc0303" }}

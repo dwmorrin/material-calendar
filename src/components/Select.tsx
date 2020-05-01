@@ -19,6 +19,7 @@ interface SelectProps extends CalendarUIProps {
   selectId: string;
   contents: (Location | Project | UserGroup)[];
   onChange: (event: any) => void;
+  value: number | string;
 }
 
 const Select: FunctionComponent<SelectProps> = ({
@@ -28,6 +29,7 @@ const Select: FunctionComponent<SelectProps> = ({
   selectId,
   contents,
   onChange,
+  value,
 }) => {
   const classes = useStyles();
   return (
@@ -38,6 +40,7 @@ const Select: FunctionComponent<SelectProps> = ({
           id: selectId,
         }}
         onChange={onChange}
+        value={value}
       >
         {contents.map((choice) => {
           return choice === contents[0] ? (
