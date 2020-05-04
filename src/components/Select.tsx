@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ChangeEvent } from "react";
+import React, { FunctionComponent } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import { NativeSelect } from "@material-ui/core";
