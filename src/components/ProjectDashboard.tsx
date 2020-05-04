@@ -16,7 +16,6 @@ import {
   Button,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import Select from "./Select";
 import ProgressBar from "./ProgressBar";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
@@ -59,7 +58,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const [groups, setGroups] = useState(initialGroups);
-  let { currentProject } = state;
+  const { currentProject } = state;
 
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
