@@ -108,6 +108,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
 
   const changeProject = (id: number): void => {
     const proj = state.projects.filter(function (project) {
+      // eslint-disable-next-line
       return project.id == id;
     });
     setCurrentProject(proj[0]);
