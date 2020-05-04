@@ -25,6 +25,7 @@ import Select from "./Select";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
 import UserGroup from "../user/UserGroup";
+import { Formik, Field, Form, FormikHelpers } from "formik";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -114,6 +115,16 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
     setCurrentProject(proj[0]);
   };
 
+  const onSubmit = (
+    values: Values,
+    { setSubmitting }: FormikHelpers<Values>
+  ): void => {
+    setTimeout(() => {
+      alert(JSON.stringify(values, null, 2));
+      setSubmitting(false);
+    }, 500);
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setLiveValue((event.target as HTMLInputElement).value);
   };
@@ -147,6 +158,10 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
       }
     }
   };
+  interface Values {
+    phone: string;
+    description: string;
+  }
 
   // Once we have projects, if we still don't have a default currentProject, assign it now.
   if (projects[0]) {
@@ -173,138 +188,182 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
         </IconButton>
         <Typography variant="h6">Make Reservation</Typography>
       </Toolbar>
-      <form className={classes.root} noValidate autoComplete="off">
-        <div>
-          {" "}
-          <div className={classes.list}>
-            <div style={{ paddingTop: 18 }}>Project:</div>
-            <div style={{ paddingLeft: 5 }}>
-              <Select
-                dispatch={dispatch}
-                state={state}
-                value={currentProject ? currentProject.id : ""}
-                selectName="projects"
-                selectId="projectsDropDown"
-                contents={projects}
-                onChange={(event): void => changeProject(event?.target.value)}
-              ></Select>
-            </div>
-          </div>
-          <div>
-            <div className={classes.list}>
-              Group:{" "}
-              <div style={{ paddingLeft: 10 }}>
-                {groups
-                  .filter((group) => user?.groupIds.includes(group.id))
-                  .map((group) => {
-                    return (
-                      <span key={group.id}>
-                        {group.title}
-                        <br />
-                      </span>
-                    );
-                  })}
+      <Formik
+        initialValues={{
+          phone: "",
+          description: "",
+        }}
+        onSubmit={(
+          values: Values,
+          { setSubmitting }: FormikHelpers<Values>
+        ) => {
+          setTimeout(() => {
+            alert(JSON.stringify(values, null, 2));
+            setSubmitting(false);
+          }, 500);
+        }}
+        render={() => (
+          <form>
+            <div>
+              {" "}
+              <div className={classes.list}>
+                <div style={{ paddingTop: 18 }}>Project:</div>
+                <div style={{ paddingLeft: 5 }}>
+                  <Select
+                    dispatch={dispatch}
+                    state={state}
+                    value={currentProject ? currentProject.id : ""}
+                    selectName="projects"
+                    selectId="projectsDropDown"
+                    contents={projects}
+                    onChange={(event): void =>
+                      changeProject(event?.target.value)
+                    }
+                  ></Select>
+                </div>
               </div>
+              <div>
+                <div className={classes.list}>
+                  Group:{" "}
+                  <div style={{ paddingLeft: 10 }}>
+                    {groups
+                      .filter((group) => user?.groupIds.includes(group.id))
+                      .map((group) => {
+                        return (
+                          <span key={group.id}>
+                            {group.title}
+                            <br />
+                          </span>
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
+              <br />
+              <FormControl component="fieldset">
+                <FormLabel component="legend">
+                  Do you need to use the Live Room?
+                </FormLabel>
+                <RadioGroup
+                  aria-label="liveroom"
+                  name="liveroom"
+                  value={liveToggle}
+                  onChange={handleChange}
+                >
+                  <FormControlLabel
+                    value="yes"
+                    control={<Radio />}
+                    label="Yes"
+                  />
+                  <FormControlLabel value="no" control={<Radio />} label="No" />
+                </RadioGroup>
+              </FormControl>
+              <br />
+              <FormControl component="fieldset">
+                <FormLabel component="legend">
+                  Would you like to use the analog tape machine?
+                </FormLabel>
+                <RadioGroup
+                  aria-label="tape"
+                  name="tape"
+                  value={tapeToggle}
+                  onChange={tapeChange}
+                >
+                  <FormControlLabel
+                    value="yes"
+                    control={<Radio />}
+                    label="Yes"
+                  />
+                  <FormControlLabel value="no" control={<Radio />} label="No" />
+                </RadioGroup>
+              </FormControl>
+              <br />
+              <div>
+                <TextField
+                  id="standard-basic"
+                  label="Brief Description of what you will be doing"
+                  fullWidth
+                  variant="filled"
+                />
+              </div>
+              <br />
+              <FormControl component="fieldset">
+                <FormLabel component="legend">Do you have guests?</FormLabel>
+                <RadioGroup
+                  aria-label="guests"
+                  name="guests"
+                  value={guestToggle}
+                  onChange={showGuests}
+                >
+                  <FormControlLabel
+                    value="yes"
+                    control={<Radio />}
+                    label="Yes"
+                  />
+                  <FormControlLabel value="no" control={<Radio />} label="No" />
+                </RadioGroup>
+              </FormControl>
+              <br />
+              <div id="guestInput" className={classes.guests}>
+                <TextField
+                  id="guestNames"
+                  label="Guest Names"
+                  variant="filled"
+                />
+                <br />
+              </div>
+              <Field
+                id="phone"
+                name="phone"
+                placeholder="Phone Number"
+                type="phone"
+              />
+              {/* <TextField id="phone" label="Phone Number" variant="filled" /> */}
+              <br />
+              <br />
+              <FormControl component="fieldset">
+                <FormLabel component="legend">
+                  Would you like to reserve any gear?
+                </FormLabel>
+                <RadioGroup
+                  aria-label="gear"
+                  name="gear"
+                  value={gearToggle}
+                  onChange={showGear}
+                >
+                  <FormControlLabel
+                    value="yes"
+                    control={<Radio />}
+                    label="Yes"
+                  />
+                  <FormControlLabel value="no" control={<Radio />} label="No" />
+                </RadioGroup>
+              </FormControl>
+              <div id="gearInput" className={classes.gear}>
+                <TextField
+                  id="gearList"
+                  label="What gear would you like to reserve?"
+                  fullWidth
+                  multiline
+                  rows={8}
+                  variant="filled"
+                />
+              </div>
+              <br />
+              <Button
+                type="submit"
+                size="small"
+                variant="contained"
+                disableElevation
+                style={{ backgroundColor: "Green", color: "white" }}
+                /* ds */
+              >
+                Confirm Reservation
+              </Button>
             </div>
-          </div>
-          <br />
-          <FormControl component="fieldset">
-            <FormLabel component="legend">
-              Do you need to use the Live Room?
-            </FormLabel>
-            <RadioGroup
-              aria-label="liveroom"
-              name="liveroom"
-              value={liveToggle}
-              onChange={handleChange}
-            >
-              <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
-          <br />
-          <FormControl component="fieldset">
-            <FormLabel component="legend">
-              Would you like to use the analog tape machine?
-            </FormLabel>
-            <RadioGroup
-              aria-label="tape"
-              name="tape"
-              value={tapeToggle}
-              onChange={tapeChange}
-            >
-              <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
-          <br />
-          <div>
-            <TextField
-              id="standard-basic"
-              label="Brief Description of what you will be doing"
-              fullWidth
-              variant="filled"
-            />
-          </div>
-          <br />
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Do you have guests?</FormLabel>
-            <RadioGroup
-              aria-label="guests"
-              name="guests"
-              value={guestToggle}
-              onChange={showGuests}
-            >
-              <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
-          <br />
-          <div id="guestInput" className={classes.guests}>
-            <TextField id="guestNames" label="Guest Names" variant="filled" />
-            <br />
-          </div>
-          <TextField id="phoneNumber" label="Phone Number" variant="filled" />
-          <br />
-          <br />
-          <FormControl component="fieldset">
-            <FormLabel component="legend">
-              Would you like to reserve any gear?
-            </FormLabel>
-            <RadioGroup
-              aria-label="gear"
-              name="gear"
-              value={gearToggle}
-              onChange={showGear}
-            >
-              <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
-          <div id="gearInput" className={classes.gear}>
-            <TextField
-              id="gearList"
-              label="What gear would you like to reserve?"
-              fullWidth
-              multiline
-              rows={8}
-              variant="filled"
-            />
-          </div>
-          <br />
-          <Button
-            size="small"
-            variant="contained"
-            disableElevation
-            style={{ backgroundColor: "Green", color: "white" }}
-            onClick={(): void =>
-              dispatch({ type: CalendarAction.CloseReservationPage })
-            }
-          >
-            Confirm Reservation
-          </Button>
-        </div>
-      </form>
+          </form>
+        )}
+      />
     </Dialog>
   );
 };
