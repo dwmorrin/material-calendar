@@ -25,7 +25,6 @@ import Select from "./Select";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
 import UserGroup from "../user/UserGroup";
-import Project from "../calendar/Project";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -86,8 +85,8 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
     user?.projectIds.includes(project.id)
   );
   const initialProject = projects[0];
-  console.log(initialProject);
   const [currentProject, setCurrentProject] = useState(initialProject);
+
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
       .then((response) => response.json())
@@ -148,161 +147,163 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
     }
   };
 
-  if (currentProject != undefined) {
-    return (
-      <Dialog
-        fullScreen
-        open={state.reservationPageIsOpen}
-        TransitionComponent={transition}
-      >
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="close1"
-            onClick={(): void =>
-              dispatch({ type: CalendarAction.CloseReservationPage })
-            }
-          >
-            <CloseIcon />
-          </IconButton>
-          <Typography>Make Reservation</Typography>
-        </Toolbar>
-        <div>
-          {" "}
-          <div className={classes.list}>
-            <div style={{ paddingTop: 6 }}>Project:</div>
-            <div style={{ paddingLeft: 5 }}>
-              <Select
-                dispatch={dispatch}
-                state={state}
-                value={currentProject.id}
-                selectName="projects"
-                selectId="projectsDropDown"
-                contents={projects}
-                onChange={(event): void => changeProject(event?.target.value)}
-              ></Select>
-            </div>
-          </div>
-          <br />
-          <br />
-          <div>
-            <div className={classes.list}>
-              Group:{" "}
-              <div style={{ paddingLeft: 10 }}>
-                {groups
-                  .filter((group) => user?.groupIds.includes(group.id))
-                  .map((group) => {
-                    return (
-                      <span key={group.id}>
-                        {group.title}
-                        <br />
-                      </span>
-                    );
-                  })}
-              </div>
-            </div>
-          </div>
-          <br />
-          <FormControl component="fieldset">
-            <FormLabel component="legend">
-              Do you need to use the Live Room?
-            </FormLabel>
-            <RadioGroup
-              aria-label="liveroom"
-              name="liveroom"
-              value={liveToggle}
-              onChange={handleChange}
-            >
-              <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
-          <br />
-          <FormControl component="fieldset">
-            <FormLabel component="legend">
-              Would you like to use the analog tape machine?
-            </FormLabel>
-            <RadioGroup
-              aria-label="tape"
-              name="tape"
-              value={tapeToggle}
-              onChange={tapeChange}
-            >
-              <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
-          <br />
-          <div>
-            <TextField
-              id="standard-basic"
-              label="Brief Description of what you will be doing"
-              style={{ minWidth: 320 }}
-            />
-          </div>
-          <br />
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Do you have guests?</FormLabel>
-            <RadioGroup
-              aria-label="guests"
-              name="guests"
-              value={guestToggle}
-              onChange={showGuests}
-            >
-              <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
-          <br />
-          <div id="guestInput" className={classes.guests}>
-            <TextField id="guestNames" label="Guest Names" />
-            <br />
-          </div>
-          <TextField id="phoneNumber" label="Phone Number" />
-          <br />
-          <br />
-          <FormControl component="fieldset">
-            <FormLabel component="legend">
-              Would you like to reserve any gear?
-            </FormLabel>
-            <RadioGroup
-              aria-label="gear"
-              name="gear"
-              value={gearToggle}
-              onChange={showGear}
-            >
-              <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
-          <div id="gearInput" className={classes.gear}>
-            <TextField
-              id="gearList"
-              label="What gear would you like to reserve?"
-              style={{ minWidth: 300 }}
-              multiline
-              rows={8}
-            />
-          </div>
-          <br />
-          <Button
-            size="small"
-            variant="contained"
-            disableElevation
-            style={{ backgroundColor: "Green", color: "white" }}
-            onClick={(): void =>
-              dispatch({ type: CalendarAction.CloseReservationPage })
-            }
-          >
-            Confirm Reservation
-          </Button>
-        </div>
-      </Dialog>
-    );
-  } else {
-    return null;
+  // Once we have projects, if we still don't have a default currentProject, assign it now.
+  if (projects[0]) {
+    if (currentProject === undefined) {
+      setCurrentProject(projects[0]);
+    }
   }
+  return (
+    <Dialog
+      fullScreen
+      open={state.reservationPageIsOpen}
+      TransitionComponent={transition}
+    >
+      <Toolbar>
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="close1"
+          onClick={(): void =>
+            dispatch({ type: CalendarAction.CloseReservationPage })
+          }
+        >
+          <CloseIcon />
+        </IconButton>
+        <Typography>Make Reservation</Typography>
+      </Toolbar>
+      <div>
+        {" "}
+        <div className={classes.list}>
+          <div style={{ paddingTop: 6 }}>Project:</div>
+          <div style={{ paddingLeft: 5 }}>
+            <Select
+              dispatch={dispatch}
+              state={state}
+              value={currentProject ? currentProject.id : ""}
+              selectName="projects"
+              selectId="projectsDropDown"
+              contents={projects}
+              onChange={(event): void => changeProject(event?.target.value)}
+            ></Select>
+          </div>
+        </div>
+        <br />
+        <br />
+        <div>
+          <div className={classes.list}>
+            Group:{" "}
+            <div style={{ paddingLeft: 10 }}>
+              {groups
+                .filter((group) => user?.groupIds.includes(group.id))
+                .map((group) => {
+                  return (
+                    <span key={group.id}>
+                      {group.title}
+                      <br />
+                    </span>
+                  );
+                })}
+            </div>
+          </div>
+        </div>
+        <br />
+        <FormControl component="fieldset">
+          <FormLabel component="legend">
+            Do you need to use the Live Room?
+          </FormLabel>
+          <RadioGroup
+            aria-label="liveroom"
+            name="liveroom"
+            value={liveToggle}
+            onChange={handleChange}
+          >
+            <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+            <FormControlLabel value="no" control={<Radio />} label="No" />
+          </RadioGroup>
+        </FormControl>
+        <br />
+        <FormControl component="fieldset">
+          <FormLabel component="legend">
+            Would you like to use the analog tape machine?
+          </FormLabel>
+          <RadioGroup
+            aria-label="tape"
+            name="tape"
+            value={tapeToggle}
+            onChange={tapeChange}
+          >
+            <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+            <FormControlLabel value="no" control={<Radio />} label="No" />
+          </RadioGroup>
+        </FormControl>
+        <br />
+        <div>
+          <TextField
+            id="standard-basic"
+            label="Brief Description of what you will be doing"
+            style={{ minWidth: 320 }}
+          />
+        </div>
+        <br />
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Do you have guests?</FormLabel>
+          <RadioGroup
+            aria-label="guests"
+            name="guests"
+            value={guestToggle}
+            onChange={showGuests}
+          >
+            <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+            <FormControlLabel value="no" control={<Radio />} label="No" />
+          </RadioGroup>
+        </FormControl>
+        <br />
+        <div id="guestInput" className={classes.guests}>
+          <TextField id="guestNames" label="Guest Names" />
+          <br />
+        </div>
+        <TextField id="phoneNumber" label="Phone Number" />
+        <br />
+        <br />
+        <FormControl component="fieldset">
+          <FormLabel component="legend">
+            Would you like to reserve any gear?
+          </FormLabel>
+          <RadioGroup
+            aria-label="gear"
+            name="gear"
+            value={gearToggle}
+            onChange={showGear}
+          >
+            <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+            <FormControlLabel value="no" control={<Radio />} label="No" />
+          </RadioGroup>
+        </FormControl>
+        <div id="gearInput" className={classes.gear}>
+          <TextField
+            id="gearList"
+            label="What gear would you like to reserve?"
+            style={{ minWidth: 300 }}
+            multiline
+            rows={8}
+          />
+        </div>
+        <br />
+        <Button
+          size="small"
+          variant="contained"
+          disableElevation
+          style={{ backgroundColor: "Green", color: "white" }}
+          onClick={(): void =>
+            dispatch({ type: CalendarAction.CloseReservationPage })
+          }
+        >
+          Confirm Reservation
+        </Button>
+      </div>
+    </Dialog>
+  );
 };
 
 export default ReservationPage;
