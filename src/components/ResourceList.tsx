@@ -4,6 +4,7 @@ import { CalendarUIProps } from "../calendar/types";
 import { locationGroupReducer } from "../calendar/Location";
 import ResourceListItem from "./ResourceListItem";
 import ResourceExpansionList from "./ResourceExpansionList";
+import { ExpansionPanelSummary, ExpansionPanel } from "@material-ui/core";
 
 const useStyles = makeStyles({
   root: {
@@ -31,12 +32,15 @@ const ResourceList: FunctionComponent<CalendarUIProps> = ({
           />
         ))}
       {singletons.map((location) => (
-        <ResourceListItem
-          key={`${location.id}_list_item`}
-          dispatch={dispatch}
-          state={state}
-          location={location}
-        />
+        <ExpansionPanel key={`${location.id}_list_item`}>
+          <ExpansionPanelSummary style={{ padding: 0 }}>
+            <ResourceListItem
+              dispatch={dispatch}
+              state={state}
+              location={location}
+            />
+          </ExpansionPanelSummary>
+        </ExpansionPanel>
       ))}
     </div>
   );

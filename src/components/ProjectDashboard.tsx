@@ -7,78 +7,106 @@ import React, {
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   IconButton,
-  Grid,
-  Paper,
   makeStyles,
   Dialog,
   Toolbar,
   Typography,
-  Button,
+  Paper,
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  ExpansionPanelDetails,
+  List,
+  ListItem,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import ProgressBar from "./ProgressBar";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
-import UserGroup from "../user/UserGroup";
+import { getFormattedEventInterval } from "../calendar/date";
+import { ProjectLocationAllotment } from "../calendar/Project";
+import ProjectLocationHours from "./ProjectLocationHours";
+import { fetchCalendarData } from "../calendar/Fetch";
+import ProjectDashboardGroup from "./ProjectDashboardGroup";
+import GroupDashboard from "./GroupDashboard";
 
 const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
   root: {
     flexGrow: 1,
   },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  title: {
-    flexGrow: 1,
-    color: "white",
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: "center",
-  },
-  grid: {
-    textAlign: "center",
-  },
-  text: {
-    paddingLeft: "10px",
-    textAlign: "left",
+  hoursBar: {
+    margin: theme.spacing(1),
+    height: 10,
   },
 }));
 
 const transition = makeTransition("right");
-const initialGroups: UserGroup[] = [];
+const initialAllotments: ProjectLocationAllotment[][] = [];
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
+  const classes = useStyles();
   const { user } = useContext(AuthContext);
-  const [groups, setGroups] = useState(initialGroups);
+  const [allotments, setAllotments] = useState(initialAllotments);
   const { currentProject } = state;
+  const locations = state.locations.filter((location) =>
+    currentProject?.locationIds.includes(location.id)
+  );
 
   useEffect(() => {
-    fetch(`/api/project_groups/${currentProject?.id}`)
-      .then((response) => response.json())
-      .then((groups) => {
-        const usergroups = groups.map(
-          (group: UserGroup) => new UserGroup(group)
-        );
-        setGroups(usergroups);
+    if (!currentProject) {
+      return;
+    }
+    fetchCalendarData({
+      dispatch,
+      onSuccessAction: CalendarAction.ReceivedGroups,
+      payloadKey: "currentProjectGroups",
+      url: `/api/project_groups/${currentProject.id}`,
+    });
+  }, [currentProject, dispatch, user]);
+
+  useEffect(() => {
+    if (!currentProject) {
+      return;
+    }
+    const requests = currentProject.childrenIds.map((id) =>
+      fetch(`/api/project_location_allotment/${id}`)
+    );
+    Promise.all(requests)
+      .then((responses) => {
+        Promise.all(responses.map((res) => res.json()))
+          .then((locations) => setAllotments(locations))
+          .catch(console.error);
       })
       .catch(console.error);
-  }, [currentProject, user]);
+  }, [currentProject]);
 
-  const classes = useStyles();
+  const groupEvents = state.events.filter(
+    (event) => event.projectGroupId === state.currentGroup?.id
+  );
+  groupEvents.sort((a, b) => {
+    if (typeof a.start !== "string" || typeof b.start !== "string") return 0;
+    const _a = new Date(a.start).getTime();
+    const _b = new Date(b.start).getTime();
+    if (_a < _b) return 1;
+    if (_a > _b) return -1;
+    return 0;
+  });
+  const now = Date.now();
+  const splitPoint = groupEvents.findIndex((event) => {
+    if (typeof event.start !== "string") return false;
+    return new Date(event.start).getTime() < now;
+  });
+
   return (
     <Dialog
+      className={classes.root}
       fullScreen
       open={state.projectDashboardIsOpen}
       TransitionComponent={transition}
     >
+      <GroupDashboard state={state} dispatch={dispatch} />
       <Toolbar>
         <IconButton
           edge="start"
@@ -90,89 +118,91 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         >
           <CloseIcon />
         </IconButton>
-        <Typography>Projects</Typography>
+        <Typography>{currentProject?.title}</Typography>
       </Toolbar>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                Studio Allotment
-              </Grid>
-              <Grid item xs={5}></Grid>
-              <Grid item xs={12}>
-                <ProgressBar
-                  left={{ title: "", value: 9, color: "#fc0303" }}
-                  right={{ title: "", value: 3, color: "#03fc1c" }}
-                />{" "}
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} className={classes.grid}>
-          <Paper className={classes.paper}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <b>My Group</b>
-              </Grid>
-              {/* <Grid item xs={5}>
-                <p className={classes.text}>
-                  {" "}
-                  Group Members:
-                  <br />
-                  {group.length < 1 ? undefined : (
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="inherit"
-                      disableElevation
-                    >
-                      Leave Group
-                    </Button>
-                  )}
-                </p>
-              </Grid> */}
-              <Grid item xs={7}>
-                <p className={classes.text}>
-                  {groups
-                    .filter((group) => user?.groupIds.includes(group.id))
-                    .map((group) => {
-                      return (
-                        <span key={group.id}>
-                          {group.title}
-                          <br />
-                        </span>
-                      );
-                    })}
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="inherit"
-                    disableElevation
-                  >
-                    Add User
-                  </Button>
-                </p>
-              </Grid>
-              <Grid item xs={12}>
-                <p className={classes.text}>My Hours:</p>
-              </Grid>
-              <Grid item xs={12}>
-                <ProgressBar
-                  left={{ title: "", value: 12, color: "#fc0303" }}
-                  right={{ title: "", value: 3, color: "#03fc1c" }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <p className={classes.text}>Upcoming Sessions:</p>
-              </Grid>
-              <Grid item xs={12}>
-                <p className={classes.text}>Previous Sessions:</p>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-      </Grid>
+      <Paper
+        style={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          // justifyContent: "space-between",
+        }}
+      >
+        <Typography variant="body2">
+          {currentProject &&
+            getFormattedEventInterval(
+              currentProject?.start as string | Date,
+              currentProject?.end as string | Date
+            )}
+        </Typography>
+        <ExpansionPanel defaultExpanded={locations.length === 1}>
+          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="body1">Location Hours</Typography>
+          </ExpansionPanelSummary>
+          {locations.map((location) => (
+            <ExpansionPanelDetails
+              key={`${location.id}`}
+              style={{ display: "flex", flexDirection: "column" }}
+            >
+              <Typography variant="body2">{location.title}</Typography>
+              <ProjectLocationHours
+                // extracts one allotments[] from allotments[][]
+                allotments={
+                  allotments.filter((a) => a[0].locationId === location.id)[0]
+                }
+              />
+            </ExpansionPanelDetails>
+          ))}
+        </ExpansionPanel>
+        <ExpansionPanel defaultExpanded>
+          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="body1">Group Info</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <ProjectDashboardGroup dispatch={dispatch} state={state} />
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+        <Typography>Upcoming Sessions</Typography>
+        {groupEvents.slice(0, splitPoint).map((event) => (
+          <List
+            key={`group_event_listing_${event.id}`}
+            onClick={(): void =>
+              dispatch({
+                type: CalendarAction.ViewEventDetail,
+                payload: { currentEvent: event },
+              })
+            }
+          >
+            <ListItem>{event.title}</ListItem>
+            <ListItem>
+              {getFormattedEventInterval(
+                event.start as string,
+                event.end as string
+              )}
+            </ListItem>
+          </List>
+        ))}
+        <Typography>Previous Sessions</Typography>
+        {groupEvents.slice(splitPoint).map((event) => (
+          <List
+            key={`group_event_listing_${event.id}`}
+            onClick={(): void =>
+              dispatch({
+                type: CalendarAction.ViewEventDetail,
+                payload: { currentEvent: event },
+              })
+            }
+          >
+            <ListItem>{event.title}</ListItem>
+            <ListItem>
+              {getFormattedEventInterval(
+                event.start as string,
+                event.end as string
+              )}
+            </ListItem>
+          </List>
+        ))}
+      </Paper>
     </Dialog>
   );
 };

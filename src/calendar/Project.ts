@@ -1,6 +1,15 @@
 import inflate from "../util/inflate";
 
+export interface ProjectLocationAllotment {
+  projectId: number;
+  locationId: number | string;
+  start: Date;
+  end: Date;
+  hours: number;
+}
+
 export interface Project {
+  childrenIds: (string | number)[];
   end: string | Date;
   id: string | number;
   locationIds: (string | number)[];
@@ -19,6 +28,7 @@ export class Project {
     this.start = new Date(this.start);
     this.end = new Date(this.end);
     this.locationIds = inflate(this.locationIds);
+    this.childrenIds = inflate(this.childrenIds);
   }
 }
 

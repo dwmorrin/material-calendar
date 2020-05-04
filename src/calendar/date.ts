@@ -25,21 +25,28 @@ export function compareDateOrder(
 }
 
 export function getFormattedEventInterval(
-  start?: DateInput,
-  end?: DateInput
+  start: string | Date,
+  end: string | Date
 ): string {
-  if (typeof start !== "string" || typeof end !== "string") {
-    return "Oops, error! Unknown date!";
+  if (typeof start === "string") {
+    start = new Date(start);
   }
-  const startDate = new Date(start);
-  const endDate = new Date(end);
+  if (typeof end === "string") {
+    end = new Date(end);
+  }
+  const sameDay =
+    start.getFullYear() === end.getFullYear() &&
+    start.getMonth() === end.getMonth() &&
+    start.getDate() === end.getDate();
+
   const dateFormat = { weekday: "long", day: "numeric", month: "long" };
   const timeFormat = { hour12: true, timeStyle: "short" };
-  return `${startDate.toLocaleDateString(
+  const startFormatted = `${start.toLocaleDateString(
     "en-US",
     dateFormat
-  )} \u00B7 ${startDate.toLocaleTimeString(
-    "en-US",
-    timeFormat
-  )} - ${endDate.toLocaleTimeString("en-US", timeFormat)}`;
+  )} \u00B7 ${start.toLocaleTimeString("en-US", timeFormat)}`;
+  const endFormatted = `${
+    !sameDay ? end.toLocaleDateString("en-US", dateFormat) + " \u00B7 " : ""
+  }${end.toLocaleTimeString("en-US", timeFormat)}`;
+  return `${startFormatted} - ${endFormatted}`;
 }
