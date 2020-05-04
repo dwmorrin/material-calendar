@@ -176,7 +176,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
       <div>
         {" "}
         <div className={classes.list}>
-          <div style={{ paddingTop: 6 }}>Project:</div>
+          <div style={{ paddingTop: 18 }}>Project:</div>
           <div style={{ paddingLeft: 5 }}>
             <Select
               dispatch={dispatch}
@@ -189,8 +189,6 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
             ></Select>
           </div>
         </div>
-        <br />
-        <br />
         <div>
           <div className={classes.list}>
             Group:{" "}
