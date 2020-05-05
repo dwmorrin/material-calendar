@@ -293,8 +293,8 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
                       Do you have guests?
                     </FormLabel>
                     <RadioGroup
-                      aria-label="guests"
-                      name="guests"
+                      aria-label="guestsToggle"
+                      name="guestsToggle"
                       value={guestToggle}
                       onChange={showGuests}
                     >
@@ -316,7 +316,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
                   <div id="guestInput" className={classes.guests}>
                     <TextField
                       label="Guest Names"
-                      name="guestNames"
+                      name="guests"
                       value={values.guests}
                       onChange={handleChange}
                       onBlur={handleBlur}
