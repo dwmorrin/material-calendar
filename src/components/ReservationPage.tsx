@@ -205,7 +205,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
               return (
                 <form onSubmit={handleSubmit}>
                   <div className={classes.list}>
-                    <div style={{ paddingTop: 18 }}>Project:</div>
+                    <div style={{ paddingTop: 16 }}>Project:</div>
                     <div style={{ paddingLeft: 5 }}>
                       <Select
                         dispatch={dispatch}

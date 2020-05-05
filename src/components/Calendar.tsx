@@ -19,7 +19,7 @@ import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
 import initialState from "../calendar/initialCalendarState";
 import ProjectDashboard from "./ProjectDashboard";
-import ReservationPage from "./ReservationPageAlt";
+import ReservationPage from "./ReservationPage";
 
 const useStyles = makeStyles(() => ({
   root: {
