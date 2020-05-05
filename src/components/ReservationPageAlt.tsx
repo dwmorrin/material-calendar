@@ -187,18 +187,16 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
         <Typography variant="h6">Make Reservation</Typography>
       </Toolbar>
       <React.Fragment>
-        <DialogTitle id="form-dialog-title">Contact</DialogTitle>
         <DialogContent>
-          <DialogContentText>Send us a comment!</DialogContentText>
           <Formik
-            initialValues={{ email: "", name: "", comment: "" }}
+            initialValues={{ email: "", description: "", guests: "" }}
             onSubmit={(values, { setSubmitting }) => {
               return undefined;
             }}
             validationSchema={Yup.object().shape({
               email: Yup.string().email().required("Required"),
-              name: Yup.string().required("Required"),
-              comment: Yup.string().required("Required"),
+              description: Yup.string().required("Required"),
+              guests: Yup.string().required("Required"),
             })}
           >
             {(props) => {
@@ -215,18 +213,115 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
               } = props;
               return (
                 <form onSubmit={handleSubmit}>
+                  <div className={classes.list}>
+                    <div style={{ paddingTop: 18 }}>Project:</div>
+                    <div style={{ paddingLeft: 5 }}>
+                      <Select
+                        dispatch={dispatch}
+                        state={state}
+                        value={currentProject ? currentProject.id : ""}
+                        selectName="projects"
+                        selectId="projectsDropDown"
+                        contents={projects}
+                        onChange={(event): void =>
+                          changeProject(event?.target.value)
+                        }
+                      ></Select>
+                    </div>
+                  </div>
+                  <div className={classes.list}>
+                    Group:{" "}
+                    <div style={{ paddingLeft: 10 }}>
+                      {groups
+                        .filter((group) => user?.groupIds.includes(group.id))
+                        .map((group) => {
+                          return (
+                            <span key={group.id}>
+                              {group.title}
+                              <br />
+                            </span>
+                          );
+                        })}
+                    </div>
+                  </div>
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend">
+                      Do you need to use the Live Room?
+                    </FormLabel>
+                    <RadioGroup
+                      aria-label="liveroom"
+                      name="liveroom"
+                      value={liveToggle}
+                      onChange={handleChange}
+                    >
+                      <FormControlLabel
+                        value="yes"
+                        control={<Radio />}
+                        label="Yes"
+                      />
+                      <FormControlLabel
+                        value="no"
+                        control={<Radio />}
+                        label="No"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                  <br />
                   <TextField
-                    label="name"
-                    name="name"
-                    className={classes.textField}
-                    value={values.name}
+                    label="Brief Description of what you will be doing"
+                    name="description"
+                    value={values.description}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    helperText={errors.name && touched.name && errors.name}
-                    margin="normal"
+                    helperText={
+                      errors.description &&
+                      touched.description &&
+                      errors.description
+                    }
+                    fullWidth
+                    variant="filled"
                   />
-
-                  <TextField
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend">
+                      Do you have guests?
+                    </FormLabel>
+                    <RadioGroup
+                      aria-label="guests"
+                      name="guests"
+                      value={guestToggle}
+                      onChange={showGuests}
+                    >
+                      <FormControlLabel
+                        value="yes"
+                        control={<Radio />}
+                        label="Yes"
+                      />
+                      <FormControlLabel
+                        value="no"
+                        control={<Radio />}
+                        label="No"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                  <br />
+                  {/* this may currently cause issues with the content being
+                  required conditionally */}
+                  <div id="guestInput" className={classes.guests}>
+                    <TextField
+                      label="Guest Names"
+                      name="guestNames"
+                      value={values.guests}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      helperText={
+                        errors.guests && touched.guests && errors.guests
+                      }
+                      fullWidth
+                      variant="filled"
+                    />
+                    <br />
+                  </div>
+                  {/*  <TextField
                     //error={errors.email && touched.email}
                     label="email"
                     name="email"
@@ -249,9 +344,9 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
                       errors.comment && touched.comment && errors.comment
                     }
                     margin="normal"
-                  />
+                  /> */}
                   <DialogActions>
-                    <Button
+                    {/* <Button
                       type="button"
                       className="outline"
                       onClick={handleReset}
@@ -261,7 +356,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
                     </Button>
                     <Button type="submit" disabled={isSubmitting}>
                       Submit
-                    </Button>
+                    </Button> */}
                     {/* <DisplayFormikState {...props} /> */}
                   </DialogActions>
                 </form>
