@@ -118,7 +118,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               onClick={(event): void => {
                 event.stopPropagation();
                 dispatch({
-                  type: CalendarAction.OpenReservationPage,
+                  type: CalendarAction.OpenReservationForm,
                   payload: { currentEvent: state.currentEvent },
                 });
               }}

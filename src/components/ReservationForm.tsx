@@ -78,7 +78,7 @@ const useStyles = makeStyles(() => ({
 const transition = makeTransition("left");
 const initialGroups: UserGroup[] = [];
 
-const ReservationPage: FunctionComponent<CalendarUIProps> = ({
+const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
@@ -158,7 +158,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
   return (
     <Dialog
       fullScreen
-      open={state.reservationPageIsOpen}
+      open={state.ReservationFormIsOpen}
       TransitionComponent={transition}
     >
       <Toolbar>
@@ -167,7 +167,7 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
           color="inherit"
           aria-label="close1"
           onClick={(): void =>
-            dispatch({ type: CalendarAction.CloseReservationPage })
+            dispatch({ type: CalendarAction.CloseReservationForm })
           }
         >
           <CloseIcon />
@@ -392,4 +392,4 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
   );
 };
 
-export default ReservationPage;
+export default ReservationForm;

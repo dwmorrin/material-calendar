@@ -42,7 +42,7 @@ export const testModifiedState: CalendarState = {
   locations: [],
   pickerShowing: true,
   projectDashboardIsOpen: true,
-  reservationPageIsOpen: true,
+  ReservationFormIsOpen: true,
   projects: [],
   ref: null,
 };
@@ -58,7 +58,7 @@ export const initialCalendarState: CalendarState = {
   locations: [],
   pickerShowing: false,
   projectDashboardIsOpen: false,
-  reservationPageIsOpen: false,
+  ReservationFormIsOpen: false,
   projects: [],
   ref: null,
 };

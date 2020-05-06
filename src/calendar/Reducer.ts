@@ -33,8 +33,8 @@ const calendarReducer = (
     return { ...state, projectDashboardIsOpen: false };
   }
 
-  if (action.type === CalendarAction.CloseReservationPage) {
-    return { ...state, reservationPageIsOpen: false };
+  if (action.type === CalendarAction.CloseReservationForm) {
+    return { ...state, ReservationFormIsOpen: false };
   }
 
   if (action.type === CalendarAction.CloseGroupDashboard) {
@@ -78,10 +78,10 @@ const calendarReducer = (
     };
   }
 
-  if (action.type === CalendarAction.OpenReservationPage) {
+  if (action.type === CalendarAction.OpenReservationForm) {
     return {
       ...state,
-      reservationPageIsOpen: true,
+      ReservationFormIsOpen: true,
     };
   }
 

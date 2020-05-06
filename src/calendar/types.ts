@@ -8,14 +8,14 @@ export enum CalendarAction {
   ChangedView,
   CloseEventDetail,
   CloseProjectDashboard,
-  CloseReservationPage,
+  CloseReservationForm,
   CloseGroupDashboard,
   Error,
   Loading,
   PickedDate,
   OpenGroupDashboard,
   OpenProjectDashboard,
-  OpenReservationPage,
+  OpenReservationForm,
   ReceivedEvents,
   ReceivedGroups,
   ReceivedLocations,
@@ -51,7 +51,7 @@ export interface CalendarState {
   locations: Location[];
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
-  reservationPageIsOpen: boolean;
+  ReservationFormIsOpen: boolean;
   projects: Project[];
   ref: React.RefObject<FullCalendar> | null;
 }
