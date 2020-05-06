@@ -244,12 +244,16 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
                     </div>
                     <br />
                     <TextField
-                      label="Phone Number"
-                      name="phone"
-                      value={values.phone}
+                      label="Brief Description of what you will be doing"
+                      name="description"
+                      value={values.description}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      helperText={errors.phone && touched.phone && errors.phone}
+                      helperText={
+                        errors.description &&
+                        touched.description &&
+                        errors.description
+                      }
                       fullWidth
                       variant="filled"
                     />
@@ -278,18 +282,13 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
                       </RadioGroup>
                     </FormControl>
                     <br />
-
                     <TextField
-                      label="Brief Description of what you will be doing"
-                      name="description"
-                      value={values.description}
+                      label="Phone Number"
+                      name="phone"
+                      value={values.phone}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      helperText={
-                        errors.description &&
-                        touched.description &&
-                        errors.description
-                      }
+                      helperText={errors.phone && touched.phone && errors.phone}
                       fullWidth
                       variant="filled"
                     />
