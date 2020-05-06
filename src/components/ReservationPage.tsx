@@ -174,211 +174,221 @@ const ReservationPage: FunctionComponent<CalendarUIProps> = ({
         </IconButton>
         <Typography variant="h6">Make Reservation</Typography>
       </Toolbar>
-      <React.Fragment>
-        <DialogContent>
-          <Formik
-            initialValues={{ phone: "", description: "", guests: "" }}
-            onSubmit={(values, { setSubmitting }) => {
-              return undefined;
-            }}
-            validationSchema={Yup.object().shape({
-              phone: Yup.string().matches(
-                phoneRegExp,
-                "Phone number is not valid"
-              ),
-              description: Yup.string().required("Required"),
-              guests: Yup.string().required("Required"),
-            })}
-          >
-            {(props) => {
-              const {
-                values,
-                touched,
-                errors,
-                dirty,
-                isSubmitting,
-                handleChange,
-                handleBlur,
-                handleSubmit,
-                handleReset,
-              } = props;
-              return (
-                <form onSubmit={handleSubmit}>
-                  <div className={classes.list}>
-                    <div style={{ paddingTop: 16 }}>Project:</div>
-                    <div style={{ paddingLeft: 5 }}>
-                      <Select
-                        dispatch={dispatch}
-                        state={state}
-                        value={currentProject ? currentProject.id : ""}
-                        selectName="projects"
-                        selectId="projectsDropDown"
-                        contents={projects}
-                        onChange={(event): void =>
-                          changeProject(event?.target.value)
-                        }
-                      ></Select>
-                    </div>
-                  </div>
-                  <div className={classes.list}>
-                    Group:{" "}
-                    <div style={{ paddingLeft: 10 }}>
-                      {groups
-                        .filter((group) => user?.groupIds.includes(group.id))
-                        .map((group) => {
-                          return (
-                            <span key={group.id}>
-                              {group.title}
-                              <br />
-                            </span>
-                          );
-                        })}
-                    </div>
-                  </div>
-                  <br />
-                  <TextField
-                    label="Phone Number"
-                    name="phone"
-                    value={values.phone}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={errors.phone && touched.phone && errors.phone}
-                    fullWidth
-                    variant="filled"
-                  />
-                  <br />
-                  <br />
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">
-                      Do you need to use the Live Room?
-                    </FormLabel>
-                    <RadioGroup
-                      aria-label="liveroom"
-                      name="liveroom"
-                      value={liveToggle}
-                      onChange={liveRoomChange}
-                    >
-                      <FormControlLabel
-                        value="yes"
-                        control={<Radio />}
-                        label="Yes"
-                      />
-                      <FormControlLabel
-                        value="no"
-                        control={<Radio />}
-                        label="No"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                  <br />
 
-                  <TextField
-                    label="Brief Description of what you will be doing"
-                    name="description"
-                    value={values.description}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={
-                      errors.description &&
-                      touched.description &&
-                      errors.description
-                    }
-                    fullWidth
-                    variant="filled"
-                  />
-                  <br />
-                  <br />
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">
-                      Do you have guests?
-                    </FormLabel>
-                    <RadioGroup
-                      aria-label="guestsToggle"
-                      name="guestsToggle"
-                      value={guestToggle}
-                      onChange={showGuests}
-                    >
-                      <FormControlLabel
-                        value="yes"
-                        control={<Radio />}
-                        label="Yes"
-                      />
-                      <FormControlLabel
-                        value="no"
-                        control={<Radio />}
-                        label="No"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                  <br />
-                  {/* this may currently cause issues with the content being
-                  required conditionally */}
-                  <div id="guestInput" className={classes.guests}>
+      {!isSubmitionCompleted && (
+        <React.Fragment>
+          <DialogContent>
+            <Formik
+              initialValues={{ phone: "", description: "", guests: "" }}
+              onSubmit={(values, { setSubmitting }) => {
+                setSubmitting(true);
+                setTimeout(() => {
+                  setSubmitting(true);
+                }, 2000);
+                console.log("submitting");
+                setSubmitionCompleted(true);
+              }}
+              validationSchema={Yup.object().shape({
+                phone: Yup.string().matches(
+                  phoneRegExp,
+                  "Phone number is not valid"
+                ),
+                description: Yup.string().required("Required"),
+                guests: Yup.string().required("Required"),
+              })}
+            >
+              {(props) => {
+                const {
+                  values,
+                  touched,
+                  errors,
+                  dirty,
+                  isSubmitting,
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  handleReset,
+                } = props;
+                return (
+                  <form onSubmit={handleSubmit}>
+                    <div className={classes.list}>
+                      <div style={{ paddingTop: 16 }}>Project:</div>
+                      <div style={{ paddingLeft: 5 }}>
+                        <Select
+                          dispatch={dispatch}
+                          state={state}
+                          value={currentProject ? currentProject.id : ""}
+                          selectName="projects"
+                          selectId="projectsDropDown"
+                          contents={projects}
+                          onChange={(event): void =>
+                            changeProject(event?.target.value)
+                          }
+                        ></Select>
+                      </div>
+                    </div>
+                    <div className={classes.list}>
+                      Group:{" "}
+                      <div style={{ paddingLeft: 10 }}>
+                        {groups
+                          .filter((group) => user?.groupIds.includes(group.id))
+                          .map((group) => {
+                            return (
+                              <span key={group.id}>
+                                {group.title}
+                                <br />
+                              </span>
+                            );
+                          })}
+                      </div>
+                    </div>
+                    <br />
                     <TextField
-                      label="Guest Names"
-                      name="guests"
-                      value={values.guests}
+                      label="Phone Number"
+                      name="phone"
+                      value={values.phone}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      helperText={errors.phone && touched.phone && errors.phone}
+                      fullWidth
+                      variant="filled"
+                    />
+                    <br />
+                    <br />
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend">
+                        Do you need to use the Live Room?
+                      </FormLabel>
+                      <RadioGroup
+                        aria-label="liveroom"
+                        name="liveroom"
+                        value={liveToggle}
+                        onChange={liveRoomChange}
+                      >
+                        <FormControlLabel
+                          value="yes"
+                          control={<Radio />}
+                          label="Yes"
+                        />
+                        <FormControlLabel
+                          value="no"
+                          control={<Radio />}
+                          label="No"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    <br />
+
+                    <TextField
+                      label="Brief Description of what you will be doing"
+                      name="description"
+                      value={values.description}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       helperText={
-                        errors.guests && touched.guests && errors.guests
+                        errors.description &&
+                        touched.description &&
+                        errors.description
                       }
                       fullWidth
                       variant="filled"
                     />
-                  </div>
-                  <br />
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">
-                      Do you have any notes about your reservation for the Tech
-                      Staff?
-                    </FormLabel>
-                    <RadioGroup
-                      aria-label="notes"
-                      name="notes"
-                      value={notesToggle}
-                      onChange={showNotes}
+                    <br />
+                    <br />
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend">
+                        Do you have guests?
+                      </FormLabel>
+                      <RadioGroup
+                        aria-label="guestsToggle"
+                        name="guestsToggle"
+                        value={guestToggle}
+                        onChange={showGuests}
+                      >
+                        <FormControlLabel
+                          value="yes"
+                          control={<Radio />}
+                          label="Yes"
+                        />
+                        <FormControlLabel
+                          value="no"
+                          control={<Radio />}
+                          label="No"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    <br />
+                    {/* this may currently cause issues with the content being
+                  required conditionally */}
+                    <div id="guestInput" className={classes.guests}>
+                      <TextField
+                        label="Guest Names"
+                        name="guests"
+                        value={values.guests}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        helperText={
+                          errors.guests && touched.guests && errors.guests
+                        }
+                        fullWidth
+                        variant="filled"
+                      />
+                    </div>
+                    <br />
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend">
+                        Do you have any notes about your reservation for the
+                        Tech Staff?
+                      </FormLabel>
+                      <RadioGroup
+                        aria-label="notes"
+                        name="notes"
+                        value={notesToggle}
+                        onChange={showNotes}
+                      >
+                        <FormControlLabel
+                          value="yes"
+                          control={<Radio />}
+                          label="Yes"
+                        />
+                        <FormControlLabel
+                          value="no"
+                          control={<Radio />}
+                          label="No"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    <div id="notesInput" className={classes.notes}>
+                      <TextField
+                        id="notes"
+                        label="Notes"
+                        fullWidth
+                        multiline
+                        rows={8}
+                        variant="filled"
+                      />
+                    </div>
+                    <br />
+                    <Button
+                      type="submit"
+                      size="small"
+                      variant="contained"
+                      disableElevation
+                      style={{ backgroundColor: "Green", color: "white" }}
+                      disabled={isSubmitting}
                     >
-                      <FormControlLabel
-                        value="yes"
-                        control={<Radio />}
-                        label="Yes"
-                      />
-                      <FormControlLabel
-                        value="no"
-                        control={<Radio />}
-                        label="No"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                  <div id="notesInput" className={classes.notes}>
-                    <TextField
-                      id="notes"
-                      label="Notes"
-                      fullWidth
-                      multiline
-                      rows={8}
-                      variant="filled"
-                    />
-                  </div>
-                  <br />
-                  <Button
-                    type="submit"
-                    size="small"
-                    variant="contained"
-                    disableElevation
-                    style={{ backgroundColor: "Green", color: "white" }}
-                  >
-                    Confirm Reservation
-                  </Button>
+                      Confirm Reservation
+                    </Button>
 
-                  <DialogActions></DialogActions>
-                </form>
-              );
-            }}
-          </Formik>
-        </DialogContent>
-      </React.Fragment>
+                    <DialogActions></DialogActions>
+                  </form>
+                );
+              }}
+            </Formik>
+          </DialogContent>
+        </React.Fragment>
+      )}
+      {isSubmitionCompleted && <div>Reservation Submitted!</div>}
     </Dialog>
   );
 };
