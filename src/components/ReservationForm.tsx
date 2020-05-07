@@ -26,71 +26,57 @@ import Select from "./Select";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
 import UserGroup from "../user/UserGroup";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
 
 const useStyles = makeStyles(() => ({
-  root: {
-    display: "flex",
-    alignItems: "center",
-  },
-  right: {
-    display: "flex",
-    justifyContent: "flex-end",
-  },
-  center: {
-    display: "flex",
-    justifyContent: "center",
-  },
   guests: {
     display: "none",
   },
   notes: {
     display: "none",
   },
-  left: {
-    display: "flex",
-    justifyContent: "flex-start",
-    margin: 0,
-  },
   list: {
     display: "flex",
     justifyContent: "flex-start",
     alignContent: "row",
   },
-  test: {
-    margin: 0,
-  },
-  container: {
-    flexWrap: "wrap",
-  },
-  textField: {
-    width: 200,
-  },
-  alignSelect: {
-    marginTop: "auto",
-  },
-  text: {
-    paddingTop: "10px",
-  },
 }));
 
 const transition = makeTransition("left");
-const initialGroups: UserGroup[] = [];
 
 const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
+  // Get values from App
   const { user } = useContext(AuthContext);
-  const [groups, setGroups] = useState(initialGroups);
   const projects = state.projects.filter((project) =>
     user?.projectIds.includes(project.id)
   );
+
+  // Constant Declatations
+  const initialGroups: UserGroup[] = [];
+  const classes = useStyles();
+  const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  const initialValidationSchema = Yup.object().shape({
+    phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
+    description: Yup.string().required("Required"),
+  });
+
+  // State Declarations
   const initialProject = projects[0];
   const [currentProject, setCurrentProject] = useState(initialProject);
+  const [groups, setGroups] = useState(initialGroups);
+  const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
+  const [liveToggle, setLiveValue] = React.useState("yes");
+  const [guestToggle, setGuestValue] = React.useState("no");
+  const [notesToggle, setNotesValue] = React.useState("no");
+  const [validationSchema, setValidationSchema] = React.useState(
+    initialValidationSchema
+  );
 
+  // Get Groups from Server
   useEffect(() => {
     fetch(`/api/project_groups/${currentProject?.id}`)
       .then((response) => response.json())
@@ -103,12 +89,14 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
       .catch(console.error);
   }, [currentProject, user]);
 
-  const classes = useStyles();
+  // Once we have projects, if we still don't have a default currentProject, assign it now.
+  if (projects[0]) {
+    if (currentProject === undefined) {
+      setCurrentProject(projects[0]);
+    }
+  }
 
-  const [liveToggle, setLiveValue] = React.useState("yes");
-  const [guestToggle, setGuestValue] = React.useState("no");
-  const [notesToggle, setNotesValue] = React.useState("no");
-
+  // HandleChange Functions
   const changeProject = (id: number): void => {
     const proj = state.projects.filter(function (project) {
       // eslint-disable-next-line
@@ -117,48 +105,24 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     setCurrentProject(proj[0]);
   };
 
-  const liveRoomChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    setLiveValue((event.target as HTMLInputElement).value);
-  };
-
-  const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
-
-  const initialValidationSchema = Yup.object().shape({
-    phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
-    description: Yup.string().required("Required"),
-  });
-  const [validationSchema, setValidationSchema] = React.useState(
-    initialValidationSchema
-  );
-
-  const showGuests = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    setGuestValue((event.target as HTMLInputElement).value);
+  const requireGuests = (event: React.ChangeEvent<{}>): void => {
     const val = (event.target as HTMLInputElement).value;
-    const element = document.getElementById("guestInput");
-    if (element != null) {
-      if (val === "yes") {
-        element.style.display = "block";
-        setValidationSchema(
-          Yup.object().shape({
-            phone: Yup.string().matches(
-              phoneRegExp,
-              "Phone number is not valid"
-            ),
-            description: Yup.string().required("Required"),
-            guests: Yup.string().required("Required"),
-          })
-        );
-      } else {
-        element.style.display = "none";
-        setValidationSchema(initialValidationSchema);
-      }
+    if (val === "yes") {
+      setValidationSchema(
+        Yup.object().shape({
+          phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
+          description: Yup.string().required("Required"),
+          guests: Yup.string().required("Required"),
+        })
+      );
+    } else {
+      setValidationSchema(initialValidationSchema);
     }
   };
 
-  const showNotes = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    setNotesValue((event.target as HTMLInputElement).value);
+  const toggleElement = (event: React.ChangeEvent<{}>, value: string): void => {
     const val = (event.target as HTMLInputElement).value;
-    const element = document.getElementById("notesInput");
+    const element = document.getElementById(value);
     if (element != null) {
       if (val === "yes") {
         element.style.display = "block";
@@ -167,13 +131,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
       }
     }
   };
-
-  // Once we have projects, if we still don't have a default currentProject, assign it now.
-  if (projects[0]) {
-    if (currentProject === undefined) {
-      setCurrentProject(projects[0]);
-    }
-  }
 
   return (
     <Dialog
@@ -200,27 +157,24 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
           <DialogContent>
             <Formik
               initialValues={{ phone: "", description: "", guests: "" }}
-              onSubmit={(values, { setSubmitting }) => {
+              onSubmit={(values, { setSubmitting }): void => {
                 setSubmitting(true);
                 setTimeout(() => {
                   setSubmitting(true);
                 }, 2000);
-                console.log("submitting");
                 setSubmitionCompleted(true);
               }}
               validationSchema={validationSchema}
             >
-              {(props) => {
+              {(props): any => {
                 const {
                   values,
                   touched,
                   errors,
-                  dirty,
                   isSubmitting,
                   handleChange,
                   handleBlur,
                   handleSubmit,
-                  handleReset,
                 } = props;
                 return (
                   <form onSubmit={handleSubmit}>
@@ -280,7 +234,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         aria-label="liveroom"
                         name="liveroom"
                         value={liveToggle}
-                        onChange={liveRoomChange}
+                        onChange={(event: React.ChangeEvent<{}>, value): void =>
+                          setLiveValue(value)
+                        }
                       >
                         <FormControlLabel
                           value="yes"
@@ -315,7 +271,14 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         aria-label="guestsToggle"
                         name="guestsToggle"
                         value={guestToggle}
-                        onChange={showGuests}
+                        onChange={(
+                          event: React.ChangeEvent<{}>,
+                          value
+                        ): void => {
+                          setGuestValue(value);
+                          requireGuests(event);
+                          toggleElement(event, "guestInput");
+                        }}
                       >
                         <FormControlLabel
                           value="yes"
@@ -356,7 +319,13 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         aria-label="notes"
                         name="notes"
                         value={notesToggle}
-                        onChange={showNotes}
+                        onChange={(
+                          event: React.ChangeEvent<{}>,
+                          value
+                        ): void => {
+                          setNotesValue(value);
+                          toggleElement(event, "notesInput");
+                        }}
                       >
                         <FormControlLabel
                           value="yes"
