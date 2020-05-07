@@ -23,6 +23,7 @@ export const testModifiedState: CalendarState = {
     end: "",
     id: "",
     locationIds: [],
+    manager: "",
     parentId: "",
     reservationEnd: "",
     reservationStart: "",
