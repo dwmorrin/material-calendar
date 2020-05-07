@@ -77,7 +77,8 @@ const login = (
       setUser(new User(user));
       navigate("/calendar");
     })
-    .catch(() => {
+    .catch((error) => {
+      console.error(error); // TODO handle 500 & 401 responses
       setErrors({ username: true, password: false });
     });
 };

@@ -135,6 +135,9 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
               currentProject?.end as string | Date
             )}
         </Typography>
+        <Typography variant="body2">
+          Managed by {currentProject && currentProject.manager}
+        </Typography>
         <ExpansionPanel defaultExpanded={locations.length === 1}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="body1">Location Hours</Typography>
