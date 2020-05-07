@@ -66,3 +66,7 @@ export const fetchCalendarData = (props: FetchOptions): void => {
       });
     });
 };
+
+export const fetchAllCalendarData = (dataList: FetchOptions[]): void => {
+  dataList.forEach((options) => fetchCalendarData(options));
+};
