@@ -47,24 +47,11 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const classes = useStyles();
-  const { user } = useContext(AuthContext);
   const [allotments, setAllotments] = useState(initialAllotments);
   const { currentProject } = state;
   const locations = state.locations.filter((location) =>
     currentProject?.locationIds.includes(location.id)
   );
-
-  useEffect(() => {
-    if (!currentProject) {
-      return;
-    }
-    fetchCalendarData({
-      dispatch,
-      onSuccessAction: CalendarAction.ReceivedGroups,
-      payloadKey: "groups",
-      url: `/api/project_groups/${currentProject.id}`,
-    });
-  }, [currentProject, dispatch, user]);
 
   useEffect(() => {
     if (!currentProject) {

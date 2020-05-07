@@ -13,7 +13,7 @@ import CalendarBar from "./CalendarBar";
 import StaticDatePicker from "./DatePicker";
 import FullCalendar from "@fullcalendar/react";
 import { AuthContext } from "./AuthContext";
-import { fetchCalendarData } from "../calendar/Fetch";
+import { fetchAllCalendarData } from "../calendar/Fetch";
 import calendarReducer from "../calendar/Reducer";
 import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
@@ -37,24 +37,32 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
 
   useEffect(() => {
     if (!user?.id) return;
-    fetchCalendarData({
-      url: "/api/events",
-      dispatch,
-      onSuccessAction: CalendarAction.ReceivedEvents,
-      payloadKey: "events",
-    });
-    fetchCalendarData({
-      url: "/api/locations",
-      dispatch,
-      onSuccessAction: CalendarAction.ReceivedLocations,
-      payloadKey: "locations",
-    });
-    fetchCalendarData({
-      url: "/api/projects",
-      dispatch,
-      onSuccessAction: CalendarAction.ReceivedProjects,
-      payloadKey: "projects",
-    });
+    fetchAllCalendarData([
+      {
+        url: "/api/events",
+        dispatch,
+        onSuccessAction: CalendarAction.ReceivedEvents,
+        payloadKey: "events",
+      },
+      {
+        url: "/api/groups",
+        dispatch,
+        onSuccessAction: CalendarAction.ReceivedGroups,
+        payloadKey: "groups",
+      },
+      {
+        url: "/api/locations",
+        dispatch,
+        onSuccessAction: CalendarAction.ReceivedLocations,
+        payloadKey: "locations",
+      },
+      {
+        url: "/api/projects",
+        dispatch,
+        onSuccessAction: CalendarAction.ReceivedProjects,
+        payloadKey: "projects",
+      },
+    ]);
   }, [user]);
 
   return (
