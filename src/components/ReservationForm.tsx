@@ -156,13 +156,26 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
         <React.Fragment>
           <DialogContent>
             <Formik
-              initialValues={{ phone: "", description: "", guests: "" }}
+              initialValues={{
+                phone: "",
+                description: "",
+                guests: "",
+                project: currentProject,
+                liveRoom: liveToggle,
+                hasGuests: guestToggle,
+                hasNotes: notesToggle,
+                group: initialGroups[0],
+              }}
               onSubmit={(values, { setSubmitting }): void => {
                 setSubmitting(true);
+
+                // sets the project property of values here because it
+                // doesn't update fast enough to set in the handleChange
+                values.project = currentProject;
                 setTimeout(() => {
-                  setSubmitting(true);
+                  console.log(values);
+                  setSubmitionCompleted(true);
                 }, 2000);
-                setSubmitionCompleted(true);
               }}
               validationSchema={validationSchema}
             >
@@ -188,9 +201,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                           selectName="projects"
                           selectId="projectsDropDown"
                           contents={projects}
-                          onChange={(event): void =>
-                            changeProject(event?.target.value)
-                          }
+                          onChange={(event): void => {
+                            changeProject(event?.target.value);
+                          }}
                         ></Select>
                       </div>
                     </div>
@@ -200,6 +213,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         {groups
                           .filter((group) => user?.groupIds.includes(group.id))
                           .map((group) => {
+                            values.group = group;
                             return (
                               <span key={group.id}>
                                 {group.title}
@@ -233,10 +247,14 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       <RadioGroup
                         aria-label="liveroom"
                         name="liveroom"
-                        value={liveToggle}
-                        onChange={(event: React.ChangeEvent<{}>, value): void =>
-                          setLiveValue(value)
-                        }
+                        value={values.liveRoom}
+                        onChange={(
+                          event: React.ChangeEvent<{}>,
+                          value
+                        ): void => {
+                          setLiveValue(value);
+                          values.liveRoom = value;
+                        }}
                       >
                         <FormControlLabel
                           value="yes"
@@ -270,7 +288,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       <RadioGroup
                         aria-label="guestsToggle"
                         name="guestsToggle"
-                        value={guestToggle}
+                        value={values.hasGuests}
                         onChange={(
                           event: React.ChangeEvent<{}>,
                           value
@@ -278,6 +296,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                           setGuestValue(value);
                           requireGuests(event);
                           toggleElement(event, "guestInput");
+                          values.hasGuests = value;
                         }}
                       >
                         <FormControlLabel
@@ -318,13 +337,14 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       <RadioGroup
                         aria-label="notes"
                         name="notes"
-                        value={notesToggle}
+                        value={values.hasNotes}
                         onChange={(
                           event: React.ChangeEvent<{}>,
                           value
                         ): void => {
                           setNotesValue(value);
                           toggleElement(event, "notesInput");
+                          values.hasNotes = value;
                         }}
                       >
                         <FormControlLabel
