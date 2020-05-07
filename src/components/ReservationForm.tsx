@@ -121,6 +121,16 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     setLiveValue((event.target as HTMLInputElement).value);
   };
 
+  const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+
+  const initialValidationSchema = Yup.object().shape({
+    phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
+    description: Yup.string().required("Required"),
+  });
+  const [validationSchema, setValidationSchema] = React.useState(
+    initialValidationSchema
+  );
+
   const showGuests = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setGuestValue((event.target as HTMLInputElement).value);
     const val = (event.target as HTMLInputElement).value;
@@ -128,8 +138,19 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     if (element != null) {
       if (val === "yes") {
         element.style.display = "block";
+        setValidationSchema(
+          Yup.object().shape({
+            phone: Yup.string().matches(
+              phoneRegExp,
+              "Phone number is not valid"
+            ),
+            description: Yup.string().required("Required"),
+            guests: Yup.string().required("Required"),
+          })
+        );
       } else {
         element.style.display = "none";
+        setValidationSchema(initialValidationSchema);
       }
     }
   };
@@ -153,7 +174,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
       setCurrentProject(projects[0]);
     }
   }
-  const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
   return (
     <Dialog
@@ -188,14 +208,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 console.log("submitting");
                 setSubmitionCompleted(true);
               }}
-              validationSchema={Yup.object().shape({
-                phone: Yup.string().matches(
-                  phoneRegExp,
-                  "Phone number is not valid"
-                ),
-                description: Yup.string().required("Required"),
-                guests: Yup.string().required("Required"),
-              })}
+              validationSchema={validationSchema}
             >
               {(props) => {
                 const {

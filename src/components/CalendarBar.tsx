@@ -50,7 +50,7 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
             dispatch({ type: CalendarAction.TogglePicker });
           }}
         >
-          <Typography variant="h6">
+          <Typography component="h6">
             {state.currentStart.toLocaleString("default", {
               month: "long",
               day: "numeric",

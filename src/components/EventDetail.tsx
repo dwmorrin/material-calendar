@@ -123,7 +123,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 });
               }}
             >
-              Reserve Block
+              Reserve this time
             </Button>
           )}
           {userOwns && future && (
