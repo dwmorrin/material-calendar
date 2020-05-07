@@ -61,7 +61,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
     fetchCalendarData({
       dispatch,
       onSuccessAction: CalendarAction.ReceivedGroups,
-      payloadKey: "currentProjectGroups",
+      payloadKey: "groups",
       url: `/api/project_groups/${currentProject.id}`,
     });
   }, [currentProject, dispatch, user]);

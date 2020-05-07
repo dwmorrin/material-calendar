@@ -37,7 +37,7 @@ export interface CalendarState {
   currentEvent?: Event;
   currentGroup?: UserGroup;
   currentProject?: Project;
-  currentProjectGroups?: UserGroup[];
+  groups: UserGroup[];
   currentStart: Date;
   currentView: string;
   detailIsOpen: boolean;

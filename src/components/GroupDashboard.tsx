@@ -24,7 +24,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   state,
   dispatch,
 }) => {
-  const { currentGroup, currentProject, currentProjectGroups } = state;
+  const { currentGroup, currentProject, groups } = state;
   return (
     <Dialog
       fullScreen
@@ -87,7 +87,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="body1">Other groups</Typography>
             </ExpansionPanelSummary>
-            {currentProjectGroups
+            {groups
               ?.filter((group) => group.id !== currentGroup?.id)
               .map((group) => (
                 <ListItem

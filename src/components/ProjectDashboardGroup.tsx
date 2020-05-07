@@ -14,7 +14,7 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const { user } = useContext(AuthContext);
-  const currentGroup = state.currentProjectGroups?.find((group) =>
+  const currentGroup = state.groups?.find((group) =>
     user?.groupIds.includes(group.id)
   );
   useEffect(() => {
@@ -27,7 +27,7 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
   }, [currentGroup, dispatch]);
 
   if (
-    !state.currentProjectGroups ||
+    !state.groups ||
     !currentGroup ||
     !Array.isArray(currentGroup.memberNames)
   ) {

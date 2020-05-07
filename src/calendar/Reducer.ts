@@ -86,13 +86,13 @@ const calendarReducer = (
   }
 
   if (action.type === CalendarAction.ReceivedGroups) {
-    if (!action.payload?.currentProjectGroups) {
+    if (!action.payload?.groups) {
       throw new Error("no groups in received groups");
     }
     return {
       ...state,
       loading: false, // ! need to evaluate the `loading` handling
-      currentProjectGroups: action.payload.currentProjectGroups.map(
+      groups: action.payload.groups.map(
         (group: UserGroup) => new UserGroup(group)
       ),
     };
