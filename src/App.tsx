@@ -4,7 +4,7 @@ import { Router } from "@reach/router";
 import SignIn from "./SignIn";
 import Calendar from "./Calendar";
 import Projects from "./Projects";
-import GearList from "./GearList";
+import GearForm from "./GearForm";
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
       <SignIn path="/" />
       <Calendar path="/calendar" />
       <Projects path="/projects" />
-      <GearList path="/gear" />
+      <GearForm path="/gear" />
     </Router>
   );
 }
