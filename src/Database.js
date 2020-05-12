@@ -20,6 +20,73 @@ const Database = {
       title: "Sound-Alike Phase 3 St3 Sp20"
     }
   ],
+  gear: [{
+      id: "ABL-1",
+      parentId: "Controllers",
+      title: "Ableton Push",
+      tags: "ableton, midi"
+    },
+    {
+      id: "ABL-2",
+      parentId: "Controllers",
+      title: "Ableton Push",
+      tags: "ableton, midi"
+    },
+    {
+      id: "ABL-3",
+      parentId: "Controllers",
+      title: "Ableton Push 2",
+      tags: "ableton, midi"
+    },
+    {
+      id: "RLD-10",
+      parentId: "Controllers",
+      title: "Roland JX-8P",
+      tags: "roland, midi"
+    },
+    {
+      id: "FEN-1",
+      parentId: "Amplifiers",
+      title: "Fender Deluxe Reverb",
+      tags: "guitar"
+    },
+    {
+      id: "EPI-1",
+      parentId: "Amplifiers",
+      title: "Epiphone Triggerman",
+      tags: "guitar"
+    },
+    {
+      id: "EPI-2",
+      parentId: "Amplifiers",
+      title: "Epiphone Blues Custom",
+      tags: "guitar"
+    },
+    {
+      id: "TAY-1",
+      parentId: "Instruments",
+      title: "Taylor Acoustic 214ce",
+      tags: "acoustic guitar"
+    },
+    {
+      id: "GIB-10",
+      parentId: "Instruments",
+      title: "Gibson Les Paul Sunburst",
+      tags: "electric guitar"
+    },
+    {
+      id: "FEN-2",
+      parentId: "Instruments",
+      title: "Fender Precision Bass",
+      tags: "bass"
+    },
+    {
+      id: "FEN-5",
+      parentId: "Instruments",
+      title: "Fender Telecaster",
+      tags: "electric guitar"
+    }
+  ],
   weeks: [{
       id: "March 14 - March 22",
       title: "March 14 - March 22"

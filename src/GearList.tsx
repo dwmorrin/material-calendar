@@ -17,6 +17,7 @@ import FilterDrawer from "./FilterDrawer";
 import Database from "./Database.js";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import SearchIcon from "@material-ui/icons/Search";
+import Gear from "./Gear";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,6 +37,7 @@ const GearList: FunctionComponent<RouteComponentProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
   const locations = Database.locations;
+  const gear = Database.gear;
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -87,6 +89,7 @@ const GearList: FunctionComponent<RouteComponentProps> = () => {
           </Toolbar>
         </List>
       </AppBar>
+      <Gear gearList={gear} />
     </div>
   );
 };
