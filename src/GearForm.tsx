@@ -29,48 +29,49 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const initialFilters = [
+  {
+    name: "",
+    toggle: false
+  }
+];
+
 const GearForm: FunctionComponent<RouteComponentProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
-  const initialFilters = [
-    {
-      name: "",
-      toggle: false
-    }
-  ];
-  const [array, setArray] = useState(initialFilters);
   const gear = Database.gear;
+  const [array, setArray] = useState(initialFilters);
 
-  const checkExists = (tag: string) => (tag: string): boolean => {
+  function checkExists(tags: string): boolean {
     let hasMatch = false;
     for (let index = 0; index < array.length; ++index) {
-      if ((array[index].name = tag)) {
+      if (array[index].name == tags) {
         hasMatch = true;
       }
     }
     return hasMatch;
-  };
+  }
 
-  const AddToArray = (tag: string) => (tag: string): void => {
-    console.log("tag is " + tag);
-    console.log("is this working");
+  function pushArray(tags: string): void {
     const tempArray = array;
     const filter = {
-      name: tag,
+      name: tags,
       toggle: false
     };
     tempArray.push(filter);
-    console.log(tempArray);
     setArray(tempArray);
-  };
+  }
 
   // something needs to be done here to go through the list of tags and put
   // them in a new JSON array in the format {name: string; toggle: boolean;}
-  const filters = Database.gear
-    .filter((item) => checkExists(item.tags))
-    .map((item) => AddToArray(item.tags));
 
-  console.log(filters);
+  for (let index = 0; index < Database.gear.length; ++index) {
+    const item = gear[index];
+    if (!checkExists(item.tags)) {
+      pushArray(item.tags);
+    }
+  }
+  console.log(array);
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
