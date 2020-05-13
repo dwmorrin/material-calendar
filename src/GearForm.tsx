@@ -32,8 +32,45 @@ const useStyles = makeStyles((theme) => ({
 const GearForm: FunctionComponent<RouteComponentProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
-  const locations = Database.locations;
+  const initialFilters = [
+    {
+      name: "",
+      toggle: false
+    }
+  ];
+  const [array, setArray] = useState(initialFilters);
   const gear = Database.gear;
+
+  const checkExists = (tag: string) => (tag: string): boolean => {
+    let hasMatch = false;
+    for (let index = 0; index < array.length; ++index) {
+      if ((array[index].name = tag)) {
+        hasMatch = true;
+      }
+    }
+    return hasMatch;
+  };
+
+  const AddToArray = (tag: string) => (tag: string): void => {
+    console.log("tag is " + tag);
+    console.log("is this working");
+    const tempArray = array;
+    const filter = {
+      name: tag,
+      toggle: false
+    };
+    tempArray.push(filter);
+    console.log(tempArray);
+    setArray(tempArray);
+  };
+
+  // something needs to be done here to go through the list of tags and put
+  // them in a new JSON array in the format {name: string; toggle: boolean;}
+  const filters = Database.gear
+    .filter((item) => checkExists(item.tags))
+    .map((item) => AddToArray(item.tags));
+
+  console.log(filters);
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -55,8 +92,8 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
           open={drawerIsOpen}
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
-          panelType={"checkboxes"}
-          drawerContents={locations}
+          items={gear}
+          //filters={filters}
         />
       </div>
       <AppBar position="sticky">

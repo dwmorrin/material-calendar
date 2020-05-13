@@ -1,9 +1,9 @@
 import React, { FunctionComponent } from "react";
-import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import List from "@material-ui/core/List";
-import { navigate } from "@reach/router";
+import TextField from "@material-ui/core/TextField";
+import Filter from "./Filter";
 
 const useStyles = makeStyles({
   list: {
@@ -14,18 +14,24 @@ const useStyles = makeStyles({
   }
 });
 
-function submitHandler(navigateTo: string): void {
-  navigate(navigateTo);
-}
-
 interface FilterDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
-  drawerContents: { id: string; parentId: string; title: string }[];
-  panelType: "checkboxes" | "buttons";
+  items: {
+    id: string;
+    parentId: string;
+    title: string;
+    tags: string;
+  }[];
+  /*   filters: {
+    name: string;
+    toggle: boolean;
+  }[]; */
 }
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
+  items,
+  //filters,
   open,
   onClose,
   onOpen
@@ -38,8 +44,25 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
       onClose={onClose}
       onOpen={onOpen}
     >
-      <div className={clsx(classes.list)} role="presentation">
-        <List></List>
+      <div className={classes.list} role="presentation">
+        <List
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center"
+          }}
+        >
+          <TextField
+            size="small"
+            id="outlined-basic"
+            label="Search"
+            variant="outlined"
+          />
+          <br />
+          <br />
+          <br />
+          {/* <Filter items={items} filters={filters} /> */}
+        </List>
       </div>
     </SwipeableDrawer>
   );
