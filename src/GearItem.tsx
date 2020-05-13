@@ -44,7 +44,8 @@ const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
         <section
           style={{
             textAlign: "center",
-            display: "flex"
+            display: "flex",
+            flexDirection: "column"
           }}
         >
           {value}
