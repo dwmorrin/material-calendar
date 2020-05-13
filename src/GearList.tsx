@@ -11,6 +11,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
+import Box from "@material-ui/core/Box";
 import GearItem from "./GearItem";
 
 const useStyles = makeStyles({
@@ -59,7 +60,13 @@ function createNestedList(
         {parent}
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
-        <List>
+        <List
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            minWidth: "100%"
+          }}
+        >
           {gearList
             .filter((item) => item.parentId === parent)
             .map((item) => (
@@ -71,24 +78,6 @@ function createNestedList(
   );
 }
 
-function NewItem(item: {
-  id: string;
-  parentId: string;
-  title: string;
-  tags: string;
-}): JSX.Element {
-  return (
-    <ListItem
-      button
-      key={item.id}
-      onClick={(event): void => event.stopPropagation()}
-    >
-      <ListItemText primary={item.title} />
-      {drawQuantity(item)}
-    </ListItem>
-  );
-}
-
 function createStandardList(
   gearList: {
     id: string;
@@ -97,7 +86,18 @@ function createStandardList(
     tags: string;
   }[]
 ): JSX.Element {
-  return <List>{gearList.map((item) => NewItem(item))}</List>;
+  return (
+    <List
+      style={{
+        minWidth: "100%",
+        display: "flex"
+      }}
+    >
+      {gearList.map((item) => (
+        <GearItem item={item} />
+      ))}
+    </List>
+  );
 }
 
 interface GearListProps {

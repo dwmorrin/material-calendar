@@ -26,23 +26,39 @@ const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
     setValue(value + change);
   };
   return (
-    <div>
+    <div
+      style={{
+        minWidth: "100%",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between"
+      }}
+    >
       <ListItem
-        button
         key={item.id}
-        onClick={(event): void => event.stopPropagation()}
+        style={{
+          display: "flex"
+        }}
       >
         <ListItemText primary={item.title} />
-        <ButtonGroup
-          variant="contained"
-          color="primary"
-          aria-label="contained primary button group"
-          size="small"
+        <section
+          style={{
+            textAlign: "center",
+            display: "flex"
+          }}
         >
-          <Button onClick={(): void => handleChange(-1)}>-</Button>
-          <Button onClick={(): void => handleChange(1)}>+</Button>
-        </ButtonGroup>
-        {value}
+          {value}
+          <br />
+          <ButtonGroup
+            variant="contained"
+            color="primary"
+            aria-label="contained primary button group"
+            size="small"
+          >
+            <Button onClick={(): void => handleChange(-1)}>-</Button>
+            <Button onClick={(): void => handleChange(1)}>+</Button>
+          </ButtonGroup>
+        </section>
       </ListItem>
     </div>
   );
