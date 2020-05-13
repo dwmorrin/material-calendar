@@ -28,23 +28,14 @@ const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
   return (
     <div
       style={{
-        minWidth: "100%",
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between"
+        flexDirection: "row"
       }}
     >
-      <ListItem
-        key={item.id}
-        style={{
-          display: "flex"
-        }}
-      >
+      <ListItem key={item.id}>
         <ListItemText primary={item.title} />
         <section
           style={{
             textAlign: "center",
-            display: "flex",
             flexDirection: "column"
           }}
         >

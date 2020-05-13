@@ -62,7 +62,6 @@ function createNestedList(
       <ExpansionPanelDetails>
         <List
           style={{
-            display: "flex",
             flexDirection: "column",
             minWidth: "100%"
           }}
@@ -89,8 +88,8 @@ function createStandardList(
   return (
     <List
       style={{
-        minWidth: "100%",
-        display: "flex"
+        flexDirection: "column",
+        minWidth: "100%"
       }}
     >
       {gearList.map((item) => (
