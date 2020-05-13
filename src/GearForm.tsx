@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState, useRef } from "react";
+import React, { FunctionComponent, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   List,
@@ -8,12 +8,9 @@ import {
   Typography,
   Button
 } from "@material-ui/core";
-
 import CloseIcon from "@material-ui/icons/Close";
 import { RouteComponentProps } from "@reach/router";
-
 import FilterDrawer from "./FilterDrawer";
-
 import Database from "./Database.js";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import SearchIcon from "@material-ui/icons/Search";
@@ -33,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const GearForm: FunctionComponent<RouteComponentProps> = () => {
-  const [pickerShowing, setPickerShowing] = useState(false);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
   const locations = Database.locations;
@@ -72,9 +68,6 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
             <Button className={classes.title}>
               <Typography component="h6">Gear</Typography>
             </Button>
-            {/* <IconButton color="inherit" onClick={handleClickToday}>
-              <TodayIcon />
-            </IconButton> */}
             <IconButton edge="start" color="inherit" aria-label="search">
               <SearchIcon />
             </IconButton>

@@ -1,16 +1,8 @@
-import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
-import React, {
-  FunctionComponent,
-  useEffect,
-  useContext,
-  useState
-} from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { FunctionComponent, useState } from "react";
 
 interface GearItemProps {
   item: {
@@ -22,8 +14,10 @@ interface GearItemProps {
 }
 const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
   const [value, setValue] = useState(0);
-  const handleChange = (change: number): void => {
-    setValue(value + change);
+  const handleChange = (newValue: number): void => {
+    if (newValue >= 0) {
+      setValue(newValue);
+    }
   };
   return (
     <div
@@ -47,8 +41,8 @@ const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
             aria-label="contained primary button group"
             size="small"
           >
-            <Button onClick={(): void => handleChange(-1)}>-</Button>
-            <Button onClick={(): void => handleChange(1)}>+</Button>
+            <Button onClick={(): void => handleChange(value - 1)}>-</Button>
+            <Button onClick={(): void => handleChange(value + 1)}>+</Button>
           </ButtonGroup>
         </section>
       </ListItem>
