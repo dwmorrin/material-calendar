@@ -5,7 +5,7 @@ import {
   IconButton,
   ListItem,
   ListItemText,
-  Divider,
+  Divider
 } from "@material-ui/core";
 import InfoIcon from "@material-ui/icons/Info";
 import Project from "../calendar/Project";
@@ -17,7 +17,7 @@ interface ProjectListItemProps extends CalendarUIProps {
 const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
   dispatch,
   state,
-  project,
+  project
 }) => {
   return (
     <ListItem
@@ -34,8 +34,8 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
               }
               proj.selected = !proj.selected;
               return proj;
-            }),
-          },
+            })
+          }
         });
       }}
     >
@@ -56,8 +56,8 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
                 }
                 proj.selected = checked;
                 return proj;
-              }),
-            },
+              })
+            }
           });
         }}
       />
@@ -69,7 +69,7 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
           event.stopPropagation();
           dispatch({
             type: CalendarAction.OpenProjectDashboard,
-            payload: { ...state, currentProject: project },
+            payload: { ...state, currentProject: project }
           });
         }}
       >

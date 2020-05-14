@@ -14,7 +14,7 @@ import { makeSelectedLocationDict } from "../calendar/Location";
 
 const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   const selectedProjects = state.projects.filter((project) => project.selected);
   const projectLocations = new Set();
@@ -46,14 +46,14 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
             );
             dispatch({
               type: CalendarAction.ViewEventDetail,
-              payload: { currentEvent: event },
+              payload: { currentEvent: event }
             });
           }}
           plugins={[
             dayGridPlugin,
             interactionPlugin,
             listPlugin,
-            resourceTimeGridPlugin,
+            resourceTimeGridPlugin
           ]}
           events={(_, successCallback): void => {
             // https://fullcalendar.io/docs/events-function

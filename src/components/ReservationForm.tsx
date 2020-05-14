@@ -2,7 +2,7 @@ import React, {
   FunctionComponent,
   useEffect,
   useContext,
-  useState,
+  useState
 } from "react";
 import TextField from "@material-ui/core/TextField";
 import Radio from "@material-ui/core/Radio";
@@ -19,7 +19,7 @@ import {
   Typography,
   DialogActions,
   DialogContent,
-  Button,
+  Button
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import Select from "./Select";
@@ -31,23 +31,23 @@ import * as Yup from "yup";
 
 const useStyles = makeStyles(() => ({
   guests: {
-    display: "none",
+    display: "none"
   },
   notes: {
-    display: "none",
+    display: "none"
   },
   list: {
     display: "flex",
     justifyContent: "flex-start",
-    alignContent: "row",
-  },
+    alignContent: "row"
+  }
 }));
 
 const transition = makeTransition("left");
 
 const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   // Get values from App
   const { user } = useContext(AuthContext);
@@ -61,7 +61,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
   const initialValidationSchema = Yup.object().shape({
     phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
-    description: Yup.string().required("Required"),
+    description: Yup.string().required("Required")
   });
 
   // State Declarations
@@ -112,7 +112,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
         Yup.object().shape({
           phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
           description: Yup.string().required("Required"),
-          guests: Yup.string().required("Required"),
+          guests: Yup.string().required("Required")
         })
       );
     } else {
@@ -164,7 +164,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 liveRoom: liveToggle,
                 hasGuests: guestToggle,
                 hasNotes: notesToggle,
-                group: initialGroups[0],
+                group: initialGroups[0]
               }}
               onSubmit={(values, { setSubmitting }): void => {
                 setSubmitting(true);
@@ -187,7 +187,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                   isSubmitting,
                   handleChange,
                   handleBlur,
-                  handleSubmit,
+                  handleSubmit
                 } = props;
                 return (
                   <form onSubmit={handleSubmit}>

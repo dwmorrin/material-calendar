@@ -10,8 +10,8 @@ import UserGroup from "../user/UserGroup";
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 125,
-  },
+    minWidth: 125
+  }
 }));
 
 interface SelectProps extends CalendarUIProps {
@@ -29,7 +29,7 @@ const Select: FunctionComponent<SelectProps> = ({
   selectId,
   contents,
   onChange,
-  value,
+  value
 }) => {
   const classes = useStyles();
   return (
@@ -37,7 +37,7 @@ const Select: FunctionComponent<SelectProps> = ({
       <NativeSelect
         inputProps={{
           name: selectName,
-          id: selectId,
+          id: selectId
         }}
         onChange={onChange}
         value={value}

@@ -7,7 +7,7 @@ import MomentUtils from "@date-io/moment";
 
 const StaticDatePicker: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   return (
     <Box>
@@ -17,7 +17,7 @@ const StaticDatePicker: FunctionComponent<CalendarUIProps> = ({
           onChange={(date: MaterialUiPickersDate): void => {
             dispatch({
               type: CalendarAction.PickedDate,
-              payload: { currentStart: date?.toDate() },
+              payload: { currentStart: date?.toDate() }
             });
           }}
           variant="static"

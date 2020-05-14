@@ -10,7 +10,7 @@ interface ResourceListItemProps extends CalendarUIProps {
 const ResourceListItem: FunctionComponent<ResourceListItemProps> = ({
   dispatch,
   state,
-  location,
+  location
 }) => {
   return (
     <ListItem button key={location.id}>
@@ -31,8 +31,8 @@ const ResourceListItem: FunctionComponent<ResourceListItemProps> = ({
                 }
                 loc.selected = checked;
                 return loc;
-              }),
-            },
+              })
+            }
           });
         }}
       />

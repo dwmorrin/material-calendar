@@ -10,7 +10,7 @@ import {
   ListItem,
   ExpansionPanel,
   ExpansionPanelSummary,
-  Box,
+  Box
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -22,7 +22,7 @@ const transition = makeTransition("right");
 
 const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   state,
-  dispatch,
+  dispatch
 }) => {
   const { currentGroup, currentProject, currentProjectGroups } = state;
   return (
@@ -48,7 +48,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
         style={{
           flexGrow: 1,
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "column"
         }}
       >
         <section>
@@ -67,7 +67,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
           style={{
             padding: "8px 16px",
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "space-between"
           }}
         >
           {currentGroup?.title}

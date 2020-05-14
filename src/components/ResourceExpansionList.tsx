@@ -6,7 +6,7 @@ import {
   FormControlLabel,
   ExpansionPanelDetails,
   List,
-  Checkbox,
+  Checkbox
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ResourceListItem from "./ResourceListItem";
@@ -14,8 +14,8 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({
   nopadding: {
-    padding: 0,
-  },
+    padding: 0
+  }
 }));
 
 interface ResourceExpansionListProps extends CalendarUIProps {
@@ -24,7 +24,7 @@ interface ResourceExpansionListProps extends CalendarUIProps {
 const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
   dispatch,
   state,
-  groupId,
+  groupId
 }) => {
   const { locations } = state;
   const classes = useStyles();
@@ -61,8 +61,8 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
                   }
                   location.selected = checked;
                   return location;
-                }),
-              },
+                })
+              }
             });
           }}
         />

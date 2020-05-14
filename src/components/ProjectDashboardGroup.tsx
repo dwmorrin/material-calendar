@@ -5,13 +5,13 @@ import {
   Typography,
   Avatar,
   Button,
-  LinearProgress,
+  LinearProgress
 } from "@material-ui/core";
 import { AuthContext } from "./AuthContext";
 
 const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   const { user } = useContext(AuthContext);
   const currentGroup = state.currentProjectGroups?.find((group) =>
@@ -21,7 +21,7 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
     if (currentGroup) {
       dispatch({
         type: CalendarAction.SelectedGroup,
-        payload: { currentGroup },
+        payload: { currentGroup }
       });
     }
   }, [currentGroup, dispatch]);
@@ -51,7 +51,7 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
         style={{
           display: "flex",
           flexDirection: "row",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         {memberNames.map(({ first, last }, index) => (
