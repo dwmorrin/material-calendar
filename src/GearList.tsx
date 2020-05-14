@@ -60,18 +60,13 @@ const GearList: FunctionComponent<GearListProps> = ({
       <div className={classes.root}>
         {parents.length > 1
           ? parents.map((parent) => {
-              return gearList.filter((obj) => obj.parentId === parent).length >
-                1 ? (
+              return (
                 <NestedList
                   parent={parent}
                   gearList={gearList}
                   selectedGroup={selectedGroup}
                   setSelectedGroup={changeCurrentGroup}
                 />
-              ) : (
-                createStandardList(
-                  gearList.filter((obj) => obj.parentId === parent)
-                )
               );
             })
           : createStandardList(gearList)}
