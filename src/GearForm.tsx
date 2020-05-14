@@ -120,7 +120,10 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
       }
     } else {
       for (let i = 0; i < gear.length; ++i) {
-        if (gear[i].title.toLowerCase() == searchString.toLowerCase()) {
+        if (
+          gear[i].title.toLowerCase().includes(searchString.toLowerCase()) ||
+          gear[i].tags.toLowerCase().includes(searchString.toLowerCase())
+        ) {
           tempArray.push(gear[i]);
         }
       }
