@@ -25,7 +25,12 @@ const Filter: FunctionComponent<FilterProps> = ({ filter }) => {
           }}
         >
           <Checkbox
-            defaultChecked
+            onChange={(event): void => {
+              event.stopPropagation();
+              filter.toggle = !filter.toggle;
+            }}
+            onClick={(event): void => event.stopPropagation()}
+            checked={filter.toggle}
             size="small"
             inputProps={{ "aria-label": "checkbox with small size" }}
           />

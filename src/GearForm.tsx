@@ -73,6 +73,17 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     return tag.trim();
   }
 
+  const toggleFilter = () => (filter: {
+    name: string;
+    toggle: boolean;
+  }): void => {
+    for (let index = 0; index < filters.length; ++index) {
+      if (filters[index] == filter) {
+        filters[index].toggle = !filters[index].toggle;
+      }
+    }
+  };
+
   function sortFilters(
     filters: {
       name: string;
