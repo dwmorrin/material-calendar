@@ -40,6 +40,10 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
   const gear = Database.gear;
+  const viewFilters: {
+    name: string;
+    toggle: boolean;
+  }[] = [];
   const [filters, setFilters] = useState(initialFilters);
   const [searchString, setSearchString] = useState("");
 
@@ -61,6 +65,28 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     };
     tempArray.push(filter);
     setFilters(tempArray);
+  }
+
+  function checkViewExists(tag: string): boolean {
+    console.log(viewFilters);
+    console.log(tag);
+    let hasMatch = false;
+    for (let index = 0; index < viewFilters.length; ++index) {
+      if (viewFilters[index].name === tag) {
+        hasMatch = true;
+      }
+    }
+    return hasMatch;
+  }
+
+  function pushViewArray(tag: string): void {
+    const viewArray = viewFilters;
+    const filter = {
+      name: tag,
+      toggle: true
+    };
+    viewArray.push(filter);
+    console.log(viewFilters);
   }
 
   function cleanTag(tag: string): string {
@@ -167,9 +193,16 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     return filters;
   }
 
-  // something needs to be done here to go through the list of tags and put
-  // them in a new JSON array in the format {name: string; toggle: boolean;}
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const changeCurrentGroup = (group: string): void => {
+    if (group === selectedGroup) {
+      setSelectedGroup("");
+    } else {
+      setSelectedGroup(group);
+    }
+  };
 
+  // Create full list of filters
   for (let index = 0; index < Database.gear.length; ++index) {
     const item = gear[index];
     const tags = item.tags.split(",");
@@ -180,14 +213,19 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
       }
     }
   }
-  const [selectedGroup, setSelectedGroup] = useState("");
-  const changeCurrentGroup = (group: string): void => {
-    if (group === selectedGroup) {
-      setSelectedGroup("");
-    } else {
-      setSelectedGroup(group);
+  // Create list of applicable filters
+  for (let index = 0; index < Database.gear.length; ++index) {
+    const item = gear[index];
+    if (item.parentId === selectedGroup) {
+      const tags = item.tags.split(",");
+      for (let i = 0; i < tags.length; ++i) {
+        const tag = cleanTag(tags[i]);
+        if (!checkViewExists(tag)) {
+          pushViewArray(tag);
+        }
+      }
     }
-  };
+  }
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -209,7 +247,7 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
           items={gear}
-          filters={sortFilters(filters)}
+          filters={sortFilters(viewFilters)}
           toggleFunction={toggleFilter}
           searchString={searchString}
           setSearchString={setSearchString}
