@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
@@ -6,50 +6,13 @@ import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import List from "@material-ui/core/List";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import GearItem from "./GearItem";
+import NestedList from "./NestedList";
 
 const useStyles = makeStyles({
   root: {
     width: "100%"
   }
 });
-
-function createNestedList(
-  parent: string,
-  gearList: {
-    id: string;
-    parentId: string;
-    title: string;
-    tags: string;
-  }[]
-): JSX.Element {
-  return (
-    <ExpansionPanel>
-      <ExpansionPanelSummary
-        expandIcon={<ExpandMoreIcon />}
-        aria-label="Expand"
-        aria-controls="additional-actions1-content"
-        id="additional-actions1-header"
-        onClick={(event): void => event.stopPropagation()}
-      >
-        {parent}
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails>
-        <List
-          style={{
-            flexDirection: "column",
-            minWidth: "100%"
-          }}
-        >
-          {gearList
-            .filter((item) => item.parentId === parent)
-            .map((item) => (
-              <GearItem item={item} />
-            ))}
-        </List>
-      </ExpansionPanelDetails>
-    </ExpansionPanel>
-  );
-}
 
 function createStandardList(
   gearList: {
@@ -84,6 +47,14 @@ interface GearListProps {
     | undefined;
 }
 const GearList: FunctionComponent<GearListProps> = ({ gearList }) => {
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const handleChange = (group: string): void => {
+    if (group === selectedGroup) {
+      setSelectedGroup("");
+    } else {
+      setSelectedGroup(group);
+    }
+  };
   const classes = useStyles();
   if (gearList) {
     const parents = [...new Set(gearList.map((items) => items.parentId))];
@@ -92,11 +63,18 @@ const GearList: FunctionComponent<GearListProps> = ({ gearList }) => {
         {parents.length > 1
           ? parents.map((parent) => {
               return gearList.filter((obj) => obj.parentId === parent).length >
-                1
-                ? createNestedList(parent, gearList)
-                : createStandardList(
-                    gearList.filter((obj) => obj.parentId === parent)
-                  );
+                1 ? (
+                <NestedList
+                  parent={parent}
+                  gearList={gearList}
+                  selectedGroup={selectedGroup}
+                  setSelectedGroup={handleChange}
+                />
+              ) : (
+                createStandardList(
+                  gearList.filter((obj) => obj.parentId === parent)
+                )
+              );
             })
           : createStandardList(gearList)}
       </div>
