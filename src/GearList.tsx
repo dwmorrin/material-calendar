@@ -45,16 +45,14 @@ interface GearListProps {
         tags: string;
       }[]
     | undefined;
+  selectedGroup: string;
+  changeCurrentGroup: (group: string) => void;
 }
-const GearList: FunctionComponent<GearListProps> = ({ gearList }) => {
-  const [selectedGroup, setSelectedGroup] = useState("");
-  const handleChange = (group: string): void => {
-    if (group === selectedGroup) {
-      setSelectedGroup("");
-    } else {
-      setSelectedGroup(group);
-    }
-  };
+const GearList: FunctionComponent<GearListProps> = ({
+  gearList,
+  selectedGroup,
+  changeCurrentGroup
+}) => {
   const classes = useStyles();
   if (gearList) {
     const parents = [...new Set(gearList.map((items) => items.parentId))];
@@ -68,7 +66,7 @@ const GearList: FunctionComponent<GearListProps> = ({ gearList }) => {
                   parent={parent}
                   gearList={gearList}
                   selectedGroup={selectedGroup}
-                  setSelectedGroup={handleChange}
+                  setSelectedGroup={changeCurrentGroup}
                 />
               ) : (
                 createStandardList(

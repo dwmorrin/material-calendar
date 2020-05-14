@@ -180,6 +180,14 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
       }
     }
   }
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const changeCurrentGroup = (group: string): void => {
+    if (group === selectedGroup) {
+      setSelectedGroup("");
+    } else {
+      setSelectedGroup(group);
+    }
+  };
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -193,7 +201,6 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     }
     setDrawerIsOpen(!drawerIsOpen);
   };
-
   return (
     <div className={classes.root}>
       <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
@@ -231,7 +238,11 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
           </Toolbar>
         </List>
       </AppBar>
-      <GearList gearList={filterItems(gear, filters, searchString)} />
+      <GearList
+        gearList={filterItems(gear, filters, searchString)}
+        selectedGroup={selectedGroup}
+        changeCurrentGroup={changeCurrentGroup}
+      />
     </div>
   );
 };
