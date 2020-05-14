@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 const initialFilters = [
   {
-    name: "",
+    name: "All",
     toggle: false
   }
 ];
@@ -40,12 +40,12 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
   const gear = Database.gear;
-  const [array, setArray] = useState(initialFilters);
+  const [filters, setFilters] = useState(initialFilters);
 
   function checkExists(tags: string): boolean {
     let hasMatch = false;
-    for (let index = 0; index < array.length; ++index) {
-      if (array[index].name == tags) {
+    for (let index = 0; index < filters.length; ++index) {
+      if (filters[index].name == tags) {
         hasMatch = true;
       }
     }
@@ -53,13 +53,24 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
   }
 
   function pushArray(tags: string): void {
-    const tempArray = array;
+    const tempArray = filters;
     const filter = {
       name: tags,
       toggle: false
     };
     tempArray.push(filter);
-    setArray(tempArray);
+    setFilters(tempArray);
+  }
+
+  function cleanTag(tag: string): string {
+    tag = tag.trim();
+    const words = tag.split(" ");
+    tag = "";
+    for (let index = 0; index < words.length; ++index) {
+      const word = words[index].charAt(0).toUpperCase() + words[index].slice(1);
+      tag = tag + word + " ";
+    }
+    return tag.trim();
   }
 
   // something needs to be done here to go through the list of tags and put
@@ -67,11 +78,15 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
 
   for (let index = 0; index < Database.gear.length; ++index) {
     const item = gear[index];
-    if (!checkExists(item.tags)) {
-      pushArray(item.tags);
+    const tags = item.tags.split(",");
+    for (let i = 0; i < tags.length; ++i) {
+      const tag = cleanTag(tags[i]);
+      if (!checkExists(tag)) {
+        pushArray(tag);
+      }
     }
   }
-  console.log(array);
+  console.log(filters);
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
