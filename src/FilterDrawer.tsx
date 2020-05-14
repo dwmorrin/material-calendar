@@ -28,13 +28,15 @@ interface FilterDrawerProps {
     name: string;
     toggle: boolean;
   }[];
+  toggleFunction: (filter: { name: string; toggle: boolean }) => void;
 }
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   items,
   filters,
   open,
   onClose,
-  onOpen
+  onOpen,
+  toggleFunction
 }) => {
   const classes = useStyles();
   return (
@@ -61,7 +63,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
           <br />
           <br />
           <br />
-          <FilterList filters={filters} />
+          <FilterList filters={filters} toggleFunction={toggleFunction} />
         </List>
       </div>
     </SwipeableDrawer>

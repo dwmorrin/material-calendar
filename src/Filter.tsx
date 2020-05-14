@@ -8,8 +8,9 @@ interface FilterProps {
     name: string;
     toggle: boolean;
   };
+  toggleFunction: (filter: { name: string; toggle: boolean }) => void;
 }
-const Filter: FunctionComponent<FilterProps> = ({ filter }) => {
+const Filter: FunctionComponent<FilterProps> = ({ filter, toggleFunction }) => {
   return (
     <div
       style={{
@@ -25,11 +26,10 @@ const Filter: FunctionComponent<FilterProps> = ({ filter }) => {
           }}
         >
           <Checkbox
-            onChange={(event): void => {
+            onClick={(event): void => {
               event.stopPropagation();
-              filter.toggle = !filter.toggle;
+              toggleFunction(filter);
             }}
-            onClick={(event): void => event.stopPropagation()}
             checked={filter.toggle}
             size="small"
             inputProps={{ "aria-label": "checkbox with small size" }}

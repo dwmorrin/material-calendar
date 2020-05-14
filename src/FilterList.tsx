@@ -9,8 +9,12 @@ interface FilterListProps {
     name: string;
     toggle: boolean;
   }[];
+  toggleFunction: (filter: { name: string; toggle: boolean }) => void;
 }
-const FilterList: FunctionComponent<FilterListProps> = ({ filters }) => {
+const FilterList: FunctionComponent<FilterListProps> = ({
+  filters,
+  toggleFunction
+}) => {
   return (
     <Box>
       <List
@@ -20,9 +24,9 @@ const FilterList: FunctionComponent<FilterListProps> = ({ filters }) => {
         }}
       >
         {filters
-          .filter((filter) => filter.name != "")
+          .filter((filter) => filter.name !== "")
           .map((filter) => (
-            <Filter filter={filter} />
+            <Filter filter={filter} toggleFunction={toggleFunction} />
           ))}
       </List>
     </Box>

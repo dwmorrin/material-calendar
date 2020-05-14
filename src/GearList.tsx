@@ -74,28 +74,35 @@ function createStandardList(
 }
 
 interface GearListProps {
-  gearList: {
-    id: string;
-    parentId: string;
-    title: string;
-    tags: string;
-  }[];
+  gearList:
+    | {
+        id: string;
+        parentId: string;
+        title: string;
+        tags: string;
+      }[]
+    | undefined;
 }
 const GearList: FunctionComponent<GearListProps> = ({ gearList }) => {
-  const parents = [...new Set(gearList.map((items) => items.parentId))];
   const classes = useStyles();
-  return (
-    <div className={classes.root}>
-      {parents.length > 1
-        ? parents.map((parent) => {
-            return gearList.filter((obj) => obj.parentId === parent).length > 1
-              ? createNestedList(parent, gearList)
-              : createStandardList(
-                  gearList.filter((obj) => obj.parentId === parent)
-                );
-          })
-        : createStandardList(gearList)}
-    </div>
-  );
+  if (gearList) {
+    const parents = [...new Set(gearList.map((items) => items.parentId))];
+    return (
+      <div className={classes.root}>
+        {parents.length > 1
+          ? parents.map((parent) => {
+              return gearList.filter((obj) => obj.parentId === parent).length >
+                1
+                ? createNestedList(parent, gearList)
+                : createStandardList(
+                    gearList.filter((obj) => obj.parentId === parent)
+                  );
+            })
+          : createStandardList(gearList)}
+      </div>
+    );
+  } else {
+    return <div></div>;
+  }
 };
 export default GearList;

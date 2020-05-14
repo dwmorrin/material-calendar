@@ -42,21 +42,21 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
   const gear = Database.gear;
   const [filters, setFilters] = useState(initialFilters);
 
-  function checkExists(tags: string): boolean {
+  function checkExists(tag: string): boolean {
     let hasMatch = false;
     for (let index = 0; index < filters.length; ++index) {
-      if (filters[index].name == tags) {
+      if (filters[index].name === tag) {
         hasMatch = true;
       }
     }
     return hasMatch;
   }
 
-  function pushArray(tags: string): void {
+  function pushArray(tag: string): void {
     const tempArray = filters;
     const filter = {
-      name: tags,
-      toggle: false
+      name: tag,
+      toggle: true
     };
     tempArray.push(filter);
     setFilters(tempArray);
@@ -73,15 +73,66 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     return tag.trim();
   }
 
-  const toggleFilter = () => (filter: {
-    name: string;
-    toggle: boolean;
-  }): void => {
-    for (let index = 0; index < filters.length; ++index) {
-      if (filters[index] == filter) {
-        filters[index].toggle = !filters[index].toggle;
+  function filterItems(
+    gear: {
+      id: string;
+      parentId: string;
+      title: string;
+      tags: string;
+    }[]
+  ):
+    | {
+        id: string;
+        parentId: string;
+        title: string;
+        tags: string;
+      }[]
+    | undefined {
+    const tempArray: {
+      id: string;
+      parentId: string;
+      title: string;
+      tags: string;
+    }[] = [];
+    // do some stuff in here to write to the tempArray to only
+    // gear that contain the items matching ids
+
+    // loop through the list of gear
+    // split the gear tags and compare to those
+    // that are true in filters[]
+    // return true if gear tag contains one of the tags
+    // let activefilters= filters where toggle=true
+    for (let i = 0; i < gear.length; ++i) {
+      let hasMatch = false;
+      const tags = gear[i].tags.split(",");
+      for (let x = 0; x < tags.length; ++x) {
+        const tag = cleanTag(tags[x]);
+        for (let index = 0; index < filters.length; ++index) {
+          if (filters[index].toggle === true) {
+            if (tag.toLowerCase() == filters[index].name.toLowerCase()) {
+              hasMatch = true;
+            }
+          }
+        }
+      }
+      if (hasMatch) {
+        tempArray.push(gear[i]);
       }
     }
+    return tempArray;
+  }
+
+  const toggleFilter = (filter: { name: string; toggle: boolean }): void => {
+    filter.toggle = !filter.toggle;
+    const tempArray = [];
+    for (let index = 0; index < filters.length; ++index) {
+      if (filters[index].name == filter.name) {
+        tempArray.push(filter);
+      } else {
+        tempArray.push(filters[index]);
+      }
+    }
+    setFilters(tempArray);
   };
 
   function sortFilters(
@@ -142,6 +193,7 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
           onClose={toggleDrawer}
           items={gear}
           filters={sortFilters(filters)}
+          toggleFunction={toggleFilter}
         />
       </div>
       <AppBar position="sticky">
@@ -167,7 +219,7 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
           </Toolbar>
         </List>
       </AppBar>
-      <GearList gearList={gear} />
+      <GearList gearList={filterItems(gear)} />
     </div>
   );
 };
