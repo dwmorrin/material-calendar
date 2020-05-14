@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 const initialFilters = [
   {
-    name: "All",
+    name: "",
     toggle: false
   }
 ];
@@ -73,6 +73,28 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     return tag.trim();
   }
 
+  function sortFilters(
+    filters: {
+      name: string;
+      toggle: boolean;
+    }[]
+  ): {
+    name: string;
+    toggle: boolean;
+  }[] {
+    filters.sort(function (a, b) {
+      if (a.name == "") {
+        return -1;
+      } else if (a.name < b.name) {
+        return -1;
+      } else if (a.name > b.name) {
+        return 1;
+      }
+      return 0;
+    });
+    return filters;
+  }
+
   // something needs to be done here to go through the list of tags and put
   // them in a new JSON array in the format {name: string; toggle: boolean;}
 
@@ -86,7 +108,6 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
       }
     }
   }
-  console.log(filters);
 
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
@@ -109,7 +130,7 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
           onOpen={toggleDrawer}
           onClose={toggleDrawer}
           items={gear}
-          //filters={filters}
+          filters={sortFilters(filters)}
         />
       </div>
       <AppBar position="sticky">

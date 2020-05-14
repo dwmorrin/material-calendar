@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import List from "@material-ui/core/List";
 import TextField from "@material-ui/core/TextField";
-import Filter from "./Filter";
+import FilterList from "./FilterList";
 
 const useStyles = makeStyles({
   list: {
@@ -24,14 +24,14 @@ interface FilterDrawerProps {
     title: string;
     tags: string;
   }[];
-  /*   filters: {
+  filters: {
     name: string;
     toggle: boolean;
-  }[]; */
+  }[];
 }
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   items,
-  //filters,
+  filters,
   open,
   onClose,
   onOpen
@@ -61,7 +61,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
           <br />
           <br />
           <br />
-          {/* <Filter items={items} filters={filters} /> */}
+          <FilterList filters={filters} />
         </List>
       </div>
     </SwipeableDrawer>

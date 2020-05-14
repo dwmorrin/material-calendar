@@ -1,32 +1,37 @@
-import React, { FunctionComponent } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import Box from "@material-ui/core/Box";
-
-const useStyles = makeStyles({
-  list: {
-    width: 250
-  },
-  fullList: {
-    width: "auto"
-  }
-});
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import Checkbox from "@material-ui/core/Checkbox";
+import React, { FunctionComponent, useState } from "react";
 
 interface FilterProps {
-  items: {
-    id: string;
-    parentId: string;
-    title: string;
-    tags: string;
-  }[];
-  filters: {
+  filter: {
     name: string;
     toggle: boolean;
-  }[];
+  };
 }
-const Filter: FunctionComponent<FilterProps> = ({ items, filters }) => {
-  const classes = useStyles();
-  return <Box>{items.map((item) => item.tags)}</Box>;
+const Filter: FunctionComponent<FilterProps> = ({ filter }) => {
+  return (
+    <div
+      style={{
+        flexDirection: "row"
+      }}
+    >
+      <ListItem key={filter.name}>
+        <ListItemText primary={filter.name} />
+        <section
+          style={{
+            textAlign: "center",
+            flexDirection: "column"
+          }}
+        >
+          <Checkbox
+            defaultChecked
+            size="small"
+            inputProps={{ "aria-label": "checkbox with small size" }}
+          />
+        </section>
+      </ListItem>
+    </div>
+  );
 };
-
 export default Filter;
