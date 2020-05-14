@@ -29,8 +29,12 @@ interface FilterDrawerProps {
     toggle: boolean;
   }[];
   toggleFunction: (filter: { name: string; toggle: boolean }) => void;
+  searchString: string;
+  setSearchString: React.Dispatch<React.SetStateAction<string>>;
 }
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
+  searchString,
+  setSearchString,
   items,
   filters,
   open,
@@ -58,6 +62,14 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
             size="small"
             id="outlined-basic"
             label="Search"
+            value={searchString}
+            onChange={(event): void => {
+              event.stopPropagation();
+              setSearchString(event.target.value);
+            }}
+            onClick={(event): void => {
+              event.stopPropagation();
+            }}
             variant="outlined"
           />
           <br />
