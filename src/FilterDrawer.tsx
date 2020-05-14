@@ -75,7 +75,11 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
           <br />
           <br />
           <br />
-          <FilterList filters={filters} toggleFunction={toggleFunction} />
+          {filters.length > 0 ? (
+            <FilterList filters={filters} toggleFunction={toggleFunction} />
+          ) : (
+            <div>Expand a ategory to see filters</div>
+          )}
         </List>
       </div>
     </SwipeableDrawer>

@@ -68,8 +68,6 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
   }
 
   function checkViewExists(tag: string): boolean {
-    console.log(viewFilters);
-    console.log(tag);
     let hasMatch = false;
     for (let index = 0; index < viewFilters.length; ++index) {
       if (viewFilters[index].name === tag) {
@@ -87,7 +85,6 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     if (filter) {
       viewArray.push(filter);
     }
-    console.log(viewFilters);
   }
 
   function cleanTag(tag: string): string {
