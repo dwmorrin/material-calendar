@@ -24,19 +24,19 @@ const Database = {
       id: "ABL-1",
       parentId: "Controllers",
       title: "Ableton Push",
-      tags: "ableton, midi"
+      tags: "ableton, midi, sequencer"
     },
     {
       id: "ABL-2",
       parentId: "Controllers",
       title: "Ableton Push",
-      tags: "ableton, midi"
+      tags: "ableton, midi, sequencer"
     },
     {
       id: "ABL-3",
       parentId: "Controllers",
       title: "Ableton Push 2",
-      tags: "ableton, midi"
+      tags: "ableton, midi, sampler"
     },
     {
       id: "RLD-10",
@@ -48,19 +48,19 @@ const Database = {
       id: "FEN-1",
       parentId: "Amplifiers",
       title: "Fender Deluxe Reverb",
-      tags: "guitar"
+      tags: "guitar, reverb, combo"
     },
     {
       id: "EPI-1",
       parentId: "Amplifiers",
       title: "Epiphone Triggerman",
-      tags: "guitar"
+      tags: "guitar, stack"
     },
     {
       id: "EPI-2",
       parentId: "Amplifiers",
       title: "Epiphone Blues Custom",
-      tags: "guitar"
+      tags: "guitar, combo"
     },
     {
       id: "TAY-1",

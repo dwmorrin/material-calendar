@@ -81,11 +81,12 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
 
   function pushViewArray(tag: string): void {
     const viewArray = viewFilters;
-    const filter = {
-      name: tag,
-      toggle: true
-    };
-    viewArray.push(filter);
+    const filter = filters.find(function (filter) {
+      return filter.name === tag;
+    });
+    if (filter) {
+      viewArray.push(filter);
+    }
     console.log(viewFilters);
   }
 
