@@ -130,7 +130,6 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     if (searchString === "") {
       for (let i = 0; i < gear.length; ++i) {
         let hasMatch = false;
-        const tags = gear[i].tags.split(",");
         if (
           activeFilters.every(function (filter) {
             return gear[i].tags
@@ -265,7 +264,12 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
             <Button className={classes.title}>
               <Typography component="h6">Gear</Typography>
             </Button>
-            <IconButton edge="start" color="inherit" aria-label="search">
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={toggleDrawer()}
+              aria-label="search"
+            >
               <SearchIcon />
             </IconButton>
             <IconButton
