@@ -134,6 +134,7 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
         let hasMatch = false;
 
         if (
+          // add a toggle button to switch between some and every
           activeFilters.every(function (filter) {
             return gear[i].tags
               .toLowerCase()
@@ -147,10 +148,18 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
         }
       }
     } else {
+      // If there is soemthing in there, pass the searched stuff to the filtering algorithm, otherwise pass all the gear through.
+      const queries = searchString.split(",");
       for (let i = 0; i < gear.length; ++i) {
         if (
-          gear[i].title.toLowerCase().includes(searchString.toLowerCase()) ||
-          gear[i].tags.toLowerCase().includes(searchString.toLowerCase())
+          queries.some(function (query) {
+            return (
+              gear[i].title
+                .toLowerCase()
+                .includes(query.toLowerCase().trim()) ||
+              gear[i].tags.toLowerCase().includes(query.toLowerCase().trim())
+            );
+          })
         ) {
           tempArray.push(gear[i]);
         }
