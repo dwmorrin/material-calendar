@@ -9,14 +9,14 @@ export const testModifiedState: CalendarState = {
     open: true,
     reservationId: null,
     projectGroupId: 0,
-    equipment: "",
+    equipment: ""
   }),
   currentGroup: new UserGroup({
     id: 0,
     projectId: 0,
     memberIds: "",
     memberNames: "",
-    title: "",
+    title: ""
   }),
   currentProject: new Project({
     childrenIds: [],
@@ -28,7 +28,7 @@ export const testModifiedState: CalendarState = {
     reservationStart: "",
     selected: false,
     start: "",
-    title: "",
+    title: ""
   }),
   currentProjectGroups: [],
   currentStart: new Date(),
@@ -42,8 +42,9 @@ export const testModifiedState: CalendarState = {
   locations: [],
   pickerShowing: true,
   projectDashboardIsOpen: true,
+  GearListIsOpen: true,
   projects: [],
-  ref: null,
+  ref: null
 };
 
 export const initialCalendarState: CalendarState = {
@@ -57,7 +58,8 @@ export const initialCalendarState: CalendarState = {
   locations: [],
   pickerShowing: false,
   projectDashboardIsOpen: false,
+  GearListIsOpen: false,
   projects: [],
-  ref: null,
+  ref: null
 };
 export default initialCalendarState;

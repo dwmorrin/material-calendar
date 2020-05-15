@@ -14,6 +14,8 @@ export enum CalendarAction {
   PickedDate,
   OpenGroupDashboard,
   OpenProjectDashboard,
+  OpenGearList,
+  CloseGearList,
   ReceivedEvents,
   ReceivedGroups,
   ReceivedLocations,
@@ -24,7 +26,7 @@ export enum CalendarAction {
   ToggleDrawer,
   TogglePicker,
   ViewEventDetail,
-  ViewToday,
+  ViewToday
 }
 
 export type CalendarView =
@@ -49,6 +51,7 @@ export interface CalendarState {
   locations: Location[];
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
+  GearListIsOpen: boolean;
   projects: Project[];
   ref: React.RefObject<FullCalendar> | null;
 }

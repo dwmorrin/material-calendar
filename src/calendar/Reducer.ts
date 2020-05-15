@@ -62,7 +62,7 @@ const calendarReducer = (
     return {
       ...state,
       // currentProject: action.payload?.currentProject,
-      groupDashboardIsOpen: true,
+      groupDashboardIsOpen: true
     };
   }
 
@@ -70,7 +70,20 @@ const calendarReducer = (
     return {
       ...state,
       currentProject: action.payload?.currentProject,
-      projectDashboardIsOpen: true,
+      projectDashboardIsOpen: true
+    };
+  }
+
+  if (action.type === CalendarAction.OpenGearList) {
+    return {
+      ...state,
+      GearListIsOpen: true
+    };
+  }
+  if (action.type === CalendarAction.CloseGearList) {
+    return {
+      ...state,
+      GearListIsOpen: false
     };
   }
 
@@ -81,7 +94,7 @@ const calendarReducer = (
     return {
       ...state,
       loading: !state.locations,
-      events: action.payload.events.map((event) => new Event(event)),
+      events: action.payload.events.map((event) => new Event(event))
     };
   }
 
@@ -94,7 +107,7 @@ const calendarReducer = (
       loading: false, // ! need to evaluate the `loading` handling
       currentProjectGroups: action.payload.currentProjectGroups.map(
         (group: UserGroup) => new UserGroup(group)
-      ),
+      )
     };
   }
 
@@ -126,7 +139,7 @@ const calendarReducer = (
       loading: !state.events,
       locations: action.payload.locations.map(
         (location) => new Location(location)
-      ),
+      )
     };
   }
 
@@ -137,7 +150,7 @@ const calendarReducer = (
     return {
       ...state,
       loading: !state.events || !state.locations,
-      projects: action.payload.projects.map((project) => new Project(project)),
+      projects: action.payload.projects.map((project) => new Project(project))
     };
   }
 
@@ -181,7 +194,7 @@ const calendarReducer = (
     return {
       ...state,
       detailIsOpen: true,
-      currentEvent: action.payload.currentEvent,
+      currentEvent: action.payload.currentEvent
     };
   }
 

@@ -6,15 +6,17 @@ import {
   Toolbar,
   IconButton,
   Typography,
-  Button
+  Button,
+  Dialog
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { RouteComponentProps } from "@reach/router";
 import FilterDrawer from "./FilterDrawer";
 import Database from "./Database.js";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import SearchIcon from "@material-ui/icons/Search";
 import GearList from "./GearList";
+import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import { makeTransition } from "./Transition";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,7 +40,9 @@ const initialFilters = [
   }
 ];
 
-const GearForm: FunctionComponent<RouteComponentProps> = () => {
+const transition = makeTransition("up");
+
+const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const classes = useStyles();
   const gear = Database.gear;
@@ -256,27 +260,39 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     setDrawerIsOpen(!drawerIsOpen);
   };
   return (
-    <div className={classes.root}>
-      <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
-        <FilterDrawer
-          open={drawerIsOpen}
-          onOpen={toggleDrawer}
-          onClose={toggleDrawer}
-          items={gear}
-          filters={sortFilters(viewFilters)}
-          toggleFunction={toggleFilter}
-          searchString={searchString}
-          setSearchString={setSearchString}
-        />
-      </div>
-      <AppBar position="sticky">
-        <List>
-          <Toolbar>
-            <IconButton edge="start" color="inherit" aria-label="exit">
-              <CloseIcon />
-            </IconButton>
-            <Typography className={classes.title}>GEAR</Typography>
-            {/* <IconButton
+    <Dialog
+      fullScreen
+      open={state.GearListIsOpen}
+      TransitionComponent={transition}
+    >
+      <div className={classes.root}>
+        <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
+          <FilterDrawer
+            open={drawerIsOpen}
+            onOpen={toggleDrawer}
+            onClose={toggleDrawer}
+            items={gear}
+            filters={sortFilters(viewFilters)}
+            toggleFunction={toggleFilter}
+            searchString={searchString}
+            setSearchString={setSearchString}
+          />
+        </div>
+        <AppBar position="sticky">
+          <List>
+            <Toolbar>
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="close1"
+                onClick={(): void =>
+                  dispatch({ type: CalendarAction.CloseGearList })
+                }
+              >
+                <CloseIcon />
+              </IconButton>
+              <Typography className={classes.title}>GEAR</Typography>
+              {/* <IconButton
               edge="start"
               color="inherit"
               onClick={toggleDrawer()}
@@ -284,23 +300,24 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
             >
               <SearchIcon />
             </IconButton> */}
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={toggleDrawer()}
-              aria-label="filter"
-            >
-              <FilterListIcon />
-            </IconButton>
-          </Toolbar>
-        </List>
-      </AppBar>
-      <GearList
-        gearList={filterItems(gear, filters, searchString)}
-        selectedGroup={selectedGroup}
-        changeCurrentGroup={changeCurrentGroup}
-      />
-    </div>
+              <IconButton
+                edge="start"
+                color="inherit"
+                onClick={toggleDrawer()}
+                aria-label="filter"
+              >
+                <FilterListIcon />
+              </IconButton>
+            </Toolbar>
+          </List>
+        </AppBar>
+        <GearList
+          gearList={filterItems(gear, filters, searchString)}
+          selectedGroup={selectedGroup}
+          changeCurrentGroup={changeCurrentGroup}
+        />
+      </div>
+    </Dialog>
   );
 };
 

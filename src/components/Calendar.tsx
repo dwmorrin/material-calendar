@@ -3,7 +3,7 @@ import React, {
   useContext,
   useEffect,
   useReducer,
-  useRef,
+  useRef
 } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { RouteComponentProps, Redirect } from "@reach/router";
@@ -19,11 +19,12 @@ import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
 import initialState from "../calendar/initialCalendarState";
 import ProjectDashboard from "./ProjectDashboard";
+import GearForm from "./GearForm";
 
 const useStyles = makeStyles(() => ({
   root: {
-    flexGrow: 1,
-  },
+    flexGrow: 1
+  }
 }));
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
@@ -32,7 +33,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(calendarReducer, {
     ...initialState,
-    ref: calendarRef,
+    ref: calendarRef
   });
 
   useEffect(() => {
@@ -41,19 +42,19 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       url: "/api/events",
       dispatch,
       onSuccessAction: CalendarAction.ReceivedEvents,
-      payloadKey: "events",
+      payloadKey: "events"
     });
     fetchCalendarData({
       url: "/api/locations",
       dispatch,
       onSuccessAction: CalendarAction.ReceivedLocations,
-      payloadKey: "locations",
+      payloadKey: "locations"
     });
     fetchCalendarData({
       url: "/api/projects",
       dispatch,
       onSuccessAction: CalendarAction.ReceivedProjects,
-      payloadKey: "projects",
+      payloadKey: "projects"
     });
   }, [user]);
 
@@ -63,6 +64,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         <ProjectDashboard dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />
+        <GearForm dispatch={dispatch} state={state} />
         <CalendarBar dispatch={dispatch} state={state} />
         {state.pickerShowing && (
           <StaticDatePicker dispatch={dispatch} state={state} />
