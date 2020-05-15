@@ -133,10 +133,9 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
         const tags = gear[i].tags.split(",");
         if (
           activeFilters.every(function (filter) {
-            return tags.some(function (tag) {
-              //debugger;
-              return filter.name.toLowerCase() == tag.toLowerCase();
-            });
+            return gear[i].tags
+              .toLowerCase()
+              .includes(filter.name.toLowerCase());
           })
         ) {
           hasMatch = true;
