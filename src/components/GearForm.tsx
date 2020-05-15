@@ -44,6 +44,7 @@ const transition = makeTransition("up");
 
 const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
+  const [matchAny, setMatchAny] = useState(false);
   const classes = useStyles();
   const gear = Database.gear;
   const viewFilters: {
@@ -160,15 +161,26 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
     }
     for (let i = 0; i < queriedGear.length; ++i) {
       let hasMatch = false;
-      if (
-        // add a toggle button to switch between some and every
-        activeFilters.every(function (filter) {
-          return queriedGear[i].tags
-            .toLowerCase()
-            .includes(filter.name.toLowerCase());
-        })
-      ) {
-        hasMatch = true;
+      if (matchAny) {
+        if (
+          activeFilters.some(function (filter) {
+            return queriedGear[i].tags
+              .toLowerCase()
+              .includes(filter.name.toLowerCase());
+          })
+        ) {
+          hasMatch = true;
+        }
+      } else {
+        if (
+          activeFilters.every(function (filter) {
+            return queriedGear[i].tags
+              .toLowerCase()
+              .includes(filter.name.toLowerCase());
+          })
+        ) {
+          hasMatch = true;
+        }
       }
       if (hasMatch) {
         tempArray.push(queriedGear[i]);
@@ -276,6 +288,8 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
             toggleFunction={toggleFilter}
             searchString={searchString}
             setSearchString={setSearchString}
+            matchAny={matchAny}
+            setMatchAny={setMatchAny}
           />
         </div>
         <AppBar position="sticky">

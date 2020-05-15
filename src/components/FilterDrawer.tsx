@@ -4,6 +4,10 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import List from "@material-ui/core/List";
 import TextField from "@material-ui/core/TextField";
 import FilterList from "./FilterList";
+import Switch from "@material-ui/core/Switch";
+import Button from "@material-ui/core/Button";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const useStyles = makeStyles({
   list: {
@@ -31,6 +35,8 @@ interface FilterDrawerProps {
   toggleFunction: (filter: { name: string; toggle: boolean }) => void;
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
+  matchAny: boolean;
+  setMatchAny: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   searchString,
@@ -40,9 +46,22 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   open,
   onClose,
   onOpen,
-  toggleFunction
+  toggleFunction,
+  matchAny,
+  setMatchAny
 }) => {
   const classes = useStyles();
+  // Still need to add X to clear textbox and close drawer on enter
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <SwipeableDrawer
       open={open}
@@ -73,11 +92,79 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
             }}
             variant="outlined"
           />
-          <br />
-          <br />
-          <br />
           {filters.length > 0 ? (
-            <FilterList filters={filters} toggleFunction={toggleFunction} />
+            <div>
+              <div
+                style={{
+                  padding: "0",
+                  margin: "0"
+                }}
+              >
+                <br />
+                <div
+                  style={{
+                    paddingTop: "20",
+                    marginTop: "20"
+                  }}
+                >
+                  Match{" "}
+                  <Button
+                    style={{
+                      padding: "0",
+                      margin: "0"
+                    }}
+                    aria-controls="simple-menu"
+                    aria-haspopup="true"
+                    size="small"
+                    onClick={(event): void => {
+                      event.stopPropagation();
+                      handleClick(event);
+                    }}
+                  >
+                    {matchAny ? <b>ANY</b> : <b>ALL</b>}
+                  </Button>
+                  <Menu
+                    id="simple-menu"
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={(): void => {
+                      handleClose();
+                    }}
+                  >
+                    <MenuItem
+                      onClick={(event): void => {
+                        event.stopPropagation();
+                        handleClose();
+                      }}
+                    >
+                      {matchAny ? <b>ANY</b> : <b>ALL</b>}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event): void => {
+                        event.stopPropagation();
+                        setMatchAny(!matchAny);
+                        handleClose();
+                      }}
+                    >
+                      {matchAny ? <b>ALL</b> : <b>ANY</b>}
+                    </MenuItem>
+                  </Menu>{" "}
+                  Selected Filters
+                </div>
+                <div
+                  style={{
+                    paddingTop: "0",
+                    margin: "0"
+                  }}
+                >
+                  <FilterList
+                    filters={filters}
+                    toggleFunction={toggleFunction}
+                  />
+                </div>
+              </div>
+            </div>
           ) : (
             <div>Expand a category to see filters</div>
           )}
