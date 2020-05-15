@@ -55,7 +55,8 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center"
+            justifyContent: "center",
+            textAlign: "center"
           }}
         >
           <TextField
@@ -78,7 +79,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
           {filters.length > 0 ? (
             <FilterList filters={filters} toggleFunction={toggleFunction} />
           ) : (
-            <div>Expand a ategory to see filters</div>
+            <div>Expand a category to see filters</div>
           )}
         </List>
       </div>
