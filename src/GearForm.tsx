@@ -25,7 +25,9 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
-    color: "white"
+    color: "white",
+    textAlign: "center",
+    fontSize: "18px"
   }
 }));
 
@@ -130,6 +132,7 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     if (searchString === "") {
       for (let i = 0; i < gear.length; ++i) {
         let hasMatch = false;
+
         if (
           activeFilters.every(function (filter) {
             return gear[i].tags
@@ -153,11 +156,7 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
         }
       }
     }
-    if (activeFilters.length == 0) {
-      return gear;
-    } else {
-      return tempArray;
-    }
+    return tempArray;
   }
 
   const toggleFilter = (filter: { name: string; toggle: boolean }): void => {
@@ -261,17 +260,15 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
             <IconButton edge="start" color="inherit" aria-label="exit">
               <CloseIcon />
             </IconButton>
-            <Button className={classes.title}>
-              <Typography component="h6">Gear</Typography>
-            </Button>
-            <IconButton
+            <Typography className={classes.title}>GEAR</Typography>
+            {/* <IconButton
               edge="start"
               color="inherit"
               onClick={toggleDrawer()}
               aria-label="search"
             >
               <SearchIcon />
-            </IconButton>
+            </IconButton> */}
             <IconButton
               edge="start"
               color="inherit"
