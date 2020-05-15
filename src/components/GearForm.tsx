@@ -111,6 +111,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
       parentId: string;
       title: string;
       tags: string;
+      quantity: number;
     }[],
     filters: {
       name: string;
@@ -123,6 +124,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
         parentId: string;
         title: string;
         tags: string;
+        quantity: number;
       }[]
     | undefined {
     const tempArray: {
@@ -130,12 +132,14 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
       parentId: string;
       title: string;
       tags: string;
+      quantity: number;
     }[] = [];
     let queriedGear: {
       id: string;
       parentId: string;
       title: string;
       tags: string;
+      quantity: number;
     }[] = [];
     const activeFilters = filters.filter(function (filter) {
       return filter.toggle;

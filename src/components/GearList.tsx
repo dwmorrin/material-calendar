@@ -20,6 +20,7 @@ function createStandardList(
     parentId: string;
     title: string;
     tags: string;
+    quantity: number;
   }[]
 ): JSX.Element {
   return (
@@ -43,6 +44,7 @@ interface GearListProps {
         parentId: string;
         title: string;
         tags: string;
+        quantity: number;
       }[]
     | undefined;
   selectedGroup: string;

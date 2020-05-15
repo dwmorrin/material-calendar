@@ -17,6 +17,7 @@ interface NestedListProps {
     parentId: string;
     title: string;
     tags: string;
+    quantity: number;
   }[];
   selectedGroup: string;
   setSelectedGroup: (group: string) => void;
