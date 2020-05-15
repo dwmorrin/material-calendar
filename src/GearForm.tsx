@@ -126,29 +126,16 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
       title: string;
       tags: string;
     }[] = [];
+    let queriedGear: {
+      id: string;
+      parentId: string;
+      title: string;
+      tags: string;
+    }[] = [];
     const activeFilters = filters.filter(function (filter) {
       return filter.toggle;
     });
-    if (searchString === "") {
-      for (let i = 0; i < gear.length; ++i) {
-        let hasMatch = false;
-
-        if (
-          // add a toggle button to switch between some and every
-          activeFilters.every(function (filter) {
-            return gear[i].tags
-              .toLowerCase()
-              .includes(filter.name.toLowerCase());
-          })
-        ) {
-          hasMatch = true;
-        }
-        if (hasMatch) {
-          tempArray.push(gear[i]);
-        }
-      }
-    } else {
-      // If there is soemthing in there, pass the searched stuff to the filtering algorithm, otherwise pass all the gear through.
+    if (searchString !== "") {
       const queries = searchString.split(",");
       for (let i = 0; i < gear.length; ++i) {
         if (
@@ -161,10 +148,29 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
             );
           })
         ) {
-          tempArray.push(gear[i]);
+          queriedGear.push(gear[i]);
         }
       }
+    } else {
+      queriedGear = gear;
     }
+    for (let i = 0; i < queriedGear.length; ++i) {
+      let hasMatch = false;
+      if (
+        // add a toggle button to switch between some and every
+        activeFilters.every(function (filter) {
+          return queriedGear[i].tags
+            .toLowerCase()
+            .includes(filter.name.toLowerCase());
+        })
+      ) {
+        hasMatch = true;
+      }
+      if (hasMatch) {
+        tempArray.push(queriedGear[i]);
+      }
+    }
+
     return tempArray;
   }
 
