@@ -3,7 +3,7 @@ import React, {
   FunctionComponent,
   useContext,
   useState,
-  useEffect,
+  useEffect
 } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
@@ -26,19 +26,19 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(8),
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    alignItems: "center"
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.primary.main
   },
   form: {
     width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(1)
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
+    margin: theme.spacing(3, 0, 2)
+  }
 }));
 
 const login = (
@@ -57,9 +57,9 @@ const login = (
     method: "POST",
     credentials: "same-origin",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({ username }),
+    body: JSON.stringify({ username })
   })
     .then((response) => response.json())
     .then((user) => {
@@ -77,7 +77,8 @@ const login = (
       setUser(new User(user));
       navigate("/calendar");
     })
-    .catch(() => {
+    .catch((error) => {
+      console.error(error); // TODO handle 500 & 401 responses
       setErrors({ username: true, password: false });
     });
 };
@@ -87,7 +88,7 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
   const [username, setUsername] = useState("");
   const [errors, setErrors] = useState({
     username: false,
-    password: false,
+    password: false
   });
   const classes = useStyles();
 

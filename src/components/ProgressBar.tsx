@@ -18,22 +18,22 @@ const ProgressBar: FunctionComponent<ProgressBarProps> = ({ left, right }) => {
       borderStyle: "solid",
       borderRadius: "20px",
       borderColor: "black",
-      height: "100%",
+      height: "100%"
     },
     left: {
       display: "inline-block",
       borderRadius: "20px 0px 0px 20px",
       width: size1 + "%",
       height: "100%",
-      backgroundColor: left.color,
+      backgroundColor: left.color
     },
     right: {
       display: "inline-block",
       borderRadius: "0px 20px 20px 0px",
       width: size2 + "%",
       height: "100%",
-      backgroundColor: right.color,
-    },
+      backgroundColor: right.color
+    }
   });
 
   const classes = useStyles();

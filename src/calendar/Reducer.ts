@@ -33,6 +33,10 @@ const calendarReducer = (
     return { ...state, projectDashboardIsOpen: false };
   }
 
+  if (action.type === CalendarAction.CloseReservationForm) {
+    return { ...state, ReservationFormIsOpen: false };
+  }
+
   if (action.type === CalendarAction.CloseGroupDashboard) {
     return { ...state, groupDashboardIsOpen: false };
   }
@@ -84,6 +88,13 @@ const calendarReducer = (
     return {
       ...state,
       GearListIsOpen: false
+    };
+  }
+
+  if (action.type === CalendarAction.OpenReservationForm) {
+    return {
+      ...state,
+      ReservationFormIsOpen: true,
     };
   }
 

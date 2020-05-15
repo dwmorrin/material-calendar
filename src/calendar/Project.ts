@@ -13,6 +13,7 @@ export interface Project {
   end: string | Date;
   id: string | number;
   locationIds: (string | number)[];
+  manager: string;
   open?: boolean;
   parentId: string | number;
   reservationEnd: string | Date;

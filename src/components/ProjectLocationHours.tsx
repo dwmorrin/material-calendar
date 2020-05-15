@@ -25,7 +25,7 @@ const getExtent = (allotments: ProjectLocationAllotment[]): AllotmentExtent => {
   return {
     hours: d3.max(allotments, (a) => a.hours) || 0,
     start: d3.min(allotments, (a) => new Date(a.start)) || new Date(),
-    end: d3.max(allotments, (a) => new Date(a.end)) || new Date(),
+    end: d3.max(allotments, (a) => new Date(a.end)) || new Date()
   };
 };
 
@@ -47,7 +47,7 @@ const getScales = (extent: AllotmentExtent): AllotmentScales => {
       .range([height - margin.bottom, margin.top]),
     color: d3
       .scaleSequential(hourColorInterpolator)
-      .domain([0, goodHourAmount(extent)]),
+      .domain([0, goodHourAmount(extent)])
   };
 };
 
@@ -71,7 +71,7 @@ const bars = (
       y,
       width: scales.x(new Date(a.end)) - x,
       height: scales.y(0) - y,
-      color: scales.color(a.hours),
+      color: scales.color(a.hours)
     };
   });
   b.push({
@@ -79,7 +79,7 @@ const bars = (
     y: margin.top / 2,
     width: 2,
     height: height - margin.bottom,
-    color: "red",
+    color: "red"
   });
   return b;
 };
@@ -88,7 +88,7 @@ interface ProjectLocationHoursProps {
   allotments: ProjectLocationAllotment[];
 }
 const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
-  allotments,
+  allotments
 }) => {
   const container = useRef(null);
   const xAxisRef = useRef(null);

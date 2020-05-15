@@ -9,13 +9,13 @@ import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
   root: {
-    width: "100%",
-  },
+    width: "100%"
+  }
 });
 
 const ProjectList: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   const { user } = useContext(AuthContext);
   const projects = state.projects.filter((project) =>

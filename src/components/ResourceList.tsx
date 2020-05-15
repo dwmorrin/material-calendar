@@ -8,13 +8,13 @@ import { ExpansionPanelSummary, ExpansionPanel } from "@material-ui/core";
 
 const useStyles = makeStyles({
   root: {
-    width: "100%",
-  },
+    width: "100%"
+  }
 });
 
 const ResourceList: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   const locations = state.locations;
   const groups = locations.reduce(locationGroupReducer, {});

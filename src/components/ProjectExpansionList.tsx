@@ -7,7 +7,7 @@ import {
   List,
   ListItemText,
   FormControlLabel,
-  Checkbox,
+  Checkbox
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/core/styles";
@@ -17,8 +17,8 @@ import Project from "../calendar/Project";
 
 const useStyles = makeStyles(() => ({
   nopadding: {
-    padding: 0,
-  },
+    padding: 0
+  }
 }));
 
 interface ProjectExpansionListProps extends CalendarUIProps {
@@ -30,7 +30,7 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
   dispatch,
   state,
   parentId,
-  projects,
+  projects
 }) => {
   const { user } = useContext(AuthContext);
   const classes = useStyles();
@@ -67,8 +67,8 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
                     project.selected = checked;
                   }
                   return project;
-                }),
-              },
+                })
+              }
             });
           }}
         />

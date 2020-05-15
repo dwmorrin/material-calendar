@@ -6,7 +6,7 @@ import ProjectList from "./ProjectList";
 
 const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   const onClose = (): void => {
     // TODO clean up after drawer closes

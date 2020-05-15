@@ -23,6 +23,7 @@ export const testModifiedState: CalendarState = {
     end: "",
     id: "",
     locationIds: [],
+    manager: "",
     parentId: "",
     reservationEnd: "",
     reservationStart: "",
@@ -32,17 +33,18 @@ export const testModifiedState: CalendarState = {
   }),
   currentProjectGroups: [],
   currentStart: new Date(),
-  currentView: "resourceTimeGridDay",
+  currentView: "resourceTimeGridWeek",
   detailIsOpen: true,
   drawerIsOpen: true,
   error: new Error("just a test"),
   events: [],
   groupDashboardIsOpen: true,
-  loading: true,
-  locations: [],
+  loading: false,
+  locations: [{ id: "", selected: true, groupId: "" }],
   pickerShowing: true,
   projectDashboardIsOpen: true,
   GearListIsOpen: true,
+  ReservationFormIsOpen: true,
   projects: [],
   ref: null
 };
@@ -59,6 +61,7 @@ export const initialCalendarState: CalendarState = {
   pickerShowing: false,
   projectDashboardIsOpen: false,
   GearListIsOpen: false,
+  ReservationFormIsOpen: false,
   projects: [],
   ref: null
 };

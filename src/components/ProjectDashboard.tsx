@@ -2,7 +2,7 @@ import React, {
   FunctionComponent,
   useEffect,
   useContext,
-  useState,
+  useState
 } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
@@ -16,7 +16,7 @@ import {
   ExpansionPanelSummary,
   ExpansionPanelDetails,
   List,
-  ListItem,
+  ListItem
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -31,12 +31,12 @@ import GroupDashboard from "./GroupDashboard";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   hoursBar: {
     margin: theme.spacing(1),
-    height: 10,
-  },
+    height: 10
+  }
 }));
 
 const transition = makeTransition("right");
@@ -44,7 +44,7 @@ const initialAllotments: ProjectLocationAllotment[][] = [];
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   const classes = useStyles();
   const { user } = useContext(AuthContext);
@@ -62,7 +62,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
       dispatch,
       onSuccessAction: CalendarAction.ReceivedGroups,
       payloadKey: "currentProjectGroups",
-      url: `/api/project_groups/${currentProject.id}`,
+      url: `/api/project_groups/${currentProject.id}`
     });
   }, [currentProject, dispatch, user]);
 
@@ -124,7 +124,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         style={{
           flexGrow: 1,
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "column"
           // justifyContent: "space-between",
         }}
       >
@@ -134,6 +134,9 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
               currentProject?.start as string | Date,
               currentProject?.end as string | Date
             )}
+        </Typography>
+        <Typography variant="body2">
+          Managed by {currentProject && currentProject.manager}
         </Typography>
         <ExpansionPanel defaultExpanded={locations.length === 1}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -169,7 +172,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             onClick={(): void =>
               dispatch({
                 type: CalendarAction.ViewEventDetail,
-                payload: { currentEvent: event },
+                payload: { currentEvent: event }
               })
             }
           >
@@ -189,7 +192,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             onClick={(): void =>
               dispatch({
                 type: CalendarAction.ViewEventDetail,
-                payload: { currentEvent: event },
+                payload: { currentEvent: event }
               })
             }
           >

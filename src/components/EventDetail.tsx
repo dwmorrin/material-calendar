@@ -2,13 +2,13 @@ import React, { FunctionComponent, useContext } from "react";
 import {
   Dialog,
   IconButton,
+  Button,
   Toolbar,
   Typography,
   makeStyles,
   ListItem,
   List,
-  Button,
-  Paper,
+  Paper
 } from "@material-ui/core";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import CloseIcon from "@material-ui/icons/Close";
@@ -20,15 +20,15 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
     display: "flex",
-    flexDirection: "column",
-  },
+    flexDirection: "column"
+  }
 }));
 
 const transition = makeTransition("left");
 
 const EventDetail: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   const classes = useStyles();
   const { user } = useContext(AuthContext);
@@ -44,7 +44,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     start,
     title,
     projectGroupId,
-    equipment,
+    equipment
   } = state.currentEvent;
 
   const projects = state.projects.filter(
@@ -85,7 +85,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             display: "flex",
             flexGrow: 1,
             flexDirection: "column",
-            justifyContent: "space-between",
+            justifyContent: "space-between"
           }}
         >
           <section>
@@ -109,10 +109,21 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           )}
           {reservable && (
             <Button
-              variant="contained"
-              style={{ marginBottom: 30, alignSelf: "center" }}
+              key="MakeBooking"
+              style={{
+                backgroundColor: "Green",
+                color: "white",
+                maxWidth: "400px"
+              }}
+              onClick={(event): void => {
+                event.stopPropagation();
+                dispatch({
+                  type: CalendarAction.OpenReservationForm,
+                  payload: { currentEvent: state.currentEvent }
+                });
+              }}
             >
-              Book Me
+              Reserve this time
             </Button>
           )}
           {userOwns && future && (

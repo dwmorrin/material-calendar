@@ -5,7 +5,7 @@ import {
   Menu,
   MenuItem,
   Hidden,
-  IconButton,
+  IconButton
 } from "@material-ui/core";
 import ViewWeekIcon from "@material-ui/icons/ViewWeek";
 import ViewDayIcon from "@material-ui/icons/ViewDay";
@@ -17,23 +17,23 @@ const options = [
   {
     label: "Schedule",
     view: "listWeek",
-    icon: <ViewAgendaIcon />,
+    icon: <ViewAgendaIcon />
   },
   {
     label: "Day View",
     view: "resourceTimeGridDay",
-    icon: <ViewDayIcon />,
+    icon: <ViewDayIcon />
   },
   {
     label: "Week View",
     view: "resourceTimeGridWeek",
-    icon: <ViewWeekIcon />,
+    icon: <ViewWeekIcon />
   },
   {
     label: "Month View",
     view: "dayGridMonth",
-    icon: <ViewComfyIcon />,
-  },
+    icon: <ViewComfyIcon />
+  }
 ];
 
 const ViewMenu: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
@@ -91,7 +91,7 @@ const ViewMenu: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
               handleClose();
               dispatch({
                 type: CalendarAction.ChangedView,
-                payload: { currentView: view },
+                payload: { currentView: view }
               });
             }}
           >

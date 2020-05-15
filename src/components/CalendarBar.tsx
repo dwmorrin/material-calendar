@@ -6,7 +6,7 @@ import {
   Toolbar,
   Typography,
   Button,
-  makeStyles,
+  makeStyles
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
@@ -19,16 +19,16 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 const useStyles = makeStyles(() => ({
   title: {
     flexGrow: 1,
-    color: "white",
+    color: "white"
   },
   toolbar: {
-    paddingRight: 0,
-  },
+    paddingRight: 0
+  }
 }));
 
 const CalendarBar: FunctionComponent<CalendarUIProps> = ({
   dispatch,
-  state,
+  state
 }) => {
   const { user, setUser } = useContext(AuthContext);
   const classes = useStyles();
@@ -53,7 +53,7 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
           <Typography component="h6">
             {state.currentStart.toLocaleString("default", {
               month: "long",
-              day: "numeric",
+              day: "numeric"
             })}
           </Typography>
         </Button>
@@ -75,7 +75,7 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
             }
             fetch("/api/logout", {
               method: "POST",
-              credentials: "include",
+              credentials: "include"
             });
             user.id = "";
             sessionStorage.clear();

@@ -2,7 +2,7 @@ import React, {
   createContext,
   FunctionComponent,
   useState,
-  SetStateAction,
+  SetStateAction
 } from "react";
 import User from "../user/User";
 
@@ -20,7 +20,7 @@ const AuthProvider: FunctionComponent = ({ children }) => {
       lastName: "",
       role: -1,
       groupIds: [],
-      projectIds: [],
+      projectIds: []
     })
   );
   const value = { user, setUser };
