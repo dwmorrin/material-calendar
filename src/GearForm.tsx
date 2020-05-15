@@ -61,7 +61,7 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
     const tempArray = filters;
     const filter = {
       name: tag,
-      toggle: true
+      toggle: false
     };
     tempArray.push(filter);
     setFilters(tempArray);
@@ -124,19 +124,22 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
       title: string;
       tags: string;
     }[] = [];
+    const activeFilters = filters.filter(function (filter) {
+      return filter.toggle;
+    });
     if (searchString === "") {
       for (let i = 0; i < gear.length; ++i) {
         let hasMatch = false;
         const tags = gear[i].tags.split(",");
-        for (let x = 0; x < tags.length; ++x) {
-          const tag = cleanTag(tags[x]);
-          for (let index = 0; index < filters.length; ++index) {
-            if (filters[index].toggle === true) {
-              if (tag.toLowerCase() == filters[index].name.toLowerCase()) {
-                hasMatch = true;
-              }
-            }
-          }
+        if (
+          activeFilters.every(function (filter) {
+            return tags.some(function (tag) {
+              //debugger;
+              return filter.name.toLowerCase() == tag.toLowerCase();
+            });
+          })
+        ) {
+          hasMatch = true;
         }
         if (hasMatch) {
           tempArray.push(gear[i]);
@@ -152,8 +155,11 @@ const GearForm: FunctionComponent<RouteComponentProps> = () => {
         }
       }
     }
-
-    return tempArray;
+    if (activeFilters.length == 0) {
+      return gear;
+    } else {
+      return tempArray;
+    }
   }
 
   const toggleFilter = (filter: { name: string; toggle: boolean }): void => {

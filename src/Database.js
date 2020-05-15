@@ -72,7 +72,7 @@ const Database = {
       id: "GIB-10",
       parentId: "Instruments",
       title: "Gibson Les Paul Sunburst",
-      tags: "electric guitar"
+      tags: "electric guitar, humbucker"
     },
     {
       id: "FEN-2",
@@ -84,7 +84,7 @@ const Database = {
       id: "FEN-5",
       parentId: "Instruments",
       title: "Fender Telecaster",
-      tags: "electric guitar"
+      tags: "electric guitar, single coil"
     }
   ],
   weeks: [{
