@@ -65,7 +65,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     });
   }, [user]);
 
-  console.log(state.gear);
   return (
     (user?.id && (
       <div className={classes.root}>
