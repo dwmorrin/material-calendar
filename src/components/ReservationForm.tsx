@@ -373,7 +373,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       size="small"
                       variant="contained"
                       disableElevation
-                      style={{ backgroundColor: "Yellow", color: "white" }}
+                      style={{ backgroundColor: "Yellow", color: "black" }}
                       disabled={isSubmitting}
                       onClick={(event): void => {
                         event.stopPropagation();
