@@ -17,6 +17,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import GearList from "./GearList";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
+import Gear from "../resources/Gear";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,7 +47,9 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [matchAny, setMatchAny] = useState(false);
   const classes = useStyles();
-  const gear = Database.gear;
+  const tempGear = Database.gear;
+  const gear: Gear[] = tempGear;
+
   const viewFilters: {
     name: string;
     toggle: boolean;
@@ -106,41 +109,15 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   }
 
   function filterItems(
-    gear: {
-      id: string;
-      parentId: string;
-      title: string;
-      tags: string;
-      quantity: number;
-    }[],
+    gear: Gear[],
     filters: {
       name: string;
       toggle: boolean;
     }[],
     search: string
-  ):
-    | {
-        id: string;
-        parentId: string;
-        title: string;
-        tags: string;
-        quantity: number;
-      }[]
-    | undefined {
-    const tempArray: {
-      id: string;
-      parentId: string;
-      title: string;
-      tags: string;
-      quantity: number;
-    }[] = [];
-    let queriedGear: {
-      id: string;
-      parentId: string;
-      title: string;
-      tags: string;
-      quantity: number;
-    }[] = [];
+  ): Gear[] | undefined {
+    const tempArray: Gear[] = [];
+    let queriedGear: Gear[] = [];
     const activeFilters = filters.filter(function (filter) {
       return filter.toggle;
     });
@@ -278,7 +255,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   return (
     <Dialog
       fullScreen
-      open={state.GearListIsOpen}
+      open={state.gearFormIsOpen}
       TransitionComponent={transition}
     >
       <div className={classes.root}>
@@ -305,7 +282,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
                 color="inherit"
                 aria-label="close1"
                 onClick={(): void =>
-                  dispatch({ type: CalendarAction.CloseGearList })
+                  dispatch({ type: CalendarAction.CloseGearForm })
                 }
               >
                 <CloseIcon />

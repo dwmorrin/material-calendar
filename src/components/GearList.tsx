@@ -7,6 +7,7 @@ import List from "@material-ui/core/List";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import GearItem from "./GearItem";
 import NestedList from "./NestedList";
+import Gear from "../resources/Gear";
 
 const useStyles = makeStyles({
   root: {
@@ -14,15 +15,7 @@ const useStyles = makeStyles({
   }
 });
 
-function createStandardList(
-  gearList: {
-    id: string;
-    parentId: string;
-    title: string;
-    tags: string;
-    quantity: number;
-  }[]
-): JSX.Element {
+function createStandardList(gearList: Gear[]): JSX.Element {
   return (
     <List
       style={{
@@ -38,15 +31,7 @@ function createStandardList(
 }
 
 interface GearListProps {
-  gearList:
-    | {
-        id: string;
-        parentId: string;
-        title: string;
-        tags: string;
-        quantity: number;
-      }[]
-    | undefined;
+  gearList: Gear[] | undefined;
   selectedGroup: string;
   changeCurrentGroup: (group: string) => void;
 }

@@ -78,23 +78,23 @@ const calendarReducer = (
     };
   }
 
-  if (action.type === CalendarAction.OpenGearList) {
+  if (action.type === CalendarAction.OpenGearForm) {
     return {
       ...state,
-      GearListIsOpen: true
+      gearFormIsOpen: true
     };
   }
-  if (action.type === CalendarAction.CloseGearList) {
+  if (action.type === CalendarAction.CloseGearForm) {
     return {
       ...state,
-      GearListIsOpen: false
+      gearFormIsOpen: false
     };
   }
 
   if (action.type === CalendarAction.OpenReservationForm) {
     return {
       ...state,
-      ReservationFormIsOpen: true,
+      ReservationFormIsOpen: true
     };
   }
 

@@ -6,16 +6,11 @@ import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import List from "@material-ui/core/List";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import GearItem from "./GearItem";
+import Gear from "../resources/Gear";
 
 interface NestedListProps {
   parent: string;
-  gearList: {
-    id: string;
-    parentId: string;
-    title: string;
-    tags: string;
-    quantity: number;
-  }[];
+  gearList: Gear[];
   selectedGroup: string;
   setSelectedGroup: (group: string) => void;
 }

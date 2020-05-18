@@ -8,6 +8,7 @@ import Switch from "@material-ui/core/Switch";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import Gear from "../resources/Gear";
 
 const useStyles = makeStyles({
   list: {
@@ -23,12 +24,7 @@ interface FilterDrawerProps {
   onClose: () => void;
   onOpen: () => void;
   closeDrawer: () => void;
-  items: {
-    id: string;
-    parentId: string;
-    title: string;
-    tags: string;
-  }[];
+  items: Gear[];
   filters: {
     name: string;
     toggle: boolean;

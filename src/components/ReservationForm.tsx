@@ -369,6 +369,21 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         variant="filled"
                       />
                     </div>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      disableElevation
+                      style={{ backgroundColor: "Yellow", color: "white" }}
+                      disabled={isSubmitting}
+                      onClick={(event): void => {
+                        event.stopPropagation();
+                        dispatch({
+                          type: CalendarAction.OpenGearForm
+                        });
+                      }}
+                    >
+                      Reserve Equipment
+                    </Button>
                     <br />
                     <Button
                       type="submit"

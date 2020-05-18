@@ -6,15 +6,10 @@ import React, { FunctionComponent, useState } from "react";
 import ErrorIcon from "@material-ui/icons/Error";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import Gear from "../resources/Gear";
 
 interface GearItemProps {
-  item: {
-    id: string;
-    parentId: string;
-    title: string;
-    tags: string;
-    quantity: number;
-  };
+  item: Gear;
 }
 const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
   const [value, setValue] = useState(0);
@@ -38,7 +33,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
         flexDirection: "row"
       }}
     >
-      <ListItem key={item.id}>
+      <ListItem>
         <ListItemText primary={item.title} />
         <section
           style={{

@@ -1,4 +1,5 @@
 import Event from "./Event";
+import Gear from "../resources/Gear";
 import Location from "./Location";
 import Project from "./Project";
 import FullCalendar from "@fullcalendar/react";
@@ -10,12 +11,14 @@ export enum CalendarAction {
   CloseProjectDashboard,
   CloseReservationForm,
   CloseGroupDashboard,
+  CloseGearForm,
   Error,
   Loading,
   PickedDate,
   OpenGroupDashboard,
   OpenProjectDashboard,
   OpenReservationForm,
+  OpenGearForm,
   ReceivedEvents,
   ReceivedGroups,
   ReceivedLocations,
@@ -46,12 +49,13 @@ export interface CalendarState {
   drawerIsOpen: boolean;
   error?: Error;
   events: Event[];
+  gear: Gear[];
   groupDashboardIsOpen: boolean;
   loading: boolean;
   locations: Location[];
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
-  GearListIsOpen: boolean;
+  gearFormIsOpen: boolean;
   ReservationFormIsOpen: boolean;
   projects: Project[];
   ref: React.RefObject<FullCalendar> | null;
