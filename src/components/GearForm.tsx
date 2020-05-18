@@ -18,6 +18,7 @@ import GearList from "./GearList";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import Gear from "../resources/Gear";
+import Filter from "../resources/Filter";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,12 +35,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const initialFilters = [
+const tempFilters = [
   {
     name: "",
     toggle: false
   }
 ];
+const initialFilters: Filter[] = tempFilters;
 
 const transition = makeTransition("up");
 
@@ -47,13 +49,9 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [matchAny, setMatchAny] = useState(false);
   const classes = useStyles();
-  const tempGear = Database.gear;
-  const gear: Gear[] = tempGear;
+  const gear: Gear[] = Database.gear;
 
-  const viewFilters: {
-    name: string;
-    toggle: boolean;
-  }[] = [];
+  const viewFilters: Filter[] = [];
   const [filters, setFilters] = useState(initialFilters);
   const [searchString, setSearchString] = useState("");
 
@@ -69,10 +67,10 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
 
   function pushArray(tag: string): void {
     const tempArray = filters;
-    const filter = {
+    const filter = new Filter({
       name: tag,
       toggle: false
-    };
+    });
     tempArray.push(filter);
     setFilters(tempArray);
   }
@@ -110,10 +108,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
 
   function filterItems(
     gear: Gear[],
-    filters: {
-      name: string;
-      toggle: boolean;
-    }[],
+    filters: Filter[],
     search: string
   ): Gear[] | undefined {
     const tempArray: Gear[] = [];
@@ -171,7 +166,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
     return tempArray;
   }
 
-  const toggleFilter = (filter: { name: string; toggle: boolean }): void => {
+  const toggleFilter = (filter: Filter): void => {
     filter.toggle = !filter.toggle;
     const tempArray = [];
     for (let index = 0; index < filters.length; ++index) {
@@ -184,15 +179,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
     setFilters(tempArray);
   };
 
-  function sortFilters(
-    filters: {
-      name: string;
-      toggle: boolean;
-    }[]
-  ): {
-    name: string;
-    toggle: boolean;
-  }[] {
+  function sortFilters(filters: Filter[]): Filter[] {
     filters.sort(function (a, b) {
       if (a.name == "") {
         return -1;

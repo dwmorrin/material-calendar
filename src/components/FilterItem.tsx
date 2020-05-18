@@ -2,15 +2,16 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Checkbox from "@material-ui/core/Checkbox";
 import React, { FunctionComponent, useState } from "react";
+import Filter from "../resources/Filter";
 
-interface FilterProps {
-  filter: {
-    name: string;
-    toggle: boolean;
-  };
+interface FilterItemProps {
+  filter: Filter;
   toggleFunction: (filter: { name: string; toggle: boolean }) => void;
 }
-const Filter: FunctionComponent<FilterProps> = ({ filter, toggleFunction }) => {
+const FilterItem: FunctionComponent<FilterItemProps> = ({
+  filter,
+  toggleFunction
+}) => {
   return (
     <div
       style={{
@@ -39,4 +40,4 @@ const Filter: FunctionComponent<FilterProps> = ({ filter, toggleFunction }) => {
     </div>
   );
 };
-export default Filter;
+export default FilterItem;

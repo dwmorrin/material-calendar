@@ -9,6 +9,7 @@ import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Gear from "../resources/Gear";
+import Filter from "../resources/Filter";
 
 const useStyles = makeStyles({
   list: {
@@ -25,11 +26,8 @@ interface FilterDrawerProps {
   onOpen: () => void;
   closeDrawer: () => void;
   items: Gear[];
-  filters: {
-    name: string;
-    toggle: boolean;
-  }[];
-  toggleFunction: (filter: { name: string; toggle: boolean }) => void;
+  filters: Filter[];
+  toggleFunction: (filter: Filter) => void;
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
   matchAny: boolean;

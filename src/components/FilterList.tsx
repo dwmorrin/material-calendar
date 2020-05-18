@@ -2,13 +2,11 @@ import React, { FunctionComponent } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import Box from "@material-ui/core/Box";
-import Filter from "./Filter";
+import FilterItem from "./FilterItem";
+import Filter from "../resources/Filter";
 
 interface FilterListProps {
-  filters: {
-    name: string;
-    toggle: boolean;
-  }[];
+  filters: Filter[];
   toggleFunction: (filter: { name: string; toggle: boolean }) => void;
 }
 const FilterList: FunctionComponent<FilterListProps> = ({
@@ -26,7 +24,7 @@ const FilterList: FunctionComponent<FilterListProps> = ({
         {filters
           .filter((filter) => filter.name !== "")
           .map((filter) => (
-            <Filter filter={filter} toggleFunction={toggleFunction} />
+            <FilterItem filter={filter} toggleFunction={toggleFunction} />
           ))}
       </List>
     </Box>
