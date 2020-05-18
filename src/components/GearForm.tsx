@@ -49,8 +49,8 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [matchAny, setMatchAny] = useState(false);
   const classes = useStyles();
-  const gear: Gear[] = state.gear;
-
+  //const gear: Gear[] = state.gear;
+  const gear: Gear[] = Database.gear;
   const viewFilters: Filter[] = [];
   const [filters, setFilters] = useState(initialFilters);
   const [searchString, setSearchString] = useState("");
