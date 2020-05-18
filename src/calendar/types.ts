@@ -23,6 +23,7 @@ export enum CalendarAction {
   ReceivedGroups,
   ReceivedLocations,
   ReceivedProjects,
+  ReceivedGear,
   SelectedGroup,
   SelectedLocation,
   SelectedProject,

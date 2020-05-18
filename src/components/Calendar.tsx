@@ -57,8 +57,15 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       onSuccessAction: CalendarAction.ReceivedProjects,
       payloadKey: "projects"
     });
+    fetchCalendarData({
+      url: "/api/gear",
+      dispatch,
+      onSuccessAction: CalendarAction.ReceivedGear,
+      payloadKey: "gear"
+    });
   }, [user]);
 
+  console.log(state.gear);
   return (
     (user?.id && (
       <div className={classes.root}>

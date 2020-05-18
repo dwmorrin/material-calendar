@@ -49,7 +49,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [matchAny, setMatchAny] = useState(false);
   const classes = useStyles();
-  const gear: Gear[] = Database.gear;
+  const gear: Gear[] = state.gear;
 
   const viewFilters: Filter[] = [];
   const [filters, setFilters] = useState(initialFilters);
@@ -199,25 +199,29 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   };
 
   // Create full list of filters
-  for (let index = 0; index < Database.gear.length; ++index) {
+  for (let index = 0; index < gear.length; ++index) {
     const item = gear[index];
-    const tags = item.tags.split(",");
-    for (let i = 0; i < tags.length; ++i) {
-      const tag = cleanTag(tags[i]);
-      if (!checkExists(tag)) {
-        pushArray(tag);
+    if (gear[index].tags) {
+      const tags = item.tags.split(",");
+      for (let i = 0; i < tags.length; ++i) {
+        const tag = cleanTag(tags[i]);
+        if (!checkExists(tag)) {
+          pushArray(tag);
+        }
       }
     }
   }
   // Create list of applicable filters
-  for (let index = 0; index < Database.gear.length; ++index) {
+  for (let index = 0; index < gear.length; ++index) {
     const item = gear[index];
-    if (item.parentId === selectedGroup) {
-      const tags = item.tags.split(",");
-      for (let i = 0; i < tags.length; ++i) {
-        const tag = cleanTag(tags[i]);
-        if (!checkViewExists(tag)) {
-          pushViewArray(tag);
+    if (gear[index]?.tags) {
+      if (item.parentId === selectedGroup) {
+        const tags = item.tags.split(",");
+        for (let i = 0; i < tags.length; ++i) {
+          const tag = cleanTag(tags[i]);
+          if (!checkViewExists(tag)) {
+            pushViewArray(tag);
+          }
         }
       }
     }

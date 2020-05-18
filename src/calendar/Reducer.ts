@@ -3,6 +3,7 @@ import Event from "./Event";
 import Location from "./Location";
 import Project from "./Project";
 import UserGroup from "../user/UserGroup";
+import Gear from "../resources/Gear";
 
 /**
  * calendarReducer takes all actions from the calendar and handles them
@@ -162,6 +163,17 @@ const calendarReducer = (
       ...state,
       loading: !state.events || !state.locations,
       projects: action.payload.projects.map((project) => new Project(project))
+    };
+  }
+
+  if (action.type === CalendarAction.ReceivedGear) {
+    if (!action.payload?.gear) {
+      throw new Error("no gear in received projects");
+    }
+    return {
+      ...state,
+      loading: !state.events || !state.locations,
+      gear: action.payload.gear.map((gear) => new Gear(gear))
     };
   }
 
