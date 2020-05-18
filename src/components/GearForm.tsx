@@ -294,6 +294,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
             setSearchString={setSearchString}
             matchAny={matchAny}
             setMatchAny={setMatchAny}
+            closeDrawer={() => setDrawerIsOpen(!drawerIsOpen)}
           />
         </div>
         <AppBar position="sticky">

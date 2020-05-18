@@ -7,9 +7,6 @@ import List from "@material-ui/core/List";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import GearItem from "./GearItem";
 
-// here is how to do this. set a string in the parent that is blank, pass a setState and that string down the line that will set that string to the passed value and pass the parentID of the nested list into that.
-// in each nested list check this string and if it matches the parent set expanded to true.
-
 interface NestedListProps {
   parent: string;
   gearList: {

@@ -22,6 +22,7 @@ interface FilterDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
+  closeDrawer: () => void;
   items: {
     id: string;
     parentId: string;
@@ -48,7 +49,8 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   onOpen,
   toggleFunction,
   matchAny,
-  setMatchAny
+  setMatchAny,
+  closeDrawer
 }) => {
   const classes = useStyles();
   // Still need to add X to clear textbox and close drawer on enter
@@ -89,6 +91,12 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
             }}
             onClick={(event): void => {
               event.stopPropagation();
+            }}
+            onKeyPress={(ev): void => {
+              if (ev.key === "Enter") {
+                closeDrawer();
+                ev.preventDefault();
+              }
             }}
             variant="outlined"
           />
