@@ -106,11 +106,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
     return tag.trim();
   }
 
-  function filterItems(
-    gear: Gear[],
-    filters: Filter[],
-    search: string
-  ): Gear[] | undefined {
+  function filterItems(gear: Gear[], filters: Filter[]): Gear[] | undefined {
     const tempArray: Gear[] = [];
     let queriedGear: Gear[] = [];
     const activeFilters = filters.filter(function (filter) {
@@ -295,7 +291,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
           </List>
         </AppBar>
         <GearList
-          gearList={filterItems(gear, filters, searchString)}
+          gearList={filterItems(gear, filters)}
           selectedGroup={selectedGroup}
           changeCurrentGroup={changeCurrentGroup}
         />
