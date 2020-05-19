@@ -19,7 +19,6 @@ import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
 import initialState from "../calendar/initialCalendarState";
 import ProjectDashboard from "./ProjectDashboard";
-import GearForm from "./GearForm";
 import ReservationForm from "./ReservationForm";
 
 const useStyles = makeStyles(() => ({
@@ -71,7 +70,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         <ProjectDashboard dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />
-        <GearForm dispatch={dispatch} state={state} />
         <ReservationForm dispatch={dispatch} state={state} />
         <CalendarBar dispatch={dispatch} state={state} />
         {state.pickerShowing && (

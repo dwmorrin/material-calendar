@@ -17,10 +17,8 @@ const useStyles = makeStyles({
 
 function createStandardList(
   gearList: Gear[],
-  values: {
-    quantities: {
-      [k: string]: number;
-    };
+  quantities: {
+    [k: string]: number;
   },
   handleChange: {
     (e: React.ChangeEvent<any>): void;
@@ -39,7 +37,11 @@ function createStandardList(
       }}
     >
       {gearList.map((item) => (
-        <GearItem item={item} values={values} handleChange={handleChange} />
+        <GearItem
+          item={item}
+          quantities={quantities}
+          handleChange={handleChange}
+        />
       ))}
     </List>
   );
@@ -49,10 +51,8 @@ interface GearListProps {
   gearList: Gear[] | undefined;
   selectedGroup: string;
   changeCurrentGroup: (group: string) => void;
-  values: {
-    quantities: {
-      [k: string]: number;
-    };
+  quantities: {
+    [k: string]: number;
   };
   handleChange: {
     (e: React.ChangeEvent<any>): void;
@@ -67,7 +67,7 @@ const GearList: FunctionComponent<GearListProps> = ({
   gearList,
   selectedGroup,
   changeCurrentGroup,
-  values,
+  quantities,
   handleChange
 }) => {
   const classes = useStyles();
@@ -83,12 +83,12 @@ const GearList: FunctionComponent<GearListProps> = ({
                   gearList={gearList}
                   selectedGroup={selectedGroup}
                   setSelectedGroup={changeCurrentGroup}
-                  values={values}
+                  quantities={quantities}
                   handleChange={handleChange}
                 />
               );
             })
-          : createStandardList(gearList, values, handleChange)}
+          : createStandardList(gearList, quantities, handleChange)}
       </div>
     );
   } else {

@@ -28,6 +28,9 @@ import { makeTransition } from "./Transition";
 import UserGroup from "../user/UserGroup";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import Database from "./Database.js";
+import GearForm from "./GearForm";
+import Gear from "../resources/Gear";
 
 const useStyles = makeStyles(() => ({
   guests: {
@@ -132,6 +135,28 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     }
   };
 
+  function quantizeGear(gear: Gear[]): Gear[] {
+    const tempArray: Gear[] = [];
+    for (let i = 0; i < gear.length; ++i) {
+      const item = gear[i];
+      item.quantity = gear.filter(
+        (element) => element.title == item.title
+      ).length;
+      const index = tempArray.findIndex(
+        (element) => element.title == item.title
+      );
+      if (index == -1) {
+        tempArray.push(item);
+      }
+    }
+    return tempArray;
+  }
+
+  //const gear: Gear[] = quantizeGear(state.gear);
+  const gear: Gear[] = quantizeGear(Database.gear);
+  const quantities: { [k: string]: number } = {};
+  gear.forEach((item) => (quantities[item.title] = 0));
+
   return (
     <Dialog
       fullScreen
@@ -164,7 +189,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 liveRoom: liveToggle,
                 hasGuests: guestToggle,
                 hasNotes: notesToggle,
-                group: initialGroups[0]
+                group: initialGroups[0],
+                quantities
               }}
               onSubmit={(values, { setSubmitting }): void => {
                 setSubmitting(true);
@@ -395,8 +421,14 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     >
                       Confirm Reservation
                     </Button>
-
-                    <DialogActions></DialogActions>
+                    <GearForm
+                      dispatch={dispatch}
+                      state={state}
+                      gear={gear}
+                      quantities={values.quantities}
+                      handleChange={handleChange}
+                    />
+                    <pre>{JSON.stringify(values, null, 2)}</pre>
                   </form>
                 );
               }}

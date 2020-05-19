@@ -13,10 +13,8 @@ interface NestedListProps {
   gearList: Gear[];
   selectedGroup: string;
   setSelectedGroup: (group: string) => void;
-  values: {
-    quantities: {
-      [k: string]: number;
-    };
+  quantities: {
+    [k: string]: number;
   };
   handleChange: {
     (e: React.ChangeEvent<any>): void;
@@ -32,7 +30,7 @@ const NestedList: FunctionComponent<NestedListProps> = ({
   gearList,
   selectedGroup,
   setSelectedGroup,
-  values,
+  quantities,
   handleChange
 }) => {
   const expanded = selectedGroup === parent ? true : false;
@@ -62,7 +60,7 @@ const NestedList: FunctionComponent<NestedListProps> = ({
             .map((item) => (
               <GearItem
                 item={item}
-                values={values}
+                quantities={quantities}
                 handleChange={handleChange}
               />
             ))}

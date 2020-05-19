@@ -6,14 +6,11 @@ import {
   Toolbar,
   IconButton,
   Typography,
-  Button,
   Dialog
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import FilterDrawer from "./FilterDrawer";
-import Database from "./Database.js";
 import FilterListIcon from "@material-ui/icons/FilterList";
-import SearchIcon from "@material-ui/icons/Search";
 import GearList from "./GearList";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
@@ -42,27 +39,32 @@ const initialFilters: Filter[] = [tempFilters];
 
 const transition = makeTransition("up");
 
-function quantizeGear(gear: Gear[]): Gear[] {
-  const tempArray: Gear[] = [];
-  for (let i = 0; i < gear.length; ++i) {
-    const item = gear[i];
-    item.quantity = gear.filter(
-      (element) => element.title == item.title
-    ).length;
-    const index = tempArray.findIndex((element) => element.title == item.title);
-    if (index == -1) {
-      tempArray.push(item);
-    }
-  }
-  return tempArray;
+interface GearFormProps {
+  gear: Gear[];
+  quantities: {
+    [k: string]: number;
+  };
+  handleChange: {
+    (e: React.ChangeEvent<any>): void;
+    <T = string | React.ChangeEvent<any>>(
+      field: T
+    ): T extends React.ChangeEvent<any>
+      ? void
+      : (e: string | React.ChangeEvent<any>) => void;
+  };
 }
 
-const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
+const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
+  dispatch,
+  state,
+  gear,
+  quantities,
+  handleChange
+}) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [matchAny, setMatchAny] = useState(false);
   const classes = useStyles();
-  //const gear: Gear[] = quantizeGear(state.gear);
-  const gear: Gear[] = quantizeGear(Database.gear);
+
   const viewFilters: Filter[] = [];
   const [filters, setFilters] = useState(initialFilters);
   const [searchString, setSearchString] = useState("");
@@ -241,9 +243,6 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
     }
   }
 
-  const quantities: { [k: string]: number } = {};
-  gear.forEach((item) => (quantities[item.title] = 0));
-
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
   ): void => {
@@ -262,84 +261,56 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
       open={state.gearFormIsOpen}
       TransitionComponent={transition}
     >
-      <Formik
-        initialValues={{
-          quantities
-        }}
-        onSubmit={(values, { setSubmitting }): void => {
-          setSubmitting(true);
-          console.log(values);
-
-          // sets the project property of values here because it
-          // doesn't update fast enough to set in the handleChange
-        }}
-      >
-        {(props): any => {
-          const {
-            values,
-            touched,
-            errors,
-            isSubmitting,
-            handleChange,
-            handleBlur,
-            handleSubmit
-          } = props;
-          return (
-            <form onSubmit={handleSubmit}>
-              <div className={classes.root}>
-                <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
-                  <FilterDrawer
-                    open={drawerIsOpen}
-                    onOpen={toggleDrawer}
-                    onClose={toggleDrawer}
-                    items={gear}
-                    filters={sortFilters(viewFilters)}
-                    toggleFunction={toggleFilter}
-                    searchString={searchString}
-                    setSearchString={setSearchString}
-                    matchAny={matchAny}
-                    setMatchAny={setMatchAny}
-                    closeDrawer={() => setDrawerIsOpen(!drawerIsOpen)}
-                  />
-                </div>
-                <AppBar position="sticky">
-                  <List>
-                    <Toolbar>
-                      <IconButton
-                        type="submit"
-                        edge="start"
-                        color="inherit"
-                        aria-label="close1"
-                        onClick={(): void =>
-                          dispatch({ type: CalendarAction.CloseGearForm })
-                        }
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography className={classes.title}>GEAR</Typography>
-                      <IconButton
-                        edge="start"
-                        color="inherit"
-                        onClick={toggleDrawer()}
-                        aria-label="filter"
-                      >
-                        <FilterListIcon />
-                      </IconButton>
-                    </Toolbar>
-                  </List>
-                </AppBar>
-                <GearList
-                  gearList={filterItems(gear, filters)}
-                  selectedGroup={selectedGroup}
-                  changeCurrentGroup={changeCurrentGroup}
-                  values={values}
-                  handleChange={handleChange}
-                />
-              </div>
-            </form>
-          );
-        }}
-      </Formik>
+      <div className={classes.root}>
+        <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
+          <FilterDrawer
+            open={drawerIsOpen}
+            onOpen={toggleDrawer}
+            onClose={toggleDrawer}
+            items={gear}
+            filters={sortFilters(viewFilters)}
+            toggleFunction={toggleFilter}
+            searchString={searchString}
+            setSearchString={setSearchString}
+            matchAny={matchAny}
+            setMatchAny={setMatchAny}
+            closeDrawer={() => setDrawerIsOpen(!drawerIsOpen)}
+          />
+        </div>
+        <AppBar position="sticky">
+          <List>
+            <Toolbar>
+              <IconButton
+                type="submit"
+                edge="start"
+                color="inherit"
+                aria-label="close1"
+                onClick={(): void =>
+                  dispatch({ type: CalendarAction.CloseGearForm })
+                }
+              >
+                <CloseIcon />
+              </IconButton>
+              <Typography className={classes.title}>GEAR</Typography>
+              <IconButton
+                edge="start"
+                color="inherit"
+                onClick={toggleDrawer()}
+                aria-label="filter"
+              >
+                <FilterListIcon />
+              </IconButton>
+            </Toolbar>
+          </List>
+        </AppBar>
+        <GearList
+          gearList={filterItems(gear, filters)}
+          selectedGroup={selectedGroup}
+          changeCurrentGroup={changeCurrentGroup}
+          quantities={quantities}
+          handleChange={handleChange}
+        />
+      </div>
     </Dialog>
   );
 };

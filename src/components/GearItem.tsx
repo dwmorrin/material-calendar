@@ -10,10 +10,8 @@ import Gear from "../resources/Gear";
 
 interface GearItemProps {
   item: Gear;
-  values: {
-    quantities: {
-      [k: string]: number;
-    };
+  quantities: {
+    [k: string]: number;
   };
   handleChange: {
     (e: React.ChangeEvent<any>): void;
@@ -26,13 +24,13 @@ interface GearItemProps {
 }
 const GearItem: FunctionComponent<GearItemProps> = ({
   item,
-  values,
+  quantities,
   handleChange
 }) => {
-  const [count, setValue] = useState(values.quantities[item.title]);
+  const [count, setValue] = useState(quantities[item.title]);
   const changeValue = (newValue: number): void => {
     if (newValue >= 0) {
-      values.quantities[item.title] = newValue;
+      quantities[item.title] = newValue;
     }
   };
   const changeSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -60,7 +58,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({
           <Select
             labelId={item.title + "QuantitySelect"}
             name={"quantities[" + item.title + "]"}
-            value={values.quantities[item.title]}
+            value={quantities[item.title]}
             onChange={handleChange}
           >
             {items}
