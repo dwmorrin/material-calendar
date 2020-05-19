@@ -15,7 +15,22 @@ const useStyles = makeStyles({
   }
 });
 
-function createStandardList(gearList: Gear[]): JSX.Element {
+function createStandardList(
+  gearList: Gear[],
+  values: {
+    quantities: {
+      [k: string]: number;
+    };
+  },
+  handleChange: {
+    (e: React.ChangeEvent<any>): void;
+    <T = string | React.ChangeEvent<any>>(
+      field: T
+    ): T extends React.ChangeEvent<any>
+      ? void
+      : (e: string | React.ChangeEvent<any>) => void;
+  }
+): JSX.Element {
   return (
     <List
       style={{
@@ -24,7 +39,7 @@ function createStandardList(gearList: Gear[]): JSX.Element {
       }}
     >
       {gearList.map((item) => (
-        <GearItem item={item} />
+        <GearItem item={item} values={values} handleChange={handleChange} />
       ))}
     </List>
   );
@@ -34,11 +49,26 @@ interface GearListProps {
   gearList: Gear[] | undefined;
   selectedGroup: string;
   changeCurrentGroup: (group: string) => void;
+  values: {
+    quantities: {
+      [k: string]: number;
+    };
+  };
+  handleChange: {
+    (e: React.ChangeEvent<any>): void;
+    <T = string | React.ChangeEvent<any>>(
+      field: T
+    ): T extends React.ChangeEvent<any>
+      ? void
+      : (e: string | React.ChangeEvent<any>) => void;
+  };
 }
 const GearList: FunctionComponent<GearListProps> = ({
   gearList,
   selectedGroup,
-  changeCurrentGroup
+  changeCurrentGroup,
+  values,
+  handleChange
 }) => {
   const classes = useStyles();
   if (gearList) {
@@ -53,10 +83,12 @@ const GearList: FunctionComponent<GearListProps> = ({
                   gearList={gearList}
                   selectedGroup={selectedGroup}
                   setSelectedGroup={changeCurrentGroup}
+                  values={values}
+                  handleChange={handleChange}
                 />
               );
             })
-          : createStandardList(gearList)}
+          : createStandardList(gearList, values, handleChange)}
       </div>
     );
   } else {

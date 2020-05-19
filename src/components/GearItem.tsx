@@ -10,17 +10,33 @@ import Gear from "../resources/Gear";
 
 interface GearItemProps {
   item: Gear;
+  values: {
+    quantities: {
+      [k: string]: number;
+    };
+  };
+  handleChange: {
+    (e: React.ChangeEvent<any>): void;
+    <T = string | React.ChangeEvent<any>>(
+      field: T
+    ): T extends React.ChangeEvent<any>
+      ? void
+      : (e: string | React.ChangeEvent<any>) => void;
+  };
 }
-const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
-  const [value, setValue] = useState(0);
-  const handleChange = (newValue: number): void => {
-    console.log(newValue);
+const GearItem: FunctionComponent<GearItemProps> = ({
+  item,
+  values,
+  handleChange
+}) => {
+  const [count, setValue] = useState(values.quantities[item.title]);
+  const changeValue = (newValue: number): void => {
     if (newValue >= 0) {
-      setValue(newValue);
+      values.quantities[item.title] = newValue;
     }
   };
   const changeSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
-    handleChange(event.target.value as number);
+    changeValue(event.target.value as number);
   };
 
   const items: JSX.Element[] = [];
@@ -42,10 +58,10 @@ const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
           }}
         >
           <Select
-            labelId="demo-customized-select-label"
-            id="demo-customized-select"
-            value={value}
-            onChange={changeSelect}
+            labelId={item.title + "QuantitySelect"}
+            name={"quantities[" + item.title + "]"}
+            value={values.quantities[item.title]}
+            onChange={handleChange}
           >
             {items}
           </Select>
@@ -56,8 +72,8 @@ const GearItem: FunctionComponent<GearItemProps> = ({ item }) => {
             aria-label="contained primary button group"
             size="small"
           >
-            <Button onClick={(): void => handleChange(value - 1)}>-</Button>
-            <Button onClick={(): void => handleChange(value + 1)}>+</Button>
+            <Button onClick={(): void => changeValue(count - 1)}>-</Button>
+            <Button onClick={(): void => changeValue(count + 1)}>+</Button>
           </ButtonGroup>
         </section>
       </ListItem>

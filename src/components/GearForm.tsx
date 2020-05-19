@@ -19,6 +19,7 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import Gear from "../resources/Gear";
 import Filter from "../resources/Filter";
+import { Formik } from "formik";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -240,6 +241,9 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
     }
   }
 
+  const quantities: { [k: string]: number } = {};
+  gear.forEach((item) => (quantities[item.title] = 0));
+
   const toggleDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
   ): void => {
@@ -258,61 +262,84 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
       open={state.gearFormIsOpen}
       TransitionComponent={transition}
     >
-      <div className={classes.root}>
-        <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
-          <FilterDrawer
-            open={drawerIsOpen}
-            onOpen={toggleDrawer}
-            onClose={toggleDrawer}
-            items={gear}
-            filters={sortFilters(viewFilters)}
-            toggleFunction={toggleFilter}
-            searchString={searchString}
-            setSearchString={setSearchString}
-            matchAny={matchAny}
-            setMatchAny={setMatchAny}
-            closeDrawer={() => setDrawerIsOpen(!drawerIsOpen)}
-          />
-        </div>
-        <AppBar position="sticky">
-          <List>
-            <Toolbar>
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="close1"
-                onClick={(): void =>
-                  dispatch({ type: CalendarAction.CloseGearForm })
-                }
-              >
-                <CloseIcon />
-              </IconButton>
-              <Typography className={classes.title}>GEAR</Typography>
-              {/* <IconButton
-              edge="start"
-              color="inherit"
-              onClick={toggleDrawer()}
-              aria-label="search"
-            >
-              <SearchIcon />
-            </IconButton> */}
-              <IconButton
-                edge="start"
-                color="inherit"
-                onClick={toggleDrawer()}
-                aria-label="filter"
-              >
-                <FilterListIcon />
-              </IconButton>
-            </Toolbar>
-          </List>
-        </AppBar>
-        <GearList
-          gearList={filterItems(gear, filters)}
-          selectedGroup={selectedGroup}
-          changeCurrentGroup={changeCurrentGroup}
-        />
-      </div>
+      <Formik
+        initialValues={{
+          quantities
+        }}
+        onSubmit={(values, { setSubmitting }): void => {
+          setSubmitting(true);
+          console.log(values);
+
+          // sets the project property of values here because it
+          // doesn't update fast enough to set in the handleChange
+        }}
+      >
+        {(props): any => {
+          const {
+            values,
+            touched,
+            errors,
+            isSubmitting,
+            handleChange,
+            handleBlur,
+            handleSubmit
+          } = props;
+          return (
+            <form onSubmit={handleSubmit}>
+              <div className={classes.root}>
+                <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
+                  <FilterDrawer
+                    open={drawerIsOpen}
+                    onOpen={toggleDrawer}
+                    onClose={toggleDrawer}
+                    items={gear}
+                    filters={sortFilters(viewFilters)}
+                    toggleFunction={toggleFilter}
+                    searchString={searchString}
+                    setSearchString={setSearchString}
+                    matchAny={matchAny}
+                    setMatchAny={setMatchAny}
+                    closeDrawer={() => setDrawerIsOpen(!drawerIsOpen)}
+                  />
+                </div>
+                <AppBar position="sticky">
+                  <List>
+                    <Toolbar>
+                      <IconButton
+                        type="submit"
+                        edge="start"
+                        color="inherit"
+                        aria-label="close1"
+                        onClick={(): void =>
+                          dispatch({ type: CalendarAction.CloseGearForm })
+                        }
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                      <Typography className={classes.title}>GEAR</Typography>
+                      <IconButton
+                        edge="start"
+                        color="inherit"
+                        onClick={toggleDrawer()}
+                        aria-label="filter"
+                      >
+                        <FilterListIcon />
+                      </IconButton>
+                    </Toolbar>
+                  </List>
+                </AppBar>
+                <GearList
+                  gearList={filterItems(gear, filters)}
+                  selectedGroup={selectedGroup}
+                  changeCurrentGroup={changeCurrentGroup}
+                  values={values}
+                  handleChange={handleChange}
+                />
+              </div>
+            </form>
+          );
+        }}
+      </Formik>
     </Dialog>
   );
 };
