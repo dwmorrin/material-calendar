@@ -6,7 +6,7 @@ import Filter from "../resources/Filter";
 
 interface FilterItemProps {
   filter: Filter;
-  toggleFunction: (filter: { name: string; toggle: boolean }) => void;
+  toggleFunction: (filter: Filter) => void;
 }
 const FilterItem: FunctionComponent<FilterItemProps> = ({
   filter,

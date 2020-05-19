@@ -4,8 +4,13 @@ interface Filter {
 }
 
 class Filter implements Filter {
-  constructor(filter: Filter) {
-    Object.assign(this, filter);
+  constructor(name: string, toggle: boolean | undefined) {
+    this.name = name;
+    if (toggle) {
+      this.toggle = toggle;
+    } else {
+      this.toggle = false;
+    }
   }
 }
 

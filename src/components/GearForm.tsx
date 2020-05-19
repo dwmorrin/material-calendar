@@ -35,13 +35,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const tempFilters = [
-  {
-    name: "",
-    toggle: false
-  }
-];
-const initialFilters: Filter[] = tempFilters;
+const tempFilters = new Filter("", false);
+
+const initialFilters: Filter[] = [tempFilters];
 
 const transition = makeTransition("up");
 
@@ -64,8 +60,8 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [matchAny, setMatchAny] = useState(false);
   const classes = useStyles();
-  //const gear: Gear[] = state.gear;
-  const gear: Gear[] = Database.gear;
+  //const gear: Gear[] = quantizeGear(state.gear);
+  const gear: Gear[] = quantizeGear(Database.gear);
   const viewFilters: Filter[] = [];
   const [filters, setFilters] = useState(initialFilters);
   const [searchString, setSearchString] = useState("");
@@ -82,10 +78,7 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
 
   function pushArray(tag: string): void {
     const tempArray = filters;
-    const filter = new Filter({
-      name: tag,
-      toggle: false
-    });
+    const filter = new Filter(tag, false);
     tempArray.push(filter);
     setFilters(tempArray);
   }
@@ -188,6 +181,11 @@ const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
       }
     }
     setFilters(tempArray);
+  };
+
+  const new_toggleFilter = (filter: Filter): void => {
+    const index = filters.findIndex((element) => element.name == filter.name);
+    filters[index].toggle = !filters[index].toggle;
   };
 
   function sortFilters(filters: Filter[]): Filter[] {
