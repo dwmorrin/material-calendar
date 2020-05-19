@@ -45,6 +45,21 @@ const initialFilters: Filter[] = tempFilters;
 
 const transition = makeTransition("up");
 
+function quantizeGear(gear: Gear[]): Gear[] {
+  const tempArray: Gear[] = [];
+  for (let i = 0; i < gear.length; ++i) {
+    const item = gear[i];
+    item.quantity = gear.filter(
+      (element) => element.title == item.title
+    ).length;
+    const index = tempArray.findIndex((element) => element.title == item.title);
+    if (index == -1) {
+      tempArray.push(item);
+    }
+  }
+  return tempArray;
+}
+
 const GearForm: FunctionComponent<CalendarUIProps> = ({ dispatch, state }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [matchAny, setMatchAny] = useState(false);
