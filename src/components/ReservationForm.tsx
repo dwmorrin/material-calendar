@@ -185,7 +185,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const categories: { [k: string]: Set<string> } = {};
   gear.forEach((item) =>
     item.tags.split(",").forEach((tag) => {
-      if (categories[cleanName(item.parentId)] == undefined) {
+      if (!categories[cleanName(item.parentId)]) {
         categories[cleanName(item.parentId)] = new Set();
       }
       categories[item.parentId].add(cleanName(tag));
