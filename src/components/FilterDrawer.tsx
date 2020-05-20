@@ -23,7 +23,7 @@ interface FilterDrawerProps {
   onOpen: () => void;
   closeDrawer: () => void;
   filters: { [k: string]: boolean };
-  visibleFilters: { [k: string]: boolean };
+  visibleFilters: Set<string>;
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
   matchAny: boolean;

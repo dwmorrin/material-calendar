@@ -41,9 +41,7 @@ interface GearFormProps {
   filters: {
     [k: string]: boolean;
   };
-  visibleFilters: {
-    [k: string]: boolean;
-  };
+  visibleFilters: Set<string>;
   selectedGroup: string;
   changeCurrentGroup: (group: string) => void;
   handleChange: {
