@@ -23,7 +23,8 @@ const FilterItem: FunctionComponent<FilterItemProps> = ({
   return (
     <div
       style={{
-        flexDirection: "row"
+        flexDirection: "row",
+        textTransform: "capitalize"
       }}
     >
       <ListItem key={name}>

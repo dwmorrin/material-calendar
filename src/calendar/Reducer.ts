@@ -168,7 +168,7 @@ const calendarReducer = (
 
   if (action.type === CalendarAction.ReceivedGear) {
     if (!action.payload?.gear) {
-      throw new Error("no gear in received projects");
+      throw new Error("no gear");
     }
     return {
       ...state,

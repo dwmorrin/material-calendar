@@ -156,10 +156,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     name = name.trim();
     const words = name.split(" ");
     name = "";
-    for (let index = 0; index < words.length; ++index) {
-      const word = words[index].charAt(0).toUpperCase() + words[index].slice(1);
-      name = name + word + " ";
-    }
+    words.forEach((word) => {
+      name = name + word.charAt(0).toUpperCase() + word.slice(1) + " ";
+    });
     return name.trim();
   }
 
@@ -181,8 +180,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const categories: { [k: string]: Set<string> } = {};
   gear.forEach((item) =>
     item.tags.split(",").forEach((tag) => {
-      tag = cleanName(tag);
-      item.parentId = cleanName(item.parentId);
+      tag = tag.trim();
       if (!categories[item.parentId]) {
         categories[item.parentId] = new Set();
       }
