@@ -4,12 +4,9 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import List from "@material-ui/core/List";
 import TextField from "@material-ui/core/TextField";
 import FilterList from "./FilterList";
-import Switch from "@material-ui/core/Switch";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import Gear from "../resources/Gear";
-import Filter from "../resources/Filter";
 
 const useStyles = makeStyles({
   list: {
@@ -25,7 +22,6 @@ interface FilterDrawerProps {
   onClose: () => void;
   onOpen: () => void;
   closeDrawer: () => void;
-  items: Gear[];
   filters: { [k: string]: boolean };
   visibleFilters: { [k: string]: boolean };
   searchString: string;
@@ -44,7 +40,6 @@ interface FilterDrawerProps {
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   searchString,
   setSearchString,
-  items,
   filters,
   visibleFilters,
   open,

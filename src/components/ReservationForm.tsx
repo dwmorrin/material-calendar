@@ -17,7 +17,6 @@ import {
   Dialog,
   Toolbar,
   Typography,
-  DialogActions,
   DialogContent,
   Button
 } from "@material-ui/core";
@@ -178,22 +177,19 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   gear.forEach((item) => (quantities[item.title] = 0));
 
   // change the set to a dictionary and feed that into
+  const filters: { [k: string]: boolean } = {};
   const categories: { [k: string]: { [k: string]: boolean } } = {};
   gear.forEach((item) =>
     item.tags.split(",").forEach((tag) => {
-      if (!categories[cleanName(item.parentId)]) {
-        categories[cleanName(item.parentId)] = {};
+      tag = cleanName(tag);
+      item.parentId = cleanName(item.parentId);
+      if (!categories[item.parentId]) {
+        categories[item.parentId] = {};
       }
-      categories[cleanName(item.parentId)][cleanName(tag)] = false;
+      categories[item.parentId][tag] = false;
+      filters[tag] = false;
     })
   );
-
-  const filters: { [k: string]: boolean } = {};
-  Object.keys(categories).forEach(function (category) {
-    Object.keys(categories[category]).forEach(function (filter) {
-      filters[filter] = false;
-    });
-  });
 
   return (
     <Dialog

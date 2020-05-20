@@ -15,7 +15,6 @@ import GearList from "./GearList";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import Gear from "../resources/Gear";
-import Filter from "../resources/Filter";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -133,7 +132,6 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
             open={drawerIsOpen}
             onOpen={toggleDrawer}
             onClose={toggleDrawer}
-            items={gear}
             filters={filters}
             visibleFilters={visibleFilters}
             searchString={searchString}

@@ -27,14 +27,10 @@ const GearItem: FunctionComponent<GearItemProps> = ({
   quantities,
   handleChange
 }) => {
-  const [count, setValue] = useState(quantities[item.title]);
   const changeValue = (newValue: number): void => {
     if (newValue >= 0) {
       quantities[item.title] = newValue;
     }
-  };
-  const changeSelect = (event: React.ChangeEvent<{ value: unknown }>): void => {
-    changeValue(event.target.value as number);
   };
 
   const items: JSX.Element[] = [];

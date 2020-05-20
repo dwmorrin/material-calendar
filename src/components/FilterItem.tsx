@@ -1,8 +1,7 @@
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Checkbox from "@material-ui/core/Checkbox";
-import React, { FunctionComponent, useState } from "react";
-import Filter from "../resources/Filter";
+import React, { FunctionComponent } from "react";
 
 interface FilterItemProps {
   name: string;
