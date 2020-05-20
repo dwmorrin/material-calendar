@@ -177,20 +177,24 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const quantities: { [k: string]: number } = {};
   gear.forEach((item) => (quantities[item.title] = 0));
 
-  const filters: { [k: string]: boolean } = {};
-  gear.forEach((item) =>
-    item.tags.split(",").forEach((tag) => (filters[cleanName(tag)] = false))
-  );
-
-  const categories: { [k: string]: Set<string> } = {};
+  // change the set to a dictionary and feed that into
+  const categories: { [k: string]: { [k: string]: boolean } } = {};
   gear.forEach((item) =>
     item.tags.split(",").forEach((tag) => {
       if (!categories[cleanName(item.parentId)]) {
-        categories[cleanName(item.parentId)] = new Set();
+        categories[cleanName(item.parentId)] = {};
       }
-      categories[item.parentId].add(cleanName(tag));
+      categories[cleanName(item.parentId)][cleanName(tag)] = false;
     })
   );
+
+  const filters: { [k: string]: boolean } = {};
+  for (let index = 0; index < Object.keys(categories).length; ++index) {
+    const category: string = Object.keys(categories)[index];
+    for (let i = 0; i < Object.keys(categories[category]).length; ++i) {
+      filters[Object.keys(categories[category])[i]] = false;
+    }
+  }
 
   return (
     <Dialog

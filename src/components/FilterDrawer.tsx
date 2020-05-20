@@ -27,7 +27,7 @@ interface FilterDrawerProps {
   closeDrawer: () => void;
   items: Gear[];
   filters: { [k: string]: boolean };
-  visibleFilters: Set<string>;
+  visibleFilters: { [k: string]: boolean };
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
   matchAny: boolean;
