@@ -189,12 +189,11 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   );
 
   const filters: { [k: string]: boolean } = {};
-  for (let index = 0; index < Object.keys(categories).length; ++index) {
-    const category: string = Object.keys(categories)[index];
-    for (let i = 0; i < Object.keys(categories[category]).length; ++i) {
-      filters[Object.keys(categories[category])[i]] = false;
-    }
-  }
+  Object.keys(categories).forEach(function (category) {
+    Object.keys(categories[category]).forEach(function (filter) {
+      filters[filter] = false;
+    });
+  });
 
   return (
     <Dialog
