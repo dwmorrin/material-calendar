@@ -106,7 +106,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
             }}
             variant="outlined"
           />
-          {filterDisplay.size > 0 ? (
+          {filterDisplay ? (
             <div>
               <div
                 style={{
