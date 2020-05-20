@@ -78,6 +78,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const [validationSchema, setValidationSchema] = React.useState(
     initialValidationSchema
   );
+  const [selectedGroup, setSelectedGroup] = useState("");
 
   // Get Groups from Server
   useEffect(() => {
@@ -140,22 +141,56 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     for (let i = 0; i < gear.length; ++i) {
       const item = gear[i];
       item.quantity = gear.filter(
-        (element) => element.title == item.title
+        (element) => element.title === item.title
       ).length;
       const index = tempArray.findIndex(
-        (element) => element.title == item.title
+        (element) => element.title === item.title
       );
-      if (index == -1) {
+      if (index === -1) {
         tempArray.push(item);
       }
     }
     return tempArray;
   }
 
+  function cleanName(name: string): string {
+    name = name.trim();
+    const words = name.split(" ");
+    name = "";
+    for (let index = 0; index < words.length; ++index) {
+      const word = words[index].charAt(0).toUpperCase() + words[index].slice(1);
+      name = name + word + " ";
+    }
+    return name.trim();
+  }
+
+  const changeCurrentGroup = (group: string): void => {
+    if (group === selectedGroup) {
+      setSelectedGroup("");
+    } else {
+      setSelectedGroup(group);
+    }
+  };
+
   //const gear: Gear[] = quantizeGear(state.gear);
   const gear: Gear[] = quantizeGear(Database.gear);
   const quantities: { [k: string]: number } = {};
   gear.forEach((item) => (quantities[item.title] = 0));
+
+  const filters: { [k: string]: boolean } = {};
+  gear.forEach((item) =>
+    item.tags.split(",").forEach((tag) => (filters[cleanName(tag)] = false))
+  );
+
+  const categories: { [k: string]: Set<string> } = {};
+  gear.forEach((item) =>
+    item.tags.split(",").forEach((tag) => {
+      if (categories[cleanName(item.parentId)] == undefined) {
+        categories[cleanName(item.parentId)] = new Set();
+      }
+      categories[item.parentId].add(cleanName(tag));
+    })
+  );
 
   return (
     <Dialog
@@ -190,7 +225,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 hasGuests: guestToggle,
                 hasNotes: notesToggle,
                 group: initialGroups[0],
-                quantities
+                quantities,
+                filters
               }}
               onSubmit={(values, { setSubmitting }): void => {
                 setSubmitting(true);
@@ -395,6 +431,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         variant="filled"
                       />
                     </div>
+                    <br />
                     <Button
                       size="small"
                       variant="contained"
@@ -426,9 +463,12 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       state={state}
                       gear={gear}
                       quantities={values.quantities}
+                      filters={values.filters}
+                      visibleFilters={categories[selectedGroup]}
                       handleChange={handleChange}
+                      selectedGroup={selectedGroup}
+                      changeCurrentGroup={changeCurrentGroup}
                     />
-                    <pre>{JSON.stringify(values, null, 2)}</pre>
                   </form>
                 );
               }}

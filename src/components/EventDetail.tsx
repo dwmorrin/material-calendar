@@ -15,6 +15,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { compareDateOrder, getFormattedEventInterval } from "../calendar/date";
 import { makeTransition } from "./Transition";
 import { AuthContext } from "./AuthContext";
+import ReservationForm from "./ReservationForm";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -155,6 +156,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             </section>
           )}
         </Paper>
+        <ReservationForm dispatch={dispatch} state={state} />
       </Dialog>
     </div>
   );

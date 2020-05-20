@@ -33,7 +33,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({
       quantities[item.title] = newValue;
     }
   };
-  const changeSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const changeSelect = (event: React.ChangeEvent<{ value: unknown }>): void => {
     changeValue(event.target.value as number);
   };
 
@@ -64,7 +64,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({
             {items}
           </Select>
           <br />
-          <ButtonGroup
+          {/* <ButtonGroup
             variant="contained"
             color="primary"
             aria-label="contained primary button group"
@@ -72,7 +72,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({
           >
             <Button onClick={(): void => changeValue(count - 1)}>-</Button>
             <Button onClick={(): void => changeValue(count + 1)}>+</Button>
-          </ButtonGroup>
+          </ButtonGroup> */}
         </section>
       </ListItem>
     </div>

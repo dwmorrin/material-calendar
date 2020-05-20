@@ -8,7 +8,7 @@ import {
   Typography,
   Dialog
 } from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import FilterDrawer from "./FilterDrawer";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import GearList from "./GearList";
@@ -16,7 +16,6 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import Gear from "../resources/Gear";
 import Filter from "../resources/Filter";
-import { Formik } from "formik";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,10 +32,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const tempFilters = new Filter("", false);
-
-const initialFilters: Filter[] = [tempFilters];
-
 const transition = makeTransition("up");
 
 interface GearFormProps {
@@ -44,6 +39,12 @@ interface GearFormProps {
   quantities: {
     [k: string]: number;
   };
+  filters: {
+    [k: string]: boolean;
+  };
+  visibleFilters: Set<string>;
+  selectedGroup: string;
+  changeCurrentGroup: (group: string) => void;
   handleChange: {
     (e: React.ChangeEvent<any>): void;
     <T = string | React.ChangeEvent<any>>(
@@ -59,187 +60,50 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
   state,
   gear,
   quantities,
-  handleChange
+  filters,
+  visibleFilters,
+  handleChange,
+  selectedGroup,
+  changeCurrentGroup
 }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [matchAny, setMatchAny] = useState(false);
   const classes = useStyles();
-
-  const viewFilters: Filter[] = [];
-  const [filters, setFilters] = useState(initialFilters);
   const [searchString, setSearchString] = useState("");
 
-  function checkExists(tag: string): boolean {
-    let hasMatch = false;
-    for (let index = 0; index < filters.length; ++index) {
-      if (filters[index].name === tag) {
-        hasMatch = true;
-      }
-    }
-    return hasMatch;
-  }
-
-  function pushArray(tag: string): void {
-    const tempArray = filters;
-    const filter = new Filter(tag, false);
-    tempArray.push(filter);
-    setFilters(tempArray);
-  }
-
-  function checkViewExists(tag: string): boolean {
-    let hasMatch = false;
-    for (let index = 0; index < viewFilters.length; ++index) {
-      if (viewFilters[index].name === tag) {
-        hasMatch = true;
-      }
-    }
-    return hasMatch;
-  }
-
-  function pushViewArray(tag: string): void {
-    const viewArray = viewFilters;
-    const filter = filters.find(function (filter) {
-      return filter.name === tag;
-    });
-    if (filter) {
-      viewArray.push(filter);
-    }
-  }
-
-  function cleanTag(tag: string): string {
-    tag = tag.trim();
-    const words = tag.split(" ");
-    tag = "";
-    for (let index = 0; index < words.length; ++index) {
-      const word = words[index].charAt(0).toUpperCase() + words[index].slice(1);
-      tag = tag + word + " ";
-    }
-    return tag.trim();
-  }
-
-  function filterItems(gear: Gear[], filters: Filter[]): Gear[] | undefined {
-    const tempArray: Gear[] = [];
+  function filterItems(
+    gear: Gear[],
+    filters: { [k: string]: boolean }
+  ): Gear[] | undefined {
     let queriedGear: Gear[] = [];
-    const activeFilters = filters.filter(function (filter) {
-      return filter.toggle;
+    const activeFilters = Object.keys(filters).filter(function (key: string) {
+      return filters[key];
     });
     if (searchString !== "") {
       const queries = searchString.split(",");
-      for (let i = 0; i < gear.length; ++i) {
-        if (
-          queries.some(function (query) {
-            return (
-              gear[i].title
-                .toLowerCase()
-                .includes(query.toLowerCase().trim()) ||
-              gear[i].tags.toLowerCase().includes(query.toLowerCase().trim())
-            );
-          })
-        ) {
-          queriedGear.push(gear[i]);
-        }
-      }
+      queriedGear = gear.filter(function (gear) {
+        return queries.some(function (query) {
+          return (
+            gear.title.toLowerCase().includes(query.toLowerCase().trim()) ||
+            gear.tags.toLowerCase().includes(query.toLowerCase().trim())
+          );
+        });
+      });
     } else {
       queriedGear = gear;
     }
-    for (let i = 0; i < queriedGear.length; ++i) {
-      let hasMatch = false;
-      if (matchAny) {
-        if (
-          activeFilters.some(function (filter) {
-            return queriedGear[i].tags
-              .toLowerCase()
-              .includes(filter.name.toLowerCase());
-          })
-        ) {
-          hasMatch = true;
-        }
-      } else {
-        if (
-          activeFilters.every(function (filter) {
-            return queriedGear[i].tags
-              .toLowerCase()
-              .includes(filter.name.toLowerCase());
-          })
-        ) {
-          hasMatch = true;
-        }
-      }
-      if (hasMatch) {
-        tempArray.push(queriedGear[i]);
-      }
-    }
-
-    return tempArray;
-  }
-
-  const toggleFilter = (filter: Filter): void => {
-    filter.toggle = !filter.toggle;
-    const tempArray = [];
-    for (let index = 0; index < filters.length; ++index) {
-      if (filters[index].name == filter.name) {
-        tempArray.push(filter);
-      } else {
-        tempArray.push(filters[index]);
-      }
-    }
-    setFilters(tempArray);
-  };
-
-  const new_toggleFilter = (filter: Filter): void => {
-    const index = filters.findIndex((element) => element.name == filter.name);
-    filters[index].toggle = !filters[index].toggle;
-  };
-
-  function sortFilters(filters: Filter[]): Filter[] {
-    filters.sort(function (a, b) {
-      if (a.name == "") {
-        return -1;
-      } else if (a.name < b.name) {
-        return -1;
-      } else if (a.name > b.name) {
-        return 1;
-      }
-      return 0;
-    });
-    return filters;
-  }
-
-  const [selectedGroup, setSelectedGroup] = useState("");
-  const changeCurrentGroup = (group: string): void => {
-    if (group === selectedGroup) {
-      setSelectedGroup("");
+    if (matchAny) {
+      return queriedGear.filter(function (gear) {
+        return activeFilters.some(function (filter) {
+          return gear.tags.toLowerCase().includes(filter.toLowerCase());
+        });
+      });
     } else {
-      setSelectedGroup(group);
-    }
-  };
-
-  // Create full list of filters
-  for (let index = 0; index < gear.length; ++index) {
-    const item = gear[index];
-    if (gear[index].tags) {
-      const tags = item.tags.split(",");
-      for (let i = 0; i < tags.length; ++i) {
-        const tag = cleanTag(tags[i]);
-        if (!checkExists(tag)) {
-          pushArray(tag);
-        }
-      }
-    }
-  }
-  // Create list of applicable filters
-  for (let index = 0; index < gear.length; ++index) {
-    const item = gear[index];
-    if (gear[index]?.tags) {
-      if (item.parentId === selectedGroup) {
-        const tags = item.tags.split(",");
-        for (let i = 0; i < tags.length; ++i) {
-          const tag = cleanTag(tags[i]);
-          if (!checkViewExists(tag)) {
-            pushViewArray(tag);
-          }
-        }
-      }
+      return queriedGear.filter(function (gear) {
+        return activeFilters.every(function (filter) {
+          return gear.tags.toLowerCase().includes(filter.toLowerCase());
+        });
+      });
     }
   }
 
@@ -268,13 +132,14 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
             onOpen={toggleDrawer}
             onClose={toggleDrawer}
             items={gear}
-            filters={sortFilters(viewFilters)}
-            toggleFunction={toggleFilter}
+            filters={filters}
+            visibleFilters={visibleFilters}
             searchString={searchString}
             setSearchString={setSearchString}
             matchAny={matchAny}
             setMatchAny={setMatchAny}
             closeDrawer={() => setDrawerIsOpen(!drawerIsOpen)}
+            handleChange={handleChange}
           />
         </div>
         <AppBar position="sticky">
@@ -289,7 +154,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
                   dispatch({ type: CalendarAction.CloseGearForm })
                 }
               >
-                <CloseIcon />
+                <ArrowBackIosIcon />
               </IconButton>
               <Typography className={classes.title}>GEAR</Typography>
               <IconButton

@@ -5,12 +5,21 @@ import React, { FunctionComponent, useState } from "react";
 import Filter from "../resources/Filter";
 
 interface FilterItemProps {
-  filter: Filter;
-  toggleFunction: (filter: Filter) => void;
+  name: string;
+  value: boolean;
+  handleChange: {
+    (e: React.ChangeEvent<any>): void;
+    <T = string | React.ChangeEvent<any>>(
+      field: T
+    ): T extends React.ChangeEvent<any>
+      ? void
+      : (e: string | React.ChangeEvent<any>) => void;
+  };
 }
 const FilterItem: FunctionComponent<FilterItemProps> = ({
-  filter,
-  toggleFunction
+  name,
+  value,
+  handleChange
 }) => {
   return (
     <div
@@ -18,8 +27,8 @@ const FilterItem: FunctionComponent<FilterItemProps> = ({
         flexDirection: "row"
       }}
     >
-      <ListItem key={filter.name}>
-        <ListItemText primary={filter.name} />
+      <ListItem key={name}>
+        <ListItemText primary={name} />
         <section
           style={{
             textAlign: "center",
@@ -27,11 +36,12 @@ const FilterItem: FunctionComponent<FilterItemProps> = ({
           }}
         >
           <Checkbox
+            name={"filters[" + name + "]"}
+            onChange={handleChange}
             onClick={(event): void => {
               event.stopPropagation();
-              toggleFunction(filter);
             }}
-            checked={filter.toggle}
+            checked={value}
             size="small"
             inputProps={{ "aria-label": "checkbox with small size" }}
           />

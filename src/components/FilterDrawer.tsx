@@ -26,37 +26,49 @@ interface FilterDrawerProps {
   onOpen: () => void;
   closeDrawer: () => void;
   items: Gear[];
-  filters: Filter[];
-  toggleFunction: (filter: Filter) => void;
+  filters: { [k: string]: boolean };
+  visibleFilters: Set<string>;
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
   matchAny: boolean;
   setMatchAny: React.Dispatch<React.SetStateAction<boolean>>;
+  handleChange: {
+    (e: React.ChangeEvent<any>): void;
+    <T = string | React.ChangeEvent<any>>(
+      field: T
+    ): T extends React.ChangeEvent<any>
+      ? void
+      : (e: string | React.ChangeEvent<any>) => void;
+  };
 }
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   searchString,
   setSearchString,
   items,
   filters,
+  visibleFilters,
   open,
   onClose,
   onOpen,
-  toggleFunction,
   matchAny,
   setMatchAny,
-  closeDrawer
+  closeDrawer,
+  handleChange
 }) => {
   const classes = useStyles();
   // Still need to add X to clear textbox and close drawer on enter
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     setAnchorEl(null);
   };
+
+  //const filterDisplay = Object.keys(filters);
+  const filterDisplay = visibleFilters;
 
   return (
     <SwipeableDrawer
@@ -94,7 +106,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
             }}
             variant="outlined"
           />
-          {filters.length > 0 ? (
+          {filterDisplay.size > 0 ? (
             <div>
               <div
                 style={{
@@ -162,7 +174,8 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
                 >
                   <FilterList
                     filters={filters}
-                    toggleFunction={toggleFunction}
+                    visibleFilters={visibleFilters}
+                    handleChange={handleChange}
                   />
                 </div>
               </div>

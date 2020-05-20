@@ -1,18 +1,28 @@
 import React, { FunctionComponent } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import Box from "@material-ui/core/Box";
 import FilterItem from "./FilterItem";
-import Filter from "../resources/Filter";
 
 interface FilterListProps {
-  filters: Filter[];
-  toggleFunction: (filter: Filter) => void;
+  filters: { [k: string]: boolean };
+  visibleFilters: Set<string>;
+  handleChange: {
+    (e: React.ChangeEvent<any>): void;
+    <T = string | React.ChangeEvent<any>>(
+      field: T
+    ): T extends React.ChangeEvent<any>
+      ? void
+      : (e: string | React.ChangeEvent<any>) => void;
+  };
 }
 const FilterList: FunctionComponent<FilterListProps> = ({
   filters,
-  toggleFunction
+  visibleFilters,
+  handleChange
 }) => {
+  //const filterKeys = Object.keys(filters);
+  //this should be able to be filterKeys = visibileFilters.entries ovalues or something
+  const filterKeys = Array.from(visibleFilters);
   return (
     <Box>
       <List
@@ -21,11 +31,13 @@ const FilterList: FunctionComponent<FilterListProps> = ({
           minWidth: "100%"
         }}
       >
-        {filters
-          .filter((filter) => filter.name !== "")
-          .map((filter) => (
-            <FilterItem filter={filter} toggleFunction={toggleFunction} />
-          ))}
+        {filterKeys.map((name) => (
+          <FilterItem
+            name={name}
+            value={filters[name]}
+            handleChange={handleChange}
+          />
+        ))}
       </List>
     </Box>
   );

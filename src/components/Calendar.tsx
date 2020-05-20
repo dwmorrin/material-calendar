@@ -19,7 +19,6 @@ import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
 import initialState from "../calendar/initialCalendarState";
 import ProjectDashboard from "./ProjectDashboard";
-import ReservationForm from "./ReservationForm";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -70,7 +69,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         <ProjectDashboard dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />
-        <ReservationForm dispatch={dispatch} state={state} />
         <CalendarBar dispatch={dispatch} state={state} />
         {state.pickerShowing && (
           <StaticDatePicker dispatch={dispatch} state={state} />
