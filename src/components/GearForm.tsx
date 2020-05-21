@@ -44,6 +44,7 @@ interface GearFormProps {
   visibleFilters: Set<string>;
   selectedGroup: string;
   changeCurrentGroup: (group: string) => void;
+  changeQuantity: (field: string, value: any) => void;
   handleChange: {
     (e: React.ChangeEvent<any>): void;
     <T = string | React.ChangeEvent<any>>(
@@ -63,7 +64,8 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
   visibleFilters,
   handleChange,
   selectedGroup,
-  changeCurrentGroup
+  changeCurrentGroup,
+  changeQuantity
 }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [matchAny, setMatchAny] = useState(false);
@@ -172,6 +174,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
           changeCurrentGroup={changeCurrentGroup}
           quantities={quantities}
           handleChange={handleChange}
+          changeQuantity={changeQuantity}
         />
       </div>
     </Dialog>

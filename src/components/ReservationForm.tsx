@@ -30,12 +30,16 @@ import * as Yup from "yup";
 import Database from "./Database.js";
 import GearForm from "./GearForm";
 import Gear from "../resources/Gear";
+import QuantityList from "./QuantityList";
 
 const useStyles = makeStyles(() => ({
   guests: {
     display: "none"
   },
   notes: {
+    display: "none"
+  },
+  gearList: {
     display: "none"
   },
   list: {
@@ -74,6 +78,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const [liveToggle, setLiveValue] = React.useState("yes");
   const [guestToggle, setGuestValue] = React.useState("no");
   const [notesToggle, setNotesValue] = React.useState("no");
+  const [gearListToggle, setGearListValue] = React.useState("no");
   const [validationSchema, setValidationSchema] = React.useState(
     initialValidationSchema
   );
@@ -137,8 +142,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
 
   function quantizeGear(gear: Gear[]): Gear[] {
     const tempArray: Gear[] = [];
-    for (let i = 0; i < gear.length; ++i) {
-      const item = gear[i];
+    gear.forEach((item) => {
       item.quantity = gear.filter(
         (element) => element.title === item.title
       ).length;
@@ -148,18 +152,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
       if (index === -1) {
         tempArray.push(item);
       }
-    }
-    return tempArray;
-  }
-
-  function cleanName(name: string): string {
-    name = name.trim();
-    const words = name.split(" ");
-    name = "";
-    words.forEach((word) => {
-      name = name + word.charAt(0).toUpperCase() + word.slice(1) + " ";
     });
-    return name.trim();
+    return tempArray;
   }
 
   const changeCurrentGroup = (group: string): void => {
@@ -170,8 +164,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     }
   };
 
-  //const gear: Gear[] = quantizeGear(state.gear);
-  const gear: Gear[] = quantizeGear(Database.gear);
+  const gear: Gear[] = quantizeGear(state.gear);
+  //const gear: Gear[] = quantizeGear(Database.gear);
   const quantities: { [k: string]: number } = {};
   gear.forEach((item) => (quantities[item.title] = 0));
 
@@ -214,6 +208,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
           <DialogContent>
             <Formik
               initialValues={{
+                event: state.currentEvent,
                 phone: "",
                 description: "",
                 guests: "",
@@ -221,8 +216,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 liveRoom: liveToggle,
                 hasGuests: guestToggle,
                 hasNotes: notesToggle,
+                hasGear: gearListToggle,
                 group: initialGroups[0],
-                quantities,
+                gear: quantities,
                 filters
               }}
               onSubmit={(values, { setSubmitting }): void => {
@@ -245,6 +241,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                   errors,
                   isSubmitting,
                   handleChange,
+                  setFieldValue,
                   handleBlur,
                   handleSubmit
                 } = props;
@@ -429,21 +426,55 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       />
                     </div>
                     <br />
-                    <Button
-                      size="small"
-                      variant="contained"
-                      disableElevation
-                      style={{ backgroundColor: "Yellow", color: "black" }}
-                      disabled={isSubmitting}
-                      onClick={(event): void => {
-                        event.stopPropagation();
-                        dispatch({
-                          type: CalendarAction.OpenGearForm
-                        });
-                      }}
-                    >
-                      Reserve Equipment
-                    </Button>
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend">
+                        Would you like to reserve any gear?
+                      </FormLabel>
+                      <RadioGroup
+                        aria-label="gear"
+                        name="gear"
+                        value={values.hasGear}
+                        onChange={(
+                          event: React.ChangeEvent<{}>,
+                          value
+                        ): void => {
+                          setGearListValue(value);
+                          toggleElement(event, "gearList");
+                          values.hasGear = value;
+                        }}
+                      >
+                        <FormControlLabel
+                          value="yes"
+                          control={<Radio />}
+                          label="Yes"
+                        />
+                        <FormControlLabel
+                          value="no"
+                          control={<Radio />}
+                          label="No"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    <div id="gearList" className={classes.gearList}>
+                      <br />
+                      <QuantityList quantities={values.gear} />
+                      <Button
+                        size="small"
+                        variant="contained"
+                        disableElevation
+                        style={{ backgroundColor: "Yellow", color: "black" }}
+                        disabled={isSubmitting}
+                        onClick={(event): void => {
+                          event.stopPropagation();
+                          dispatch({
+                            type: CalendarAction.OpenGearForm
+                          });
+                        }}
+                      >
+                        Add Gear
+                      </Button>
+                    </div>
+                    <br />
                     <br />
                     <Button
                       type="submit"
@@ -459,12 +490,13 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       dispatch={dispatch}
                       state={state}
                       gear={gear}
-                      quantities={values.quantities}
+                      quantities={values.gear}
                       filters={values.filters}
                       visibleFilters={categories[selectedGroup]}
                       handleChange={handleChange}
                       selectedGroup={selectedGroup}
                       changeCurrentGroup={changeCurrentGroup}
+                      changeQuantity={setFieldValue}
                     />
                   </form>
                 );
