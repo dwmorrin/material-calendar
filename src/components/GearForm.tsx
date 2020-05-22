@@ -42,8 +42,8 @@ interface GearFormProps {
     [k: string]: boolean;
   };
   visibleFilters: Set<string>;
-  selectedGroup: string;
-  changeCurrentGroup: (group: string) => void;
+  selectedCategory: string;
+  changeCurrentCategory: (group: string) => void;
   changeQuantity: (field: string, value: any) => void;
   handleChange: {
     (e: React.ChangeEvent<any>): void;
@@ -63,15 +63,19 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
   filters,
   visibleFilters,
   handleChange,
-  selectedGroup,
-  changeCurrentGroup,
+  selectedCategory,
+  changeCurrentCategory,
   changeQuantity
 }) => {
-  const [drawerIsOpen, setDrawerIsOpen] = useState(false);
-  const [matchAny, setMatchAny] = useState(false);
+  // Constant Declarations
   const classes = useStyles();
+
+  // State Declarations
+  const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
+  const [matchAnyFilter, setMatchAnyFilter] = useState(false);
   const [searchString, setSearchString] = useState("");
 
+  // Filtering Function to reduce the size of the gear array being passed down
   function filterItems(
     gear: Gear[],
     filters: { [k: string]: boolean }
@@ -93,7 +97,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
     } else {
       queriedGear = gear;
     }
-    if (matchAny) {
+    if (matchAnyFilter) {
       return queriedGear.filter(function (gear) {
         return activeFilters.some(function (filter) {
           return gear.tags.toLowerCase().includes(filter.toLowerCase());
@@ -108,7 +112,8 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
     }
   }
 
-  const toggleDrawer = () => (
+  // Filter Drawer Toggle Function
+  const toggleFilterDrawer = () => (
     event: React.KeyboardEvent | React.MouseEvent
   ): void => {
     if (
@@ -118,8 +123,9 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
     ) {
       return;
     }
-    setDrawerIsOpen(!drawerIsOpen);
+    setFilterDrawerIsOpen(!filterDrawerIsOpen);
   };
+
   return (
     <Dialog
       fullScreen
@@ -127,18 +133,18 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
       TransitionComponent={transition}
     >
       <div className={classes.root}>
-        <div onClick={(): void => setDrawerIsOpen(!drawerIsOpen)}>
+        <div onClick={(): void => setFilterDrawerIsOpen(!filterDrawerIsOpen)}>
           <FilterDrawer
-            open={drawerIsOpen}
-            onOpen={toggleDrawer}
-            onClose={toggleDrawer}
+            open={filterDrawerIsOpen}
+            onOpen={toggleFilterDrawer}
+            onClose={toggleFilterDrawer}
             filters={filters}
             visibleFilters={visibleFilters}
             searchString={searchString}
             setSearchString={setSearchString}
-            matchAny={matchAny}
-            setMatchAny={setMatchAny}
-            closeDrawer={() => setDrawerIsOpen(!drawerIsOpen)}
+            matchAny={matchAnyFilter}
+            setMatchAny={setMatchAnyFilter}
+            closeDrawer={() => setFilterDrawerIsOpen(!filterDrawerIsOpen)}
             handleChange={handleChange}
           />
         </div>
@@ -160,7 +166,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
               <IconButton
                 edge="start"
                 color="inherit"
-                onClick={toggleDrawer()}
+                onClick={toggleFilterDrawer()}
                 aria-label="filter"
               >
                 <FilterListIcon />
@@ -170,10 +176,9 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
         </AppBar>
         <GearList
           gearList={filterItems(gear, filters)}
-          selectedGroup={selectedGroup}
-          changeCurrentGroup={changeCurrentGroup}
+          selectedCategory={selectedCategory}
+          changeCurrentCategory={changeCurrentCategory}
           quantities={quantities}
-          handleChange={handleChange}
           changeQuantity={changeQuantity}
         />
       </div>

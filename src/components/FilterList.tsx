@@ -6,22 +6,13 @@ import FilterItem from "./FilterItem";
 interface FilterListProps {
   filters: { [k: string]: boolean };
   visibleFilters: Set<string>;
-  handleChange: {
-    (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(
-      field: T
-    ): T extends React.ChangeEvent<any>
-      ? void
-      : (e: string | React.ChangeEvent<any>) => void;
-  };
+  handleChange: (e: React.ChangeEvent<any>) => void;
 }
 const FilterList: FunctionComponent<FilterListProps> = ({
   filters,
   visibleFilters,
   handleChange
 }) => {
-  //const filterKeys = visibleFilters.sort();
-  //this should be able to be filterKeys = visibileFilters.entries ovalues or something
   const filterKeys = Array.from(visibleFilters).sort();
   return (
     <Box>

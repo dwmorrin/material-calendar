@@ -6,14 +6,7 @@ import React, { FunctionComponent } from "react";
 interface FilterItemProps {
   name: string;
   value: boolean;
-  handleChange: {
-    (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(
-      field: T
-    ): T extends React.ChangeEvent<any>
-      ? void
-      : (e: string | React.ChangeEvent<any>) => void;
-  };
+  handleChange: (e: React.ChangeEvent<any>) => void;
 }
 const FilterItem: FunctionComponent<FilterItemProps> = ({
   name,

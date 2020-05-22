@@ -16,15 +16,7 @@ function createStandardList(
   quantities: {
     [k: string]: number;
   },
-  changeQuantity: (field: string, value: any) => void,
-  handleChange: {
-    (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(
-      field: T
-    ): T extends React.ChangeEvent<any>
-      ? void
-      : (e: string | React.ChangeEvent<any>) => void;
-  }
+  changeQuantity: (field: string, value: number) => void
 ): JSX.Element {
   return (
     <List
@@ -37,7 +29,6 @@ function createStandardList(
         <GearItem
           item={item}
           quantity={quantities[item.title]}
-          handleChange={handleChange}
           changeQuantity={changeQuantity}
         />
       ))}
@@ -47,27 +38,18 @@ function createStandardList(
 
 interface GearListProps {
   gearList: Gear[] | undefined;
-  selectedGroup: string;
-  changeCurrentGroup: (group: string) => void;
-  changeQuantity: (field: string, value: any) => void;
+  selectedCategory: string;
+  changeCurrentCategory: (group: string) => void;
+  changeQuantity: (field: string, value: number) => void;
   quantities: {
     [k: string]: number;
-  };
-  handleChange: {
-    (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(
-      field: T
-    ): T extends React.ChangeEvent<any>
-      ? void
-      : (e: string | React.ChangeEvent<any>) => void;
   };
 }
 const GearList: FunctionComponent<GearListProps> = ({
   gearList,
-  selectedGroup,
-  changeCurrentGroup,
+  selectedCategory,
+  changeCurrentCategory,
   quantities,
-  handleChange,
   changeQuantity
 }) => {
   const classes = useStyles();
@@ -81,20 +63,14 @@ const GearList: FunctionComponent<GearListProps> = ({
                 <NestedList
                   parent={parent}
                   gearList={gearList}
-                  selectedGroup={selectedGroup}
-                  setSelectedGroup={changeCurrentGroup}
+                  selectedCategory={selectedCategory}
+                  setCurrentCategory={changeCurrentCategory}
                   quantities={quantities}
-                  handleChange={handleChange}
                   changeQuantity={changeQuantity}
                 />
               );
             })
-          : createStandardList(
-              gearList,
-              quantities,
-              changeQuantity,
-              handleChange
-            )}
+          : createStandardList(gearList, quantities, changeQuantity)}
       </div>
     );
   } else {

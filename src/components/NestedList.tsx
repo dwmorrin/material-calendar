@@ -10,31 +10,22 @@ import Gear from "../resources/Gear";
 interface NestedListProps {
   parent: string;
   gearList: Gear[];
-  selectedGroup: string;
-  setSelectedGroup: (group: string) => void;
-  changeQuantity: (field: string, value: any) => void;
+  selectedCategory: string;
+  setCurrentCategory: (group: string) => void;
+  changeQuantity: (field: string, value: number) => void;
   quantities: {
     [k: string]: number;
-  };
-  handleChange: {
-    (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(
-      field: T
-    ): T extends React.ChangeEvent<any>
-      ? void
-      : (e: string | React.ChangeEvent<any>) => void;
   };
 }
 const NestedList: FunctionComponent<NestedListProps> = ({
   parent,
   gearList,
-  selectedGroup,
-  setSelectedGroup,
+  selectedCategory,
+  setCurrentCategory,
   quantities,
-  handleChange,
   changeQuantity
 }) => {
-  const expanded = selectedGroup === parent ? true : false;
+  const expanded = selectedCategory === parent ? true : false;
   return (
     <ExpansionPanel expanded={expanded}>
       <ExpansionPanelSummary
@@ -44,7 +35,7 @@ const NestedList: FunctionComponent<NestedListProps> = ({
         id="additional-actions1-header"
         onClick={(event): void => {
           event.stopPropagation();
-          setSelectedGroup(parent);
+          setCurrentCategory(parent);
         }}
       >
         {parent}
@@ -62,7 +53,6 @@ const NestedList: FunctionComponent<NestedListProps> = ({
               <GearItem
                 item={item}
                 quantity={quantities[item.title]}
-                handleChange={handleChange}
                 changeQuantity={changeQuantity}
               />
             ))}

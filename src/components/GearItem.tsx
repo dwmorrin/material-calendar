@@ -11,39 +11,34 @@ import Gear from "../resources/Gear";
 interface GearItemProps {
   item: Gear;
   quantity: number;
-  changeQuantity: (field: string, value: any) => void;
-  handleChange: {
-    (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(
-      field: T
-    ): T extends React.ChangeEvent<any>
-      ? void
-      : (e: string | React.ChangeEvent<any>) => void;
-  };
+  changeQuantity: (field: string, value: number) => void;
 }
 const GearItem: FunctionComponent<GearItemProps> = ({
   item,
   quantity,
-  handleChange,
   changeQuantity
 }) => {
-  const items: JSX.Element[] = [];
+  // Create all possible quantities for current item
+  const selectOptions: JSX.Element[] = [];
   for (let i = 0; i <= item.quantity; ++i) {
-    items.push(<MenuItem value={i}>{i}</MenuItem>);
+    selectOptions.push(<MenuItem value={i}>{i}</MenuItem>);
   }
+
+  // Show ErrorIcon
+  const showError = (): void => {
+    const element = document.getElementById("error");
+    if (element) {
+      element.style.display = "block";
+    }
+  };
+
+  // Change current Gear Value
   const changeValue = (newValue: number): void => {
     if (newValue >= 0 && newValue <= item.quantity) {
       changeQuantity("gear[" + item.title + "]", newValue);
     }
     if (newValue > item.quantity) {
-      toggleElement();
-    }
-  };
-
-  const toggleElement = (): void => {
-    const element = document.getElementById("error");
-    if (element) {
-      element.style.display = "block";
+      showError();
     }
   };
 
@@ -65,9 +60,11 @@ const GearItem: FunctionComponent<GearItemProps> = ({
             labelId={item.title + "QuantitySelect"}
             name={"gear[" + item.title + "]"}
             value={quantity}
-            onChange={handleChange}
+            onChange={(event): void =>
+              changeValue(event.target.value as number)
+            }
           >
-            {items}
+            {selectOptions}
           </Select>
           <br />
           <ButtonGroup

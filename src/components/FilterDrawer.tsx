@@ -28,14 +28,7 @@ interface FilterDrawerProps {
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
   matchAny: boolean;
   setMatchAny: React.Dispatch<React.SetStateAction<boolean>>;
-  handleChange: {
-    (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(
-      field: T
-    ): T extends React.ChangeEvent<any>
-      ? void
-      : (e: string | React.ChangeEvent<any>) => void;
-  };
+  handleChange: (e: React.ChangeEvent<any>) => void;
 }
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   searchString,
@@ -61,9 +54,6 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   const handleClose = (): void => {
     setAnchorEl(null);
   };
-
-  //const filterDisplay = Object.keys(filters);
-  const filterDisplay = visibleFilters;
 
   return (
     <SwipeableDrawer
@@ -101,83 +91,88 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
             }}
             variant="outlined"
           />
-          {filterDisplay ? (
-            <div>
-              <div
-                style={{
-                  padding: "0",
-                  margin: "0"
-                }}
-              >
-                <br />
+
+          {
+            // If the user has expanded a category
+            visibleFilters ? (
+              <div>
                 <div
                   style={{
-                    paddingTop: "20",
-                    marginTop: "20"
-                  }}
-                >
-                  Match{" "}
-                  <Button
-                    style={{
-                      padding: "0",
-                      margin: "0"
-                    }}
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    size="small"
-                    onClick={(event): void => {
-                      event.stopPropagation();
-                      handleClick(event);
-                    }}
-                  >
-                    {matchAny ? <b>ANY</b> : <b>ALL</b>}
-                  </Button>
-                  <Menu
-                    id="simple-menu"
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={Boolean(anchorEl)}
-                    onClose={(): void => {
-                      handleClose();
-                    }}
-                  >
-                    <MenuItem
-                      onClick={(event): void => {
-                        event.stopPropagation();
-                        handleClose();
-                      }}
-                    >
-                      {matchAny ? <b>ANY</b> : <b>ALL</b>}
-                    </MenuItem>
-                    <MenuItem
-                      onClick={(event): void => {
-                        event.stopPropagation();
-                        setMatchAny(!matchAny);
-                        handleClose();
-                      }}
-                    >
-                      {matchAny ? <b>ALL</b> : <b>ANY</b>}
-                    </MenuItem>
-                  </Menu>{" "}
-                  Selected Filters
-                </div>
-                <div
-                  style={{
-                    paddingTop: "0",
+                    padding: "0",
                     margin: "0"
                   }}
                 >
-                  <FilterList
-                    filters={filters}
-                    visibleFilters={visibleFilters}
-                    handleChange={handleChange}
-                  />
+                  <br />
+                  <div
+                    style={{
+                      paddingTop: "20",
+                      marginTop: "20"
+                    }}
+                  >
+                    Match{" "}
+                    <Button
+                      style={{
+                        padding: "0",
+                        margin: "0"
+                      }}
+                      aria-controls="simple-menu"
+                      aria-haspopup="true"
+                      size="small"
+                      onClick={(event): void => {
+                        event.stopPropagation();
+                        handleClick(event);
+                      }}
+                    >
+                      {matchAny ? <b>ANY</b> : <b>ALL</b>}
+                    </Button>
+                    <Menu
+                      id="simple-menu"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={(): void => {
+                        handleClose();
+                      }}
+                    >
+                      <MenuItem
+                        onClick={(event): void => {
+                          event.stopPropagation();
+                          handleClose();
+                        }}
+                      >
+                        {matchAny ? <b>ANY</b> : <b>ALL</b>}
+                      </MenuItem>
+                      <MenuItem
+                        onClick={(event): void => {
+                          event.stopPropagation();
+                          setMatchAny(!matchAny);
+                          handleClose();
+                        }}
+                      >
+                        {matchAny ? <b>ALL</b> : <b>ANY</b>}
+                      </MenuItem>
+                    </Menu>{" "}
+                    Selected Filters
+                  </div>
+                  <div
+                    style={{
+                      paddingTop: "0",
+                      margin: "0"
+                    }}
+                  >
+                    <FilterList
+                      filters={filters}
+                      visibleFilters={visibleFilters}
+                      handleChange={handleChange}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div>Expand a category to see filters</div>
-          )}
+            ) : (
+              // If the user has NOT expanded a category
+              <div>Expand a category to see filters</div>
+            )
+          }
         </List>
       </div>
     </SwipeableDrawer>

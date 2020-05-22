@@ -13,7 +13,7 @@ const FilterList: FunctionComponent<QuantityListProps> = ({ quantities }) => {
   return (
     <div>
       <Typography variant="subtitle2" style={{ textAlign: "center" }}>
-        Gear to be reserved
+        Gear in your cart
       </Typography>
       <hr />
       <List
@@ -31,7 +31,7 @@ const FilterList: FunctionComponent<QuantityListProps> = ({ quantities }) => {
         ) : (
           <div>
             You haven't reserved any gear yet! Click the button below to add
-            gear to your reservation
+            gear to your cart
           </div>
         )}
       </List>

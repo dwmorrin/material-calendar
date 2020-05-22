@@ -27,6 +27,7 @@ import { makeTransition } from "./Transition";
 import UserGroup from "../user/UserGroup";
 import { Formik } from "formik";
 import * as Yup from "yup";
+// eslint-disable-next-line
 import Database from "./Database.js";
 import GearForm from "./GearForm";
 import Gear from "../resources/Gear";
@@ -60,6 +61,23 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const projects = state.projects.filter((project) =>
     user?.projectIds.includes(project.id)
   );
+  // Function to convert Gear Array to Quantized Gear Array
+  function quantizeGear(gear: Gear[]): Gear[] {
+    const tempArray: Gear[] = [];
+    gear.forEach((item) => {
+      item.quantity = gear.filter(
+        (element) => element.title === item.title
+      ).length;
+      const index = tempArray.findIndex(
+        (element) => element.title === item.title
+      );
+      if (index === -1) {
+        tempArray.push(item);
+      }
+    });
+    return tempArray;
+  }
+  const gear: Gear[] = quantizeGear(state.gear);
 
   // Constant Declatations
   const initialGroups: UserGroup[] = [];
@@ -69,10 +87,29 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
     description: Yup.string().required("Required")
   });
+  const filters: { [k: string]: boolean } = {};
+  const categories: { [k: string]: Set<string> } = {};
+  const quantities: { [k: string]: number } = {};
+
+  // Build quantities dictionary for Formik
+  // Build Categories Dictionary
+  // Build Filters Dictionary
+  gear.forEach((item) => {
+    quantities[item.title] = 0;
+    item.tags.split(",").forEach((tag) => {
+      tag = tag.trim();
+      if (!categories[item.parentId]) {
+        categories[item.parentId] = new Set();
+      }
+      categories[item.parentId].add(tag);
+      filters[tag] = false;
+    });
+  });
 
   // State Declarations
   const initialProject = projects[0];
   const [currentProject, setCurrentProject] = useState(initialProject);
+  const [selectedCategory, setCurrentCategory] = useState("");
   const [groups, setGroups] = useState(initialGroups);
   const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
   const [liveToggle, setLiveValue] = React.useState("yes");
@@ -82,7 +119,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const [validationSchema, setValidationSchema] = React.useState(
     initialValidationSchema
   );
-  const [selectedGroup, setSelectedGroup] = useState("");
 
   // Get Groups from Server
   useEffect(() => {
@@ -140,48 +176,13 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     }
   };
 
-  function quantizeGear(gear: Gear[]): Gear[] {
-    const tempArray: Gear[] = [];
-    gear.forEach((item) => {
-      item.quantity = gear.filter(
-        (element) => element.title === item.title
-      ).length;
-      const index = tempArray.findIndex(
-        (element) => element.title === item.title
-      );
-      if (index === -1) {
-        tempArray.push(item);
-      }
-    });
-    return tempArray;
-  }
-
-  const changeCurrentGroup = (group: string): void => {
-    if (group === selectedGroup) {
-      setSelectedGroup("");
+  const changeCurrentCategory = (group: string): void => {
+    if (group === selectedCategory) {
+      setCurrentCategory("");
     } else {
-      setSelectedGroup(group);
+      setCurrentCategory(group);
     }
   };
-
-  const gear: Gear[] = quantizeGear(state.gear);
-  //const gear: Gear[] = quantizeGear(Database.gear);
-  const quantities: { [k: string]: number } = {};
-  gear.forEach((item) => (quantities[item.title] = 0));
-
-  // change the set to a dictionary and feed that into
-  const filters: { [k: string]: boolean } = {};
-  const categories: { [k: string]: Set<string> } = {};
-  gear.forEach((item) =>
-    item.tags.split(",").forEach((tag) => {
-      tag = tag.trim();
-      if (!categories[item.parentId]) {
-        categories[item.parentId] = new Set();
-      }
-      categories[item.parentId].add(tag);
-      filters[tag] = false;
-    })
-  );
 
   return (
     <Dialog
@@ -368,8 +369,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       </RadioGroup>
                     </FormControl>
                     <br />
-                    {/* this may currently cause issues with the content being
-                  required conditionally */}
                     <div id="guestInput" className={classes.guests}>
                       <TextField
                         label="Guest Names"
@@ -428,7 +427,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     <br />
                     <FormControl component="fieldset">
                       <FormLabel component="legend">
-                        Would you like to reserve any gear?
+                        Would you like to reserve any gear now?
                       </FormLabel>
                       <RadioGroup
                         aria-label="gear"
@@ -492,10 +491,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       gear={gear}
                       quantities={values.gear}
                       filters={values.filters}
-                      visibleFilters={categories[selectedGroup]}
+                      visibleFilters={categories[selectedCategory]}
                       handleChange={handleChange}
-                      selectedGroup={selectedGroup}
-                      changeCurrentGroup={changeCurrentGroup}
+                      selectedCategory={selectedCategory}
+                      changeCurrentCategory={changeCurrentCategory}
                       changeQuantity={setFieldValue}
                     />
                   </form>
