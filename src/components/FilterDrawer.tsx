@@ -28,7 +28,7 @@ interface FilterDrawerProps {
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
   matchAny: boolean;
   setMatchAny: React.Dispatch<React.SetStateAction<boolean>>;
-  handleChange: (e: React.ChangeEvent<any>) => void;
+  setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   searchString,
@@ -41,7 +41,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   matchAny,
   setMatchAny,
   closeDrawer,
-  handleChange
+  setFieldValue
 }) => {
   const classes = useStyles();
   // Still need to add X to clear textbox and close drawer on enter
@@ -163,7 +163,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
                     <FilterList
                       filters={filters}
                       visibleFilters={visibleFilters}
-                      handleChange={handleChange}
+                      setFieldValue={setFieldValue}
                     />
                   </div>
                 </div>

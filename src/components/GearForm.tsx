@@ -44,8 +44,7 @@ interface GearFormProps {
   visibleFilters: Set<string>;
   selectedCategory: string;
   changeCurrentCategory: (group: string) => void;
-  changeQuantity: (field: string, value: number) => void;
-  handleChange: (e: React.ChangeEvent<any>) => void;
+  setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 
 const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
@@ -55,10 +54,9 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
   quantities,
   filters,
   visibleFilters,
-  handleChange,
   selectedCategory,
   changeCurrentCategory,
-  changeQuantity
+  setFieldValue
 }) => {
   // Constant Declarations
   const classes = useStyles();
@@ -138,7 +136,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
             matchAny={matchAnyFilter}
             setMatchAny={setMatchAnyFilter}
             closeDrawer={() => setFilterDrawerIsOpen(!filterDrawerIsOpen)}
-            handleChange={handleChange}
+            setFieldValue={setFieldValue}
           />
         </div>
         <AppBar position="sticky">
@@ -172,7 +170,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
           selectedCategory={selectedCategory}
           changeCurrentCategory={changeCurrentCategory}
           quantities={quantities}
-          changeQuantity={changeQuantity}
+          setFieldValue={setFieldValue}
         />
       </div>
     </Dialog>

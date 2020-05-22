@@ -16,7 +16,7 @@ function createStandardList(
   quantities: {
     [k: string]: number;
   },
-  changeQuantity: (field: string, value: number) => void
+  setFieldValue: (field: string, value: any) => void
 ): JSX.Element {
   return (
     <List
@@ -29,7 +29,7 @@ function createStandardList(
         <GearItem
           item={item}
           quantity={quantities[item.title]}
-          changeQuantity={changeQuantity}
+          setFieldValue={setFieldValue}
         />
       ))}
     </List>
@@ -40,7 +40,7 @@ interface GearListProps {
   gearList: Gear[] | undefined;
   selectedCategory: string;
   changeCurrentCategory: (group: string) => void;
-  changeQuantity: (field: string, value: number) => void;
+  setFieldValue: (field: string, value: number | string | boolean) => void;
   quantities: {
     [k: string]: number;
   };
@@ -50,7 +50,7 @@ const GearList: FunctionComponent<GearListProps> = ({
   selectedCategory,
   changeCurrentCategory,
   quantities,
-  changeQuantity
+  setFieldValue
 }) => {
   const classes = useStyles();
   if (gearList) {
@@ -65,11 +65,11 @@ const GearList: FunctionComponent<GearListProps> = ({
                   selectedCategory={selectedCategory}
                   setCurrentCategory={changeCurrentCategory}
                   quantities={quantities}
-                  changeQuantity={changeQuantity}
+                  setFieldValue={setFieldValue}
                 />
               );
             })
-          : createStandardList(gearList, quantities, changeQuantity)}
+          : createStandardList(gearList, quantities, setFieldValue)}
       </div>
     );
   } else {

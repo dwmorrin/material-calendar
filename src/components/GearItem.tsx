@@ -11,12 +11,12 @@ import Gear from "../resources/Gear";
 interface GearItemProps {
   item: Gear;
   quantity: number;
-  changeQuantity: (field: string, value: number) => void;
+  setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 const GearItem: FunctionComponent<GearItemProps> = ({
   item,
   quantity,
-  changeQuantity
+  setFieldValue
 }) => {
   // Create all possible quantities for current item
   const selectOptions: JSX.Element[] = [];
@@ -35,7 +35,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({
   // Change current Gear Value
   const changeValue = (newValue: number): void => {
     if (newValue >= 0 && newValue <= item.quantity) {
-      changeQuantity("gear[" + item.title + "]", newValue);
+      setFieldValue("gear[" + item.title + "]", newValue);
     }
     if (newValue > item.quantity) {
       showError();

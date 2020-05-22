@@ -210,6 +210,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
             <Formik
               initialValues={{
                 event: state.currentEvent,
+                currentCategory: "",
                 phone: "",
                 description: "",
                 guests: "",
@@ -492,10 +493,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       quantities={values.gear}
                       filters={values.filters}
                       visibleFilters={categories[selectedCategory]}
-                      handleChange={handleChange}
                       selectedCategory={selectedCategory}
                       changeCurrentCategory={changeCurrentCategory}
-                      changeQuantity={setFieldValue}
+                      setFieldValue={setFieldValue}
                     />
                   </form>
                 );

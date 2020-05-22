@@ -6,12 +6,12 @@ import React, { FunctionComponent } from "react";
 interface FilterItemProps {
   name: string;
   value: boolean;
-  handleChange: (e: React.ChangeEvent<any>) => void;
+  setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 const FilterItem: FunctionComponent<FilterItemProps> = ({
   name,
   value,
-  handleChange
+  setFieldValue
 }) => {
   return (
     <div
@@ -30,7 +30,9 @@ const FilterItem: FunctionComponent<FilterItemProps> = ({
         >
           <Checkbox
             name={"filters[" + name + "]"}
-            onChange={handleChange}
+            onChange={(event): void =>
+              setFieldValue("filters[" + name + "]", !value)
+            }
             onClick={(event): void => {
               event.stopPropagation();
             }}
