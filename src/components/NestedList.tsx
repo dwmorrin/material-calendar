@@ -23,8 +23,7 @@ const NestedList: FunctionComponent<NestedListProps> = ({
   quantities,
   changeQuantity
 }) => {
-  const parent = gearList[0].parentId;
-  const expanded = selectedCategory === parent ? true : false;
+  const expanded = selectedCategory === gearList[0].parentId ? true : false;
   return (
     <ExpansionPanel expanded={expanded}>
       <ExpansionPanelSummary
@@ -34,10 +33,10 @@ const NestedList: FunctionComponent<NestedListProps> = ({
         id="additional-actions1-header"
         onClick={(event): void => {
           event.stopPropagation();
-          setCurrentCategory(parent);
+          setCurrentCategory(gearList[0].parentId);
         }}
       >
-        {parent}
+        {gearList[0].parentId}
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         <List
@@ -47,7 +46,7 @@ const NestedList: FunctionComponent<NestedListProps> = ({
           }}
         >
           {gearList
-            .filter((item) => item.parentId === parent)
+            .filter((item) => item.parentId === gearList[0].parentId)
             .map((item) => (
               <GearItem
                 item={item}
