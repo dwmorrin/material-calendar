@@ -8,7 +8,6 @@ import GearItem from "./GearItem";
 import Gear from "../resources/Gear";
 
 interface NestedListProps {
-  parent: string;
   gearList: Gear[];
   selectedCategory: string;
   setCurrentCategory: (group: string) => void;
@@ -18,13 +17,13 @@ interface NestedListProps {
   };
 }
 const NestedList: FunctionComponent<NestedListProps> = ({
-  parent,
   gearList,
   selectedCategory,
   setCurrentCategory,
   quantities,
   changeQuantity
 }) => {
+  const parent = gearList[0].parentId;
   const expanded = selectedCategory === parent ? true : false;
   return (
     <ExpansionPanel expanded={expanded}>

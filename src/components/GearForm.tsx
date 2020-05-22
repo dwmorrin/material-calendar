@@ -44,15 +44,8 @@ interface GearFormProps {
   visibleFilters: Set<string>;
   selectedCategory: string;
   changeCurrentCategory: (group: string) => void;
-  changeQuantity: (field: string, value: any) => void;
-  handleChange: {
-    (e: React.ChangeEvent<any>): void;
-    <T = string | React.ChangeEvent<any>>(
-      field: T
-    ): T extends React.ChangeEvent<any>
-      ? void
-      : (e: string | React.ChangeEvent<any>) => void;
-  };
+  changeQuantity: (field: string, value: number) => void;
+  handleChange: (e: React.ChangeEvent<any>) => void;
 }
 
 const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({

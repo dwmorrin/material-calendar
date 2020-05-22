@@ -61,8 +61,7 @@ const GearList: FunctionComponent<GearListProps> = ({
           ? parents.map((parent) => {
               return (
                 <NestedList
-                  parent={parent}
-                  gearList={gearList}
+                  gearList={gearList.filter((item) => item.parentId === parent)}
                   selectedCategory={selectedCategory}
                   setCurrentCategory={changeCurrentCategory}
                   quantities={quantities}
