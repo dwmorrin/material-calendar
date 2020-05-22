@@ -36,7 +36,7 @@ const FilterItem: FunctionComponent<FilterItemProps> = ({
             }}
             checked={value}
             size="small"
-            inputProps={{ "aria-label": "checkbox with small size" }}
+            inputProps={{ "aria-label": name + " Checkbox" }}
           />
         </section>
       </ListItem>

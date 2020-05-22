@@ -28,9 +28,9 @@ const NestedList: FunctionComponent<NestedListProps> = ({
     <ExpansionPanel expanded={expanded}>
       <ExpansionPanelSummary
         expandIcon={<ExpandMoreIcon />}
-        aria-label="Expand"
-        aria-controls="additional-actions1-content"
-        id="additional-actions1-header"
+        aria-label={gearList[0].parentId + "category expansion"}
+        aria-controls={gearList[0].parentId + "category expansion"}
+        id={gearList[0].parentId + "category expansion"}
         onClick={(event): void => {
           event.stopPropagation();
           setCurrentCategory(gearList[0].parentId);

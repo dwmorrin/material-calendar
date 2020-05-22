@@ -148,7 +148,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
                 type="submit"
                 edge="start"
                 color="inherit"
-                aria-label="close1"
+                aria-label="close"
                 onClick={(): void =>
                   dispatch({ type: CalendarAction.CloseGearForm })
                 }

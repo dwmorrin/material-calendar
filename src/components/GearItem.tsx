@@ -57,7 +57,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({
           }}
         >
           <Select
-            labelId={item.title + "QuantitySelect"}
+            labelId={item.title + "Quantity Select"}
             name={"gear[" + item.title + "]"}
             value={quantity}
             onChange={(event): void =>
@@ -70,7 +70,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({
           <ButtonGroup
             variant="contained"
             color="primary"
-            aria-label="contained primary button group"
+            aria-label={item.title + "Quantity Buttons"}
             size="small"
           >
             <Button
