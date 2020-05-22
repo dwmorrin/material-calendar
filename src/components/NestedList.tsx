@@ -9,8 +9,7 @@ import Gear from "../resources/Gear";
 
 interface NestedListProps {
   gearList: Gear[];
-  selectedCategory: string;
-  setCurrentCategory: (group: string) => void;
+  currentCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
   quantities: {
     [k: string]: number;
@@ -18,12 +17,19 @@ interface NestedListProps {
 }
 const NestedList: FunctionComponent<NestedListProps> = ({
   gearList,
-  selectedCategory,
-  setCurrentCategory,
+  currentCategory,
   quantities,
   setFieldValue
 }) => {
-  const expanded = selectedCategory === gearList[0].parentId ? true : false;
+  const changeCategory = (newCategory: string): void => {
+    if (newCategory === currentCategory) {
+      setFieldValue("currentCategory", "");
+    } else {
+      setFieldValue("currentCategory", newCategory);
+    }
+  };
+
+  const expanded = currentCategory === gearList[0].parentId ? true : false;
   return (
     <ExpansionPanel expanded={expanded}>
       <ExpansionPanelSummary
@@ -33,7 +39,7 @@ const NestedList: FunctionComponent<NestedListProps> = ({
         id={gearList[0].parentId + "category expansion"}
         onClick={(event): void => {
           event.stopPropagation();
-          setCurrentCategory(gearList[0].parentId);
+          changeCategory(gearList[0].parentId);
         }}
       >
         {gearList[0].parentId}

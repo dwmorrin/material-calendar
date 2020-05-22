@@ -42,8 +42,7 @@ interface GearFormProps {
     [k: string]: boolean;
   };
   visibleFilters: Set<string>;
-  selectedCategory: string;
-  changeCurrentCategory: (group: string) => void;
+  currentCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 
@@ -54,8 +53,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
   quantities,
   filters,
   visibleFilters,
-  selectedCategory,
-  changeCurrentCategory,
+  currentCategory,
   setFieldValue
 }) => {
   // Constant Declarations
@@ -167,8 +165,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
         </AppBar>
         <GearList
           gearList={filterItems(gear, filters)}
-          selectedCategory={selectedCategory}
-          changeCurrentCategory={changeCurrentCategory}
+          currentCategory={currentCategory}
           quantities={quantities}
           setFieldValue={setFieldValue}
         />

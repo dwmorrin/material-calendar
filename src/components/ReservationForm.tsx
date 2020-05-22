@@ -109,7 +109,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   // State Declarations
   const initialProject = projects[0];
   const [currentProject, setCurrentProject] = useState(initialProject);
-  const [selectedCategory, setCurrentCategory] = useState("");
   const [groups, setGroups] = useState(initialGroups);
   const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
   const [liveToggle, setLiveValue] = React.useState("yes");
@@ -176,14 +175,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     }
   };
 
-  const changeCurrentCategory = (group: string): void => {
-    if (group === selectedCategory) {
-      setCurrentCategory("");
-    } else {
-      setCurrentCategory(group);
-    }
-  };
-
   return (
     <Dialog
       fullScreen
@@ -211,6 +202,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               initialValues={{
                 event: state.currentEvent,
                 currentCategory: "",
+                searchString: "",
                 phone: "",
                 description: "",
                 guests: "",
@@ -492,9 +484,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       gear={gear}
                       quantities={values.gear}
                       filters={values.filters}
-                      visibleFilters={categories[selectedCategory]}
-                      selectedCategory={selectedCategory}
-                      changeCurrentCategory={changeCurrentCategory}
+                      visibleFilters={categories[values.currentCategory]}
+                      currentCategory={values.currentCategory}
                       setFieldValue={setFieldValue}
                     />
                   </form>

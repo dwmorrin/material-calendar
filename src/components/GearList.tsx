@@ -38,8 +38,7 @@ function createStandardList(
 
 interface GearListProps {
   gearList: Gear[] | undefined;
-  selectedCategory: string;
-  changeCurrentCategory: (group: string) => void;
+  currentCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
   quantities: {
     [k: string]: number;
@@ -47,8 +46,7 @@ interface GearListProps {
 }
 const GearList: FunctionComponent<GearListProps> = ({
   gearList,
-  selectedCategory,
-  changeCurrentCategory,
+  currentCategory,
   quantities,
   setFieldValue
 }) => {
@@ -62,8 +60,7 @@ const GearList: FunctionComponent<GearListProps> = ({
               return (
                 <NestedList
                   gearList={gearList.filter((item) => item.parentId === parent)}
-                  selectedCategory={selectedCategory}
-                  setCurrentCategory={changeCurrentCategory}
+                  currentCategory={currentCategory}
                   quantities={quantities}
                   setFieldValue={setFieldValue}
                 />
