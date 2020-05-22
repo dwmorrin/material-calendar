@@ -73,7 +73,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
         >
           <TextField
             size="small"
-            id="outlined-basic"
+            id="gearSearch"
             label="Search"
             value={searchString}
             onChange={(event): void => {
@@ -115,7 +115,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
                         padding: "0",
                         margin: "0"
                       }}
-                      aria-controls="simple-menu"
+                      aria-controls="MatchAnyButton"
                       aria-haspopup="true"
                       size="small"
                       onClick={(event): void => {
@@ -126,7 +126,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
                       {matchAny ? <b>ANY</b> : <b>ALL</b>}
                     </Button>
                     <Menu
-                      id="simple-menu"
+                      id="MatchAnyMenu"
                       anchorEl={anchorEl}
                       keepMounted
                       open={Boolean(anchorEl)}
