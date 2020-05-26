@@ -18,6 +18,7 @@ function createStandardList(
   },
   setFieldValue: (field: string, value: any) => void
 ): JSX.Element {
+  // Create list of single elements. may not work properly for singletons
   return (
     <List
       style={{
@@ -52,11 +53,13 @@ const GearList: FunctionComponent<GearListProps> = ({
 }) => {
   const classes = useStyles();
   if (gearList) {
-    const parents = [...new Set(gearList.map((items) => items.parentId))];
+    const category = [...new Set(gearList.map((items) => items.parentId))];
+    // Create Nested list for categories with multiple elements, create a standard (not nested)
+    // list for singletons
     return (
       <div className={classes.root}>
-        {parents.length > 1
-          ? parents.map((parent) => {
+        {category.length > 1
+          ? category.map((parent) => {
               return (
                 <NestedList
                   gearList={gearList.filter((item) => item.parentId === parent)}

@@ -10,6 +10,7 @@ const FilterList: FunctionComponent<QuantityListProps> = ({ quantities }) => {
   const selectedItems = Object.keys(quantities).filter(function (key: string) {
     return quantities[key] > 0;
   });
+  // Get list of elements to be reserved and display them nicely
   return (
     <div>
       <Typography variant="subtitle2" style={{ textAlign: "center" }}>

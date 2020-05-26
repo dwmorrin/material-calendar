@@ -13,6 +13,7 @@ const FilterItem: FunctionComponent<FilterItemProps> = ({
   value,
   setFieldValue
 }) => {
+  // Create ListItem with checkbox for filter, onChange use setFieldValue to toggle
   return (
     <div
       style={{

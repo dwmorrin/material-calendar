@@ -45,12 +45,14 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
 }) => {
   const classes = useStyles();
   // Still need to add X to clear textbox and close drawer on enter
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
+  // Set anchor for any/all match menu
+  // handleClick of any/all match menu button
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setAnchorEl(event.currentTarget);
   };
-
+  // handleClose of any/all match menu
   const handleClose = (): void => {
     setAnchorEl(null);
   };

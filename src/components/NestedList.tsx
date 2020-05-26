@@ -21,6 +21,7 @@ const NestedList: FunctionComponent<NestedListProps> = ({
   quantities,
   setFieldValue
 }) => {
+  // Manage the currently expanded category using string identifiers assigned by parentId
   const changeCategory = (newCategory: string): void => {
     if (newCategory === currentCategory) {
       setFieldValue("currentCategory", "");
@@ -29,6 +30,7 @@ const NestedList: FunctionComponent<NestedListProps> = ({
     }
   };
 
+  // Expand panel when the currently selected category is this NestedList's cateogory (parentId)
   const expanded = currentCategory === gearList[0].parentId ? true : false;
   return (
     <ExpansionPanel expanded={expanded}>

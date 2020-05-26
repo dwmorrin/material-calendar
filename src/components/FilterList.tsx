@@ -14,6 +14,7 @@ const FilterList: FunctionComponent<FilterListProps> = ({
   setFieldValue
 }) => {
   const filterKeys = Array.from(visibleFilters).sort();
+  // Create list of FilterItems from visible (valid for that category) filters
   return (
     <Box>
       <List
