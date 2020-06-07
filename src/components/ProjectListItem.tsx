@@ -6,10 +6,11 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  FormControlLabel,
 } from "@material-ui/core";
 import InfoIcon from "@material-ui/icons/Info";
 import Project from "../resources/Project";
-import { ResourceKey } from "../resources/types";
+import { dispatchSelectedProject } from "../calendar/dispatch";
 
 interface ProjectListItemProps extends CalendarUIProps {
   project: Project;
@@ -24,55 +25,18 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
     <ListItem
       button
       key={project.id}
-      onClick={(event): void => {
-        event.stopPropagation();
-        dispatch({
-          type: CalendarAction.SelectedProject,
-          payload: {
-            resources: {
-              ...state.resources,
-              [ResourceKey.Projects]: state.resources[ResourceKey.Projects].map(
-                (proj) => {
-                  if (proj.id !== project.id) {
-                    return proj;
-                  }
-                  proj.selected = !proj.selected;
-                  return proj;
-                }
-              ),
-            },
-          },
-        });
-      }}
+      onClick={(event): void => event.stopPropagation()}
     >
-      <Checkbox
+      <FormControlLabel
         checked={project.selected || false}
-        size="small"
-        inputProps={{ "aria-label": "checkbox with small size" }}
-        key={project.title}
+        control={<Checkbox />}
+        label={<ListItemText primary={project.title} />}
         onClick={(event): void => event.stopPropagation()}
-        onChange={(event: React.ChangeEvent, checked): void => {
+        onChange={(event: React.ChangeEvent<{}>, checked): void => {
           event.stopPropagation();
-          dispatch({
-            type: CalendarAction.SelectedProject,
-            payload: {
-              resources: {
-                ...state.resources,
-                [ResourceKey.Projects]: state.resources[
-                  ResourceKey.Projects
-                ].map((proj) => {
-                  if (proj.id !== project.id) {
-                    return proj;
-                  }
-                  proj.selected = checked;
-                  return proj;
-                }),
-              },
-            },
-          });
+          dispatchSelectedProject(state, dispatch, project.id, checked);
         }}
       />
-      <ListItemText primary={project.title} />
       <Divider orientation="vertical" flexItem />
       <IconButton
         key={project.id}
