@@ -1,7 +1,7 @@
-import Event from "./Event";
+import Event from "../resources/Event";
 import { CalendarState } from "./types";
-import Project from "./Project";
-import UserGroup from "../user/UserGroup";
+import Project from "../resources/Project";
+import UserGroup from "../resources/UserGroup";
 
 export const testModifiedState: CalendarState = {
   currentEvent: new Event({

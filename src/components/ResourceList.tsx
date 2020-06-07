@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { CalendarUIProps } from "../calendar/types";
-import { locationGroupReducer } from "../calendar/Location";
+import { locationGroupReducer } from "../resources/Location";
 import ResourceListItem from "./ResourceListItem";
 import ResourceExpansionList from "./ResourceExpansionList";
 import { ExpansionPanelSummary, ExpansionPanel } from "@material-ui/core";

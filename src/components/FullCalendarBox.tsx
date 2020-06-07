@@ -10,7 +10,7 @@ import "@fullcalendar/daygrid/main.css";
 import "@fullcalendar/list/main.css";
 import "@fullcalendar/timegrid/main.css";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
-import { makeSelectedLocationDict } from "../calendar/Location";
+import { makeSelectedLocationDict } from "../resources/Location";
 
 const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   dispatch,

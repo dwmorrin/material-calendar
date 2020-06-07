@@ -1,8 +1,8 @@
-import Event from "./Event";
-import Location from "./Location";
-import Project from "./Project";
+import Event from "../resources/Event";
+import Location from "../resources/Location";
+import Project from "../resources/Project";
 import FullCalendar from "@fullcalendar/react";
-import UserGroup from "../user/UserGroup";
+import UserGroup from "../resources/UserGroup";
 
 export enum CalendarAction {
   ChangedView,

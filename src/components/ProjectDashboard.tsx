@@ -23,7 +23,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
 import { getFormattedEventInterval } from "../calendar/date";
-import { ProjectLocationAllotment } from "../calendar/Project";
+import { ProjectLocationAllotment } from "../resources/Project";
 import ProjectLocationHours from "./ProjectLocationHours";
 import { fetchCalendarData } from "../calendar/Fetch";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";

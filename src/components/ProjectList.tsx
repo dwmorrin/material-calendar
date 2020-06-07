@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { CalendarUIProps } from "../calendar/types";
-import { projectGroupReducer } from "../calendar/Project";
+import { projectGroupReducer } from "../resources/Project";
 import ProjectExpansionList from "./ProjectExpansionList";
 import ProjectListItem from "./ProjectListItem";
 import { AuthContext } from "./AuthContext";

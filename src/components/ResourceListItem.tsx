@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { ListItem, ListItemText, Checkbox } from "@material-ui/core";
-import Location from "../calendar/Location";
+import Location from "../resources/Location";
 
 interface ResourceListItemProps extends CalendarUIProps {
   location: Location;

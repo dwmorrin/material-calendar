@@ -3,9 +3,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import { NativeSelect } from "@material-ui/core";
 import { CalendarUIProps } from "../calendar/types";
-import Location from "../calendar/Location";
-import Project from "../calendar/Project";
-import UserGroup from "../user/UserGroup";
+import Location from "../resources/Location";
+import Project from "../resources/Project";
+import UserGroup from "../resources/UserGroup";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {

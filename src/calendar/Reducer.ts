@@ -1,8 +1,8 @@
 import { CalendarAction, CalendarState, Action } from "./types";
-import Event from "./Event";
-import Location from "./Location";
-import Project from "./Project";
-import UserGroup from "../user/UserGroup";
+import Event from "../resources/Event";
+import Location from "../resources/Location";
+import Project from "../resources/Project";
+import UserGroup from "../resources/UserGroup";
 
 /**
  * calendarReducer takes all actions from the calendar and handles them

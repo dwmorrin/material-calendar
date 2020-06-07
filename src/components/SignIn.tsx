@@ -19,7 +19,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { navigate, RouteComponentProps } from "@reach/router";
 import { AuthContext } from "./AuthContext";
-import User from "../user/User";
+import User from "../resources/User";
 
 const useStyles = makeStyles((theme) => ({
   paper: {

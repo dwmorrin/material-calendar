@@ -4,7 +4,7 @@ import React, {
   useState,
   SetStateAction,
 } from "react";
-import User from "../user/User";
+import User from "../resources/User";
 
 interface AuthContext {
   user?: User;

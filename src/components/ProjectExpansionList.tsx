@@ -13,7 +13,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/core/styles";
 import ProjectListItem from "./ProjectListItem";
 import { AuthContext } from "./AuthContext";
-import Project from "../calendar/Project";
+import Project from "../resources/Project";
 
 const useStyles = makeStyles(() => ({
   nopadding: {

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, FunctionComponent } from "react";
 import * as d3 from "d3";
-import { ProjectLocationAllotment } from "../calendar/Project";
+import { ProjectLocationAllotment } from "../resources/Project";
 
 const height = 90; // height of the total bar chart area in px
 const width = 300; // width of the totla bar char area in px
