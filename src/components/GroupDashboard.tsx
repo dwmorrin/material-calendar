@@ -16,7 +16,8 @@ import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
-import { getFormattedEventInterval } from "../calendar/date";
+import { getFormattedEventInterval } from "../utils/date";
+import { ResourceKey } from "../resources/types";
 
 const transition = makeTransition("right");
 
@@ -24,9 +25,10 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   state,
   dispatch,
 }) => {
-  const { currentGroup, currentProject, groups } = state;
-  const projectGroups = groups.filter(
-    (group) => group.projectId === currentProject?.id
+  const { currentGroup, currentProject, resources } = state;
+  const groups = resources[ResourceKey.Groups];
+  const courses = groups.filter(
+    (group) => group.project === currentProject?.id
   );
   return (
     <Dialog
@@ -90,11 +92,11 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="body1">Other groups</Typography>
             </ExpansionPanelSummary>
-            {projectGroups
+            {courses
               ?.filter((group) => group.id !== currentGroup?.id)
               .map((group) => (
                 <ListItem
-                  key={`projectGroup${group.id}`}
+                  key={`course${group.id}`}
                   style={{ justifyContent: "space-between" }}
                 >
                   {group.title}

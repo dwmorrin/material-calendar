@@ -13,16 +13,7 @@ interface AuthContext {
 const initialContext: AuthContext = {};
 export const AuthContext = createContext(initialContext);
 const AuthProvider: FunctionComponent = ({ children }) => {
-  const [user, setUser] = useState(
-    new User({
-      id: "",
-      firstName: "",
-      lastName: "",
-      role: -1,
-      groupIds: [],
-      projectIds: [],
-    })
-  );
+  const [user, setUser] = useState(new User());
   const value = { user, setUser };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

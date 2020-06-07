@@ -1,50 +1,34 @@
-import React, { FunctionComponent, useEffect, useContext } from "react";
+import React, { FunctionComponent } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
-import {
-  CircularProgress,
-  Typography,
-  Avatar,
-  Button,
-  LinearProgress,
-} from "@material-ui/core";
-import { AuthContext } from "./AuthContext";
+import { Typography, Avatar, Button, LinearProgress } from "@material-ui/core";
+import { ResourceKey } from "../resources/types";
+import UserGroup from "../resources/UserGroup";
+
+const availableHoursAsPercent = (maximum: number, used: number): number =>
+  (100 * (maximum - used)) / maximum;
 
 const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { user } = useContext(AuthContext);
-  const currentGroup = state.groups?.find((group) =>
-    user?.groupIds.includes(group.id)
-  );
-  useEffect(() => {
-    if (currentGroup) {
-      dispatch({
-        type: CalendarAction.SelectedGroup,
-        payload: { currentGroup },
-      });
-    }
-  }, [currentGroup, dispatch]);
+  const { currentProject, resources } = state;
+  const currentGroup =
+    (resources[ResourceKey.Groups] as UserGroup[]).find(
+      (g) => g.projectId === currentProject?.id
+    ) || new UserGroup();
 
-  if (
-    !state.groups ||
-    !currentGroup ||
-    !Array.isArray(currentGroup.memberNames)
-  ) {
-    return <CircularProgress />;
-  }
+  if (!currentProject || isNaN(currentProject.groupAllottedHours)) return null;
 
-  const memberNames = currentGroup.memberNames.map((name) => {
-    const [first, last] = name.split(" ");
-    return { first, last };
-  });
   return (
     <section>
       <Typography variant="body2">Group Hours</Typography>
-      <LinearProgress // TODO remove hardcoded mock
+      <LinearProgress
         style={{ height: 10 }}
         variant="determinate"
-        value={20}
+        value={availableHoursAsPercent(
+          currentProject.groupAllottedHours,
+          currentGroup.reservedHours
+        )}
       />
       <Typography variant="body2">Members</Typography>
       <div
@@ -54,16 +38,15 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
           alignItems: "center",
         }}
       >
-        {memberNames.map(({ first, last }, index) => (
+        {currentGroup.members.map(({ name }, index) => (
           <Avatar
             key={`avatar_${index}`}
             style={{ backgroundColor: "purple", marginLeft: 10 }} // TODO no inline
           >
-            {`${first[0]}${last[0]}`}
+            {`${name.first} ${name.last}`}
           </Avatar>
         ))}
       </div>
-      {/* <Typography>{group?.title}</Typography> */}
       <Button
         size="small"
         variant="contained"

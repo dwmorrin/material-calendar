@@ -1,11 +1,12 @@
-import React, { FunctionComponent, useContext } from "react";
+import React, { FunctionComponent } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { CalendarUIProps } from "../calendar/types";
-import { projectGroupReducer } from "../resources/Project";
 import ProjectExpansionList from "./ProjectExpansionList";
-import ProjectListItem from "./ProjectListItem";
-import { AuthContext } from "./AuthContext";
+// import ProjectListItem from "./ProjectListItem";
 import { Typography } from "@material-ui/core";
+import { ResourceKey } from "../resources/types";
+import Project from "../resources/Project";
+import Course from "../resources/Course";
 
 const useStyles = makeStyles({
   root: {
@@ -17,34 +18,24 @@ const ProjectList: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { user } = useContext(AuthContext);
-  const projects = state.projects.filter((project) =>
-    user?.projectIds.includes(project.id)
-  );
-  const groups = projects.reduce(projectGroupReducer, {});
-  const singletons = projects.filter((project) => !project.parentId);
   const classes = useStyles();
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const courses = state.resources[ResourceKey.Courses] as Course[];
   return (
     <div className={classes.root}>
       {projects.length ? <Typography variant="body1">Projects</Typography> : ""}
-      {groups &&
-        Object.keys(groups).map((key) => (
+      {courses &&
+        courses.map((course, index) => (
           <ProjectExpansionList
-            key={`${key}_exp_list`}
+            key={`${index}_exp_list`}
             dispatch={dispatch}
             state={state}
-            parentId={key}
-            projects={projects.filter((project) => project.parentId === key)}
+            parentId={course.title}
+            projects={projects.filter(
+              (project) => project.course.title === course.title
+            )}
           />
         ))}
-      {singletons.map((project) => (
-        <ProjectListItem
-          key={`${project.id}_list_item`}
-          dispatch={dispatch}
-          state={state}
-          project={project}
-        />
-      ))}
     </div>
   );
 };

@@ -53,7 +53,7 @@ const login = (
 ): void => {
   if (!setUser || !setErrors) return;
   // FOR TESTING ONLY, NOT USED IN PRODUCTION
-  fetch("/api/login", {
+  fetch("/login", {
     method: "POST",
     credentials: "same-origin",
     headers: {
@@ -62,23 +62,20 @@ const login = (
     body: JSON.stringify({ username }),
   })
     .then((response) => response.json())
-    .then((user) => {
+    .then(({ data }) => {
       if (!setUser) {
         throw new Error("no method to log in user found");
       }
-      if (!user) {
+      if (!data) {
         throw new Error("not a valid user");
       }
-      if (!user.id) {
-        setErrors({ username: true, password: false });
-        return;
-      }
-      sessionStorage.setItem("id", user.id);
-      setUser(new User(user));
+      sessionStorage.setItem("username", data.username);
+      setUser(new User(data));
       navigate("/calendar");
     })
     .catch((error) => {
       console.error(error); // TODO handle 500 & 401 responses
+      sessionStorage.clear(); //! experimental - double check this is correct
       setErrors({ username: true, password: false });
     });
 };
@@ -98,7 +95,7 @@ const SignIn: FunctionComponent<RouteComponentProps> = () => {
   };
 
   useEffect(() => {
-    const username = sessionStorage.getItem("id");
+    const username = sessionStorage.getItem("username");
     if (username) {
       login(username, setUser, setErrors);
     }

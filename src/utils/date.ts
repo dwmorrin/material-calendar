@@ -24,6 +24,17 @@ export function compareDateOrder(
   return dateInputToNumber(earlier) <= dateInputToNumber(later);
 }
 
+export function getFormattedDate(d: string | Date): string {
+  if (typeof d === "string") {
+    d = new Date(d);
+  }
+  return d.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
+  });
+}
+
 export function getFormattedEventInterval(
   start: string | Date,
   end: string | Date
@@ -34,6 +45,8 @@ export function getFormattedEventInterval(
   if (typeof end === "string") {
     end = new Date(end);
   }
+  if (start === undefined) start = new Date();
+  if (end === undefined) end = new Date();
   const sameDay =
     start.getFullYear() === end.getFullYear() &&
     start.getMonth() === end.getMonth() &&

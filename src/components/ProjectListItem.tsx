@@ -9,6 +9,7 @@ import {
 } from "@material-ui/core";
 import InfoIcon from "@material-ui/icons/Info";
 import Project from "../resources/Project";
+import { ResourceKey } from "../resources/types";
 
 interface ProjectListItemProps extends CalendarUIProps {
   project: Project;
@@ -28,13 +29,18 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
         dispatch({
           type: CalendarAction.SelectedProject,
           payload: {
-            projects: state.projects.map((proj) => {
-              if (proj.id !== project.id) {
-                return proj;
-              }
-              proj.selected = !proj.selected;
-              return proj;
-            }),
+            resources: {
+              ...state.resources,
+              [ResourceKey.Projects]: state.resources[ResourceKey.Projects].map(
+                (proj) => {
+                  if (proj.id !== project.id) {
+                    return proj;
+                  }
+                  proj.selected = !proj.selected;
+                  return proj;
+                }
+              ),
+            },
           },
         });
       }}
@@ -45,18 +51,23 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
         inputProps={{ "aria-label": "checkbox with small size" }}
         key={project.title}
         onClick={(event): void => event.stopPropagation()}
-        onChange={(event: React.ChangeEvent<{}>, checked): void => {
+        onChange={(event: React.ChangeEvent, checked): void => {
           event.stopPropagation();
           dispatch({
             type: CalendarAction.SelectedProject,
             payload: {
-              projects: state.projects.map((proj) => {
-                if (proj.id !== project.id) {
+              resources: {
+                ...state.resources,
+                [ResourceKey.Projects]: state.resources[
+                  ResourceKey.Projects
+                ].map((proj) => {
+                  if (proj.id !== project.id) {
+                    return proj;
+                  }
+                  proj.selected = checked;
                   return proj;
-                }
-                proj.selected = checked;
-                return proj;
-              }),
+                }),
+              },
             },
           });
         }}

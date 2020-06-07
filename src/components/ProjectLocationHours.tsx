@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, FunctionComponent } from "react";
 import * as d3 from "d3";
-import { ProjectLocationAllotment } from "../resources/Project";
+import { ProjectAllotment } from "../resources/Project";
 
 const height = 90; // height of the total bar chart area in px
 const width = 300; // width of the totla bar char area in px
@@ -21,7 +21,7 @@ const goodHourAmount = (extent: AllotmentExtent): number => {
   return (goodHourThreshold * d3.timeDay.count(extent.start, extent.end)) / 7;
 };
 
-const getExtent = (allotments: ProjectLocationAllotment[]): AllotmentExtent => {
+const getExtent = (allotments: ProjectAllotment[]): AllotmentExtent => {
   return {
     hours: d3.max(allotments, (a) => a.hours) || 0,
     start: d3.min(allotments, (a) => new Date(a.start)) || new Date(),
@@ -60,7 +60,7 @@ interface AllotmentBar {
 }
 
 const bars = (
-  allotments: ProjectLocationAllotment[],
+  allotments: ProjectAllotment[],
   scales: AllotmentScales
 ): AllotmentBar[] => {
   const b = allotments.map((a) => {
@@ -85,7 +85,7 @@ const bars = (
 };
 
 interface ProjectLocationHoursProps {
-  allotments: ProjectLocationAllotment[];
+  allotments: ProjectAllotment[];
 }
 const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
   allotments,

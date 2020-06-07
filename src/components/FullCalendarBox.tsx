@@ -11,15 +11,26 @@ import "@fullcalendar/list/main.css";
 import "@fullcalendar/timegrid/main.css";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeSelectedLocationDict } from "../resources/Location";
+import { ResourceKey } from "../resources/types";
+import Event from "../resources/Event";
+import Location from "../resources/Location";
+import Project from "../resources/Project";
+
+const stringStartsWithResource = (s: string): boolean =>
+  s.indexOf("resource") === 0;
 
 const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const selectedProjects = state.projects.filter((project) => project.selected);
+  const selectedProjects = state.resources[ResourceKey.Projects].filter(
+    (project) => project.selected
+  );
   const projectLocations = new Set();
   selectedProjects.forEach((project) =>
-    project.locationIds.forEach((id) => projectLocations.add(id))
+    (project as Project).allotments.forEach(({ locationId }) =>
+      projectLocations.add(locationId)
+    )
   );
 
   return (
@@ -41,12 +52,12 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
           height="parent"
           defaultView="resourceTimeGridDay"
           eventClick={(info): void => {
-            const event = state.events.find(
+            const event = state.resources[ResourceKey.Events].find(
               (event) => event.id === +info.event.id
             );
             dispatch({
-              type: CalendarAction.ViewEventDetail,
-              payload: { currentEvent: event },
+              type: CalendarAction.OpenEventDetail,
+              payload: { currentEvent: event as Event },
             });
           }}
           plugins={[
@@ -57,24 +68,35 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
           ]}
           events={(_, successCallback): void => {
             // https://fullcalendar.io/docs/events-function
-            if (state.currentView.indexOf("resource") !== 0) {
-              const selectedLocations = makeSelectedLocationDict(
-                state.locations
-              );
+            if (stringStartsWithResource(state.currentView)) {
+              // FullCalendar's resource system handles locations automatically
+              // so long as we provide a .resourceId prop
               successCallback(
-                state.events.filter(
-                  (event) =>
-                    projectLocations.has(event.resourceId) ||
-                    selectedLocations[event.resourceId]
-                )
+                state.resources[ResourceKey.Events].map((event) => ({
+                  ...event,
+                  resourceId: (event as Event).location.id,
+                }))
               );
             } else {
-              successCallback(state.events);
+              // We are not using the resource system; we have to manually group locations
+              const selectedLocations = makeSelectedLocationDict(
+                state.resources[ResourceKey.Locations] as Location[]
+              );
+              successCallback(
+                state.resources[ResourceKey.Events].filter(
+                  (event) =>
+                    projectLocations.has((event as Event).location.id) ||
+                    selectedLocations[(event as Event).location.title as string]
+                )
+              );
             }
           }}
-          resources={state.locations.filter(
-            (location) => projectLocations.has(location.id) || location.selected
-          )}
+          resources={state.resources[ResourceKey.Locations]
+            .filter(
+              (location) =>
+                projectLocations.has(location.id) || location.selected
+            )
+            .map((location) => ({ ...location, id: "" + location.id }))}
           schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         />
       )}

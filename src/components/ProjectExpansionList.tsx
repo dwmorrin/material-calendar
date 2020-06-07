@@ -14,6 +14,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import ProjectListItem from "./ProjectListItem";
 import { AuthContext } from "./AuthContext";
 import Project from "../resources/Project";
+import { ResourceKey } from "../resources/types";
 
 const useStyles = makeStyles(() => ({
   nopadding: {
@@ -59,15 +60,17 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
             dispatch({
               type: CalendarAction.SelectedProject,
               payload: {
-                projects: state.projects.map((project) => {
-                  if (
-                    user?.projectIds.includes(project.id) &&
-                    project.parentId === parentId
-                  ) {
-                    project.selected = checked;
-                  }
-                  return project;
-                }),
+                resources: {
+                  //! TODO check that this is working - major refactor
+                  ...state.resources,
+                  [ResourceKey.Projects]: state.resources[
+                    ResourceKey.Projects
+                  ].map((project) => {
+                    if ((project as Project).course.title === parentId)
+                      project.selected = checked;
+                    return project;
+                  }),
+                },
               },
             });
           }}

@@ -1,8 +1,8 @@
 import Event from "../resources/Event";
-import Location from "../resources/Location";
 import Project from "../resources/Project";
 import FullCalendar from "@fullcalendar/react";
 import UserGroup from "../resources/UserGroup";
+import { ResourceKey, ResourceInstance } from "../resources/types";
 
 export enum CalendarAction {
   ChangedView,
@@ -12,18 +12,16 @@ export enum CalendarAction {
   Error,
   Loading,
   PickedDate,
+  OpenEventDetail,
   OpenGroupDashboard,
   OpenProjectDashboard,
-  ReceivedEvents,
-  ReceivedGroups,
-  ReceivedLocations,
-  ReceivedProjects,
+  ReceivedAllResources,
+  ReceivedResource,
   SelectedGroup,
   SelectedLocation,
   SelectedProject,
   ToggleDrawer,
   TogglePicker,
-  ViewEventDetail,
   ViewToday,
 }
 
@@ -34,30 +32,51 @@ export type CalendarView =
   | "resourceTimeGridWeek";
 
 export interface CalendarState {
-  currentEvent?: Event;
-  currentGroup?: UserGroup;
-  currentProject?: Project;
-  groups: UserGroup[];
+  // UI state
   currentStart: Date;
   currentView: string;
   detailIsOpen: boolean;
   drawerIsOpen: boolean;
   error?: Error;
-  events: Event[];
   groupDashboardIsOpen: boolean;
   loading: boolean;
-  locations: Location[];
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
-  projects: Project[];
   ref: React.RefObject<FullCalendar> | null;
+
+  // Resources
+  resources: { [k in ResourceKey]: ResourceInstance[] };
+  currentEvent?: Event;
+  currentGroup?: UserGroup;
+  currentProject?: Project;
 }
 
 // https://github.com/redux-utilities/flux-standard-action
 export interface Action {
   type: CalendarAction;
-  payload?: Partial<CalendarState>;
+  //! Partial<CalendarState> would work except for resources
+  payload?: {
+    // UI state
+    currentStart?: Date;
+    currentView?: string;
+    detailIsOpen?: boolean;
+    drawerIsOpen?: boolean;
+    error?: Error;
+    groupDashboardIsOpen?: boolean;
+    loading?: boolean;
+    pickerShowing?: boolean;
+    projectDashboardIsOpen?: boolean;
+    ref?: React.RefObject<FullCalendar> | null;
+
+    // Resources
+    //! this needs to be Partial as well
+    resources?: { [k: number]: ResourceInstance[] };
+    currentEvent?: Event;
+    currentGroup?: UserGroup;
+    currentProject?: Project;
+  };
   error?: boolean;
+  meta?: ResourceKey;
 }
 
 export type CalendarUIProps = {

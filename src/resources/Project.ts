@@ -1,57 +1,46 @@
-import inflate from "../util/inflate";
-
-export interface ProjectLocationAllotment {
-  projectId: number;
-  locationId: number | string;
-  start: Date;
-  end: Date;
+export interface ProjectAllotment {
+  locationId: number;
+  start: string;
+  end: string;
   hours: number;
 }
 
 export interface Project {
-  childrenIds: (string | number)[];
-  end: string | Date;
-  id: string | number;
-  locationIds: (string | number)[];
-  manager: string;
-  open?: boolean;
-  parentId: string | number;
-  reservationEnd: string | Date;
-  reservationStart: string | Date;
-  selected: boolean;
-  start: string | Date;
+  [k: string]: unknown;
+  id: number;
   title: string;
+  course: { title: string };
+  start: string;
+  end: string;
+  reservationStart: string;
+  allotments: ProjectAllotment[];
+  managers: string[];
+  open: boolean;
+  groupSize: number;
+  groupAllottedHours: number;
+  selected?: boolean;
 }
 
-export class Project {
-  constructor(project: Project) {
-    Object.assign(this, project);
-    this.start = new Date(this.start);
-    this.end = new Date(this.end);
-    this.locationIds = inflate(this.locationIds);
-    this.childrenIds = inflate(this.childrenIds);
-  }
-}
-
-export interface ProjectGroups {
-  [k: string]: Project[];
-}
-
-export const projectGroupReducer = (
-  groups: ProjectGroups | undefined,
-  project: Project
-): ProjectGroups | undefined => {
-  if (!project.parentId) {
-    return groups;
-  }
-  if (groups) {
-    if (!groups[project.parentId]) {
-      groups[project.parentId] = [project];
-      return groups;
+export class Project implements Project {
+  static url = "/api/projects";
+  static collectionKey = "projects";
+  constructor(
+    project = {
+      id: 0,
+      title: "",
+      course: { title: "" },
+      start: "",
+      end: "",
+      reservationStart: "",
+      allotments: [] as ProjectAllotment[],
+      managers: [] as string[],
+      open: false,
+      groupSize: 0,
+      groupAllottedHours: 0,
     }
-    groups[project.parentId].push(project);
-    return groups;
+  ) {
+    Object.assign(this, project);
   }
-};
+}
 
 export default Project;

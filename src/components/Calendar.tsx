@@ -8,17 +8,18 @@ import React, {
 import { makeStyles } from "@material-ui/core/styles";
 import { RouteComponentProps, Redirect } from "@reach/router";
 import TemporaryDrawer from "./TemporaryDrawer";
-import { CalendarAction } from "../calendar/types";
 import CalendarBar from "./CalendarBar";
 import StaticDatePicker from "./DatePicker";
 import FullCalendar from "@fullcalendar/react";
 import { AuthContext } from "./AuthContext";
-import { fetchAllCalendarData } from "../calendar/Fetch";
-import calendarReducer from "../calendar/Reducer";
+import reducer from "../calendar/reducer";
 import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
-import initialState from "../calendar/initialCalendarState";
+import initialState from "../calendar/initialState";
 import ProjectDashboard from "./ProjectDashboard";
+import { ResourceKey } from "../resources/types";
+import fetchAllResources from "../utils/fetchAllResources";
+import { CalendarAction } from "../calendar/types";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -30,43 +31,26 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
   const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
-  const [state, dispatch] = useReducer(calendarReducer, {
+  const [state, dispatch] = useReducer(reducer, {
     ...initialState,
     ref: calendarRef,
   });
 
   useEffect(() => {
-    if (!user?.id) return;
-    fetchAllCalendarData([
-      {
-        url: "/api/events",
-        dispatch,
-        onSuccessAction: CalendarAction.ReceivedEvents,
-        payloadKey: "events",
-      },
-      {
-        url: "/api/groups",
-        dispatch,
-        onSuccessAction: CalendarAction.ReceivedGroups,
-        payloadKey: "groups",
-      },
-      {
-        url: "/api/locations",
-        dispatch,
-        onSuccessAction: CalendarAction.ReceivedLocations,
-        payloadKey: "locations",
-      },
-      {
-        url: "/api/projects",
-        dispatch,
-        onSuccessAction: CalendarAction.ReceivedProjects,
-        payloadKey: "projects",
-      },
-    ]);
+    if (!user?.username) return;
+    fetchAllResources(
+      dispatch,
+      CalendarAction.ReceivedAllResources,
+      `/api/events?context=${ResourceKey.Events}`,
+      `/api/locations?context=${ResourceKey.Locations}`,
+      `/api/users/${user.username}/courses?context=${ResourceKey.Courses}`,
+      `/api/users/${user.username}/groups?context=${ResourceKey.Groups}`,
+      `/api/users/${user.username}/projects?context=${ResourceKey.Projects}`
+    );
   }, [user]);
 
   return (
-    (user?.id && (
+    (user?.username && (
       <div className={classes.root}>
         <ProjectDashboard dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />

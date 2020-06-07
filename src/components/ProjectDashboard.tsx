@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useEffect,
-  useContext,
-  useState,
-} from "react";
+import React, { FunctionComponent } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   IconButton,
@@ -20,14 +15,13 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
-import { getFormattedEventInterval } from "../calendar/date";
-import { ProjectLocationAllotment } from "../resources/Project";
+import { getFormattedEventInterval } from "../utils/date";
 import ProjectLocationHours from "./ProjectLocationHours";
-import { fetchCalendarData } from "../calendar/Fetch";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
 import GroupDashboard from "./GroupDashboard";
+import { ResourceKey } from "../resources/types";
+import Event from "../resources/Event";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,37 +34,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const transition = makeTransition("right");
-const initialAllotments: ProjectLocationAllotment[][] = [];
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
   const classes = useStyles();
-  const [allotments, setAllotments] = useState(initialAllotments);
   const { currentProject } = state;
-  const locations = state.locations.filter((location) =>
-    currentProject?.locationIds.includes(location.id)
+  const locations = state.resources[ResourceKey.Locations].filter((location) =>
+    currentProject?.allotments.find((a) => a.locationId === location.id)
   );
 
-  useEffect(() => {
-    if (!currentProject) {
-      return;
-    }
-    const requests = currentProject.childrenIds.map((id) =>
-      fetch(`/api/project_location_allotment/${id}`)
-    );
-    Promise.all(requests)
-      .then((responses) => {
-        Promise.all(responses.map((res) => res.json()))
-          .then((locations) => setAllotments(locations))
-          .catch(console.error);
-      })
-      .catch(console.error);
-  }, [currentProject]);
-
-  const groupEvents = state.events.filter(
-    (event) => event.projectGroupId === state.currentGroup?.id
+  const groupEvents = (state.resources[ResourceKey.Events] as Event[]).filter(
+    (event) =>
+      event.reservation &&
+      state.currentGroup &&
+      event.reservation.groupId === state.currentGroup.id
   );
   groupEvents.sort((a, b) => {
     if (typeof a.start !== "string" || typeof b.start !== "string") return 0;
@@ -123,7 +102,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             )}
         </Typography>
         <Typography variant="body2">
-          Managed by {currentProject && currentProject.manager}
+          Managed by {currentProject && currentProject.managers.join(", ")}
         </Typography>
         <ExpansionPanel defaultExpanded={locations.length === 1}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -134,11 +113,14 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
               key={`${location.id}`}
               style={{ display: "flex", flexDirection: "column" }}
             >
-              <Typography variant="body2">{location.title}</Typography>
+              <Typography variant="body2">
+                {location.title as string}
+              </Typography>
               <ProjectLocationHours
-                // extracts one allotments[] from allotments[][]
                 allotments={
-                  allotments.filter((a) => a[0].locationId === location.id)[0]
+                  currentProject?.allotments.filter(
+                    (a) => a.locationId === location.id
+                  ) || []
                 }
               />
             </ExpansionPanelDetails>
@@ -158,7 +140,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             key={`group_event_listing_${event.id}`}
             onClick={(): void =>
               dispatch({
-                type: CalendarAction.ViewEventDetail,
+                type: CalendarAction.OpenEventDetail,
                 payload: { currentEvent: event },
               })
             }
@@ -178,7 +160,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             key={`group_event_listing_${event.id}`}
             onClick={(): void =>
               dispatch({
-                type: CalendarAction.ViewEventDetail,
+                type: CalendarAction.OpenEventDetail,
                 payload: { currentEvent: event },
               })
             }

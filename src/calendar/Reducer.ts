@@ -1,198 +1,186 @@
 import { CalendarAction, CalendarState, Action } from "./types";
-import Event from "../resources/Event";
-import Location from "../resources/Location";
-import Project from "../resources/Project";
-import UserGroup from "../resources/UserGroup";
+import { ResourceKey } from "../resources/types";
 
-/**
- * calendarReducer takes all actions from the calendar and handles them
- * NOTE: the series of `if` statements should be kept in sorted order by
- *   CalendarAction, i.e. first is CalendarAction.A, last is CalendarAction.Z
- * @param {CalendarState} state The state of the calendar
- * @param {Action} action An action that needs to be handled here
- */
-const calendarReducer = (
-  state: CalendarState,
-  action: Action
-): CalendarState => {
-  if (action.type === CalendarAction.ChangedView) {
-    if (!action.payload?.currentView) {
-      throw new Error("no view received in view change request");
-    }
-    if (state.ref?.current) {
-      state.ref.current.getApi().changeView(action.payload.currentView);
-    }
-    return { ...state, currentView: action.payload.currentView };
+type StateHandler = (state: CalendarState, action: Action) => CalendarState;
+
+const changedView: StateHandler = (state, { payload }) => {
+  if (!state.ref?.current || !payload?.currentView) {
+    console.error("no calendar ref or no view received in view change request");
+    return state;
   }
+  state.ref.current.getApi().changeView(payload.currentView);
+  return { ...state, currentView: payload.currentView };
+};
 
-  if (action.type === CalendarAction.CloseEventDetail) {
-    return { ...state, detailIsOpen: false };
+const closeEventDetail: StateHandler = (state) => ({
+  ...state,
+  detailIsOpen: false,
+});
+
+const closeProjectDashboard: StateHandler = (state) => ({
+  ...state,
+  projectDashboardIsOpen: false,
+});
+
+const closeGroupDashboard: StateHandler = (state) => ({
+  ...state,
+  groupDashboardIsOpen: false,
+});
+
+const error: StateHandler = (state, { payload }) => {
+  if (payload && payload.error) {
+    console.error(payload.error);
   }
-
-  if (action.type === CalendarAction.CloseProjectDashboard) {
-    return { ...state, projectDashboardIsOpen: false };
-  }
-
-  if (action.type === CalendarAction.CloseGroupDashboard) {
-    return { ...state, groupDashboardIsOpen: false };
-  }
-
-  if (action.type === CalendarAction.Error) {
-    if (action.payload && action.payload.error) {
-      console.error(action.payload.error);
-    }
-  }
-
-  if (action.type === CalendarAction.Loading) {
-    return { ...state, loading: true };
-  }
-
-  if (action.type === CalendarAction.PickedDate) {
-    if (!action.payload?.currentStart) {
-      throw new Error("no date returned from picker");
-    }
-    const currentStart = action.payload.currentStart;
-    if (state.ref?.current) {
-      state.ref.current.getApi().gotoDate(currentStart);
-    }
-    return { ...state, currentStart, pickerShowing: !state.pickerShowing };
-  }
-
-  if (action.type === CalendarAction.OpenGroupDashboard) {
-    return {
-      ...state,
-      // currentProject: action.payload?.currentProject,
-      groupDashboardIsOpen: true,
-    };
-  }
-
-  if (action.type === CalendarAction.OpenProjectDashboard) {
-    return {
-      ...state,
-      currentProject: action.payload?.currentProject,
-      projectDashboardIsOpen: true,
-    };
-  }
-
-  if (action.type === CalendarAction.ReceivedEvents) {
-    if (!action.payload?.events) {
-      throw new Error("no event data in received events");
-    }
-    return {
-      ...state,
-      loading: !state.locations,
-      events: action.payload.events.map((event) => new Event(event)),
-    };
-  }
-
-  if (action.type === CalendarAction.ReceivedGroups) {
-    if (!action.payload?.groups) {
-      throw new Error("no groups in received groups");
-    }
-    return {
-      ...state,
-      loading: false, // ! need to evaluate the `loading` handling
-      groups: action.payload.groups.map(
-        (group: UserGroup) => new UserGroup(group)
-      ),
-    };
-  }
-
-  if (action.type === CalendarAction.ReceivedLocations) {
-    if (!action.payload?.locations) {
-      throw new Error("no locations in received locations");
-    }
-    if (!state.locations.length) {
-      let savedLocations = sessionStorage.getItem("locations");
-      if (savedLocations) {
-        try {
-          savedLocations = JSON.parse(savedLocations);
-          // loop over payload with saved, updating selected
-          if (Array.isArray(savedLocations)) {
-            savedLocations.forEach((savedLocation) => {
-              const location = action.payload?.locations?.find(
-                (l) => l.id === savedLocation.id
-              );
-              if (location) location.selected = savedLocation.selected;
-            });
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    }
-    return {
-      ...state,
-      loading: !state.events,
-      locations: action.payload.locations.map(
-        (location) => new Location(location)
-      ),
-    };
-  }
-
-  if (action.type === CalendarAction.ReceivedProjects) {
-    if (!action.payload?.projects) {
-      throw new Error("no projects in received projects");
-    }
-    return {
-      ...state,
-      loading: !state.events || !state.locations,
-      projects: action.payload.projects.map((project) => new Project(project)),
-    };
-  }
-
-  if (action.type === CalendarAction.SelectedGroup) {
-    if (!action.payload?.currentGroup) {
-      throw new Error("no group in selected group");
-    }
-    return { ...state, currentGroup: action.payload.currentGroup };
-  }
-
-  if (action.type === CalendarAction.SelectedLocation) {
-    if (!action.payload?.locations) {
-      throw new Error("no locations in selected location");
-    }
-    sessionStorage.setItem(
-      "locations",
-      JSON.stringify(action.payload.locations)
-    );
-    return { ...state, locations: action.payload.locations };
-  }
-
-  if (action.type === CalendarAction.SelectedProject) {
-    if (!action.payload?.projects) {
-      throw new Error("no user projects in selected projects");
-    }
-    return { ...state, projects: action.payload.projects };
-  }
-
-  if (action.type === CalendarAction.ToggleDrawer) {
-    return { ...state, drawerIsOpen: !state.drawerIsOpen };
-  }
-
-  if (action.type === CalendarAction.TogglePicker) {
-    return { ...state, pickerShowing: !state.pickerShowing };
-  }
-
-  if (action.type === CalendarAction.ViewEventDetail) {
-    if (!action.payload?.currentEvent) {
-      throw new Error("no event received for detail view");
-    }
-    return {
-      ...state,
-      detailIsOpen: true,
-      currentEvent: action.payload.currentEvent,
-    };
-  }
-
-  if (action.type === CalendarAction.ViewToday) {
-    if (state.ref?.current) {
-      state.ref.current.getApi().today();
-    }
-    return { ...state, currentStart: new Date() };
-  }
-
   return state;
 };
+
+const loading: StateHandler = (state) => ({
+  ...state,
+  loading: true,
+});
+
+const pickedDate: StateHandler = (state, { payload }) => {
+  if (!payload?.currentStart) {
+    console.error("no date returned from picker");
+    return state;
+  }
+  const currentStart = payload.currentStart;
+  if (state.ref?.current) {
+    state.ref.current.getApi().gotoDate(currentStart);
+  }
+  return { ...state, currentStart, pickerShowing: !state.pickerShowing };
+};
+
+const openEventDetail: StateHandler = (state, { payload }) => {
+  if (!payload?.currentEvent) {
+    console.error("no event received for detail view");
+    return state;
+  }
+  return {
+    ...state,
+    detailIsOpen: true,
+    currentEvent: payload.currentEvent,
+  };
+};
+
+const openGroupDashboard: StateHandler = (state) => ({
+  ...state,
+  // currentProject: payload?.currentProject,
+  groupDashboardIsOpen: true,
+});
+
+const openProjectDashboard: StateHandler = (state, { payload }) => ({
+  ...state,
+  currentProject: payload?.currentProject,
+  projectDashboardIsOpen: true,
+});
+
+const receivedAllResources: StateHandler = (state, { payload }) => ({
+  ...state,
+  resources: { ...state.resources, ...payload?.resources },
+  loading: false,
+});
+
+const receivedResource: StateHandler = (
+  state,
+  { payload, meta: resourceKey }
+) => {
+  const resources = payload?.resources;
+  if (!resources) {
+    throw new Error("no resources in payload");
+  }
+  if (resourceKey === undefined) {
+    throw new Error("no context given");
+  }
+  return {
+    ...state,
+    resources: { ...state.resources, [resourceKey]: resources[resourceKey] },
+  };
+};
+
+const selectedGroup: StateHandler = (state, { payload }) => {
+  if (!payload?.currentGroup) {
+    console.error("no group in selected group");
+    return state;
+  }
+  return { ...state, currentGroup: payload.currentGroup };
+};
+
+const selectedLocation: StateHandler = (state, { payload }) => {
+  if (
+    !payload ||
+    !payload.resources ||
+    !payload.resources[ResourceKey.Locations]
+  ) {
+    console.error("no locations in selected location");
+    return state;
+  }
+  sessionStorage.setItem(
+    "locations",
+    JSON.stringify(!payload.resources[ResourceKey.Locations])
+  );
+  return {
+    ...state,
+    resources: {
+      ...state.resources,
+      [ResourceKey.Locations]: payload.resources[ResourceKey.Locations],
+    },
+  };
+};
+
+const selectedProject: StateHandler = (state, { payload }) => {
+  if (!payload?.resources || !payload.resources[ResourceKey.Projects]) {
+    console.error("no user projects in selected projects");
+    return state;
+  }
+  return {
+    ...state,
+    resources: {
+      ...state.resources,
+      [ResourceKey.Projects]: payload.resources[ResourceKey.Projects],
+    },
+  };
+};
+
+const toggleDrawer: StateHandler = (state) => ({
+  ...state,
+  drawerIsOpen: !state.drawerIsOpen,
+});
+
+const togglePicker: StateHandler = (state) => ({
+  ...state,
+  pickerShowing: !state.pickerShowing,
+});
+
+const viewToday: StateHandler = (state) => {
+  if (!state.ref?.current) {
+    console.error("no calendar reference");
+    return state;
+  }
+  state.ref.current.getApi().today();
+  return { ...state, currentStart: new Date() };
+};
+
+const calendarReducer: StateHandler = (state, action) =>
+  ({
+    [CalendarAction.ChangedView]: changedView,
+    [CalendarAction.CloseEventDetail]: closeEventDetail,
+    [CalendarAction.CloseProjectDashboard]: closeProjectDashboard,
+    [CalendarAction.CloseGroupDashboard]: closeGroupDashboard,
+    [CalendarAction.Error]: error,
+    [CalendarAction.Loading]: loading,
+    [CalendarAction.PickedDate]: pickedDate,
+    [CalendarAction.OpenEventDetail]: openEventDetail,
+    [CalendarAction.OpenGroupDashboard]: openGroupDashboard,
+    [CalendarAction.OpenProjectDashboard]: openProjectDashboard,
+    [CalendarAction.ReceivedAllResources]: receivedAllResources,
+    [CalendarAction.ReceivedResource]: receivedResource,
+    [CalendarAction.SelectedGroup]: selectedGroup,
+    [CalendarAction.SelectedLocation]: selectedLocation,
+    [CalendarAction.SelectedProject]: selectedProject,
+    [CalendarAction.ToggleDrawer]: toggleDrawer,
+    [CalendarAction.TogglePicker]: togglePicker,
+    [CalendarAction.ViewToday]: viewToday,
+  }[action.type](state, action));
 
 export default calendarReducer;

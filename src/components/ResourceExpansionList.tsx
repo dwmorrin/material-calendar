@@ -11,6 +11,8 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ResourceListItem from "./ResourceListItem";
 import { makeStyles } from "@material-ui/core/styles";
+import Location from "../resources/Location";
+import { ResourceKey } from "../resources/types";
 
 const useStyles = makeStyles(() => ({
   nopadding: {
@@ -26,9 +28,9 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
   state,
   groupId,
 }) => {
-  const { locations } = state;
+  const locations = state.resources[ResourceKey.Locations] as Location[];
   const classes = useStyles();
-  const groupLocations = state.locations.filter(
+  const groupLocations = locations.filter(
     (location) => location.groupId === groupId
   );
   const checked = groupLocations.every((location) => location.selected);
@@ -55,13 +57,16 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
             dispatch({
               type: CalendarAction.SelectedLocation,
               payload: {
-                locations: state.locations.map((location) => {
-                  if (location.groupId !== groupId) {
+                resources: {
+                  ...state.resources,
+                  [ResourceKey.Locations]: locations.map((location) => {
+                    if (location.groupId !== groupId) {
+                      return location;
+                    }
+                    location.selected = checked;
                     return location;
-                  }
-                  location.selected = checked;
-                  return location;
-                }),
+                  }),
+                },
               },
             });
           }}

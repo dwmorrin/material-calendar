@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from "react";
+import React, { FunctionComponent } from "react";
 import { CalendarAction, CalendarUIProps } from "../calendar/types";
 import {
   AppBar,
@@ -9,11 +9,9 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
 import TodayIcon from "@material-ui/icons/Today";
-import { AuthContext } from "./AuthContext";
-import { navigate } from "@reach/router";
 import ViewMenu from "./ViewMenu";
+import MoreMenu from "./MoreMenu";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 const useStyles = makeStyles(() => ({
@@ -30,7 +28,6 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { user, setUser } = useContext(AuthContext);
   const classes = useStyles();
   return (
     <AppBar position="sticky">
@@ -67,24 +64,7 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
           <TodayIcon />
         </IconButton>
         <ViewMenu dispatch={dispatch} state={state} />
-        <IconButton
-          color="inherit"
-          onClick={(): void => {
-            if (!user || !setUser) {
-              throw new Error("no method to logout user");
-            }
-            fetch("/api/logout", {
-              method: "POST",
-              credentials: "include",
-            });
-            user.id = "";
-            sessionStorage.clear();
-            setUser(user);
-            navigate("/");
-          }}
-        >
-          <MoreVertIcon />
-        </IconButton>
+        <MoreMenu />
       </Toolbar>
     </AppBar>
   );

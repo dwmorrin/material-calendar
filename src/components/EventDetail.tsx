@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from "react";
+import React, { FunctionComponent } from "react";
 import {
   Dialog,
   IconButton,
@@ -12,9 +12,11 @@ import {
 } from "@material-ui/core";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import CloseIcon from "@material-ui/icons/Close";
-import { compareDateOrder, getFormattedEventInterval } from "../calendar/date";
+import { compareDateOrder, getFormattedEventInterval } from "../utils/date";
 import { makeTransition } from "./Transition";
-import { AuthContext } from "./AuthContext";
+import { ResourceKey } from "../resources/types";
+import Project from "../resources/Project";
+import UserGroup from "../resources/UserGroup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -31,34 +33,37 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const classes = useStyles();
-  const { user } = useContext(AuthContext);
   if (!state.currentEvent || !state.currentEvent.location) {
     return null;
   }
   const {
     end,
     location,
-    open,
-    reservationId,
-    resourceId,
+    reservable,
     start,
     title,
-    projectGroupId,
-    equipment,
+    reservation,
   } = state.currentEvent;
 
-  const projects = state.projects.filter(
-    (project) =>
-      compareDateOrder(project.start, start) &&
-      compareDateOrder(end, project.end) &&
-      project.locationIds &&
-      project.locationIds.includes(resourceId)
+  const projects = (state.resources[
+    ResourceKey.Projects
+  ] as Project[]).filter(({ allotments }) =>
+    allotments.some(
+      (a) =>
+        a.locationId === location.id &&
+        compareDateOrder(a.start, start) &&
+        compareDateOrder(end, a.end)
+    )
   );
-  const userOwns = projectGroupId && user?.groupIds.includes(projectGroupId);
+  const open = reservable && !reservation;
+  const userOwns =
+    reservation &&
+    (state.resources[ResourceKey.Groups] as UserGroup[]).find(
+      (group) => reservation.groupId === group.id
+    );
   const future = new Date(start as string).getTime() > Date.now();
-  const reservable = open && !reservationId;
-  const equipmentList = equipment
-    ? equipment.split(",").map((item) => item.split(";"))
+  const equipmentList = reservation?.equipment
+    ? reservation.equipment.split(",").map((item) => item.split(";"))
     : null;
 
   return (
@@ -89,7 +94,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           }}
         >
           <section>
-            <Typography variant="h6">{location}</Typography>
+            <Typography variant="h6">{location.title}</Typography>
             <Typography variant="h5">{title}</Typography>
             <Typography variant="body2">
               {getFormattedEventInterval(
@@ -100,14 +105,14 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           </section>
           {equipmentList && (
             <List>
-              {equipmentList.map((item) => (
+              {equipmentList.map(([description, sku, quantity]) => (
                 <ListItem
-                  key={item[1]}
-                >{`${item[0]} ${item[1]} ${item[2]}`}</ListItem>
+                  key={sku}
+                >{`${description} ${sku} ${quantity}`}</ListItem>
               ))}
             </List>
           )}
-          {reservable && (
+          {open && (
             <Button
               variant="contained"
               style={{ marginBottom: 30, alignSelf: "center" }}
@@ -131,9 +136,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               </Button>
             </div>
           )}
-          {reservable && (
+          {open && (
             <section>
-              <Typography component="h3">Available to</Typography>
+              <Typography component="h3">
+                {projects.length
+                  ? "Available for"
+                  : "Not available to any of your projects"}
+              </Typography>
               <List>
                 {projects.map((project) => (
                   <ListItem key={`${project.title}_list_item`}>

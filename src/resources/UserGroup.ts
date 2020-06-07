@@ -1,20 +1,29 @@
-import inflate from "../util/inflate";
-
+export interface GroupMember {
+  username: string;
+  name: {
+    first: string;
+    middle?: string;
+    last: string;
+  };
+}
 interface UserGroup {
+  [k: string]: unknown;
   id: number;
   projectId: number;
-  memberIds: string | (string | number)[];
-  memberNames: string | string[];
+  members: GroupMember[];
+  reservedHours: number;
 }
 
 class UserGroup implements UserGroup {
-  public title: string;
-  constructor(group: UserGroup) {
-    this.id = group.id;
-    this.projectId = group.projectId;
-    this.memberIds = inflate(group.memberIds);
-    this.memberNames = inflate(group.memberNames);
-    this.title = this.memberNames.join(", ");
+  static url = "/api/users/groups";
+  constructor(
+    group = {
+      id: 0,
+      projectId: 0,
+      members: [] as GroupMember[],
+    }
+  ) {
+    Object.assign(this, group);
   }
 }
 

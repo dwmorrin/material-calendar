@@ -2,6 +2,7 @@ import React, { FunctionComponent } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { ListItem, ListItemText, Checkbox } from "@material-ui/core";
 import Location from "../resources/Location";
+import { ResourceKey } from "../resources/types";
 
 interface ResourceListItemProps extends CalendarUIProps {
   location: Location;
@@ -25,13 +26,18 @@ const ResourceListItem: FunctionComponent<ResourceListItemProps> = ({
           dispatch({
             type: CalendarAction.SelectedLocation,
             payload: {
-              locations: state.locations.map((loc) => {
-                if (loc.id !== location.id) {
+              resources: {
+                ...state.resources,
+                [ResourceKey.Locations]: state.resources[
+                  ResourceKey.Locations
+                ].map((loc) => {
+                  if (loc.id !== location.id) {
+                    return loc;
+                  }
+                  loc.selected = checked;
                   return loc;
-                }
-                loc.selected = checked;
-                return loc;
-              }),
+                }),
+              },
             },
           });
         }}
