@@ -76,7 +76,7 @@ export interface Action {
     currentProject?: Project;
   };
   error?: boolean;
-  meta?: ResourceKey;
+  meta?: unknown;
 }
 
 export type CalendarUIProps = {

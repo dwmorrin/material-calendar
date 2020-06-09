@@ -27,9 +27,9 @@ const closeGroupDashboard: StateHandler = (state) => ({
   groupDashboardIsOpen: false,
 });
 
-const error: StateHandler = (state, { payload }) => {
+const error: StateHandler = (state, { payload, meta }) => {
   if (payload && payload.error) {
-    console.error(payload.error);
+    console.error({ error: payload.error, meta });
   }
   return state;
 };
@@ -81,20 +81,21 @@ const receivedAllResources: StateHandler = (state, { payload }) => ({
   loading: false,
 });
 
-const receivedResource: StateHandler = (
-  state,
-  { payload, meta: resourceKey }
-) => {
+const receivedResource: StateHandler = (state, { payload, meta }) => {
   const resources = payload?.resources;
   if (!resources) {
     throw new Error("no resources in payload");
   }
+  const resourceKey = meta as number;
   if (resourceKey === undefined) {
     throw new Error("no context given");
   }
   return {
     ...state,
-    resources: { ...state.resources, [resourceKey]: resources[resourceKey] },
+    resources: {
+      ...state.resources,
+      [resourceKey]: resources[resourceKey],
+    },
   };
 };
 
@@ -107,11 +108,7 @@ const selectedGroup: StateHandler = (state, { payload }) => {
 };
 
 const selectedLocation: StateHandler = (state, { payload }) => {
-  if (
-    !payload ||
-    !payload.resources ||
-    !payload.resources[ResourceKey.Locations]
-  ) {
+  if (!payload?.resources || !payload.resources[ResourceKey.Locations]) {
     console.error("no locations in selected location");
     return state;
   }

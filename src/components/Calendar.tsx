@@ -41,6 +41,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     fetchAllResources(
       dispatch,
       CalendarAction.ReceivedAllResources,
+      CalendarAction.Error,
       `/api/events?context=${ResourceKey.Events}`,
       `/api/locations?context=${ResourceKey.Locations}`,
       `/api/users/${user.username}/courses?context=${ResourceKey.Courses}`,
