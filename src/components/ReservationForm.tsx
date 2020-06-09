@@ -62,7 +62,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const gear = state.resources[ResourceKey.Equipment] as Equipment[];
 
-  console.log(gear);
   // Function to convert Gear Array to Quantized Gear Array
   function quantizeGear(gear: Equipment[]): Equipment[] {
     const tempArray: Equipment[] = [];
@@ -245,10 +244,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     </div>
                     <div className={classes.list}>
                       Group:{" "}
-                      {/* <div style={{ paddingLeft: 10 }}>
+                      <div style={{ paddingLeft: 10 }}>
                         {groups
                           .filter(function (group) {
-                            return group.projectId === values.project.id;
+                            return group.projectId === currentProject.id;
                           })[0]
                           .members.map((user) => {
                             return (
@@ -258,7 +257,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                               </span>
                             );
                           })}
-                      </div> */}
+                      </div>
                     </div>
                     <br />
                     <TextField
