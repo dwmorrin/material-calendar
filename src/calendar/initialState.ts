@@ -16,6 +16,8 @@ export const initialCalendarState: CalendarState = {
   detailIsOpen: false,
   drawerIsOpen: false,
   groupDashboardIsOpen: false,
+  gearFormIsOpen: false,
+  reservationFormIsOpen: false,
   loading: true,
   pickerShowing: false,
   projectDashboardIsOpen: false,

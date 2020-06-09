@@ -12,6 +12,16 @@ const changedView: StateHandler = (state, { payload }) => {
   return { ...state, currentView: payload.currentView };
 };
 
+const closeReservationForm: StateHandler = (state) => ({
+  ...state,
+  reservationFormIsOpen: false,
+});
+
+const closeGearForm: StateHandler = (state) => ({
+  ...state,
+  gearFormIsOpen: false,
+});
+
 const closeEventDetail: StateHandler = (state) => ({
   ...state,
   detailIsOpen: false,
@@ -50,6 +60,16 @@ const pickedDate: StateHandler = (state, { payload }) => {
   }
   return { ...state, currentStart, pickerShowing: !state.pickerShowing };
 };
+
+const openReservationForm: StateHandler = (state) => ({
+  ...state,
+  reservationFormIsOpen: true,
+});
+
+const openGearForm: StateHandler = (state) => ({
+  ...state,
+  gearFormIsOpen: true,
+});
 
 const openEventDetail: StateHandler = (state, { payload }) => {
   if (!payload?.currentEvent) {
@@ -164,12 +184,16 @@ const viewToday: StateHandler = (state) => {
 const calendarReducer: StateHandler = (state, action) =>
   ({
     [CalendarAction.ChangedView]: changedView,
+    [CalendarAction.CloseReservationForm]: closeReservationForm,
+    [CalendarAction.CloseGearForm]: closeGearForm,
     [CalendarAction.CloseEventDetail]: closeEventDetail,
     [CalendarAction.CloseProjectDashboard]: closeProjectDashboard,
     [CalendarAction.CloseGroupDashboard]: closeGroupDashboard,
     [CalendarAction.Error]: error,
     [CalendarAction.Loading]: loading,
     [CalendarAction.PickedDate]: pickedDate,
+    [CalendarAction.OpenReservationForm]: openReservationForm,
+    [CalendarAction.OpenGearForm]: openGearForm,
     [CalendarAction.OpenEventDetail]: openEventDetail,
     [CalendarAction.OpenGroupDashboard]: openGroupDashboard,
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,

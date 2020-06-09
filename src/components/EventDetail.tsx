@@ -2,12 +2,12 @@ import React, { FunctionComponent } from "react";
 import {
   Dialog,
   IconButton,
+  Button,
   Toolbar,
   Typography,
   makeStyles,
   ListItem,
   List,
-  Button,
   Paper,
 } from "@material-ui/core";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
@@ -17,6 +17,7 @@ import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
+import ReservationForm from "./ReservationForm";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -114,10 +115,21 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           )}
           {open && (
             <Button
-              variant="contained"
-              style={{ marginBottom: 30, alignSelf: "center" }}
+              key="MakeBooking"
+              style={{
+                backgroundColor: "Green",
+                color: "white",
+                maxWidth: "400px",
+              }}
+              onClick={(event): void => {
+                event.stopPropagation();
+                dispatch({
+                  type: CalendarAction.OpenReservationForm,
+                  payload: { currentEvent: state.currentEvent },
+                });
+              }}
             >
-              Book Me
+              Reserve this time
             </Button>
           )}
           {userOwns && future && (
@@ -153,6 +165,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             </section>
           )}
         </Paper>
+        <ReservationForm dispatch={dispatch} state={state} />
       </Dialog>
     </div>
   );
