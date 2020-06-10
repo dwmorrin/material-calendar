@@ -61,7 +61,6 @@ const EquipmentForm: FunctionComponent<CalendarUIProps & EquipmentFormProps> = (
 
   // State Declarations
   const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
-  const [matchAnyFilter, setMatchAnyFilter] = useState(false);
   const [searchString, setSearchString] = useState("");
 
   // Filtering Function to reduce the size of the equipment array being passed down
@@ -74,9 +73,9 @@ const EquipmentForm: FunctionComponent<CalendarUIProps & EquipmentFormProps> = (
       return filters[key];
     });
     if (searchString !== "") {
-      const queries = searchString.split(",");
+      const queries = searchString.split((/\W+/));
       queriedEquipment = equipment.filter(function (equipment) {
-        return queries.some(function (query) {
+        return queries.every(function (query) {
           return (
             equipment.description
               .toLowerCase()
@@ -92,15 +91,6 @@ const EquipmentForm: FunctionComponent<CalendarUIProps & EquipmentFormProps> = (
     } else {
       queriedEquipment = equipment;
     }
-    if (matchAnyFilter) {
-      return queriedEquipment.filter(function (equipment) {
-        return activeFilters.some(function (filter) {
-          return equipment.tags.some(function (tag) {
-            return tag.name.toLowerCase().includes(filter.toLowerCase().trim());
-          });
-        });
-      });
-    } else {
       return queriedEquipment.filter(function (equipment) {
         return activeFilters.every(function (filter) {
           return equipment.tags.some(function (tag) {
@@ -108,7 +98,6 @@ const EquipmentForm: FunctionComponent<CalendarUIProps & EquipmentFormProps> = (
           });
         });
       });
-    }
   }
 
   // Filter Drawer Toggle Function
@@ -141,8 +130,6 @@ const EquipmentForm: FunctionComponent<CalendarUIProps & EquipmentFormProps> = (
             visibleFilters={visibleFilters}
             searchString={searchString}
             setSearchString={setSearchString}
-            matchAny={matchAnyFilter}
-            setMatchAny={setMatchAnyFilter}
             closeDrawer={(): void => setFilterDrawerIsOpen(!filterDrawerIsOpen)}
             setFieldValue={setFieldValue}
           />
