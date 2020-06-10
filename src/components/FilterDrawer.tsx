@@ -85,7 +85,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
                   >
                     <br />
                     <br />
-                    Selected Filters
+                    Filters
                   </div>
                   <div
                     style={{
