@@ -33,6 +33,7 @@ import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import Equipment from "../resources/Equipment";
 import { quantizeEquipment, buildDictionaries } from "../utils/equipment";
+import { findProjectById } from "../utils/project";
 
 const useStyles = makeStyles(() => ({
   guests: {
@@ -74,32 +75,12 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   });
 
   // State Declarations
-  const [currentProject, setCurrentProject] = useState(projects[0]);
   const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
-  const [liveToggle, setLiveValue] = React.useState("yes");
-  const [guestToggle, setGuestValue] = React.useState("no");
-  const [notesToggle, setNotesValue] = React.useState("no");
-  const [equipmentListToggle, setEquipmentListValue] = React.useState("no");
   const [validationSchema, setValidationSchema] = React.useState(
     initialValidationSchema
   );
 
-  // Once we have projects, if we still don't have a default currentProject, assign it now.
-  if (projects[0]) {
-    if (currentProject === undefined) {
-      setCurrentProject(projects[0]);
-    }
-  }
-
-  // HandleChange Functions
-  const changeProject = (id: number): void => {
-    const proj = projects.filter(function (project) {
-      // eslint-disable-next-line
-      return project.id == id;
-    });
-    setCurrentProject(proj[0]);
-  };
-
+// HandleChange Functions
   const requireGuests = (event: React.ChangeEvent<{}>): void => {
     const val = (event.target as HTMLInputElement).value;
     if (val === "yes") {
@@ -116,7 +97,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
       setValidationSchema(initialValidationSchema);
     }
   };
-
   const toggleElement = (event: React.ChangeEvent<{}>, value: string): void => {
     const val = (event.target as HTMLInputElement).value;
     const element = document.getElementById(value);
@@ -159,12 +139,12 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 phone: "",
                 description: "",
                 guests: "",
-                project: currentProject,
-                liveRoom: liveToggle,
-                hasGuests: guestToggle,
-                hasNotes: notesToggle,
-                hasEquipment: equipmentListToggle,
-                group: groups.filter(function (group) {return group.projectId === currentProject.id;})[0],
+                project: projects[0],
+                liveRoom: "no",
+                hasGuests: "no",
+                hasNotes: "no",
+                hasEquipment: "no",
+                group: groups.filter(function (group) {return group.projectId === projects[0].id;})[0],
                 equipment: quantities,
                 filters,
               }}
@@ -173,7 +153,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
 
                 // sets the project property of values here because it
                 // doesn't update fast enough to set in the handleChange
-                values.project = currentProject;
                 setTimeout(() => {
                   console.log(values);
                   setSubmitionCompleted(true);
@@ -200,12 +179,12 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         <Select
                           dispatch={dispatch}
                           state={state}
-                          value={currentProject ? currentProject.id : ""}
+                          value={values.project.id}
                           selectName="projects"
                           selectId="projectsDropDown"
                           contents={projects}
                           onChange={(event): void => {
-                            changeProject(event?.target.value);
+                            setFieldValue("project", findProjectById(projects,event?.target.value));
                           }}
                         ></Select>
                       </div>
@@ -215,7 +194,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       <div style={{ paddingLeft: 10 }}>
                         {groups
                           .filter(function (group) {
-                            return group.projectId === currentProject.id;
+                            return group.projectId === values.project.id;
                           })[0]
                           .members.map((user) => {
                             return (
@@ -249,16 +228,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         Do you need to use the Live Room?
                       </FormLabel>
                       <RadioGroup
-                        aria-label="liveroom"
-                        name="liveroom"
+                        aria-label="liveRoom"
+                        name="liveRoom"
                         value={values.liveRoom}
-                        onChange={(
-                          event: React.ChangeEvent<{}>,
-                          value
-                        ): void => {
-                          setLiveValue(value);
-                          values.liveRoom = value;
-                        }}
+                        onChange={handleChange}
                       >
                         <FormControlLabel
                           value="yes"
@@ -291,16 +264,15 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       </FormLabel>
                       <RadioGroup
                         aria-label="guestsToggle"
-                        name="guestsToggle"
+                        name="hasGuests"
                         value={values.hasGuests}
                         onChange={(
                           event: React.ChangeEvent<{}>,
                           value
                         ): void => {
-                          setGuestValue(value);
+                          setFieldValue("hasGuests",value);
                           requireGuests(event);
                           toggleElement(event, "guestInput");
-                          values.hasGuests = value;
                         }}
                       >
                         <FormControlLabel
@@ -344,9 +316,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                           event: React.ChangeEvent<{}>,
                           value
                         ): void => {
-                          setNotesValue(value);
+                          setFieldValue("hasNotes",value);
                           toggleElement(event, "notesInput");
-                          values.hasNotes = value;
                         }}
                       >
                         <FormControlLabel
@@ -384,9 +355,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                           event: React.ChangeEvent<{}>,
                           value
                         ): void => {
-                          setEquipmentListValue(value);
+                          setFieldValue("hasEquipment",value);
                           toggleElement(event, "equipmentList");
-                          values.hasEquipment = value;
                         }}
                       >
                         <FormControlLabel
