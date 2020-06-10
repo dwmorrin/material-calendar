@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import { CalendarUIProps } from "../calendar/types";
 import { locationGroupReducer } from "../resources/Location";
 import ResourceListItem from "./ResourceListItem";
@@ -8,12 +7,6 @@ import { ExpansionPanelSummary, ExpansionPanel } from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import Location from "../resources/Location";
 
-const useStyles = makeStyles({
-  root: {
-    width: "100%",
-  },
-});
-
 const ResourceList: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
@@ -21,9 +14,8 @@ const ResourceList: FunctionComponent<CalendarUIProps> = ({
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const groups = locations.reduce(locationGroupReducer, {});
   const singletons = locations.filter((location) => !location.groupId);
-  const classes = useStyles();
   return (
-    <div className={classes.root}>
+    <div>
       {groups &&
         Object.keys(groups).map((key) => (
           <ResourceExpansionList

@@ -1,5 +1,5 @@
-import React, { FunctionComponent, useContext } from "react";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import React, { FunctionComponent } from "react";
+import { CalendarUIProps } from "../calendar/types";
 import {
   ExpansionPanel,
   ExpansionPanelSummary,
@@ -10,17 +10,9 @@ import {
   Checkbox,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { makeStyles } from "@material-ui/core/styles";
 import ProjectListItem from "./ProjectListItem";
-import { AuthContext } from "./AuthContext";
 import Project from "../resources/Project";
-import { ResourceKey } from "../resources/types";
-
-const useStyles = makeStyles(() => ({
-  nopadding: {
-    padding: 0,
-  },
-}));
+import { dispatchSelectedProjectsByCourse } from "../calendar/dispatch";
 
 interface ProjectExpansionListProps extends CalendarUIProps {
   parentId: string | number;
@@ -33,8 +25,6 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
   parentId,
   projects,
 }) => {
-  const { user } = useContext(AuthContext);
-  const classes = useStyles();
   const checked = projects.every((project) => project.selected);
   const indeterminate =
     !checked && projects.some((project) => project.selected);
@@ -57,26 +47,16 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
           onClick={(event): void => event.stopPropagation()}
           onChange={(event: React.ChangeEvent<{}>, checked): void => {
             event.stopPropagation();
-            dispatch({
-              type: CalendarAction.SelectedProject,
-              payload: {
-                resources: {
-                  //! TODO check that this is working - major refactor
-                  ...state.resources,
-                  [ResourceKey.Projects]: state.resources[
-                    ResourceKey.Projects
-                  ].map((project) => {
-                    if ((project as Project).course.title === parentId)
-                      project.selected = checked;
-                    return project;
-                  }),
-                },
-              },
-            });
+            dispatchSelectedProjectsByCourse(
+              state,
+              dispatch,
+              parentId as string,
+              checked
+            );
           }}
         />
       </ExpansionPanelSummary>
-      <ExpansionPanelDetails classes={{ root: classes.nopadding }}>
+      <ExpansionPanelDetails>
         <List>
           {projects.map((project) => (
             <ProjectListItem
