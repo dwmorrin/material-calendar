@@ -3,12 +3,14 @@ import { FindResource } from "../resources/types";
 type Dispatch = (action: {
   type: number;
   payload: { [k: string]: unknown };
+  meta?: unknown;
 }) => void;
 
 const dispatchError = (dispatch: Dispatch, type: number, error: Error): void =>
   dispatch({
     type,
     payload: { error },
+    meta: "FETCH_ALL_RESOURCES_REJECTED",
   });
 
 const dispatchAllResources = (
@@ -38,15 +40,18 @@ const dispatchAllResources = (
 
 const fetchAllResources = (
   dispatch: Dispatch,
-  type: number,
+  onFulfilledType: number,
+  onRejectedType: number,
   ...endpoints: string[]
 ): Promise<void> =>
   Promise.all(endpoints.map((url) => fetch(url)))
     .then((responses) =>
       Promise.all(responses.map((response) => response.json()))
-        .then((dataArray) => dispatchAllResources(dispatch, type, dataArray))
-        .catch((error) => dispatchError(dispatch, type, error))
+        .then((dataArray) =>
+          dispatchAllResources(dispatch, onFulfilledType, dataArray)
+        )
+        .catch((error) => dispatchError(dispatch, onRejectedType, error))
     )
-    .catch((error) => dispatchError(dispatch, type, error));
+    .catch((error) => dispatchError(dispatch, onRejectedType, error));
 
 export default fetchAllResources;
