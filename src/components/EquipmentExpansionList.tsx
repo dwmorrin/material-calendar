@@ -7,7 +7,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import EquipmentItem from "./EquipmentItem";
 import Equipment from "../resources/Equipment";
 
-interface NestedListProps {
+interface EquipmentExpansionListProps {
   equipmentList: Equipment[];
   currentCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
@@ -15,7 +15,7 @@ interface NestedListProps {
     [k: string]: number;
   };
 }
-const NestedList: FunctionComponent<NestedListProps> = ({
+const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = ({
   equipmentList,
   currentCategory,
   quantities,
@@ -30,7 +30,7 @@ const NestedList: FunctionComponent<NestedListProps> = ({
     }
   };
 
-  // Expand panel when the currently selected category is this NestedList's cateogory (parentId)
+  // Expand panel when the currently selected category is this EquipmentExpansionList's cateogory (parentId)
   const expanded = currentCategory === equipmentList[0].category ? true : false;
   return (
     <ExpansionPanel expanded={expanded}>
@@ -67,4 +67,4 @@ const NestedList: FunctionComponent<NestedListProps> = ({
     </ExpansionPanel>
   );
 };
-export default NestedList;
+export default EquipmentExpansionList;
