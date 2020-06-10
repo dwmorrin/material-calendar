@@ -8,12 +8,12 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import Equipment from "../resources/Equipment";
 
-interface GearItemProps {
+interface EquipmentItemProps {
   item: Equipment;
   quantity: number;
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
-const GearItem: FunctionComponent<GearItemProps> = ({
+const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   item,
   quantity,
   setFieldValue,
@@ -26,16 +26,16 @@ const GearItem: FunctionComponent<GearItemProps> = ({
 
   // Show ErrorIcon
   const showError = (): void => {
-    const element = document.getElementById("error");
+    const element = document.getElementById("error"+ item.description);
     if (element) {
       element.style.display = "block";
     }
   };
 
-  // Change current Gear Value
+  // Change current Equipment Value
   const changeValue = (newValue: number): void => {
     if (newValue >= 0 && newValue <= item.quantity) {
-      setFieldValue("gear[" + item.title + "]", newValue);
+      setFieldValue("equipment[" + item.description + "]", newValue);
     }
     if (newValue > item.quantity) {
       showError();
@@ -58,7 +58,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({
         >
           <Select
             labelId={item.description + "Quantity Select"}
-            name={"gear[" + item.description + "]"}
+            name={"equipment[" + item.description + "]"}
             value={quantity}
             onChange={(event): void =>
               changeValue(event.target.value as number)
@@ -88,7 +88,7 @@ const GearItem: FunctionComponent<GearItemProps> = ({
               +
             </Button>
           </ButtonGroup>
-          <div style={{ display: "none" }} id="error">
+          <div style={{ display: "none" }} id={"error"+ item.description}>
             <ErrorIcon />
           </div>
         </section>
@@ -96,4 +96,4 @@ const GearItem: FunctionComponent<GearItemProps> = ({
     </div>
   );
 };
-export default GearItem;
+export default EquipmentItem;

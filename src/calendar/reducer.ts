@@ -17,9 +17,9 @@ const closeReservationForm: StateHandler = (state) => ({
   reservationFormIsOpen: false,
 });
 
-const closeGearForm: StateHandler = (state) => ({
+const closeEquipmentForm: StateHandler = (state) => ({
   ...state,
-  gearFormIsOpen: false,
+  equipmentFormIsOpen: false,
 });
 
 const closeEventDetail: StateHandler = (state) => ({
@@ -66,9 +66,9 @@ const openReservationForm: StateHandler = (state) => ({
   reservationFormIsOpen: true,
 });
 
-const openGearForm: StateHandler = (state) => ({
+const openEquipmentForm: StateHandler = (state) => ({
   ...state,
-  gearFormIsOpen: true,
+  equipmentFormIsOpen: true,
 });
 
 const openEventDetail: StateHandler = (state, { payload }) => {
@@ -185,7 +185,7 @@ const calendarReducer: StateHandler = (state, action) =>
   ({
     [CalendarAction.ChangedView]: changedView,
     [CalendarAction.CloseReservationForm]: closeReservationForm,
-    [CalendarAction.CloseGearForm]: closeGearForm,
+    [CalendarAction.CloseEquipmentForm]: closeEquipmentForm,
     [CalendarAction.CloseEventDetail]: closeEventDetail,
     [CalendarAction.CloseProjectDashboard]: closeProjectDashboard,
     [CalendarAction.CloseGroupDashboard]: closeGroupDashboard,
@@ -193,7 +193,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.Loading]: loading,
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.OpenReservationForm]: openReservationForm,
-    [CalendarAction.OpenGearForm]: openGearForm,
+    [CalendarAction.OpenEquipmentForm]: openEquipmentForm,
     [CalendarAction.OpenEventDetail]: openEventDetail,
     [CalendarAction.OpenGroupDashboard]: openGroupDashboard,
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,

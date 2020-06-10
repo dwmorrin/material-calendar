@@ -27,7 +27,7 @@ import { makeTransition } from "./Transition";
 import UserGroup from "../resources/UserGroup";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import GearForm from "./GearForm";
+import EquipmentForm from "./EquipmentForm";
 import QuantityList from "./QuantityList";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
@@ -40,7 +40,7 @@ const useStyles = makeStyles(() => ({
   notes: {
     display: "none",
   },
-  gearList: {
+  equipmentList: {
     display: "none",
   },
   list: {
@@ -60,17 +60,17 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const { user } = useContext(AuthContext);
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
-  const gear = state.resources[ResourceKey.Equipment] as Equipment[];
+  const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
 
-  // Function to convert Gear Array to Quantized Gear Array
-  function quantizeGear(gear: Equipment[]): Equipment[] {
+  // Function to convert equipment Array to Quantized equipment Array
+  function quantizeEquipment(equipment: Equipment[]): Equipment[] {
     const tempArray: Equipment[] = [];
-    gear.forEach((item) => {
-      item.quantity = gear.filter(
-        (element) => element.title === item.title
+    equipment.forEach((item) => {
+      item.quantity = equipment.filter(
+        (element) => element.description === item.description
       ).length;
       const index = tempArray.findIndex(
-        (element) => element.title === item.title
+        (element) => element.description === item.description
       );
       if (index === -1) {
         tempArray.push(item);
@@ -78,7 +78,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     });
     return tempArray;
   }
-  //const gear: Equipment[] = quantizeGear(state.gear);
+  //const equipment: Equipment[] = quantizeEquipment(state.equipment);
 
   // Constant Declatations
   const initialGroups: UserGroup[] = [];
@@ -95,7 +95,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   // Build quantities dictionary for Formik
   // Build Categories Dictionary
   // Build Filters Dictionary
-  gear.forEach((item) => {
+  equipment.forEach((item) => {
     quantities[item.description] = 0;
     item.tags.forEach((tag) => {
       if (!categories[item.category]) {
@@ -113,7 +113,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const [liveToggle, setLiveValue] = React.useState("yes");
   const [guestToggle, setGuestValue] = React.useState("no");
   const [notesToggle, setNotesValue] = React.useState("no");
-  const [gearListToggle, setGearListValue] = React.useState("no");
+  const [equipmentListToggle, setEquipmentListValue] = React.useState("no");
   const [validationSchema, setValidationSchema] = React.useState(
     initialValidationSchema
   );
@@ -195,9 +195,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 liveRoom: liveToggle,
                 hasGuests: guestToggle,
                 hasNotes: notesToggle,
-                hasGear: gearListToggle,
+                hasEquipment: equipmentListToggle,
                 group: initialGroups[0],
-                gear: quantities,
+                equipment: quantities,
                 filters,
               }}
               onSubmit={(values, { setSubmitting }): void => {
@@ -406,19 +406,19 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     <br />
                     <FormControl component="fieldset">
                       <FormLabel component="legend">
-                        Would you like to reserve any gear now?
+                        Would you like to reserve any equipment now?
                       </FormLabel>
                       <RadioGroup
-                        aria-label="gear"
-                        name="gear"
-                        value={values.hasGear}
+                        aria-label="equipment"
+                        name="equipment"
+                        value={values.hasEquipment}
                         onChange={(
                           event: React.ChangeEvent<{}>,
                           value
                         ): void => {
-                          setGearListValue(value);
-                          toggleElement(event, "gearList");
-                          values.hasGear = value;
+                          setEquipmentListValue(value);
+                          toggleElement(event, "equipmentList");
+                          values.hasEquipment = value;
                         }}
                       >
                         <FormControlLabel
@@ -433,9 +433,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         />
                       </RadioGroup>
                     </FormControl>
-                    <div id="gearList" className={classes.gearList}>
+                    <div id="equipmentList" className={classes.equipmentList}>
                       <br />
-                      <QuantityList quantities={values.gear} />
+                      <QuantityList quantities={values.equipment} />
                       <Button
                         size="small"
                         variant="contained"
@@ -445,11 +445,11 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         onClick={(event): void => {
                           event.stopPropagation();
                           dispatch({
-                            type: CalendarAction.OpenGearForm,
+                            type: CalendarAction.OpenEquipmentForm,
                           });
                         }}
                       >
-                        Add Gear
+                        Add Equipment
                       </Button>
                     </div>
                     <br />
@@ -464,11 +464,11 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     >
                       Confirm Reservation
                     </Button>
-                    <GearForm
+                    <EquipmentForm
                       dispatch={dispatch}
                       state={state}
-                      gear={gear}
-                      quantities={values.gear}
+                      equipment={equipment}
+                      quantities={values.equipment}
                       filters={values.filters}
                       visibleFilters={categories[values.currentCategory]}
                       currentCategory={values.currentCategory}

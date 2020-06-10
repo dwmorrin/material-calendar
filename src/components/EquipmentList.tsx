@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
-import GearItem from "./GearItem";
+import EquipmentItem from "./EquipmentItem";
 import NestedList from "./NestedList";
 import Equipment from "../resources/Equipment";
 
@@ -12,7 +12,7 @@ const useStyles = makeStyles({
 });
 
 function createStandardList(
-  gearList: Equipment[],
+  equipmentList: Equipment[],
   quantities: {
     [k: string]: number;
   },
@@ -26,8 +26,8 @@ function createStandardList(
         minWidth: "100%",
       }}
     >
-      {gearList.map((item) => (
-        <GearItem
+      {equipmentList.map((item) => (
+        <EquipmentItem
           item={item}
           quantity={quantities[item.description]}
           setFieldValue={setFieldValue}
@@ -37,23 +37,23 @@ function createStandardList(
   );
 }
 
-interface GearListProps {
-  gearList: Equipment[] | undefined;
+interface EquipmentListProps {
+  equipmentList: Equipment[] | undefined;
   currentCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
   quantities: {
     [k: string]: number;
   };
 }
-const GearList: FunctionComponent<GearListProps> = ({
-  gearList,
+const EquipmentList: FunctionComponent<EquipmentListProps> = ({
+  equipmentList,
   currentCategory,
   quantities,
   setFieldValue,
 }) => {
   const classes = useStyles();
-  if (gearList) {
-    const category = [...new Set(gearList.map((items) => items.category))];
+  if (equipmentList) {
+    const category = [...new Set(equipmentList.map((items) => items.category))];
     // Create Nested list for categories with multiple elements, create a standard (not nested)
     // list for singletons
     return (
@@ -62,18 +62,18 @@ const GearList: FunctionComponent<GearListProps> = ({
           ? category.map((parent) => {
               return (
                 <NestedList
-                  gearList={gearList.filter((item) => item.category === parent)}
+                  equipmentList={equipmentList.filter((item) => item.category === parent)}
                   currentCategory={currentCategory}
                   quantities={quantities}
                   setFieldValue={setFieldValue}
                 />
               );
             })
-          : createStandardList(gearList, quantities, setFieldValue)}
+          : createStandardList(equipmentList, quantities, setFieldValue)}
       </div>
     );
   } else {
     return <div></div>;
   }
 };
-export default GearList;
+export default EquipmentList;

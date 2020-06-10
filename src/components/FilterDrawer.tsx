@@ -75,7 +75,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
         >
           <TextField
             size="small"
-            id="gearSearch"
+            id="equipmentSearch"
             label="Search"
             value={searchString}
             onChange={(event): void => {

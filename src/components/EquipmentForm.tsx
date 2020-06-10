@@ -11,7 +11,7 @@ import {
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import FilterDrawer from "./FilterDrawer";
 import FilterListIcon from "@material-ui/icons/FilterList";
-import GearList from "./GearList";
+import EquipmentList from "./EquipmentList";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import Equipment from "../resources/Equipment";
@@ -33,8 +33,8 @@ const useStyles = makeStyles((theme) => ({
 
 const transition = makeTransition("up");
 
-interface GearFormProps {
-  gear: Equipment[];
+interface EquipmentFormProps {
+  equipment: Equipment[];
   quantities: {
     [k: string]: number;
   };
@@ -46,10 +46,10 @@ interface GearFormProps {
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 
-const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
+const EquipmentForm: FunctionComponent<CalendarUIProps & EquipmentFormProps> = ({
   dispatch,
   state,
-  gear,
+  equipment,
   quantities,
   filters,
   visibleFilters,
@@ -64,24 +64,24 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
   const [matchAnyFilter, setMatchAnyFilter] = useState(false);
   const [searchString, setSearchString] = useState("");
 
-  // Filtering Function to reduce the size of the gear array being passed down
+  // Filtering Function to reduce the size of the equipment array being passed down
   function filterItems(
-    gear: Equipment[],
+    equipment: Equipment[],
     filters: { [k: string]: boolean }
   ): Equipment[] | undefined {
-    let queriedGear: Equipment[] = [];
+    let queriedEquipment: Equipment[] = [];
     const activeFilters = Object.keys(filters).filter(function (key: string) {
       return filters[key];
     });
     if (searchString !== "") {
       const queries = searchString.split(",");
-      queriedGear = gear.filter(function (gear) {
+      queriedEquipment = equipment.filter(function (equipment) {
         return queries.some(function (query) {
           return (
-            gear.description
+            equipment.description
               .toLowerCase()
               .includes(query.toLowerCase().trim()) ||
-            gear.tags.some(function (tag) {
+            equipment.tags.some(function (tag) {
               return tag.name
                 .toLowerCase()
                 .includes(query.toLowerCase().trim());
@@ -90,20 +90,20 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
         });
       });
     } else {
-      queriedGear = gear;
+      queriedEquipment = equipment;
     }
     if (matchAnyFilter) {
-      return queriedGear.filter(function (gear) {
+      return queriedEquipment.filter(function (equipment) {
         return activeFilters.some(function (filter) {
-          return gear.tags.some(function (tag) {
+          return equipment.tags.some(function (tag) {
             return tag.name.toLowerCase().includes(filter.toLowerCase().trim());
           });
         });
       });
     } else {
-      return queriedGear.filter(function (gear) {
+      return queriedEquipment.filter(function (equipment) {
         return activeFilters.every(function (filter) {
-          return gear.tags.some(function (tag) {
+          return equipment.tags.some(function (tag) {
             return tag.name.toLowerCase().includes(filter.toLowerCase().trim());
           });
         });
@@ -128,7 +128,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
   return (
     <Dialog
       fullScreen
-      open={state.gearFormIsOpen}
+      open={state.equipmentFormIsOpen}
       TransitionComponent={transition}
     >
       <div className={classes.root}>
@@ -143,7 +143,7 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
             setSearchString={setSearchString}
             matchAny={matchAnyFilter}
             setMatchAny={setMatchAnyFilter}
-            closeDrawer={() => setFilterDrawerIsOpen(!filterDrawerIsOpen)}
+            closeDrawer={(): void => setFilterDrawerIsOpen(!filterDrawerIsOpen)}
             setFieldValue={setFieldValue}
           />
         </div>
@@ -156,12 +156,12 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
                 color="inherit"
                 aria-label="close"
                 onClick={(): void =>
-                  dispatch({ type: CalendarAction.CloseGearForm })
+                  dispatch({ type: CalendarAction.CloseEquipmentForm })
                 }
               >
                 <ArrowBackIosIcon />
               </IconButton>
-              <Typography className={classes.title}>GEAR</Typography>
+              <Typography className={classes.title}>Equipment</Typography>
               <IconButton
                 edge="start"
                 color="inherit"
@@ -173,8 +173,8 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
             </Toolbar>
           </List>
         </AppBar>
-        <GearList
-          gearList={filterItems(gear, filters)}
+        <EquipmentList
+          equipmentList={filterItems(equipment, filters)}
           currentCategory={currentCategory}
           quantities={quantities}
           setFieldValue={setFieldValue}
@@ -184,4 +184,4 @@ const GearForm: FunctionComponent<CalendarUIProps & GearFormProps> = ({
   );
 };
 
-export default GearForm;
+export default EquipmentForm;
