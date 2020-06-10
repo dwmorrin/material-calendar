@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { Box } from "@material-ui/core";
+import { Box, Dialog } from "@material-ui/core";
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 import { CalendarAction, CalendarUIProps } from "../calendar/types";
@@ -10,20 +10,27 @@ const StaticDatePicker: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   return (
-    <Box>
-      <MuiPickersUtilsProvider utils={MomentUtils}>
-        <DatePicker
-          value={state.currentStart}
-          onChange={(date: MaterialUiPickersDate): void => {
-            dispatch({
-              type: CalendarAction.PickedDate,
-              payload: { currentStart: date?.toDate() },
-            });
-          }}
-          variant="static"
-        />
-      </MuiPickersUtilsProvider>
-    </Box>
+    <Dialog
+      open={state.pickerShowing}
+      onClose={(): void => {
+        dispatch({ type: CalendarAction.TogglePicker });
+      }}
+    >
+      <Box>
+        <MuiPickersUtilsProvider utils={MomentUtils}>
+          <DatePicker
+            value={state.currentStart}
+            onChange={(date: MaterialUiPickersDate): void => {
+              dispatch({
+                type: CalendarAction.PickedDate,
+                payload: { currentStart: date?.toDate() },
+              });
+            }}
+            variant="static"
+          />
+        </MuiPickersUtilsProvider>
+      </Box>
+    </Dialog>
   );
 };
 
