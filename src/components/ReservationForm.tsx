@@ -32,6 +32,7 @@ import QuantityList from "./QuantityList";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import Equipment from "../resources/Equipment";
+import { quantizeEquipment, buildDictionaries } from "../utils/equipment";
 
 const useStyles = makeStyles(() => ({
   guests: {
@@ -60,55 +61,20 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const { user } = useContext(AuthContext);
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
-  const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
-
-  // Function to convert equipment Array to Quantized equipment Array
-  function quantizeEquipment(equipment: Equipment[]): Equipment[] {
-    const tempArray: Equipment[] = [];
-    equipment.forEach((item) => {
-      item.quantity = equipment.filter(
-        (element) => element.description === item.description
-      ).length;
-      const index = tempArray.findIndex(
-        (element) => element.description === item.description
-      );
-      if (index === -1) {
-        tempArray.push(item);
-      }
-    });
-    return tempArray;
-  }
-  //const equipment: Equipment[] = quantizeEquipment(state.equipment);
+  const equipment = quantizeEquipment(
+    state.resources[ResourceKey.Equipment] as Equipment[]
+  );
+  const [filters, categories, quantities] = buildDictionaries(equipment);
 
   // Constant Declatations
-  const initialGroups: UserGroup[] = [];
   const classes = useStyles();
-  const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
   const initialValidationSchema = Yup.object().shape({
-    phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
-    description: Yup.string().required("Required"),
-  });
-  const filters: { [k: string]: boolean } = {};
-  const categories: { [k: string]: Set<string> } = {};
-  const quantities: { [k: string]: number } = {};
-
-  // Build quantities dictionary for Formik
-  // Build Categories Dictionary
-  // Build Filters Dictionary
-  equipment.forEach((item) => {
-    quantities[item.description] = 0;
-    item.tags.forEach((tag) => {
-      if (!categories[item.category]) {
-        categories[item.category] = new Set();
-      }
-      categories[item.category].add(tag.name);
-      filters[tag.name] = false;
-    });
+    phone: Yup.string().required("Please Enter a Phone Number"),
+    description: Yup.string().required("Please Enter a description"),
   });
 
   // State Declarations
-  const initialProject = projects[0];
-  const [currentProject, setCurrentProject] = useState(initialProject);
+  const [currentProject, setCurrentProject] = useState(projects[0]);
   const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
   const [liveToggle, setLiveValue] = React.useState("yes");
   const [guestToggle, setGuestValue] = React.useState("no");
@@ -139,9 +105,11 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     if (val === "yes") {
       setValidationSchema(
         Yup.object().shape({
-          phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
-          description: Yup.string().required("Required"),
-          guests: Yup.string().required("Required"),
+          phone: Yup.string().required("Please Enter a Phone Number"),
+          description: Yup.string().required("Please Enter a description"),
+          guests: Yup.string().required(
+            "Please enter the names of your guests"
+          ),
         })
       );
     } else {
@@ -196,7 +164,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 hasGuests: guestToggle,
                 hasNotes: notesToggle,
                 hasEquipment: equipmentListToggle,
-                group: initialGroups[0],
+                group: groups.filter(function (group) {return group.projectId === currentProject.id;})[0],
                 equipment: quantities,
                 filters,
               }}
