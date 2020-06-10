@@ -15,6 +15,7 @@ import EquipmentList from "./EquipmentList";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import Equipment from "../resources/Equipment";
+import { filterEquipment } from "../utils/equipment";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,7 +47,9 @@ interface EquipmentFormProps {
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 
-const EquipmentForm: FunctionComponent<CalendarUIProps & EquipmentFormProps> = ({
+const EquipmentForm: FunctionComponent<
+  CalendarUIProps & EquipmentFormProps
+> = ({
   dispatch,
   state,
   equipment,
@@ -62,43 +65,6 @@ const EquipmentForm: FunctionComponent<CalendarUIProps & EquipmentFormProps> = (
   // State Declarations
   const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
   const [searchString, setSearchString] = useState("");
-
-  // Filtering Function to reduce the size of the equipment array being passed down
-  function filterItems(
-    equipment: Equipment[],
-    filters: { [k: string]: boolean }
-  ): Equipment[] | undefined {
-    let queriedEquipment: Equipment[] = [];
-    const activeFilters = Object.keys(filters).filter(function (key: string) {
-      return filters[key];
-    });
-    if (searchString !== "") {
-      const queries = searchString.split((/\W+/));
-      queriedEquipment = equipment.filter(function (equipment) {
-        return queries.every(function (query) {
-          return (
-            equipment.description
-              .toLowerCase()
-              .includes(query.toLowerCase().trim()) ||
-            equipment.tags.some(function (tag) {
-              return tag.name
-                .toLowerCase()
-                .includes(query.toLowerCase().trim());
-            })
-          );
-        });
-      });
-    } else {
-      queriedEquipment = equipment;
-    }
-      return queriedEquipment.filter(function (equipment) {
-        return activeFilters.every(function (filter) {
-          return equipment.tags.some(function (tag) {
-            return tag.name.toLowerCase().includes(filter.toLowerCase().trim());
-          });
-        });
-      });
-  }
 
   // Filter Drawer Toggle Function
   const toggleFilterDrawer = () => (
@@ -161,7 +127,7 @@ const EquipmentForm: FunctionComponent<CalendarUIProps & EquipmentFormProps> = (
           </List>
         </AppBar>
         <EquipmentList
-          equipmentList={filterItems(equipment, filters)}
+          equipmentList={filterEquipment(searchString, equipment, filters)}
           currentCategory={currentCategory}
           quantities={quantities}
           setFieldValue={setFieldValue}
