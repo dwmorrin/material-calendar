@@ -45,21 +45,18 @@ export function filterEquipment(
   });
 }
 
-// Function to convert equipment Array to Quantized equipment Array
 export function quantizeEquipment(equipment: Equipment[]): Equipment[] {
-  const tempArray: Equipment[] = [];
-  equipment.forEach((item) => {
-    item.quantity = equipment.filter(
-      (element) => element.description === item.description
-    ).length;
-    const index = tempArray.findIndex(
-      (element) => element.description === item.description
-    );
-    if (index === -1) {
-      tempArray.push(item);
-    }
-  });
-  return tempArray;
+  return equipment.reduce((quantized: Equipment[], item) => {
+    const hasTitle = (equipment: Equipment): boolean =>
+      equipment.description === item.description;
+    const alreadyDone = quantized.find(hasTitle);
+    if (!alreadyDone)
+      quantized.push({
+        ...item,
+        quantity: equipment.filter(hasTitle).length,
+      });
+    return quantized;
+  }, []);
 }
 
 // Function to convert equipment Array to Quantized equipment Array
