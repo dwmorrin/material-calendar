@@ -1,14 +1,10 @@
 import Equipment from "../resources/Equipment";
 // Filtering Function to reduce the size of the equipment array being passed down
-export function filterEquipment(
-  searchString: string,
+export function queryEquipment(
   equipment: Equipment[],
-  filters: { [k: string]: boolean }
-): Equipment[] | undefined {
+  searchString: string
+): Equipment[] {
   let queriedEquipment: Equipment[] = [];
-  const activeFilters = Object.keys(filters).filter(function (key: string) {
-    return filters[key];
-  });
   if (searchString !== "") {
     const queries = searchString.split(/\W+/);
     queriedEquipment = equipment.filter(function (equipment) {
@@ -29,9 +25,20 @@ export function filterEquipment(
   } else {
     queriedEquipment = equipment;
   }
-  return queriedEquipment.filter(function (equipment) {
+  return queriedEquipment;
+}
+
+// Filtering Function to reduce the size of the equipment array being passed down
+export function filterEquipment(
+  equipment: Equipment[],
+  filters: { [k: string]: boolean }
+): Equipment[] | undefined {
+  const activeFilters = Object.keys(filters).filter(function (key: string) {
+    return filters[key];
+  });
+  return equipment.filter(function (item) {
     return activeFilters.every(function (filter) {
-      return equipment.tags.some(function (tag) {
+      return item.tags.some(function (tag) {
         return tag.name.toLowerCase().includes(filter.toLowerCase().trim());
       });
     });

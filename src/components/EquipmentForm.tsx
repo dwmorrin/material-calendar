@@ -15,7 +15,7 @@ import EquipmentList from "./EquipmentList";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import Equipment from "../resources/Equipment";
-import { filterEquipment } from "../utils/equipment";
+import { queryEquipment, filterEquipment } from "../utils/equipment";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -127,7 +127,7 @@ const EquipmentForm: FunctionComponent<
           </List>
         </AppBar>
         <EquipmentList
-          equipmentList={filterEquipment(searchString, equipment, filters)}
+          equipmentList={filterEquipment(queryEquipment(equipment, searchString), filters)}
           currentCategory={currentCategory}
           quantities={quantities}
           setFieldValue={setFieldValue}
