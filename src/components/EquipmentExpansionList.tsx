@@ -31,20 +31,25 @@ const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = (
   };
 
   // Expand panel when the currently selected category is this EquipmentExpansionList's cateogory (parentId)
-  const expanded = currentCategory === equipmentList[0].category ? true : false;
+  const expanded = currentCategory === (equipmentList[0].category.path || equipmentList[0].category.name)  ? true : false;
   return (
+    <div
+      style={{
+        textTransform: "capitalize"
+      }}
+    >
     <ExpansionPanel expanded={expanded}>
       <ExpansionPanelSummary
         expandIcon={<ExpandMoreIcon />}
-        aria-label={equipmentList[0].category + "category expansion"}
-        aria-controls={equipmentList[0].category + "category expansion"}
-        id={equipmentList[0].category + "category expansion"}
+        aria-label={equipmentList[0].category.path || equipmentList[0].category.name + "category expansion"}
+        aria-controls={equipmentList[0].category.path || equipmentList[0].category.name + "category expansion"}
+        id={equipmentList[0].category.path || equipmentList[0].category.name + "category expansion"}
         onClick={(event): void => {
           event.stopPropagation();
-          changeCategory(equipmentList[0].category);
+          changeCategory(equipmentList[0].category.path || equipmentList[0].category.name);
         }}
       >
-        {equipmentList[0].category}
+        {equipmentList[0].category.path || equipmentList[0].category.name}
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         <List
@@ -54,7 +59,7 @@ const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = (
           }}
         >
           {equipmentList
-            .filter((item) => item.category === equipmentList[0].category)
+            .filter((item) => item.category.path || item.category.name === equipmentList[0].category.path || equipmentList[0].category.name)
             .map((item) => (
               <EquipmentItem
                 item={item}
@@ -65,6 +70,7 @@ const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = (
         </List>
       </ExpansionPanelDetails>
     </ExpansionPanel>
+    </div>
   );
 };
 export default EquipmentExpansionList;

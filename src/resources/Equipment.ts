@@ -5,7 +5,7 @@ interface Equipment {
   [k: string]: unknown;
   id: string;
   description: string; //! required
-  category: string; // hierchial; use sparingly
+  category: Category; // hierchial; use sparingly
   tags: Tag[];
   manufacturer?: string;
   model?: string;

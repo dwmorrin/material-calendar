@@ -26,7 +26,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
 }) => {
   const classes = useStyles();
   if (equipmentList) {
-    const category = [...new Set(equipmentList.map((items) => items.category))];
+    const category = [...new Set(equipmentList.map((items) => (items.category.path || items.category.name)))];
     // Create Nested list for categories with multiple elements, create a standard (not nested)
     // list for singletons
     return (
@@ -36,7 +36,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
             return (
               <EquipmentExpansionList
                 equipmentList={equipmentList.filter(
-                  (item) => item.category === parent
+                  (item) => (item.category.path || item.category.name) === parent
                 )}
                 currentCategory={currentCategory}
                 quantities={quantities}

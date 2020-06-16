@@ -13,7 +13,8 @@ export function queryEquipment(
           equipment.description
             .toLowerCase()
             .includes(query.toLowerCase().trim()) ||
-          equipment.category
+          equipment.category.path ||
+          equipment.category.name
             .toLowerCase()
             .includes(query.toLowerCase().trim()) ||
           equipment.tags.some(function (tag) {
@@ -74,12 +75,21 @@ export function buildDictionaries(
   const categories: { [k: string]: Set<string> } = {};
   const quantities: { [k: string]: number } = {};
   equipment.forEach((item) => {
+    console.log(item.tags);
     quantities[item.description] = 0;
     item.tags.forEach((tag) => {
-      if (!categories[item.category]) {
-        categories[item.category] = new Set();
+      if (
+        !categories[
+          item.category.path || item.category.name
+        ]
+      ) {
+        categories[
+          item.category.path || item.category.name
+        ] = new Set();
       }
-      categories[item.category].add(tag.name);
+      categories[
+        item.category.path || item.category.name
+      ].add(tag.name);
       filters[tag.name] = false;
     });
   });

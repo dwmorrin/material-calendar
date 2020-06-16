@@ -18,6 +18,8 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   quantity,
   setFieldValue,
 }) => {
+  //it would be great for this to be a getter
+  const itemName = item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description;
   // Create all possible quantities for current item
   const selectOptions: JSX.Element[] = [];
   for (let i = 0; i <= item.quantity; ++i) {
@@ -35,7 +37,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   // Change current Equipment Value
   const changeValue = (newValue: number): void => {
     if (newValue >= 0 && newValue <= item.quantity) {
-      setFieldValue("equipment[" + item.description + "]", newValue);
+      setFieldValue("equipment[" + itemName + "]", newValue);
     }
     if (newValue > item.quantity) {
       showError();
@@ -46,10 +48,11 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
     <div
       style={{
         flexDirection: "row",
+        textTransform: "capitalize",
       }}
     >
       <ListItem>
-        <ListItemText primary={item.description} />
+        <ListItemText primary={itemName} />
         <section
           style={{
             textAlign: "center",
@@ -57,8 +60,8 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
           }}
         >
           <Select
-            labelId={item.description + "Quantity Select"}
-            name={"equipment[" + item.description + "]"}
+            labelId={itemName + "Quantity Select"}
+            name={"equipment[" + itemName + "]"}
             value={quantity}
             onChange={(event): void =>
               changeValue(event.target.value as number)
@@ -70,7 +73,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
           <ButtonGroup
             variant="contained"
             color="primary"
-            aria-label={item.description + "Quantity Buttons"}
+            aria-label={itemName + "Quantity Buttons"}
             size="small"
           >
             <Button
@@ -88,7 +91,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
               +
             </Button>
           </ButtonGroup>
-          <div style={{ display: "none" }} id={"error"+ item.description}>
+          <div style={{ display: "none" }} id={"error"+ itemName}>
             <ErrorIcon />
           </div>
         </section>
