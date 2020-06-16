@@ -75,8 +75,8 @@ export function buildDictionaries(
   const categories: { [k: string]: Set<string> } = {};
   const quantities: { [k: string]: number } = {};
   equipment.forEach((item) => {
-    console.log(item.tags);
-    quantities[item.description] = 0;
+    const itemName = item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description;
+    quantities[itemName] = 0;
     item.tags.forEach((tag) => {
       if (
         !categories[
