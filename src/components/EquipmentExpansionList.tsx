@@ -63,7 +63,7 @@ const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = (
             .map((item) => (
               <EquipmentItem
                 item={item}
-                quantity={quantities[item.description]}
+                quantity={quantities[item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description]}
                 setFieldValue={setFieldValue}
               />
             ))}

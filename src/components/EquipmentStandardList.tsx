@@ -26,7 +26,7 @@ const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
       {equipmentList.map((item) => (
         <EquipmentItem
           item={item}
-          quantity={quantities[item.description]}
+          quantity={quantities[item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description]}
           setFieldValue={setFieldValue}
         />
       ))}

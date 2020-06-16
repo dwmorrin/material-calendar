@@ -24,15 +24,19 @@ const FilterList: FunctionComponent<QuantityListProps> = ({ quantities }) => {
         }}
       >
         {selectedItems.length > 0 ? (
-          <div>
+          <div
+            style={{
+              textTransform: "capitalize",
+            }}
+          >
             {selectedItems.map((item) => (
               <ListItem key={item}>{item + ": " + quantities[item]}</ListItem>
             ))}
           </div>
         ) : (
           <div>
-            You haven't reserved any equipment yet! Click the button below to add
-            equipment to your cart
+            You haven't reserved any equipment yet! Click the button below to
+            add equipment to your cart
           </div>
         )}
       </List>
