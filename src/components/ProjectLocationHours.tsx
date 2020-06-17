@@ -106,8 +106,7 @@ const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
     update
       .enter()
       .append("rect")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .merge(update as any)
+      .merge(update as never)
       .attr("x", (d) => d.x)
       .attr("y", (d) => d.y)
       .attr("width", (d) => d.width)
@@ -116,12 +115,8 @@ const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
     update.exit().remove();
     const xAxis = d3.axisBottom(scales.x).ticks(4);
     const yAxis = d3.axisLeft(scales.y).ticks(3);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore: Not assignable error
-    d3.select(xAxisRef.current).call(xAxis);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore: Not assignable error
-    d3.select(yAxisRef.current).call(yAxis);
+    d3.select(xAxisRef.current).call(xAxis as never);
+    d3.select(yAxisRef.current).call(yAxis as never);
   }, [allotments]);
 
   return (
