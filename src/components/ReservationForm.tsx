@@ -34,6 +34,7 @@ import Project from "../resources/Project";
 import Equipment from "../resources/Equipment";
 import { quantizeEquipment, buildDictionaries } from "../utils/equipment";
 import { findProjectById } from "../utils/project";
+import fetchAllResources from "../utils/fetchAllResources";
 
 const useStyles = makeStyles(() => ({
   list: {
@@ -51,6 +52,17 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
 }) => {
   // Get values from App
   const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    fetchAllResources(
+      dispatch,
+      CalendarAction.ReceivedAllResources,
+      CalendarAction.Error,
+      `/api/equipment?context=${ResourceKey.Equipment}`
+    );
+  });
+
+
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const equipment = quantizeEquipment(

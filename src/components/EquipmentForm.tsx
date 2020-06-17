@@ -127,7 +127,10 @@ const EquipmentForm: FunctionComponent<
           </List>
         </AppBar>
         <EquipmentList
-          equipmentList={filterEquipment(queryEquipment(equipment, searchString), filters)}
+          equipmentList={filterEquipment(
+            queryEquipment(equipment, searchString),
+            filters
+          )}
           currentCategory={currentCategory}
           quantities={quantities}
           setFieldValue={setFieldValue}

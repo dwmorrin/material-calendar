@@ -44,7 +44,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       CalendarAction.Error,
       `/api/events?context=${ResourceKey.Events}`,
       `/api/locations?context=${ResourceKey.Locations}`,
-      `/api/equipment?context=${ResourceKey.Equipment}`,
       `/api/users/${user.username}/courses?context=${ResourceKey.Courses}`,
       `/api/users/${user.username}/groups?context=${ResourceKey.Groups}`,
       `/api/users/${user.username}/projects?context=${ResourceKey.Projects}`
