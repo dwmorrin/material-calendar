@@ -26,7 +26,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
 }) => {
   const classes = useStyles();
   if (equipmentList) {
-    const category = [...new Set(equipmentList.map((items) => (items.category.path || items.category.name)))];
+    const category = [...new Set(equipmentList.map((item) => (item.category.path || item.category.name)))];
     // Create Nested list for categories with multiple elements, create a standard (not nested)
     // list for singletons
     return (
