@@ -34,18 +34,8 @@ import Project from "../resources/Project";
 import Equipment from "../resources/Equipment";
 import { quantizeEquipment, buildDictionaries } from "../utils/equipment";
 import { findProjectById } from "../utils/project";
-import {toggleElement} from "../utils/div";
 
 const useStyles = makeStyles(() => ({
-  guests: {
-    display: "none",
-  },
-  notes: {
-    display: "none",
-  },
-  equipmentList: {
-    display: "none",
-  },
   list: {
     display: "flex",
     justifyContent: "flex-start",
@@ -81,7 +71,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
     initialValidationSchema
   );
 
-// HandleChange Functions
+  // HandleChange Functions
   const requireGuests = (event: React.ChangeEvent<{}>): void => {
     const val = (event.target as HTMLInputElement).value;
     if (val === "yes") {
@@ -134,7 +124,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 hasGuests: "no",
                 hasNotes: "no",
                 hasEquipment: "no",
-                group: groups.filter(function (group) {return group.projectId === projects[0].id;})[0],
+                group: groups.filter(function (group) {
+                  return group.projectId === projects[0].id;
+                })[0],
                 equipment: quantities,
                 filters,
               }}
@@ -174,7 +166,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                           selectId="projectsDropDown"
                           contents={projects}
                           onChange={(event): void => {
-                            setFieldValue("project", findProjectById(projects,event?.target.value));
+                            setFieldValue(
+                              "project",
+                              findProjectById(projects, event?.target.value)
+                            );
                           }}
                         ></Select>
                       </div>
@@ -260,9 +255,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                           event: React.ChangeEvent<{}>,
                           value
                         ): void => {
-                          setFieldValue("hasGuests",value);
+                          setFieldValue("hasGuests", value);
                           requireGuests(event);
-                          toggleElement(event, "guestInput");
                         }}
                       >
                         <FormControlLabel
@@ -278,7 +272,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       </RadioGroup>
                     </FormControl>
                     <br />
-                    <div id="guestInput" className={classes.guests}>
+                    {values.hasGuests === "yes" && (
                       <TextField
                         label="Guest Names"
                         name="guests"
@@ -291,7 +285,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         fullWidth
                         variant="filled"
                       />
-                    </div>
+                    )}
                     <br />
                     <FormControl component="fieldset">
                       <FormLabel component="legend">
@@ -300,15 +294,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       </FormLabel>
                       <RadioGroup
                         aria-label="notes"
-                        name="notes"
+                        name="hasNotes"
                         value={values.hasNotes}
-                        onChange={(
-                          event: React.ChangeEvent<{}>,
-                          value
-                        ): void => {
-                          setFieldValue("hasNotes",value);
-                          toggleElement(event, "notesInput");
-                        }}
+                        onChange={handleChange}
                       >
                         <FormControlLabel
                           value="yes"
@@ -322,7 +310,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         />
                       </RadioGroup>
                     </FormControl>
-                    <div id="notesInput" className={classes.notes}>
+                    {values.hasNotes === "yes" && (
                       <TextField
                         id="notes"
                         label="Notes"
@@ -331,7 +319,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         rows={8}
                         variant="filled"
                       />
-                    </div>
+                    )}
                     <br />
                     <FormControl component="fieldset">
                       <FormLabel component="legend">
@@ -339,15 +327,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       </FormLabel>
                       <RadioGroup
                         aria-label="equipment"
-                        name="equipment"
+                        name="hasEquipment"
                         value={values.hasEquipment}
-                        onChange={(
-                          event: React.ChangeEvent<{}>,
-                          value
-                        ): void => {
-                          setFieldValue("hasEquipment",value);
-                          toggleElement(event, "equipmentList");
-                        }}
+                        onChange={handleChange}
                       >
                         <FormControlLabel
                           value="yes"
@@ -361,25 +343,27 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                         />
                       </RadioGroup>
                     </FormControl>
-                    <div id="equipmentList" className={classes.equipmentList}>
-                      <br />
-                      <QuantityList quantities={values.equipment} />
-                      <Button
-                        size="small"
-                        variant="contained"
-                        disableElevation
-                        style={{ backgroundColor: "Yellow", color: "black" }}
-                        disabled={isSubmitting}
-                        onClick={(event): void => {
-                          event.stopPropagation();
-                          dispatch({
-                            type: CalendarAction.OpenEquipmentForm,
-                          });
-                        }}
-                      >
-                        Add Equipment
-                      </Button>
-                    </div>
+                    {values.hasEquipment === "yes" && (
+                      <div>
+                        <br />
+                        <QuantityList quantities={values.equipment} />
+                        <Button
+                          size="small"
+                          variant="contained"
+                          disableElevation
+                          style={{ backgroundColor: "Yellow", color: "black" }}
+                          disabled={isSubmitting}
+                          onClick={(event): void => {
+                            event.stopPropagation();
+                            dispatch({
+                              type: CalendarAction.OpenEquipmentForm,
+                            });
+                          }}
+                        >
+                          Add Equipment
+                        </Button>
+                      </div>
+                    )}
                     <br />
                     <br />
                     <Button
