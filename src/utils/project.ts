@@ -2,8 +2,10 @@ import Project from "../resources/Project";
 
 export function findProjectById(projects: Project[], id: number): Project {
   const proj = projects.filter(function (project) {
-    // eslint-disable-next-line
-    return project.id == id;
+    // project.id and id are not considered equal by ===, but are equal 
+    // according to ==
+    // eslint-disable-next-line eqeqeq
+    return project.id === id;
   });
   return proj[0];
 };
