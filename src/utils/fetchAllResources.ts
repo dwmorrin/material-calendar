@@ -26,10 +26,7 @@ const dispatchAllResources = (
           (all, { data, context }) => ({
             ...all,
             [+context]: data.map(
-              //! data is `any` but context should provide check
-              // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-              // @ts-ignore
-              (d) => new (FindResource(+context))(d)
+              (d) => new (FindResource(+context))(d as never)
             ),
           }),
           {}
