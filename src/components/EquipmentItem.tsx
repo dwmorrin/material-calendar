@@ -20,6 +20,8 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
 }) => {
   //it would be great for this to be a getter
   const itemName = item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description;
+  //if there currently is no quantity, set the selected quantity of the item to 0
+  quantity = quantity | 0;
   // Create all possible quantities for current item
   const selectOptions: JSX.Element[] = [];
   for (let i = 0; i <= item.quantity; ++i) {

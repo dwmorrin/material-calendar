@@ -68,7 +68,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const equipment = quantizeEquipment(
     state.resources[ResourceKey.Equipment] as Equipment[]
   );
-  const [filters, categories, quantities] = buildDictionaries(equipment);
+  const [filters, categories] = buildDictionaries(equipment);
+  
+  const quantities: { [k: string]: number } = {};
 
   // Constant Declatations
   const classes = useStyles();

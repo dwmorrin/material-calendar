@@ -66,17 +66,13 @@ export function buildDictionaries(
 ): [
   { [k: string]: boolean },
   { [k: string]: Set<string> },
-  { [k: string]: number }
 ] {
   // Build quantities dictionary for Formik
   // Build Categories Dictionary
   // Build Filters Dictionary
   const filters: { [k: string]: boolean } = {};
   const categories: { [k: string]: Set<string> } = {};
-  const quantities: { [k: string]: number } = {};
   equipment.forEach((item) => {
-    const itemName = item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description;
-    quantities[itemName] = 0;
     item.tags.forEach((tag) => {
       if (
         !categories[
@@ -93,5 +89,5 @@ export function buildDictionaries(
       filters[tag.name] = false;
     });
   });
-  return [filters, categories, quantities];
+  return [filters, categories];
 }
