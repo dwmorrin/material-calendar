@@ -31,7 +31,7 @@ const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = (
   };
 
   // Expand panel when the currently selected category is this EquipmentExpansionList's cateogory (parentId)
-  const expanded = currentCategory === (equipmentList[0].category.path || equipmentList[0].category.name)  ? true : false;
+  const expanded = currentCategory === (equipmentList[0].category.path || equipmentList[0].category.name);
   return (
     <div
       style={{
