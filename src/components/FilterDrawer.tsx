@@ -4,6 +4,7 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import List from "@material-ui/core/List";
 import TextField from "@material-ui/core/TextField";
 import FilterList from "./FilterList";
+import Tag from "../resources/Tag";
 
 const useStyles = makeStyles({
   list: {
@@ -17,7 +18,7 @@ interface FilterDrawerProps {
   onOpen: () => void;
   closeDrawer: () => void;
   filters: { [k: string]: boolean };
-  visibleFilters: Set<string>;
+  validTags: string[];
   searchString: string;
   setSearchString: React.Dispatch<React.SetStateAction<string>>;
   setFieldValue: (field: string, value: number | string | boolean) => void;
@@ -26,7 +27,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
   searchString,
   setSearchString,
   filters,
-  visibleFilters,
+  validTags,
   open,
   onClose,
   onOpen,
@@ -35,7 +36,6 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
 }) => {
   const classes = useStyles();
   // Still need to add X to clear textbox and close drawer on enter
-
   return (
     <SwipeableDrawer
       open={open}
@@ -75,7 +75,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
 
           {
             // If the user has expanded a category
-            visibleFilters ? (
+            validTags ? (
               <div>
                   <div
                     style={{
@@ -95,7 +95,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
                   >
                     <FilterList
                       filters={filters}
-                      visibleFilters={visibleFilters}
+                      validTags={validTags}
                       setFieldValue={setFieldValue}
                     />
                   </div>

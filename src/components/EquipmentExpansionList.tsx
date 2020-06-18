@@ -11,14 +11,14 @@ interface EquipmentExpansionListProps {
   equipmentList: Equipment[];
   currentCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
-  quantities: {
+  selectedEquipment: {
     [k: string]: number;
   };
 }
 const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = ({
   equipmentList,
   currentCategory,
-  quantities,
+  selectedEquipment,
   setFieldValue,
 }) => {
   // Manage the currently expanded category using string identifiers assigned by parentId
@@ -31,7 +31,7 @@ const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = (
   };
 
   // Expand panel when the currently selected category is this EquipmentExpansionList's cateogory (parentId)
-  const expanded = currentCategory === (equipmentList[0].category.path || equipmentList[0].category.name);
+  const expanded = currentCategory.includes(equipmentList[0].category.path || equipmentList[0].category.name);
   return (
     <div
       style={{
@@ -63,7 +63,7 @@ const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = (
             .map((item) => (
               <EquipmentItem
                 item={item}
-                quantity={quantities[item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description]}
+                quantity={selectedEquipment[item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description]}
                 setFieldValue={setFieldValue}
               />
             ))}

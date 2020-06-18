@@ -2,13 +2,13 @@ import React, { FunctionComponent } from "react";
 import { List, ListItem, Typography } from "@material-ui/core";
 
 interface QuantityListProps {
-  quantities: {
+  selectedEquipment: {
     [k: string]: number;
   };
 }
-const FilterList: FunctionComponent<QuantityListProps> = ({ quantities }) => {
-  const selectedItems = Object.keys(quantities).filter(function (key: string) {
-    return quantities[key] > 0;
+const FilterList: FunctionComponent<QuantityListProps> = ({ selectedEquipment }) => {
+  const selectedItems = Object.keys(selectedEquipment).filter(function (key: string) {
+    return selectedEquipment[key] > 0;
   });
   // Get list of elements to be reserved and display them nicely
   return (
@@ -30,7 +30,7 @@ const FilterList: FunctionComponent<QuantityListProps> = ({ quantities }) => {
             }}
           >
             {selectedItems.map((item) => (
-              <ListItem key={item}>{item + ": " + quantities[item]}</ListItem>
+              <ListItem key={item}>{item + ": " + selectedEquipment[item]}</ListItem>
             ))}
           </div>
         ) : (

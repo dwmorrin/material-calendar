@@ -5,14 +5,14 @@ import Equipment from "../resources/Equipment";
 
 interface EquipmentStandardListProps {
   equipmentList: Equipment[];
-  quantities: {
+  selectedEquipment: {
     [k: string]: number;
   };
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
   equipmentList,
-  quantities,
+  selectedEquipment,
   setFieldValue,
 }) => {
   // Create list of single elements. may not work properly for singletons
@@ -26,7 +26,7 @@ const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
       {equipmentList.map((item) => (
         <EquipmentItem
           item={item}
-          quantity={quantities[item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description]}
+          quantity={selectedEquipment[item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description]}
           setFieldValue={setFieldValue}
         />
       ))}

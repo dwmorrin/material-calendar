@@ -1,8 +1,10 @@
+import Category from "./Category";
+
 interface Tag {
   [k: string]: unknown;
   id: string;
   name: string;
-  category: string;
+  category: Category;
 }
 
 class Tag implements Tag {

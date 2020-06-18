@@ -1,4 +1,5 @@
 import Equipment from "../resources/Equipment";
+import Tags from "../resources/Tag";
 // Filtering Function to reduce the size of the equipment array being passed down
 export function queryEquipment(
   equipment: Equipment[],
@@ -67,7 +68,7 @@ export function buildDictionaries(
   { [k: string]: boolean },
   { [k: string]: Set<string> },
 ] {
-  // Build quantities dictionary for Formik
+  // Build selectedEquipment dictionary for Formik
   // Build Categories Dictionary
   // Build Filters Dictionary
   const filters: { [k: string]: boolean } = {};

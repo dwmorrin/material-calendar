@@ -22,7 +22,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   const itemName = item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description;
   //if there currently is no quantity, set the selected quantity of the item to 0
   quantity = quantity | 0;
-  // Create all possible quantities for current item
+  // Create all possible selectedEquipment for current item
   const selectOptions: JSX.Element[] = [];
   for (let i = 0; i <= item.quantity; ++i) {
     selectOptions.push(<MenuItem value={i}>{i}</MenuItem>);

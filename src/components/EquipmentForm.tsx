@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   List,
@@ -16,6 +16,11 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import Equipment from "../resources/Equipment";
 import { queryEquipment, filterEquipment } from "../utils/equipment";
+import Tag from "../resources/Tag";
+import Category from "../resources/Category";
+import { quantizeEquipment } from "../utils/equipment";
+import fetchAllResources from "../utils/fetchAllResources";
+import { ResourceKey } from "../resources/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,14 +40,12 @@ const useStyles = makeStyles((theme) => ({
 const transition = makeTransition("up");
 
 interface EquipmentFormProps {
-  equipment: Equipment[];
-  quantities: {
+  selectedEquipment: {
     [k: string]: number;
   };
   filters: {
     [k: string]: boolean;
   };
-  visibleFilters: Set<string>;
   currentCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
@@ -52,16 +55,36 @@ const EquipmentForm: FunctionComponent<
 > = ({
   dispatch,
   state,
-  equipment,
-  quantities,
+  selectedEquipment,
   filters,
-  visibleFilters,
   currentCategory,
   setFieldValue,
 }) => {
+  useEffect(() => {
+    fetchAllResources(
+      dispatch,
+      CalendarAction.ReceivedAllResources,
+      CalendarAction.Error,
+      `/api/equipment?context=${ResourceKey.Equipment}`,
+      `/api/categories?context=${ResourceKey.Categories}`,
+      `/api/tag?context=${ResourceKey.Tags}`
+    );
+  });
   // Constant Declarations
   const classes = useStyles();
-
+  const categories = state.resources[ResourceKey.Categories] as Category[];
+  const tags = state.resources[ResourceKey.Tags] as Tag[];
+  const equipment = quantizeEquipment(
+    state.resources[ResourceKey.Equipment] as Equipment[]
+  );
+  const validTags = tags
+    .filter(
+      (tag) =>
+        tag.category.name === currentCategory ||
+        tag.category.path === currentCategory
+    )
+    .map((tag) => tag.name)
+    .filter((v, i, a) => a.indexOf(v) === i);
   // State Declarations
   const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
   const [searchString, setSearchString] = useState("");
@@ -92,8 +115,8 @@ const EquipmentForm: FunctionComponent<
             open={filterDrawerIsOpen}
             onOpen={toggleFilterDrawer}
             onClose={toggleFilterDrawer}
+            validTags={validTags}
             filters={filters}
-            visibleFilters={visibleFilters}
             searchString={searchString}
             setSearchString={setSearchString}
             closeDrawer={(): void => setFilterDrawerIsOpen(!filterDrawerIsOpen)}
@@ -132,7 +155,7 @@ const EquipmentForm: FunctionComponent<
             filters
           )}
           currentCategory={currentCategory}
-          quantities={quantities}
+          selectedEquipment={selectedEquipment}
           setFieldValue={setFieldValue}
         />
       </div>

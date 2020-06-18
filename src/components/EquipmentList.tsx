@@ -14,14 +14,14 @@ interface EquipmentListProps {
   equipmentList: Equipment[] | undefined;
   currentCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
-  quantities: {
+  selectedEquipment: {
     [k: string]: number;
   };
 }
 const EquipmentList: FunctionComponent<EquipmentListProps> = ({
   equipmentList,
   currentCategory,
-  quantities,
+  selectedEquipment,
   setFieldValue,
 }) => {
   const classes = useStyles();
@@ -39,7 +39,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                   (item) => (item.category.path || item.category.name) === parent
                 )}
                 currentCategory={currentCategory}
-                quantities={quantities}
+                selectedEquipment={selectedEquipment}
                 setFieldValue={setFieldValue}
               />
             );
@@ -47,7 +47,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
         ) : (
           <EquipmentStandardList
             equipmentList={equipmentList}
-            quantities={quantities}
+            selectedEquipment={selectedEquipment}
             setFieldValue={setFieldValue}
           />
         )}

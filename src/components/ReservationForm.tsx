@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useEffect,
-  useContext,
-  useState,
-} from "react";
+import React, { FunctionComponent, useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
@@ -22,7 +17,6 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import Select from "./Select";
-import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
 import UserGroup from "../resources/UserGroup";
 import { Formik } from "formik";
@@ -31,10 +25,7 @@ import EquipmentForm from "./EquipmentForm";
 import QuantityList from "./QuantityList";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
-import Equipment from "../resources/Equipment";
-import { quantizeEquipment, buildDictionaries } from "../utils/equipment";
 import { findProjectById } from "../utils/project";
-import fetchAllResources from "../utils/fetchAllResources";
 
 const useStyles = makeStyles(() => ({
   list: {
@@ -51,27 +42,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   // Get values from App
-  const { user } = useContext(AuthContext);
-
-  useEffect(() => {
-    fetchAllResources(
-      dispatch,
-      CalendarAction.ReceivedAllResources,
-      CalendarAction.Error,
-      `/api/equipment?context=${ResourceKey.Equipment}`
-    );
-  });
-
-
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
-  const equipment = quantizeEquipment(
-    state.resources[ResourceKey.Equipment] as Equipment[]
-  );
-  const [filters, categories] = buildDictionaries(equipment);
-  
-  const quantities: { [k: string]: number } = {};
-
   // Constant Declatations
   const classes = useStyles();
   const initialValidationSchema = Yup.object().shape({
@@ -141,8 +113,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 group: groups.filter(function (group) {
                   return group.projectId === projects[0].id;
                 })[0],
-                equipment: quantities,
-                filters,
+                equipment: {},
+                filters: {},
               }}
               onSubmit={(values, { setSubmitting }): void => {
                 setSubmitting(true);
@@ -360,7 +332,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     {values.hasEquipment === "yes" && (
                       <div>
                         <br />
-                        <QuantityList quantities={values.equipment} />
+                        <QuantityList selectedEquipment={values.equipment} />
                         <Button
                           size="small"
                           variant="contained"
@@ -393,10 +365,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     <EquipmentForm
                       dispatch={dispatch}
                       state={state}
-                      equipment={equipment}
-                      quantities={values.equipment}
+                      selectedEquipment={values.equipment}
                       filters={values.filters}
-                      visibleFilters={categories[values.currentCategory]}
                       currentCategory={values.currentCategory}
                       setFieldValue={setFieldValue}
                     />

@@ -2,18 +2,19 @@ import React, { FunctionComponent } from "react";
 import List from "@material-ui/core/List";
 import Box from "@material-ui/core/Box";
 import FilterItem from "./FilterItem";
+import Tag from "../resources/Tag";
+
 
 interface FilterListProps {
   filters: { [k: string]: boolean };
-  visibleFilters: Set<string>;
+  validTags: string [];
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 const FilterList: FunctionComponent<FilterListProps> = ({
   filters,
-  visibleFilters,
+  validTags,
   setFieldValue,
 }) => {
-  const filterKeys = Array.from(visibleFilters).sort();
   // Create list of FilterItems from visible (valid for that category) filters
   return (
     <Box>
@@ -23,10 +24,10 @@ const FilterList: FunctionComponent<FilterListProps> = ({
           minWidth: "100%",
         }}
       >
-        {filterKeys.map((name) => (
+        {validTags.map((tag) => (
           <FilterItem
-            name={name}
-            value={filters[name]}
+            name={tag}
+            value={filters[tag]}
             setFieldValue={setFieldValue}
           />
         ))}
