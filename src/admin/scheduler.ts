@@ -187,10 +187,7 @@ export const makeDailyHours = (location: Location): {}[] => {
 const addADay = (s: string): string => {
   const d = new Date(s);
   d.setUTCDate(d.getUTCDate() + 1);
-  const month = d.getUTCMonth() + 1;
-  const date = d.getUTCDate();
-  const leftPad = (n: number): string => (n < 10 ? "0" : "") + n;
-  return `${d.getUTCFullYear()}-${leftPad(month)}-${leftPad(date)}`;
+  return d.toJSON().split("T")[0];
 };
 
 export const processVirtualWeeks = (
