@@ -68,7 +68,7 @@ const EquipmentForm: FunctionComponent<
       `/api/categories?context=${ResourceKey.Categories}`,
       `/api/tag?context=${ResourceKey.Tags}`
     );
-  });
+  }, [dispatch]);
   // Constant Declarations
   const classes = useStyles();
   const tags = state.resources[ResourceKey.Tags] as Tag[];
