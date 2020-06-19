@@ -4,12 +4,11 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import List from "@material-ui/core/List";
 import TextField from "@material-ui/core/TextField";
 import FilterList from "./FilterList";
-import Tag from "../resources/Tag";
 
 const useStyles = makeStyles({
   list: {
     width: 250,
-  }
+  },
 });
 
 interface FilterDrawerProps {
@@ -77,29 +76,29 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
             // If the user has expanded a category
             validTags ? (
               <div>
-                  <div
-                    style={{
-                      paddingTop: "20",
-                      marginTop: "20",
-                    }}
-                  >
-                    <br />
-                    <br />
-                    Filters
-                  </div>
-                  <div
-                    style={{
-                      paddingTop: "0",
-                      margin: "0",
-                    }}
-                  >
-                    <FilterList
-                      filters={filters}
-                      validTags={validTags}
-                      setFieldValue={setFieldValue}
-                    />
-                  </div>
+                <div
+                  style={{
+                    paddingTop: "20",
+                    marginTop: "20",
+                  }}
+                >
+                  <br />
+                  <br />
+                  Filters
                 </div>
+                <div
+                  style={{
+                    paddingTop: "0",
+                    margin: "0",
+                  }}
+                >
+                  <FilterList
+                    filters={filters}
+                    validTags={validTags}
+                    setFieldValue={setFieldValue}
+                  />
+                </div>
+              </div>
             ) : (
               // If the user has NOT expanded a category
               <div>Expand a category to see filters</div>

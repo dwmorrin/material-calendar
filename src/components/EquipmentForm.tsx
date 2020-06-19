@@ -17,7 +17,6 @@ import { makeTransition } from "./Transition";
 import Equipment from "../resources/Equipment";
 import { queryEquipment, filterEquipment } from "../utils/equipment";
 import Tag from "../resources/Tag";
-import Category from "../resources/Category";
 import { quantizeEquipment } from "../utils/equipment";
 import fetchAllResources from "../utils/fetchAllResources";
 import { ResourceKey } from "../resources/types";
@@ -72,7 +71,6 @@ const EquipmentForm: FunctionComponent<
   });
   // Constant Declarations
   const classes = useStyles();
-  const categories = state.resources[ResourceKey.Categories] as Category[];
   const tags = state.resources[ResourceKey.Tags] as Tag[];
   const equipment = quantizeEquipment(
     state.resources[ResourceKey.Equipment] as Equipment[]

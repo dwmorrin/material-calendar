@@ -1,5 +1,4 @@
 import Equipment from "../resources/Equipment";
-import Tags from "../resources/Tag";
 // Filtering Function to reduce the size of the equipment array being passed down
 export function queryEquipment(
   equipment: Equipment[],
@@ -64,10 +63,7 @@ export function quantizeEquipment(equipment: Equipment[]): Equipment[] {
 // Function to convert equipment Array to Quantized equipment Array
 export function buildDictionaries(
   equipment: Equipment[]
-): [
-  { [k: string]: boolean },
-  { [k: string]: Set<string> },
-] {
+): [{ [k: string]: boolean }, { [k: string]: Set<string> }] {
   // Build selectedEquipment dictionary for Formik
   // Build Categories Dictionary
   // Build Filters Dictionary
@@ -75,18 +71,10 @@ export function buildDictionaries(
   const categories: { [k: string]: Set<string> } = {};
   equipment.forEach((item) => {
     item.tags.forEach((tag) => {
-      if (
-        !categories[
-          item.category.path || item.category.name
-        ]
-      ) {
-        categories[
-          item.category.path || item.category.name
-        ] = new Set();
+      if (!categories[item.category.path || item.category.name]) {
+        categories[item.category.path || item.category.name] = new Set();
       }
-      categories[
-        item.category.path || item.category.name
-      ].add(tag.name);
+      categories[item.category.path || item.category.name].add(tag.name);
       filters[tag.name] = false;
     });
   });

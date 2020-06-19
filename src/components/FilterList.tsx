@@ -2,12 +2,10 @@ import React, { FunctionComponent } from "react";
 import List from "@material-ui/core/List";
 import Box from "@material-ui/core/Box";
 import FilterItem from "./FilterItem";
-import Tag from "../resources/Tag";
-
 
 interface FilterListProps {
   filters: { [k: string]: boolean };
-  validTags: string [];
+  validTags: string[];
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 const FilterList: FunctionComponent<FilterListProps> = ({
@@ -26,6 +24,7 @@ const FilterList: FunctionComponent<FilterListProps> = ({
       >
         {validTags.map((tag) => (
           <FilterItem
+            key={tag}
             name={tag}
             value={filters[tag]}
             setFieldValue={setFieldValue}

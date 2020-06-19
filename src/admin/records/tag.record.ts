@@ -4,7 +4,7 @@ const template = (tag: unknown): string[][] =>
   tag instanceof Tag
     ? [
         ["Name", tag.name],
-        ["Category", tag.category],
+        ["Category", tag.category.name],
       ]
     : [["", JSON.stringify(tag)]];
 
