@@ -25,7 +25,6 @@ import EquipmentForm from "./EquipmentForm";
 import QuantityList from "./QuantityList";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
-import { findProjectById } from "../utils/project";
 
 const useStyles = makeStyles(() => ({
   list: {
@@ -129,7 +128,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               }}
               validationSchema={validationSchema}
             >
-              {(props): any => {
+              {(props): unknown => {
                 const {
                   values,
                   touched,
@@ -155,7 +154,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                           onChange={(event): void => {
                             setFieldValue(
                               "project",
-                              findProjectById(projects, event?.target.value)
+                              projects.find(
+                                (p) => p.id === +event?.target.value
+                              )
                             );
                           }}
                         ></Select>
