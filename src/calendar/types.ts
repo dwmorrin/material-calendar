@@ -6,12 +6,16 @@ import { ResourceKey, ResourceInstance } from "../resources/types";
 
 export enum CalendarAction {
   ChangedView,
+  CloseReservationForm,
+  CloseEquipmentForm,
   CloseEventDetail,
   CloseProjectDashboard,
   CloseGroupDashboard,
   Error,
   Loading,
   PickedDate,
+  OpenReservationForm,
+  OpenEquipmentForm,
   OpenEventDetail,
   OpenGroupDashboard,
   OpenProjectDashboard,
@@ -42,6 +46,8 @@ export interface CalendarState {
   loading: boolean;
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
+  equipmentFormIsOpen: boolean;
+  reservationFormIsOpen: boolean;
   ref: React.RefObject<FullCalendar> | null;
 
   // Resources

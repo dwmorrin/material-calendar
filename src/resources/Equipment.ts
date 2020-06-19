@@ -3,7 +3,7 @@ import Tag from "./Tag";
 
 interface Equipment {
   [k: string]: unknown;
-  id: string;
+  id: number;
   description: string; //! required
   category: Category; // hierchial; use sparingly
   tags: Tag[];
@@ -15,21 +15,20 @@ interface Equipment {
   notes?: string; //! string or string[]?
   quantity: number; // default=1
   consumable: boolean; // default=false; for admins for periodic reordering
-  reservations: string[];
-  // checkedOut: boolean; //! check if needed, or does res[] suffice?
+  reservations: number[];
 }
 
 class Equipment implements Equipment {
   static url = "/api/equipment";
   constructor(
     equip = {
-      id: "",
+      id: 0,
       description: "",
       category: new Category(),
       tags: [] as Tag[],
       quantity: 1,
       consumable: false,
-      reservations: [] as string[],
+      reservations: [] as number[],
     }
   ) {
     Object.assign(this, equip);

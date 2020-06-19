@@ -49,7 +49,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `/api/users/${user.username}/projects?context=${ResourceKey.Projects}`
     );
   }, [user]);
-
   return (
     (user?.username && (
       <div className={classes.root}>

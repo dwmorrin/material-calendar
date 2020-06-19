@@ -15,7 +15,12 @@ interface Category {
 
 class Category implements Category {
   static url = "/api/equipment/category";
-  constructor(category = { name: "", path: "" }) {
+  constructor(
+    category = {
+      name: "",
+      path: "",
+    }
+  ) {
     Object.assign(this, category);
   }
 }
