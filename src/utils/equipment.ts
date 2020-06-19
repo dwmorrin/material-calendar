@@ -1,32 +1,23 @@
 import Equipment from "../resources/Equipment";
+
 // Filtering Function to reduce the size of the equipment array being passed down
 export function queryEquipment(
   equipment: Equipment[],
   searchString: string
 ): Equipment[] {
-  let queriedEquipment: Equipment[] = [];
-  if (searchString !== "") {
-    const queries = searchString.split(/\W+/);
-    queriedEquipment = equipment.filter(function (equipment) {
-      return queries.every(function (query) {
-        return (
-          equipment.description
-            .toLowerCase()
-            .includes(query.toLowerCase().trim()) ||
-          equipment.category.path ||
-          equipment.category.name
-            .toLowerCase()
-            .includes(query.toLowerCase().trim()) ||
-          equipment.tags.some(function (tag) {
-            return tag.name.toLowerCase().includes(query.toLowerCase().trim());
-          })
-        );
-      });
-    });
-  } else {
-    queriedEquipment = equipment;
+  if (!searchString) {
+    return equipment;
   }
-  return queriedEquipment;
+  const queries = searchString.trim().toLowerCase().split(/\W+/);
+  return equipment.filter((equipment) =>
+    queries.every(
+      (query) =>
+        equipment.description.toLowerCase().includes(query) ||
+        equipment.category.path ||
+        equipment.category.name.toLowerCase().includes(query) ||
+        equipment.tags.some((tag) => tag.name.toLowerCase().includes(query))
+    )
+  );
 }
 
 // Filtering Function to reduce the size of the equipment array being passed down
@@ -34,16 +25,14 @@ export function filterEquipment(
   equipment: Equipment[],
   filters: { [k: string]: boolean }
 ): Equipment[] | undefined {
-  const activeFilters = Object.keys(filters).filter(function (key: string) {
-    return filters[key];
-  });
-  return equipment.filter(function (item) {
-    return activeFilters.every(function (filter) {
-      return item.tags.some(function (tag) {
-        return tag.name.toLowerCase().includes(filter.toLowerCase().trim());
-      });
-    });
-  });
+  const activeFilters = Object.keys(filters)
+    .filter((key) => filters[key])
+    .map((key) => key.trim().toLowerCase());
+  return equipment.filter((item) =>
+    activeFilters.every((filter) =>
+      item.tags.some((tag) => tag.name.toLowerCase().includes(filter))
+    )
+  );
 }
 
 export function quantizeEquipment(equipment: Equipment[]): Equipment[] {
