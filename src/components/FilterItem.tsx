@@ -31,7 +31,7 @@ const FilterItem: FunctionComponent<FilterItemProps> = ({
         >
           <Checkbox
             name={"filters[" + name + "]"}
-            onChange={(event): void =>
+            onChange={(): void =>
               setFieldValue("filters[" + name + "]", !value)
             }
             onClick={(event): void => {

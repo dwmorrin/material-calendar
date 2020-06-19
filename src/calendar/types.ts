@@ -15,7 +15,6 @@ export enum CalendarAction {
   Loading,
   PickedDate,
   OpenReservationForm,
-  OpenEquipmentForm,
   OpenEventDetail,
   OpenGroupDashboard,
   OpenProjectDashboard,
@@ -46,7 +45,6 @@ export interface CalendarState {
   loading: boolean;
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
-  equipmentFormIsOpen: boolean;
   reservationFormIsOpen: boolean;
   ref: React.RefObject<FullCalendar> | null;
 

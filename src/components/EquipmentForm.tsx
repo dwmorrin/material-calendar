@@ -12,14 +12,13 @@ import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import FilterDrawer from "./FilterDrawer";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import EquipmentList from "./EquipmentList";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import Equipment from "../resources/Equipment";
 import { queryEquipment, filterEquipment } from "../utils/equipment";
 import Tag from "../resources/Tag";
 import { quantizeEquipment } from "../utils/equipment";
-import fetchAllResources from "../utils/fetchAllResources";
 import { ResourceKey } from "../resources/types";
+import Category from "../resources/Category";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,6 +38,8 @@ const useStyles = makeStyles((theme) => ({
 const transition = makeTransition("up");
 
 interface EquipmentFormProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
   selectedEquipment: {
     [k: string]: number;
   };
@@ -49,32 +50,57 @@ interface EquipmentFormProps {
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 
-const EquipmentForm: FunctionComponent<
-  CalendarUIProps & EquipmentFormProps
-> = ({
-  dispatch,
-  state,
+const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
+  open,
+  setOpen,
   selectedEquipment,
   filters,
   currentCategory,
   setFieldValue,
 }) => {
+  const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
+  const [searchString, setSearchString] = useState("");
+  const [equipment, setEquipment] = useState([] as Equipment[]);
+  const [tags, setTags] = useState([] as Tag[]);
+  const [categories, setCategories] = useState([] as Category[]);
   useEffect(() => {
-    fetchAllResources(
-      dispatch,
-      CalendarAction.ReceivedAllResources,
-      CalendarAction.Error,
+    const resourceUrls = [
       `/api/equipment?context=${ResourceKey.Equipment}`,
       `/api/categories?context=${ResourceKey.Categories}`,
-      `/api/tag?context=${ResourceKey.Tags}`
+      `/api/tag?context=${ResourceKey.Tags}`,
+    ];
+    Promise.all(resourceUrls.map((url) => fetch(url))).then((responses) =>
+      Promise.all(responses.map((response) => response.json())).then(
+        (dataArray) => {
+          dataArray.forEach(({ data, context }) => {
+            switch (+context) {
+              case ResourceKey.Equipment:
+                setEquipment(
+                  data.map((d: unknown) => new Equipment(d as never))
+                );
+                break;
+              case ResourceKey.Categories:
+                setCategories(
+                  data.map((d: unknown) => new Category(d as never))
+                );
+                break;
+              case ResourceKey.Tags:
+                setTags(data.map((d: unknown) => new Tag(d as never)));
+                break;
+              default:
+                throw new Error(
+                  `unhandled resource fetch in equipment form with ${context}`
+                );
+            }
+          });
+        }
+      )
     );
-  }, [dispatch]);
+  }, []);
+
   // Constant Declarations
   const classes = useStyles();
-  const tags = state.resources[ResourceKey.Tags] as Tag[];
-  const equipment = quantizeEquipment(
-    state.resources[ResourceKey.Equipment] as Equipment[]
-  );
+  const quantizedEquipment = quantizeEquipment(equipment);
   const validTags = tags
     .filter(
       (tag) =>
@@ -83,9 +109,6 @@ const EquipmentForm: FunctionComponent<
     )
     .map((tag) => tag.name)
     .filter((v, i, a) => a.indexOf(v) === i);
-  // State Declarations
-  const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
-  const [searchString, setSearchString] = useState("");
 
   // Filter Drawer Toggle Function
   const toggleFilterDrawer = () => (
@@ -102,25 +125,19 @@ const EquipmentForm: FunctionComponent<
   };
 
   return (
-    <Dialog
-      fullScreen
-      open={state.equipmentFormIsOpen}
-      TransitionComponent={transition}
-    >
+    <Dialog fullScreen open={open} TransitionComponent={transition}>
       <div className={classes.root}>
-        <div onClick={(): void => setFilterDrawerIsOpen(!filterDrawerIsOpen)}>
-          <FilterDrawer
-            open={filterDrawerIsOpen}
-            onOpen={toggleFilterDrawer}
-            onClose={toggleFilterDrawer}
-            validTags={validTags}
-            filters={filters}
-            searchString={searchString}
-            setSearchString={setSearchString}
-            closeDrawer={(): void => setFilterDrawerIsOpen(!filterDrawerIsOpen)}
-            setFieldValue={setFieldValue}
-          />
-        </div>
+        <FilterDrawer
+          open={filterDrawerIsOpen}
+          onOpen={toggleFilterDrawer}
+          onClose={toggleFilterDrawer}
+          validTags={validTags}
+          filters={filters}
+          searchString={searchString}
+          setSearchString={setSearchString}
+          closeDrawer={(): void => setFilterDrawerIsOpen(!filterDrawerIsOpen)}
+          setFieldValue={setFieldValue}
+        />
         <AppBar position="sticky">
           <List>
             <Toolbar>
@@ -129,9 +146,7 @@ const EquipmentForm: FunctionComponent<
                 edge="start"
                 color="inherit"
                 aria-label="close"
-                onClick={(): void =>
-                  dispatch({ type: CalendarAction.CloseEquipmentForm })
-                }
+                onClick={(): void => setOpen(false)}
               >
                 <ArrowBackIosIcon />
               </IconButton>
@@ -149,7 +164,7 @@ const EquipmentForm: FunctionComponent<
         </AppBar>
         <EquipmentList
           equipmentList={filterEquipment(
-            queryEquipment(equipment, searchString),
+            queryEquipment(quantizedEquipment, searchString),
             filters
           )}
           currentCategory={currentCategory}

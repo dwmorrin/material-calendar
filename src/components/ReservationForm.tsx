@@ -53,9 +53,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
 
   // State Declarations
   const [isSubmissionCompleted, setSubmissionCompleted] = useState(false);
-  const [validationSchema, setValidationSchema] = React.useState(
+  const [validationSchema, setValidationSchema] = useState(
     initialValidationSchema
   );
+  const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
 
   // HandleChange Functions
   const requireGuests = (event: React.ChangeEvent<{}>): void => {
@@ -339,12 +340,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                           disableElevation
                           style={{ backgroundColor: "Yellow", color: "black" }}
                           disabled={isSubmitting}
-                          onClick={(event): void => {
-                            event.stopPropagation();
-                            dispatch({
-                              type: CalendarAction.OpenEquipmentForm,
-                            });
-                          }}
+                          onClick={(): void => setEquipmentFormIsOpen(true)}
                         >
                           Add Equipment
                         </Button>
@@ -363,8 +359,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                       Confirm Reservation
                     </Button>
                     <EquipmentForm
-                      dispatch={dispatch}
-                      state={state}
+                      open={equipmentFormIsOpen}
+                      setOpen={setEquipmentFormIsOpen}
                       selectedEquipment={values.equipment}
                       filters={values.filters}
                       currentCategory={values.currentCategory}

@@ -66,11 +66,6 @@ const openReservationForm: StateHandler = (state) => ({
   reservationFormIsOpen: true,
 });
 
-const openEquipmentForm: StateHandler = (state) => ({
-  ...state,
-  equipmentFormIsOpen: true,
-});
-
 const openEventDetail: StateHandler = (state, { payload }) => {
   if (!payload?.currentEvent) {
     console.error("no event received for detail view");
@@ -190,7 +185,6 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.Loading]: loading,
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.OpenReservationForm]: openReservationForm,
-    [CalendarAction.OpenEquipmentForm]: openEquipmentForm,
     [CalendarAction.OpenEventDetail]: openEventDetail,
     [CalendarAction.OpenGroupDashboard]: openGroupDashboard,
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,
