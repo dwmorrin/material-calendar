@@ -8,8 +8,11 @@ import { IconButton, Menu, Typography, MenuItem } from "@material-ui/core";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { navigate } from "@reach/router";
 import { AuthContext } from "./AuthContext";
+import User from "../resources/User";
 
-const MoreMenu: FunctionComponent = () => {
+const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
+  inAdminApp,
+}) => {
   const { user, setUser } = useContext(AuthContext);
   const isAdmin = user && user.roles.includes("admin");
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -28,9 +31,8 @@ const MoreMenu: FunctionComponent = () => {
       method: "POST",
       credentials: "include",
     });
-    user.id = ""; // TODO unset the entire user object, gracefully
     sessionStorage.clear();
-    setUser(user);
+    setUser(new User());
     navigate("/");
   };
 
@@ -56,8 +58,14 @@ const MoreMenu: FunctionComponent = () => {
           <Typography>Logout</Typography>
         </MenuItem>
         {isAdmin && (
-          <MenuItem onClick={(): Promise<void> => navigate("/admin")}>
-            <Typography>Switch to admin app</Typography>
+          <MenuItem
+            onClick={(): Promise<void> =>
+              navigate(inAdminApp ? "/calendar" : "/admin")
+            }
+          >
+            <Typography>
+              {inAdminApp ? "Switch to calendar" : "Switch to admin app"}
+            </Typography>
           </MenuItem>
         )}
       </Menu>

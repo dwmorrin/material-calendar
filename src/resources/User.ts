@@ -1,5 +1,6 @@
 interface User {
   [k: string]: unknown;
+  id: number;
   username: string; // unique to each user
   roles: string[]; // admin, user, etc
   name?: {
@@ -11,6 +12,7 @@ interface User {
     email?: string[];
     phone?: string[];
   };
+  projects?: { id: number; title: string; groupId: number }[];
 }
 
 class User implements User {

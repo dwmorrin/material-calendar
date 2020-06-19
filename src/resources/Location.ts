@@ -70,15 +70,18 @@ interface Location {
   title: string;
   groupId: string; // for UI, to group by categories
   selected?: boolean;
+  hours: { id: number; date: string; hours: number }[];
 }
 
 class Location implements Location {
   static url = "/api/locations";
+  static locationHoursId = "002"; // magic number to set scheduler order
   constructor(
     location = {
       id: 0,
       title: "",
       groupId: "",
+      hours: [] as { id: number; date: string; hours: number }[],
     }
   ) {
     Object.assign(this, location);

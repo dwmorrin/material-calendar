@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import { CalendarUIProps } from "../calendar/types";
 import {
   ExpansionPanel,
   ExpansionPanelSummary,
@@ -10,15 +10,9 @@ import {
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ResourceListItem from "./ResourceListItem";
-import { makeStyles } from "@material-ui/core/styles";
 import Location from "../resources/Location";
 import { ResourceKey } from "../resources/types";
-
-const useStyles = makeStyles(() => ({
-  nopadding: {
-    padding: 0,
-  },
-}));
+import { dispatchSelectedLocation } from "../calendar/dispatch";
 
 interface ResourceExpansionListProps extends CalendarUIProps {
   groupId: string;
@@ -29,7 +23,6 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
   groupId,
 }) => {
   const locations = state.resources[ResourceKey.Locations] as Location[];
-  const classes = useStyles();
   const groupLocations = locations.filter(
     (location) => location.groupId === groupId
   );
@@ -54,25 +47,11 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
           onClick={(event): void => event.stopPropagation()}
           onChange={(event: React.ChangeEvent<{}>, checked): void => {
             event.stopPropagation();
-            dispatch({
-              type: CalendarAction.SelectedLocation,
-              payload: {
-                resources: {
-                  ...state.resources,
-                  [ResourceKey.Locations]: locations.map((location) => {
-                    if (location.groupId !== groupId) {
-                      return location;
-                    }
-                    location.selected = checked;
-                    return location;
-                  }),
-                },
-              },
-            });
+            dispatchSelectedLocation(state, dispatch, groupId, checked);
           }}
         />
       </ExpansionPanelSummary>
-      <ExpansionPanelDetails classes={{ root: classes.nopadding }}>
+      <ExpansionPanelDetails>
         <List>
           {locations
             .filter((location) => location.groupId === groupId)
