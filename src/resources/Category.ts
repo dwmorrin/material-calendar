@@ -14,7 +14,7 @@ interface Category {
 }
 
 class Category implements Category {
-  static url = "/api/equipment/category";
+  static url = "/api/categories";
   constructor(
     category = {
       name: "",
