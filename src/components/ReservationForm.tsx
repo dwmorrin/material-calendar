@@ -52,7 +52,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   });
 
   // State Declarations
-  const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
+  const [isSubmissionCompleted, setSubmissionCompleted] = useState(false);
   const [validationSchema, setValidationSchema] = React.useState(
     initialValidationSchema
   );
@@ -94,7 +94,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
         <Typography variant="h6">Make Reservation</Typography>
       </Toolbar>
 
-      {!isSubmitionCompleted && (
+      {!isSubmissionCompleted && (
         <React.Fragment>
           <DialogContent>
             <Formik
@@ -123,7 +123,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 // doesn't update fast enough to set in the handleChange
                 setTimeout(() => {
                   console.log(values);
-                  setSubmitionCompleted(true);
+                  setSubmissionCompleted(true);
                 }, 2000);
               }}
               validationSchema={validationSchema}
@@ -377,7 +377,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
           </DialogContent>
         </React.Fragment>
       )}
-      {isSubmitionCompleted && <div>Reservation Submitted!</div>}
+      {isSubmissionCompleted && <div>Reservation Submitted!</div>}
     </Dialog>
   );
 };
