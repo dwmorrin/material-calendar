@@ -9,23 +9,21 @@ import {
   FormLabel,
   IconButton,
   Radio,
-  RadioGroup,
-  TextField,
   Toolbar,
   Typography,
 } from "@material-ui/core";
+import { RadioGroup, TextField } from "formik-material-ui";
 import CloseIcon from "@material-ui/icons/Close";
 import Select from "./Select";
 import UserGroup from "../resources/UserGroup";
-import { Form, Formik } from "formik";
+import { Field, Form, Formik } from "formik";
 import EquipmentForm from "./EquipmentForm";
 import QuantityList from "./QuantityList";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import {
-  initialValidationSchema,
+  validationSchema,
   makeInitialValues,
-  makeRequiredGuests,
   useStyles,
   submitHandler,
   transition,
@@ -35,10 +33,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const [validationSchema, setValidationSchema] = useState(
-    initialValidationSchema
-  );
-  const requireGuests = makeRequiredGuests(setValidationSchema);
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
@@ -75,15 +69,13 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
             touched,
             errors,
             isSubmitting,
-            handleChange,
             setFieldValue,
-            handleBlur,
             handleSubmit,
           }): unknown => (
             <Form onSubmit={handleSubmit}>
               <div className={classes.list}>
-                <div style={{ paddingTop: 16 }}>Project:</div>
-                <div style={{ paddingLeft: 5 }}>
+                <div className={classes.paddingLeftSixteen}>Project:</div>
+                <div className={classes.paddingLeftFive}>
                   <Select
                     dispatch={dispatch}
                     state={state}
@@ -119,12 +111,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 </div>
               </div>
               <br />
-              <TextField
+              <Field
+                component={TextField}
                 label="Brief Description of what you will be doing"
                 name="description"
-                value={values.description}
-                onChange={handleChange}
-                onBlur={handleBlur}
                 helperText={
                   errors.description &&
                   touched.description &&
@@ -135,31 +125,18 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               />
               <br />
               <br />
-              <FormControl component="fieldset">
-                <FormLabel component="legend">
-                  Do you need to use the Live Room?
-                </FormLabel>
-                <RadioGroup
-                  aria-label="liveRoom"
-                  name="liveRoom"
-                  value={values.liveRoom}
-                  onChange={handleChange}
-                >
-                  <FormControlLabel
-                    value="yes"
-                    control={<Radio />}
-                    label="Yes"
-                  />
-                  <FormControlLabel value="no" control={<Radio />} label="No" />
-                </RadioGroup>
-              </FormControl>
+              <FormLabel component="legend">
+                Do you need to use the Live Room?
+              </FormLabel>
+              <Field component={RadioGroup} name="liveRoom">
+                <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+                <FormControlLabel value="no" control={<Radio />} label="No" />
+              </Field>
               <br />
-              <TextField
+              <Field
+                component={TextField}
                 label="Phone Number"
                 name="phone"
-                value={values.phone}
-                onChange={handleChange}
-                onBlur={handleBlur}
                 helperText={errors.phone && touched.phone && errors.phone}
                 fullWidth
                 variant="filled"
@@ -168,14 +145,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               <br />
               <FormControl component="fieldset">
                 <FormLabel component="legend">Do you have guests?</FormLabel>
-                <RadioGroup
+                <Field
+                  component={RadioGroup}
                   aria-label="guestsToggle"
                   name="hasGuests"
-                  value={values.hasGuests}
-                  onChange={(event: React.ChangeEvent<{}>, value): void => {
-                    setFieldValue("hasGuests", value);
-                    requireGuests(event);
-                  }}
                 >
                   <FormControlLabel
                     value="yes"
@@ -183,16 +156,14 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     label="Yes"
                   />
                   <FormControlLabel value="no" control={<Radio />} label="No" />
-                </RadioGroup>
+                </Field>
               </FormControl>
               <br />
               {values.hasGuests === "yes" && (
-                <TextField
+                <Field
+                  component={TextField}
                   label="Guest Names"
                   name="guests"
-                  value={values.guests}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
                   helperText={errors.guests && touched.guests && errors.guests}
                   fullWidth
                   variant="filled"
@@ -204,22 +175,18 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                   Do you have any notes about your reservation for the Tech
                   Staff?
                 </FormLabel>
-                <RadioGroup
-                  aria-label="notes"
-                  name="hasNotes"
-                  value={values.hasNotes}
-                  onChange={handleChange}
-                >
+                <Field component={RadioGroup} name="hasNotes">
                   <FormControlLabel
                     value="yes"
                     control={<Radio />}
                     label="Yes"
                   />
                   <FormControlLabel value="no" control={<Radio />} label="No" />
-                </RadioGroup>
+                </Field>
               </FormControl>
               {values.hasNotes === "yes" && (
-                <TextField
+                <Field
+                  component={TextField}
                   id="notes"
                   label="Notes"
                   fullWidth
@@ -233,11 +200,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 <FormLabel component="legend">
                   Would you like to reserve any equipment now?
                 </FormLabel>
-                <RadioGroup
+                <Field
+                  component={RadioGroup}
                   aria-label="equipment"
                   name="hasEquipment"
-                  value={values.hasEquipment}
-                  onChange={handleChange}
                 >
                   <FormControlLabel
                     value="yes"
@@ -245,7 +211,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     label="Yes"
                   />
                   <FormControlLabel value="no" control={<Radio />} label="No" />
-                </RadioGroup>
+                </Field>
               </FormControl>
               {values.hasEquipment === "yes" && (
                 <div>
@@ -287,6 +253,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 currentCategory={values.currentCategory as string}
                 setFieldValue={setFieldValue}
               />
+              <pre>{JSON.stringify(values, null, 2)}</pre>
             </Form>
           )}
         </Formik>

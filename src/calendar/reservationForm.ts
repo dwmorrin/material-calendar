@@ -1,4 +1,3 @@
-import React, { SetStateAction } from "react";
 import { makeStyles } from "@material-ui/core";
 import { makeTransition } from "../components/Transition";
 import * as Yup from "yup";
@@ -17,35 +16,24 @@ export const useStyles = makeStyles(() => ({
   paddingLeftTen: {
     paddingLeft: 10,
   },
+  paddingLeftSixteen: {
+    paddingLeft: 16,
+  },
+  paddingLeftFive: {
+    paddingLeft: 5,
+  },
 }));
 
 export const transition = makeTransition("left");
-export const initialValidationSchema = Yup.object().shape({
+
+export const validationSchema = Yup.object().shape({
   phone: Yup.string().required("Please Enter a Phone Number"),
   description: Yup.string().required("Please Enter a description"),
+  guests: Yup.string().when("hasGuests", {
+    is: "yes",
+    then: Yup.string().required("Please enter the names of your guests"),
+  }),
 });
-
-export const makeRequiredGuests = (
-  setValidationSchema: React.Dispatch<
-    SetStateAction<
-      Yup.ObjectSchema<
-        object & { phone: string; description: string; guests?: string }
-      >
-    >
-  >
-) => (event: React.ChangeEvent<{}>): void => {
-  const val = (event.target as HTMLInputElement).value;
-  if (val !== "yes") {
-    return setValidationSchema(initialValidationSchema);
-  }
-  setValidationSchema(
-    Yup.object().shape({
-      phone: Yup.string().required("Please Enter a Phone Number"),
-      description: Yup.string().required("Please Enter a description"),
-      guests: Yup.string().required("Please enter the names of your guests"),
-    })
-  );
-};
 
 export const submitHandler = (
   values: { [k: string]: unknown },
