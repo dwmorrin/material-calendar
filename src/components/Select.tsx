@@ -15,13 +15,11 @@ interface SelectProps extends CalendarUIProps {
   selectName: string;
   selectId: string;
   contents: { id: number; title: string }[];
-  onChange: (event: any) => void;
+  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   value: number | string;
 }
 
 const Select: FunctionComponent<SelectProps> = ({
-  // dispatch,
-  // state,
   selectName,
   selectId,
   contents,

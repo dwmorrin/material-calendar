@@ -91,7 +91,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     selectName="projects"
                     selectId="projectsDropDown"
                     contents={projects}
-                    onChange={(event): void => {
+                    onChange={(
+                      event: React.ChangeEvent<HTMLSelectElement>
+                    ): void => {
                       setFieldValue(
                         "project",
                         projects.find((p) => p.id === +event?.target.value)
