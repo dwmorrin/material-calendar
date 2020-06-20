@@ -49,9 +49,6 @@ export const makeInitialValues = (
 ): { [k: string]: unknown } => {
   const project = (state.resources[ResourceKey.Projects] as Project[])[0];
   return {
-    event: state.currentEvent,
-    currentCategory: "",
-    searchString: "",
     phone: "",
     description: "",
     guests: "",
@@ -60,10 +57,6 @@ export const makeInitialValues = (
     hasGuests: "no",
     hasNotes: "no",
     hasEquipment: "no",
-    group: (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-      (g) => g.projectId === project.id
-    ),
     equipment: {},
-    filters: {},
   };
 };

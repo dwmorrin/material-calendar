@@ -239,8 +239,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 open={equipmentFormIsOpen}
                 setOpen={setEquipmentFormIsOpen}
                 selectedEquipment={values.equipment as { [k: string]: number }}
-                filters={values.filters as {}}
-                currentCategory={values.currentCategory as string}
                 setFieldValue={setFieldValue}
               />
               <pre>{JSON.stringify(values, null, 2)}</pre>

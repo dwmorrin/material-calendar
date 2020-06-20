@@ -43,10 +43,10 @@ interface EquipmentFormProps {
   selectedEquipment: {
     [k: string]: number;
   };
-  filters: {
-    [k: string]: boolean;
-  };
-  currentCategory: string;
+  // filters: {
+  //   [k: string]: boolean;
+  // };
+  // currentCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 
@@ -54,8 +54,8 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   open,
   setOpen,
   selectedEquipment,
-  filters,
-  currentCategory,
+  // filters,
+  // currentCategory,
   setFieldValue,
 }) => {
   const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
@@ -63,6 +63,8 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   const [equipment, setEquipment] = useState([] as Equipment[]);
   const [tags, setTags] = useState([] as Tag[]);
   const [categories, setCategories] = useState([] as Category[]);
+  const [filters, setFilters] = useState({} as { [k: string]: boolean });
+  const [currentCategory, setCurrentCategory] = useState("");
   useEffect(() => {
     const resourceUrls = [
       `/api/equipment?context=${ResourceKey.Equipment}`,
