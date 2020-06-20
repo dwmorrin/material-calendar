@@ -3,7 +3,7 @@ import {
   filterEquipment,
   quantizeEquipment,
   buildDictionaries,
-} from "../utils/equipment";
+} from "../calendar/equipmentForm";
 
 test("query with nothing returns all input", () => {
   const testItem = {

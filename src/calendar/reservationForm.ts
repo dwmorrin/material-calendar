@@ -1,11 +1,10 @@
 import { makeStyles } from "@material-ui/core";
 import { makeTransition } from "../components/Transition";
-import * as Yup from "yup";
+import { object, string } from "yup";
 import { FormikValues } from "formik";
 import { CalendarState } from "./types";
 import Project from "../resources/Project";
 import { ResourceKey } from "../resources/types";
-import UserGroup from "../resources/UserGroup";
 
 export const useStyles = makeStyles(() => ({
   list: {
@@ -26,12 +25,12 @@ export const useStyles = makeStyles(() => ({
 
 export const transition = makeTransition("left");
 
-export const validationSchema = Yup.object().shape({
-  phone: Yup.string().required("Please Enter a Phone Number"),
-  description: Yup.string().required("Please Enter a description"),
-  guests: Yup.string().when("hasGuests", {
+export const validationSchema = object().shape({
+  phone: string().required("Please Enter a Phone Number"),
+  description: string().required("Please Enter a description"),
+  guests: string().when("hasGuests", {
     is: "yes",
-    then: Yup.string().required("Please enter the names of your guests"),
+    then: string().required("Please enter the names of your guests"),
   }),
 });
 
