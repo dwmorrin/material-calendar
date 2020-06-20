@@ -55,7 +55,7 @@ export const makeInitialValues = (
     phone: "",
     description: "",
     guests: "",
-    project,
+    project: project.id,
     liveRoom: "no",
     hasGuests: "no",
     hasNotes: "no",

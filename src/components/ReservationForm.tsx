@@ -8,13 +8,13 @@ import {
   FormControlLabel,
   FormLabel,
   IconButton,
+  MenuItem,
   Radio,
   Toolbar,
   Typography,
 } from "@material-ui/core";
-import { RadioGroup, TextField } from "formik-material-ui";
+import { RadioGroup, Select, TextField } from "formik-material-ui";
 import CloseIcon from "@material-ui/icons/Close";
-import Select from "./Select";
 import UserGroup from "../resources/UserGroup";
 import { Field, Form, Formik } from "formik";
 import EquipmentForm from "./EquipmentForm";
@@ -76,22 +76,13 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               <div className={classes.list}>
                 <div className={classes.paddingLeftSixteen}>Project:</div>
                 <div className={classes.paddingLeftFive}>
-                  <Select
-                    dispatch={dispatch}
-                    state={state}
-                    value={(values.project as Project).id}
-                    selectName="projects"
-                    selectId="projectsDropDown"
-                    contents={projects}
-                    onChange={(
-                      event: React.ChangeEvent<HTMLSelectElement>
-                    ): void => {
-                      setFieldValue(
-                        "project",
-                        projects.find((p) => p.id === +event?.target.value)
-                      );
-                    }}
-                  ></Select>
+                  <Field component={Select} name="project">
+                    {projects.map((p) => (
+                      <MenuItem key={p.id} value={p.id}>
+                        {p.title}
+                      </MenuItem>
+                    ))}
+                  </Field>
                 </div>
               </div>
               <div className={classes.list}>
@@ -99,8 +90,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 <div className={classes.paddingLeftTen}>
                   {(
                     groups.find(
-                      (group) =>
-                        group.projectId === (values.project as Project).id
+                      (group) => group.projectId === values.project
                     ) || new UserGroup()
                   ).members.map(({ username, name }) => (
                     <span key={username}>
