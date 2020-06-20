@@ -4,108 +4,75 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import List from "@material-ui/core/List";
 import TextField from "@material-ui/core/TextField";
 import FilterList from "./FilterList";
+import {
+  EquipmentAction,
+  EquipmentState,
+  EquipmentActionTypes,
+} from "../equipmentForm/types";
 
 const useStyles = makeStyles({
   list: {
     width: 250,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    textAlign: "center",
   },
 });
 
 interface FilterDrawerProps {
-  open: boolean;
+  state: EquipmentState;
+  dispatch: (action: EquipmentAction) => void;
   onClose: () => void;
   onOpen: () => void;
   closeDrawer: () => void;
-  filters: { [k: string]: boolean };
-  validTags: string[];
-  searchString: string;
-  setSearchString: React.Dispatch<React.SetStateAction<string>>;
-  setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
-  searchString,
-  setSearchString,
-  filters,
-  validTags,
-  open,
+  state,
+  dispatch,
   onClose,
   onOpen,
   closeDrawer,
-  setFieldValue,
 }) => {
   const classes = useStyles();
   // Still need to add X to clear textbox and close drawer on enter
   return (
     <SwipeableDrawer
-      open={open}
+      open={state.filterDrawerIsOpen}
       anchor="right"
       onClose={onClose}
       onOpen={onOpen}
     >
-      <div className={classes.list} role="presentation">
-        <List
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            textAlign: "center",
+      <List className={classes.list}>
+        <TextField
+          size="small"
+          id="equipmentSearch"
+          label="Search"
+          value={state.searchString}
+          onChange={(event): void => {
+            event.stopPropagation();
+            dispatch({
+              type: EquipmentActionTypes.ChangedSearchString,
+              payload: { searchString: event.target.value },
+            });
           }}
-        >
-          <TextField
-            size="small"
-            id="equipmentSearch"
-            label="Search"
-            value={searchString}
-            onChange={(event): void => {
-              event.stopPropagation();
-              setSearchString(event.target.value);
-            }}
-            onClick={(event): void => {
-              event.stopPropagation();
-            }}
-            onKeyPress={(ev): void => {
-              if (ev.key === "Enter") {
-                closeDrawer();
-                ev.preventDefault();
-              }
-            }}
-            variant="outlined"
-          />
+          onClick={(event): void => {
+            event.stopPropagation();
+          }}
+          onKeyPress={(ev): void => {
+            if (ev.key === "Enter") {
+              closeDrawer();
+              ev.preventDefault();
+            }
+          }}
+          variant="outlined"
+        />
 
-          {
-            // If the user has expanded a category
-            validTags ? (
-              <div>
-                <div
-                  style={{
-                    paddingTop: "20",
-                    marginTop: "20",
-                  }}
-                >
-                  <br />
-                  <br />
-                  Filters
-                </div>
-                <div
-                  style={{
-                    paddingTop: "0",
-                    margin: "0",
-                  }}
-                >
-                  <FilterList
-                    filters={filters}
-                    validTags={validTags}
-                    setFieldValue={setFieldValue}
-                  />
-                </div>
-              </div>
-            ) : (
-              // If the user has NOT expanded a category
-              <div>Expand a category to see filters</div>
-            )
-          }
-        </List>
-      </div>
+        <FilterList
+          filters={state.filters}
+          setFieldValue={state.setFieldValue}
+        />
+      </List>
     </SwipeableDrawer>
   );
 };

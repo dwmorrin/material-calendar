@@ -4,6 +4,11 @@ import Equipment from "../resources/Equipment";
 import Tag from "../resources/Tag";
 import { ResourceKey } from "../resources/types";
 import Category from "../resources/Category";
+import {
+  EquipmentAction,
+  EquipmentState,
+  EquipmentActionTypes,
+} from "../equipmentForm/types";
 
 export const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,29 +34,33 @@ const resourceUrls = [
 ];
 type StateSetter<T> = React.Dispatch<React.SetStateAction<T>>;
 export const fetchAllEquipmentResources = (
-  setEquipment: StateSetter<Equipment[]>,
-  setCategories: StateSetter<Category[]>,
-  setTags: StateSetter<Tag[]>
+  dispatch: (action: EquipmentAction) => void
 ): void => {
   Promise.all(resourceUrls.map((url) => fetch(url))).then((responses) =>
     Promise.all(responses.map((response) => response.json())).then(
       (dataArray) => {
         dataArray.forEach(({ data, context }) => {
+          const payload = {} as Partial<EquipmentState>;
           switch (+context) {
             case ResourceKey.Equipment:
-              setEquipment(data.map((d: unknown) => new Equipment(d as never)));
+              payload.equipment = data.map(
+                (d: unknown) => new Equipment(d as never)
+              );
               break;
             case ResourceKey.Categories:
-              setCategories(data.map((d: unknown) => new Category(d as never)));
+              payload.categories = data.map(
+                (d: unknown) => new Category(d as never)
+              );
               break;
             case ResourceKey.Tags:
-              setTags(data.map((d: unknown) => new Tag(d as never)));
+              payload.tags = data.map((d: unknown) => new Tag(d as never));
               break;
             default:
               throw new Error(
                 `unhandled resource fetch in equipment form with ${context}`
               );
           }
+          dispatch({ type: EquipmentActionTypes.ReceivedResource, payload });
         });
       }
     )

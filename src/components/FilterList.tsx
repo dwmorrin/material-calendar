@@ -5,12 +5,10 @@ import FilterItem from "./FilterItem";
 
 interface FilterListProps {
   filters: { [k: string]: boolean };
-  validTags: string[];
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 const FilterList: FunctionComponent<FilterListProps> = ({
   filters,
-  validTags,
   setFieldValue,
 }) => {
   // Create list of FilterItems from visible (valid for that category) filters
@@ -22,11 +20,11 @@ const FilterList: FunctionComponent<FilterListProps> = ({
           minWidth: "100%",
         }}
       >
-        {validTags.map((tag) => (
+        {Object.keys(filters).map((name) => (
           <FilterItem
-            key={tag}
-            name={tag}
-            value={filters[tag]}
+            key={name}
+            name={name}
+            value={filters[name]}
             setFieldValue={setFieldValue}
           />
         ))}

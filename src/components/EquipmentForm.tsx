@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import {
   List,
   AppBar,
@@ -11,28 +11,19 @@ import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import FilterDrawer from "./FilterDrawer";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import EquipmentList from "./EquipmentList";
-import Equipment from "../resources/Equipment";
-import Tag from "../resources/Tag";
-import Category from "../resources/Category";
 import {
   fetchAllEquipmentResources,
   filterEquipment,
-  makeToggleFilterDrawer,
-  makeValidTags,
   quantizeEquipment,
   queryEquipment,
   transition,
   useStyles,
 } from "../calendar/equipmentForm";
-
-interface EquipmentFormProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  selectedEquipment: {
-    [k: string]: number;
-  };
-  setFieldValue: (field: string, value: number | string | boolean) => void;
-}
+import {
+  EquipmentFormProps,
+  EquipmentActionTypes,
+} from "../equipmentForm/types";
+import reducer, { initialState } from "../equipmentForm/reducer";
 
 const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   open,
@@ -40,38 +31,27 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   selectedEquipment,
   setFieldValue,
 }) => {
-  const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
-  const [searchString, setSearchString] = useState("");
-  const [equipment, setEquipment] = useState([] as Equipment[]);
-  const [tags, setTags] = useState([] as Tag[]);
-  const [categories, setCategories] = useState([] as Category[]);
-  const [filters, setFilters] = useState({} as { [k: string]: boolean });
-  const [currentCategory, setCurrentCategory] = useState("");
+  const [state, dispatch] = React.useReducer(reducer, {
+    ...initialState,
+    setFieldValue,
+  });
   const classes = useStyles();
-  const quantizedEquipment = quantizeEquipment(equipment);
-  const toggleFilterDrawer = makeToggleFilterDrawer(
-    filterDrawerIsOpen,
-    setFilterDrawerIsOpen
-  );
+  const quantizedEquipment = quantizeEquipment(state.equipment);
 
-  useEffect(
-    () => fetchAllEquipmentResources(setEquipment, setCategories, setTags),
-    []
-  );
+  useEffect(() => fetchAllEquipmentResources(dispatch), []);
+
+  const toggleFilterDrawer = (): void =>
+    dispatch({ type: EquipmentActionTypes.ToggleFilterDrawer, payload: {} });
 
   return (
     <Dialog fullScreen open={open} TransitionComponent={transition}>
       <div className={classes.root}>
         <FilterDrawer
-          open={filterDrawerIsOpen}
+          state={state}
+          dispatch={dispatch}
           onOpen={toggleFilterDrawer}
           onClose={toggleFilterDrawer}
-          validTags={makeValidTags(tags, currentCategory)}
-          filters={filters}
-          searchString={searchString}
-          setSearchString={setSearchString}
-          closeDrawer={(): void => setFilterDrawerIsOpen(!filterDrawerIsOpen)}
-          setFieldValue={setFieldValue}
+          closeDrawer={toggleFilterDrawer}
         />
         <AppBar position="sticky">
           <List>
@@ -99,10 +79,10 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
         </AppBar>
         <EquipmentList
           equipmentList={filterEquipment(
-            queryEquipment(quantizedEquipment, searchString),
-            filters
+            queryEquipment(quantizedEquipment, state.searchString),
+            state.filters
           )}
-          currentCategory={currentCategory}
+          currentCategory={state.currentCategory}
           selectedEquipment={selectedEquipment}
           setFieldValue={setFieldValue}
         />
