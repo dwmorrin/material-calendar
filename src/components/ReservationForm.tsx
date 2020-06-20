@@ -17,7 +17,7 @@ import {
 import CloseIcon from "@material-ui/icons/Close";
 import Select from "./Select";
 import UserGroup from "../resources/UserGroup";
-import { Formik } from "formik";
+import { Form, Formik } from "formik";
 import EquipmentForm from "./EquipmentForm";
 import QuantityList from "./QuantityList";
 import { ResourceKey } from "../resources/types";
@@ -80,7 +80,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
             handleBlur,
             handleSubmit,
           }): unknown => (
-            <form onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit}>
               <div className={classes.list}>
                 <div style={{ paddingTop: 16 }}>Project:</div>
                 <div style={{ paddingLeft: 5 }}>
@@ -285,7 +285,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 currentCategory={values.currentCategory as string}
                 setFieldValue={setFieldValue}
               />
-            </form>
+            </Form>
           )}
         </Formik>
       </DialogContent>
