@@ -9,17 +9,8 @@ import { ResourceKey } from "../resources/types";
 export const useStyles = makeStyles(() => ({
   list: {
     display: "flex",
-    justifyContent: "flex-start",
-    alignContent: "row",
-  },
-  paddingLeftTen: {
-    paddingLeft: 10,
-  },
-  paddingLeftSixteen: {
-    paddingLeft: 16,
-  },
-  paddingLeftFive: {
-    paddingLeft: 5,
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
 }));
 

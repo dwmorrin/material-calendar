@@ -1,10 +1,9 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useState, Fragment } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   Button,
   Dialog,
   DialogContent,
-  FormControl,
   FormControlLabel,
   FormLabel,
   IconButton,
@@ -28,6 +27,19 @@ import {
   submitHandler,
   transition,
 } from "../calendar/reservationForm";
+
+const RadioYesNo: FunctionComponent<{ label: string; name: string }> = ({
+  label,
+  name,
+}) => (
+  <Fragment>
+    <FormLabel component="legend">{label}</FormLabel>
+    <Field component={RadioGroup} name={name}>
+      <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+      <FormControlLabel value="no" control={<Radio />} label="No" />
+    </Field>
+  </Fragment>
+);
 
 const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -64,148 +76,75 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
           onSubmit={submitHandler}
           validationSchema={validationSchema}
         >
-          {({
-            values,
-            touched,
-            errors,
-            isSubmitting,
-            setFieldValue,
-            handleSubmit,
-          }): unknown => (
-            <Form onSubmit={handleSubmit}>
-              <div className={classes.list}>
-                <div className={classes.paddingLeftSixteen}>Project:</div>
-                <div className={classes.paddingLeftFive}>
-                  <Field component={Select} name="project">
-                    {projects.map((p) => (
-                      <MenuItem key={p.id} value={p.id}>
-                        {p.title}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </div>
-              </div>
-              <div className={classes.list}>
-                {"Group: "}
-                <div className={classes.paddingLeftTen}>
-                  {(
-                    groups.find(
-                      (group) => group.projectId === values.project
-                    ) || new UserGroup()
-                  ).members.map(({ username, name }) => (
-                    <span key={username}>
-                      {`${name.first} ${name.last}`}
-                      <br />
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <br />
+          {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
+            <Form className={classes.list} onSubmit={handleSubmit}>
+              <FormLabel>Project:</FormLabel>
+              <Field component={Select} name="project">
+                {projects.map((p) => (
+                  <MenuItem key={p.id} value={p.id}>
+                    {p.title}
+                  </MenuItem>
+                ))}
+              </Field>
+              <FormLabel>Group:</FormLabel>
+              {(
+                groups.find((group) => group.projectId === values.project) ||
+                new UserGroup()
+              ).members.map(({ username, name }) => (
+                <span key={username}>
+                  {`${name.first} ${name.last}`}
+                  <br />
+                </span>
+              ))}
               <Field
                 component={TextField}
                 label="Brief Description of what you will be doing"
                 name="description"
-                helperText={
-                  errors.description &&
-                  touched.description &&
-                  errors.description
-                }
                 fullWidth
                 variant="filled"
               />
-              <br />
-              <br />
-              <FormLabel component="legend">
-                Do you need to use the Live Room?
-              </FormLabel>
-              <Field component={RadioGroup} name="liveRoom">
-                <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-                <FormControlLabel value="no" control={<Radio />} label="No" />
-              </Field>
-              <br />
+              <RadioYesNo
+                label="Do you need to use the Live Room?"
+                name="liveRoom"
+              />
               <Field
                 component={TextField}
                 label="Phone Number"
                 name="phone"
-                helperText={errors.phone && touched.phone && errors.phone}
                 fullWidth
                 variant="filled"
               />
-              <br />
-              <br />
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Do you have guests?</FormLabel>
-                <Field
-                  component={RadioGroup}
-                  aria-label="guestsToggle"
-                  name="hasGuests"
-                >
-                  <FormControlLabel
-                    value="yes"
-                    control={<Radio />}
-                    label="Yes"
-                  />
-                  <FormControlLabel value="no" control={<Radio />} label="No" />
-                </Field>
-              </FormControl>
-              <br />
+              <RadioYesNo label="Do you have guests?" name="hasGuests" />
               {values.hasGuests === "yes" && (
                 <Field
                   component={TextField}
                   label="Guest Names"
                   name="guests"
-                  helperText={errors.guests && touched.guests && errors.guests}
                   fullWidth
                   variant="filled"
                 />
               )}
-              <br />
-              <FormControl component="fieldset">
-                <FormLabel component="legend">
-                  Do you have any notes about your reservation for the Tech
-                  Staff?
-                </FormLabel>
-                <Field component={RadioGroup} name="hasNotes">
-                  <FormControlLabel
-                    value="yes"
-                    control={<Radio />}
-                    label="Yes"
-                  />
-                  <FormControlLabel value="no" control={<Radio />} label="No" />
-                </Field>
-              </FormControl>
+              <RadioYesNo
+                label="Do you have any notes about your reservation for the Tech Staff?"
+                name="hasNotes"
+              />
               {values.hasNotes === "yes" && (
                 <Field
                   component={TextField}
-                  id="notes"
                   label="Notes"
+                  name="notes"
                   fullWidth
                   multiline
                   rows={8}
                   variant="filled"
                 />
               )}
-              <br />
-              <FormControl component="fieldset">
-                <FormLabel component="legend">
-                  Would you like to reserve any equipment now?
-                </FormLabel>
-                <Field
-                  component={RadioGroup}
-                  aria-label="equipment"
-                  name="hasEquipment"
-                >
-                  <FormControlLabel
-                    value="yes"
-                    control={<Radio />}
-                    label="Yes"
-                  />
-                  <FormControlLabel value="no" control={<Radio />} label="No" />
-                </Field>
-              </FormControl>
+              <RadioYesNo
+                label="Would you like to reserve any equipment now?"
+                name="hasEquipment"
+              />
               {values.hasEquipment === "yes" && (
                 <div>
-                  <br />
                   <QuantityList
                     selectedEquipment={
                       values.equipment as { [k: string]: number }
@@ -223,8 +162,6 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                   </Button>
                 </div>
               )}
-              <br />
-              <br />
               <Button
                 type="submit"
                 size="small"
