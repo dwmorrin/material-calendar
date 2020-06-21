@@ -12,6 +12,13 @@ export const useStyles = makeStyles(() => ({
     flexDirection: "column",
     justifyContent: "space-between",
   },
+  item: {
+    marginTop: 30,
+  },
+  addEquipment: {
+    backgroundColor: "yellow",
+    color: "black",
+  },
 }));
 
 export const transition = makeTransition("left");

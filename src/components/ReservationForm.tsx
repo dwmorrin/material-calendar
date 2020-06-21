@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, Fragment } from "react";
+import React, { FunctionComponent, useState } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   Button,
@@ -28,17 +28,18 @@ import {
   transition,
 } from "../calendar/reservationForm";
 
-const RadioYesNo: FunctionComponent<{ label: string; name: string }> = ({
-  label,
-  name,
-}) => (
-  <Fragment>
+const RadioYesNo: FunctionComponent<{
+  label: string;
+  name: string;
+  className: string;
+}> = ({ label, name, className }) => (
+  <section className={className}>
     <FormLabel component="legend">{label}</FormLabel>
     <Field component={RadioGroup} name={name}>
       <FormControlLabel value="yes" control={<Radio />} label="Yes" />
       <FormControlLabel value="no" control={<Radio />} label="No" />
     </Field>
-  </Fragment>
+  </section>
 );
 
 const ReservationForm: FunctionComponent<CalendarUIProps> = ({
@@ -86,16 +87,16 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                   </MenuItem>
                 ))}
               </Field>
-              <FormLabel>Group:</FormLabel>
+              <FormLabel className={classes.item}>Group:</FormLabel>
               {(
                 groups.find((group) => group.projectId === values.project) ||
                 new UserGroup()
               ).members.map(({ username, name }) => (
-                <span key={username}>
+                <Typography key={username}>
                   {`${name.first} ${name.last}`}
-                  <br />
-                </span>
+                </Typography>
               ))}
+              <FormLabel className={classes.item}>Description</FormLabel>
               <Field
                 component={TextField}
                 label="Brief Description of what you will be doing"
@@ -106,7 +107,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               <RadioYesNo
                 label="Do you need to use the Live Room?"
                 name="liveRoom"
+                className={classes.item}
               />
+              <FormLabel className={classes.item}>Phone</FormLabel>
               <Field
                 component={TextField}
                 label="Phone Number"
@@ -114,7 +117,11 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 fullWidth
                 variant="filled"
               />
-              <RadioYesNo label="Do you have guests?" name="hasGuests" />
+              <RadioYesNo
+                label="Do you have guests?"
+                name="hasGuests"
+                className={classes.item}
+              />
               {values.hasGuests === "yes" && (
                 <Field
                   component={TextField}
@@ -127,6 +134,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               <RadioYesNo
                 label="Do you have any notes about your reservation for the Tech Staff?"
                 name="hasNotes"
+                className={classes.item}
               />
               {values.hasNotes === "yes" && (
                 <Field
@@ -142,27 +150,29 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               <RadioYesNo
                 label="Would you like to reserve any equipment now?"
                 name="hasEquipment"
+                className={classes.item}
               />
               {values.hasEquipment === "yes" && (
-                <div>
+                <section className={classes.list}>
                   <QuantityList
                     selectedEquipment={
                       values.equipment as { [k: string]: number }
                     }
                   />
                   <Button
+                    className={classes.addEquipment}
                     size="small"
                     variant="contained"
                     disableElevation
-                    style={{ backgroundColor: "Yellow", color: "black" }}
                     disabled={isSubmitting}
                     onClick={(): void => setEquipmentFormIsOpen(true)}
                   >
                     Add Equipment
                   </Button>
-                </div>
+                </section>
               )}
               <Button
+                className={classes.item}
                 type="submit"
                 size="small"
                 variant="contained"
