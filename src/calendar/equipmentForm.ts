@@ -39,8 +39,8 @@ export const fetchAllEquipmentResources = (
   Promise.all(resourceUrls.map((url) => fetch(url))).then((responses) =>
     Promise.all(responses.map((response) => response.json())).then(
       (dataArray) => {
-        dataArray.forEach(({ data, context }) => {
-          const payload = {} as Partial<EquipmentState>;
+        const payload = dataArray.reduce(
+          (payload: Partial<EquipmentState>, { data, context }) => {
           switch (+context) {
             case ResourceKey.Equipment:
               payload.equipment = data.map(
@@ -54,7 +54,7 @@ export const fetchAllEquipmentResources = (
               break;
             case ResourceKey.Tags:
               payload.tags = data.map((d: unknown) => new Tag(d as never));
-              payload.filters = payload.tags?.reduce(
+                payload.selectedTags = payload.tags?.reduce(
                 (filters, tag) => ({
                   ...filters,
                   [tag.name]: false,
@@ -67,8 +67,11 @@ export const fetchAllEquipmentResources = (
                 `unhandled resource fetch in equipment form with ${context}`
               );
           }
+            return payload;
+          },
+          {} as Partial<EquipmentState>
+        );
           dispatch({ type: EquipmentActionTypes.ReceivedResource, payload });
-        });
       }
     )
   );
