@@ -54,6 +54,13 @@ export const fetchAllEquipmentResources = (
               break;
             case ResourceKey.Tags:
               payload.tags = data.map((d: unknown) => new Tag(d as never));
+              payload.filters = payload.tags?.reduce(
+                (filters, tag) => ({
+                  ...filters,
+                  [tag.name]: false,
+                }),
+                {}
+              );
               break;
             default:
               throw new Error(
@@ -125,37 +132,98 @@ export function filterEquipment(
   );
 }
 
+const last = (array: Equipment[]): Equipment => array[array.length - 1];
+const byDescription = (a: Equipment, b: Equipment): number =>
+  a.description < b.description ? -1 : a.description > b.description ? 1 : 0;
+const copyAndSortByDescription = (array: Equipment[]): Equipment[] => {
+  const copy = array.slice();
+  copy.sort(byDescription);
+  return copy;
+};
+
 export function quantizeEquipment(equipment: Equipment[]): Equipment[] {
-  return equipment.reduce((quantized: Equipment[], item) => {
-    const hasTitle = (equipment: Equipment): boolean =>
-      equipment.description === item.description;
-    const alreadyDone = quantized.find(hasTitle);
-    if (!alreadyDone)
-      quantized.push({
-        ...item,
-        quantity: equipment.filter(hasTitle).length,
-      });
-    return quantized;
-  }, []);
+  const toBeQuantized = copyAndSortByDescription(equipment);
+  const quantized = [{ ...toBeQuantized[0] }];
+  for (let i = 1; i < toBeQuantized.length; ++i) {
+    if (toBeQuantized[i].description === last(quantized).description) {
+      last(quantized).quantity += toBeQuantized[i].quantity;
+    } else {
+      quantized.push({ ...toBeQuantized[i] });
+    }
+  }
+  return quantized;
 }
 
-// Function to convert equipment Array to Quantized equipment Array
-export function buildDictionaries(
-  equipment: Equipment[]
-): [{ [k: string]: boolean }, { [k: string]: Set<string> }] {
-  // Build selectedEquipment dictionary for Formik
-  // Build Categories Dictionary
-  // Build Filters Dictionary
-  const filters: { [k: string]: boolean } = {};
-  const categories: { [k: string]: Set<string> } = {};
-  equipment.forEach((item) => {
-    item.tags.forEach((tag) => {
-      if (!categories[item.category.path || item.category.name]) {
-        categories[item.category.path || item.category.name] = new Set();
-      }
-      categories[item.category.path || item.category.name].add(tag.name);
-      filters[tag.name] = false;
-    });
-  });
-  return [filters, categories];
-}
+//---------------------------------------//
+type ItemTest = (item: Equipment) => boolean;
+
+const lowerCaseAndTrimEquipment = (e: Equipment): Equipment => ({
+  ...e,
+  category: { ...e.category, name: e.category.name.trim().toLowerCase() },
+  description: e.description.trim().toLowerCase(),
+  tags: e.tags.map((t) => ({ ...t, name: t.name.trim().toLowerCase() })),
+});
+
+export const makeQueryRegExp = (query: string): RegExp =>
+  new RegExp(query.trim().replace(/\W+/g, "|"), "ig");
+
+const isTruthy: ItemTest = (item) => !!item;
+
+// match all tokens
+export const makeQueryTest = (query: string): ItemTest => {
+  if (!query) return isTruthy;
+  const tokenize = (s: string): string[] => s.trim().split(/\W+/);
+  const numberOfTokens = tokenize(query).length;
+  const queryRegExp = makeQueryRegExp(query);
+  return ({ description, category, tags }: Equipment): boolean => {
+    const strings = [
+      ...tokenize(description),
+      ...tokenize(category.name),
+      ...tokenize(category.path),
+      ...tags.map((t) => t.name),
+    ];
+    strings.sort();
+    const distinct = strings.reduce(
+      (unique, string) =>
+        unique.includes(string) || !string ? unique : [...unique, string],
+      [] as string[]
+    );
+    const matches = [...distinct.join(" ").matchAll(queryRegExp)];
+    return numberOfTokens === matches.length;
+  };
+};
+
+// TODO consider name & path
+const makeCategoryTest = (category?: Category): ItemTest =>
+  !category
+    ? isTruthy
+    : (item: Equipment): boolean => item.category.name === category.name;
+
+const makeTagsTest = (tags: Tag[]): ItemTest =>
+  !tags.length
+    ? isTruthy
+    : (item: Equipment): boolean =>
+        tags.every((tag) => item.tags.some(({ name }) => tag.name === name));
+
+const makeItemTest = (
+  query: string,
+  tags: Tag[],
+  category?: Category
+): ItemTest => {
+  const tests = [
+    makeCategoryTest(category),
+    makeTagsTest(tags),
+    makeQueryTest(query),
+  ];
+  return (item: Equipment): boolean => {
+    const itemUnderTest = lowerCaseAndTrimEquipment(item);
+    return tests.every((test) => test(itemUnderTest));
+  };
+};
+
+export const filterItems = (
+  equipment: Equipment[],
+  query: string,
+  tags: Tag[],
+  category?: Category
+): Equipment[] => equipment.filter(makeItemTest(query, tags, category));

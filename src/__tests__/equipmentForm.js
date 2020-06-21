@@ -2,7 +2,9 @@ import {
   queryEquipment,
   filterEquipment,
   quantizeEquipment,
-  buildDictionaries,
+  filterItems,
+  makeQueryRegExp,
+  makeQueryTest,
 } from "../calendar/equipmentForm";
 
 test("query with nothing returns all input", () => {
@@ -67,18 +69,53 @@ test("filter matches tags", () => {
 });
 
 test("quantize collapses items of same description", () => {
-  const equipment = [{ description: "ITEM" }, { description: "ITEM" }];
-  expect(quantizeEquipment(equipment).length).toBe(1);
+  const equipment = [
+    { description: "ITEM", quantity: 1 },
+    { description: "TEST", quantity: 1 },
+    { description: "ITEM", quantity: 1 },
+    { description: "TEST", quantity: 1 },
+    { description: "ITEM", quantity: 1 },
+  ];
+  expect(quantizeEquipment(equipment).length).toBe(2);
+  expect(quantizeEquipment(equipment)[0].quantity).toBe(3);
 });
 
-test("build dictionaries", () => {
-  const testItem = {
-    category: { path: "MAIN", name: "SUB" },
-    tags: [{ name: "TEST" }, { name: "ITEM" }],
+//---------------------------------------------//
+
+test("filterItems with no filter inputs returns all items", () => {
+  const equipment = [
+    {
+      description: "guitar",
+      quantity: 1,
+      tags: [{ name: "guitar" }],
+      category: { name: "intruments" },
+    },
+  ];
+  expect(filterItems(equipment, "", [])).toEqual(equipment);
+});
+
+test("make query RegExp", () => {
+  expect(makeQueryRegExp(" guitar amp ")).toEqual(/guitar|amp/gi);
+});
+
+test("make query test", () => {
+  const item = {
+    description: "electric guitar",
+    quantity: 1,
+    tags: [{ name: "guitar" }],
+    category: { name: "intruments", path: "" },
   };
-  const equipment = [testItem];
-  expect(buildDictionaries(equipment)).toEqual([
-    { ITEM: false, TEST: false },
-    { MAIN: new Set(["TEST", "ITEM"]) },
-  ]);
+  expect(makeQueryTest(" electric guitar ")(item)).toBeTruthy();
+});
+
+test("filterItems by query", () => {
+  const equipment = [
+    {
+      description: "electric guitar",
+      quantity: 1,
+      tags: [{ name: "guitar" }],
+      category: { name: "intruments", path: "" },
+    },
+  ];
+  expect(filterItems(equipment, "guitar", [])).toEqual(equipment);
 });
