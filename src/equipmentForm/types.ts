@@ -8,8 +8,8 @@ export interface EquipmentState {
   equipment: Equipment[];
   tags: Tag[];
   categories: Category[];
-  filters: { [k: string]: boolean };
-  currentCategory: string;
+  selectedTags: { [k: string]: boolean };
+  currentCategory: Category | null;
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 

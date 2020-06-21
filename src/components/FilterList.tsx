@@ -21,11 +21,11 @@ const FilterList: FunctionComponent<FilterListProps> = ({
           minWidth: "100%",
         }}
       >
-        {Object.keys(state.filters).map((name) => (
+        {Object.keys(state.selectedTags).map((name) => (
           <FilterItem
             key={name}
             name={name}
-            value={state.filters[name]}
+            value={state.selectedTags[name]}
             dispatch={dispatch}
           />
         ))}

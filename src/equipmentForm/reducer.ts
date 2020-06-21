@@ -9,8 +9,8 @@ export const initialState = {
   equipment: [] as Equipment[],
   tags: [] as Tag[],
   categories: [] as Category[],
-  filters: {} as { [k: string]: boolean },
-  currentCategory: "microphones",
+  selectedTags: {} as { [k: string]: boolean },
+  currentCategory: null,
 };
 
 type StateHandler = (
@@ -30,9 +30,9 @@ const receivedResource: StateHandler = (state, { payload }) => ({
 
 const selectedFilter: StateHandler = (state, { payload }) => ({
   ...state,
-  filters: {
-    ...state.filters,
-    ...payload.filters,
+  selectedTags: {
+    ...state.selectedTags,
+    ...payload.selectedTags,
   },
 });
 

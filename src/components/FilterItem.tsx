@@ -33,7 +33,7 @@ const FilterItem: FunctionComponent<FilterItemProps> = ({
             onChange={(): void =>
               dispatch({
                 type: EquipmentActionTypes.SelectedFilter,
-                payload: { filters: { [name]: !value } },
+                payload: { selectedTags: { [name]: !value } },
               })
             }
             onClick={(event): void => {
