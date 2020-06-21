@@ -80,6 +80,10 @@ test("quantize collapses items of same description", () => {
   expect(quantizeEquipment(equipment)[0].quantity).toBe(3);
 });
 
+test("quantize empty array return empty array", () => {
+  expect(quantizeEquipment([])).toEqual([]);
+});
+
 //---------------------------------------------//
 
 test("filterItems with no filter inputs returns all items", () => {
@@ -88,10 +92,10 @@ test("filterItems with no filter inputs returns all items", () => {
       description: "guitar",
       quantity: 1,
       tags: [{ name: "guitar" }],
-      category: { name: "intruments" },
+      category: { name: "intruments", path: "" },
     },
   ];
-  expect(filterItems(equipment, "", [])).toEqual(equipment);
+  expect(filterItems(equipment, "", {})).toEqual(equipment);
 });
 
 test("make query RegExp", () => {
@@ -121,7 +125,7 @@ test("filterItems by query", () => {
     tags: [{ name: "condenser" }],
     category: { name: "microphones", path: "" },
   };
-  expect(filterItems([guitar, mic], "guitar", [])).toEqual([guitar]);
+  expect(filterItems([guitar, mic], "guitar", {})).toEqual([guitar]);
 });
 
 test("filterItems by tags", () => {
@@ -137,9 +141,7 @@ test("filterItems by tags", () => {
     tags: [{ name: "condenser" }],
     category: { name: "microphones", path: "" },
   };
-  expect(filterItems([guitar, mic], "", [{ name: "guitar" }])).toEqual([
-    guitar,
-  ]);
+  expect(filterItems([guitar, mic], "", { guitar: true })).toEqual([guitar]);
 });
 
 test("filterItems by category", () => {
@@ -156,6 +158,6 @@ test("filterItems by category", () => {
     category: { name: "microphones", path: "" },
   };
   expect(
-    filterItems([guitar, mic], "", [], { name: "instruments", path: "" })
+    filterItems([guitar, mic], "", {}, { name: "instruments", path: "" })
   ).toEqual([guitar]);
 });

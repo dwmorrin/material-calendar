@@ -32,7 +32,7 @@ const resourceUrls = [
   `${Category.url}?context=${ResourceKey.Categories}`,
   `${Tag.url}?context=${ResourceKey.Tags}`,
 ];
-type StateSetter<T> = React.Dispatch<React.SetStateAction<T>>;
+
 export const fetchAllEquipmentResources = (
   dispatch: (action: EquipmentAction) => void
 ): void => {
@@ -41,37 +41,37 @@ export const fetchAllEquipmentResources = (
       (dataArray) => {
         const payload = dataArray.reduce(
           (payload: Partial<EquipmentState>, { data, context }) => {
-          switch (+context) {
-            case ResourceKey.Equipment:
-              payload.equipment = data.map(
-                (d: unknown) => new Equipment(d as never)
-              );
-              break;
-            case ResourceKey.Categories:
-              payload.categories = data.map(
-                (d: unknown) => new Category(d as never)
-              );
-              break;
-            case ResourceKey.Tags:
-              payload.tags = data.map((d: unknown) => new Tag(d as never));
+            switch (+context) {
+              case ResourceKey.Equipment:
+                payload.equipment = data.map(
+                  (d: unknown) => new Equipment(d as never)
+                );
+                break;
+              case ResourceKey.Categories:
+                payload.categories = data.map(
+                  (d: unknown) => new Category(d as never)
+                );
+                break;
+              case ResourceKey.Tags:
+                payload.tags = data.map((d: unknown) => new Tag(d as never));
                 payload.selectedTags = payload.tags?.reduce(
-                (filters, tag) => ({
-                  ...filters,
-                  [tag.name]: false,
-                }),
-                {}
-              );
-              break;
-            default:
-              throw new Error(
-                `unhandled resource fetch in equipment form with ${context}`
-              );
-          }
+                  (filters, tag) => ({
+                    ...filters,
+                    [tag.name]: false,
+                  }),
+                  {}
+                );
+                break;
+              default:
+                throw new Error(
+                  `unhandled resource fetch in equipment form with ${context}`
+                );
+            }
             return payload;
           },
           {} as Partial<EquipmentState>
         );
-          dispatch({ type: EquipmentActionTypes.ReceivedResource, payload });
+        dispatch({ type: EquipmentActionTypes.ReceivedResource, payload });
       }
     )
   );
@@ -89,7 +89,7 @@ export const makeValidTags = (tags: Tag[], currentCategory: string): string[] =>
 
 export const makeToggleFilterDrawer = (
   currentState: boolean,
-  setFilterDrawerIsOpen: StateSetter<boolean>
+  setFilterDrawerIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 ) => (event?: React.KeyboardEvent | React.MouseEvent): void => {
   if (
     event?.type === "keydown" &&
@@ -145,6 +145,7 @@ const copyAndSortByDescription = (array: Equipment[]): Equipment[] => {
 };
 
 export function quantizeEquipment(equipment: Equipment[]): Equipment[] {
+  if (!equipment.length) return [];
   const toBeQuantized = copyAndSortByDescription(equipment);
   const quantized = [{ ...toBeQuantized[0] }];
   for (let i = 1; i < toBeQuantized.length; ++i) {
@@ -159,10 +160,18 @@ export function quantizeEquipment(equipment: Equipment[]): Equipment[] {
 
 //---------------------------------------//
 type ItemTest = (item: Equipment) => boolean;
+type SelectedDictionary = { [k: string]: boolean };
 
-const lowerCaseAndTrimEquipment = (e: Equipment): Equipment => ({
+const makeTestableItem = (e: Equipment): Equipment => ({
   ...e,
-  category: { ...e.category, name: e.category.name.trim().toLowerCase() },
+  manufacturer: e.manufacturer ? e.manufacturer.trim().toLowerCase() : "",
+  model: e.model ? e.model.trim().toLowerCase() : "",
+  category: {
+    ...e.category,
+    name: `${e.category.path
+      .trim()
+      .toLowerCase()} ${e.category.name.trim().toLowerCase()}`,
+  },
   description: e.description.trim().toLowerCase(),
   tags: e.tags.map((t) => ({ ...t, name: t.name.trim().toLowerCase() })),
 });
@@ -175,14 +184,14 @@ const isTruthy: ItemTest = (item) => !!item;
 // match all tokens
 export const makeQueryTest = (query: string): ItemTest => {
   if (!query) return isTruthy;
-  const tokenize = (s: string): string[] => s.trim().split(/\W+/);
+  const tokenize = (s?: string): string[] => (s ? s.trim().split(/\W+/) : []);
   const numberOfTokens = tokenize(query).length;
   const queryRegExp = makeQueryRegExp(query);
-  return ({ description, category, tags }: Equipment): boolean => {
+  return ({ description, manufacturer, model, tags }: Equipment): boolean => {
     const strings = [
       ...tokenize(description),
-      ...tokenize(category.name),
-      ...tokenize(category.path),
+      ...tokenize(manufacturer),
+      ...tokenize(model),
       ...tags.map((t) => t.name),
     ];
     strings.sort();
@@ -196,22 +205,27 @@ export const makeQueryTest = (query: string): ItemTest => {
   };
 };
 
-// TODO consider name & path
-const makeCategoryTest = (category?: Category): ItemTest =>
+const makeCategoryTest = (category: Category | null): ItemTest =>
   !category
     ? isTruthy
-    : (item: Equipment): boolean => item.category.name === category.name;
+    : (item: Equipment): boolean =>
+        item.category.name === `${category.path} ${category.name}`;
 
-const makeTagsTest = (tags: Tag[]): ItemTest =>
-  !tags.length
+const getSelectedKeys = (dictionary: SelectedDictionary): string[] =>
+  Object.keys(dictionary).filter((key) => dictionary[key]);
+
+const makeTagsTest = (tags: SelectedDictionary): ItemTest => {
+  const selectedTags = getSelectedKeys(tags);
+  return !selectedTags.length
     ? isTruthy
     : (item: Equipment): boolean =>
-        tags.every((tag) => item.tags.some(({ name }) => tag.name === name));
+        selectedTags.every((tag) => item.tags.some(({ name }) => tag === name));
+};
 
 const makeItemTest = (
   query: string,
-  tags: Tag[],
-  category?: Category
+  tags: SelectedDictionary,
+  category: Category | null
 ): ItemTest => {
   const tests = [
     makeCategoryTest(category),
@@ -219,7 +233,7 @@ const makeItemTest = (
     makeQueryTest(query),
   ];
   return (item: Equipment): boolean => {
-    const itemUnderTest = lowerCaseAndTrimEquipment(item);
+    const itemUnderTest = makeTestableItem(item);
     return tests.every((test) => test(itemUnderTest));
   };
 };
@@ -227,6 +241,6 @@ const makeItemTest = (
 export const filterItems = (
   equipment: Equipment[],
   query: string,
-  tags: Tag[],
-  category?: Category
+  tags: SelectedDictionary,
+  category: Category | null
 ): Equipment[] => equipment.filter(makeItemTest(query, tags, category));
