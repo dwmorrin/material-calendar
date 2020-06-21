@@ -105,17 +105,57 @@ test("make query test", () => {
     tags: [{ name: "guitar" }],
     category: { name: "intruments", path: "" },
   };
-  expect(makeQueryTest(" electric guitar ")(item)).toBeTruthy();
+  expect(makeQueryTest(" electric guitar ")(item)).toBe(true);
 });
 
 test("filterItems by query", () => {
-  const equipment = [
-    {
-      description: "electric guitar",
-      quantity: 1,
-      tags: [{ name: "guitar" }],
-      category: { name: "intruments", path: "" },
-    },
-  ];
-  expect(filterItems(equipment, "guitar", [])).toEqual(equipment);
+  const guitar = {
+    description: "electric guitar",
+    quantity: 1,
+    tags: [{ name: "guitar" }],
+    category: { name: "instruments", path: "" },
+  };
+  const mic = {
+    description: "condenser mic",
+    quantity: 1,
+    tags: [{ name: "condenser" }],
+    category: { name: "microphones", path: "" },
+  };
+  expect(filterItems([guitar, mic], "guitar", [])).toEqual([guitar]);
+});
+
+test("filterItems by tags", () => {
+  const guitar = {
+    description: "electric guitar",
+    quantity: 1,
+    tags: [{ name: "guitar" }],
+    category: { name: "instruments", path: "" },
+  };
+  const mic = {
+    description: "condenser mic",
+    quantity: 1,
+    tags: [{ name: "condenser" }],
+    category: { name: "microphones", path: "" },
+  };
+  expect(filterItems([guitar, mic], "", [{ name: "guitar" }])).toEqual([
+    guitar,
+  ]);
+});
+
+test("filterItems by category", () => {
+  const guitar = {
+    description: "electric guitar",
+    quantity: 1,
+    tags: [{ name: "guitar" }],
+    category: { name: "instruments", path: "" },
+  };
+  const mic = {
+    description: "condenser mic",
+    quantity: 1,
+    tags: [{ name: "condenser" }],
+    category: { name: "microphones", path: "" },
+  };
+  expect(
+    filterItems([guitar, mic], "", [], { name: "instruments", path: "" })
+  ).toEqual([guitar]);
 });
