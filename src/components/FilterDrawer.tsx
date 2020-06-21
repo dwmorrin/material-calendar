@@ -68,10 +68,7 @@ const FilterDrawer: FunctionComponent<FilterDrawerProps> = ({
           variant="outlined"
         />
 
-        <FilterList
-          filters={state.filters}
-          setFieldValue={state.setFieldValue}
-        />
+        <FilterList state={state} dispatch={dispatch} />
       </List>
     </SwipeableDrawer>
   );

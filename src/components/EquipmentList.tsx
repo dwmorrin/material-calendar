@@ -1,60 +1,28 @@
 import React, { FunctionComponent } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import EquipmentExpansionList from "./EquipmentExpansionList";
 import Equipment from "../resources/Equipment";
 import EquipmentStandardList from "./EquipmentStandardList";
-
-const useStyles = makeStyles({
-  root: {
-    width: "100%",
-  },
-});
+import { EquipmentState, EquipmentAction } from "../equipmentForm/types";
 
 interface EquipmentListProps {
+  state: EquipmentState;
+  dispatch: (action: EquipmentAction) => void;
   equipmentList: Equipment[] | undefined;
-  currentCategory: string;
-  setFieldValue: (field: string, value: number | string | boolean) => void;
   selectedEquipment: {
     [k: string]: number;
   };
 }
 const EquipmentList: FunctionComponent<EquipmentListProps> = ({
+  state,
   equipmentList,
-  currentCategory,
   selectedEquipment,
-  setFieldValue,
 }) => {
-  const classes = useStyles();
-  if (equipmentList) {
-    const category = [...new Set(equipmentList.map((item) => (item.category.path || item.category.name)))];
-    // Create Nested list for categories with multiple elements, create a standard (not nested)
-    // list for singletons
-    return (
-      <div className={classes.root}>
-        {category.length > 1 ? (
-          category.map((parent) => {
-            return (
-              <EquipmentExpansionList
-                equipmentList={equipmentList.filter(
-                  (item) => (item.category.path || item.category.name) === parent
-                )}
-                currentCategory={currentCategory}
-                selectedEquipment={selectedEquipment}
-                setFieldValue={setFieldValue}
-              />
-            );
-          })
-        ) : (
-          <EquipmentStandardList
-            equipmentList={equipmentList}
-            selectedEquipment={selectedEquipment}
-            setFieldValue={setFieldValue}
-          />
-        )}
-      </div>
-    );
-  } else {
-    return <div></div>;
-  }
+  if (!state.equipment.length) return null;
+  return (
+    <EquipmentStandardList
+      equipmentList={equipmentList}
+      selectedEquipment={selectedEquipment}
+      setFieldValue={state.setFieldValue}
+    />
+  );
 };
 export default EquipmentList;

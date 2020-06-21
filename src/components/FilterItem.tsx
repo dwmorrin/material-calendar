@@ -2,18 +2,18 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Checkbox from "@material-ui/core/Checkbox";
 import React, { FunctionComponent } from "react";
+import { EquipmentAction, EquipmentActionTypes } from "../equipmentForm/types";
 
 interface FilterItemProps {
   name: string;
   value: boolean;
-  setFieldValue: (field: string, value: number | string | boolean) => void;
+  dispatch: (action: EquipmentAction) => void;
 }
 const FilterItem: FunctionComponent<FilterItemProps> = ({
   name,
   value,
-  setFieldValue,
+  dispatch,
 }) => {
-  // Create ListItem with checkbox for filter, onChange use setFieldValue to toggle
   return (
     <div
       style={{
@@ -30,9 +30,11 @@ const FilterItem: FunctionComponent<FilterItemProps> = ({
           }}
         >
           <Checkbox
-            name={"filters[" + name + "]"}
             onChange={(): void =>
-              setFieldValue("filters[" + name + "]", !value)
+              dispatch({
+                type: EquipmentActionTypes.SelectedFilter,
+                payload: { filters: { [name]: !value } },
+              })
             }
             onClick={(event): void => {
               event.stopPropagation();

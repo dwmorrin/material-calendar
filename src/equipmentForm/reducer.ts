@@ -10,7 +10,7 @@ export const initialState = {
   tags: [] as Tag[],
   categories: [] as Category[],
   filters: {} as { [k: string]: boolean },
-  currentCategory: "",
+  currentCategory: "microphones",
 };
 
 type StateHandler = (
@@ -28,6 +28,14 @@ const receivedResource: StateHandler = (state, { payload }) => ({
   ...payload,
 });
 
+const selectedFilter: StateHandler = (state, { payload }) => ({
+  ...state,
+  filters: {
+    ...state.filters,
+    ...payload.filters,
+  },
+});
+
 const toggleFilterDrawer: StateHandler = (state) => ({
   ...state,
   filterDrawerIsOpen: !state.filterDrawerIsOpen,
@@ -37,6 +45,7 @@ const reducer: StateHandler = (state, action) =>
   ({
     [EquipmentActionTypes.ChangedSearchString]: changedSearchString,
     [EquipmentActionTypes.ReceivedResource]: receivedResource,
+    [EquipmentActionTypes.SelectedFilter]: selectedFilter,
     [EquipmentActionTypes.ToggleFilterDrawer]: toggleFilterDrawer,
   }[action.type](state, action));
 

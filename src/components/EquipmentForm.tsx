@@ -78,13 +78,13 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
           </List>
         </AppBar>
         <EquipmentList
+          dispatch={dispatch}
+          state={state}
           equipmentList={filterEquipment(
             queryEquipment(quantizedEquipment, state.searchString),
             state.filters
           )}
-          currentCategory={state.currentCategory}
           selectedEquipment={selectedEquipment}
-          setFieldValue={setFieldValue}
         />
       </div>
     </Dialog>

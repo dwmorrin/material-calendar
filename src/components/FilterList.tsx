@@ -2,14 +2,15 @@ import React, { FunctionComponent } from "react";
 import List from "@material-ui/core/List";
 import Box from "@material-ui/core/Box";
 import FilterItem from "./FilterItem";
+import { EquipmentState, EquipmentAction } from "../equipmentForm/types";
 
 interface FilterListProps {
-  filters: { [k: string]: boolean };
-  setFieldValue: (field: string, value: number | string | boolean) => void;
+  state: EquipmentState;
+  dispatch: (action: EquipmentAction) => void;
 }
 const FilterList: FunctionComponent<FilterListProps> = ({
-  filters,
-  setFieldValue,
+  state,
+  dispatch,
 }) => {
   // Create list of FilterItems from visible (valid for that category) filters
   return (
@@ -20,12 +21,12 @@ const FilterList: FunctionComponent<FilterListProps> = ({
           minWidth: "100%",
         }}
       >
-        {Object.keys(filters).map((name) => (
+        {Object.keys(state.filters).map((name) => (
           <FilterItem
             key={name}
             name={name}
-            value={filters[name]}
-            setFieldValue={setFieldValue}
+            value={state.filters[name]}
+            dispatch={dispatch}
           />
         ))}
       </List>
