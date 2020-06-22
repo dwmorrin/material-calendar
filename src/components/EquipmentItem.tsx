@@ -4,9 +4,12 @@ import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import React, { FunctionComponent } from "react";
 import ErrorIcon from "@material-ui/icons/Error";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
 import Equipment from "../resources/Equipment";
+
+const getItemName = (item: Equipment): string =>
+  item.manufacturer && item.model
+    ? item.manufacturer + " " + item.model
+    : item.description;
 
 interface EquipmentItemProps {
   item: Equipment;
@@ -15,35 +18,18 @@ interface EquipmentItemProps {
 }
 const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   item,
-  quantity,
+  quantity = 0,
   setFieldValue,
 }) => {
-  //it would be great for this to be a getter
-  const itemName = item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description;
-  //if there currently is no quantity, set the selected quantity of the item to 0
-  quantity = quantity | 0;
-  // Create all possible selectedEquipment for current item
-  const selectOptions: JSX.Element[] = [];
-  for (let i = 0; i <= item.quantity; ++i) {
-    selectOptions.push(<MenuItem value={i}>{i}</MenuItem>);
-  }
-
-  // Show ErrorIcon
-  const showError = (): void => {
-    const element = document.getElementById("error"+ item.description);
-    if (element) {
-      element.style.display = "block";
-    }
-  };
-
-  // Change current Equipment Value
+  const [errors, setErrors] = React.useState({} as { [k: string]: boolean });
+  const itemName = getItemName(item);
   const changeValue = (newValue: number): void => {
-    if (newValue >= 0 && newValue <= item.quantity) {
-      setFieldValue("equipment[" + itemName + "]", newValue);
-    }
+    if (newValue < 0) return;
     if (newValue > item.quantity) {
-      showError();
+      return setErrors({ ...errors, itemName: true });
     }
+    if (itemName in errors) setErrors({ ...errors, itemName: false });
+    setFieldValue("equipment[" + itemName + "]", newValue);
   };
 
   return (
@@ -61,16 +47,6 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
             flexDirection: "column",
           }}
         >
-          <Select
-            labelId={itemName + "Quantity Select"}
-            name={"equipment[" + itemName + "]"}
-            value={quantity}
-            onChange={(event): void =>
-              changeValue(event.target.value as number)
-            }
-          >
-            {selectOptions}
-          </Select>
           <br />
           <ButtonGroup
             variant="contained"
@@ -93,9 +69,11 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
               +
             </Button>
           </ButtonGroup>
-          <div style={{ display: "none" }} id={"error"+ itemName}>
-            <ErrorIcon />
-          </div>
+          {errors[itemName] && (
+            <div>
+              <ErrorIcon />
+            </div>
+          )}
         </section>
       </ListItem>
     </div>

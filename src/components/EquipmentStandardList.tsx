@@ -4,7 +4,7 @@ import EquipmentItem from "./EquipmentItem";
 import Equipment from "../resources/Equipment";
 
 interface EquipmentStandardListProps {
-  equipmentList: Equipment[];
+  equipmentList?: Equipment[];
   selectedEquipment: {
     [k: string]: number;
   };
@@ -23,13 +23,21 @@ const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
         minWidth: "100%",
       }}
     >
-      {equipmentList.map((item) => (
-        <EquipmentItem
-          item={item}
-          quantity={selectedEquipment[item.manufacturer && item.model ?item.manufacturer + " " + item.model : item.description]}
-          setFieldValue={setFieldValue}
-        />
-      ))}
+      {equipmentList &&
+        equipmentList.map((item) => (
+          <EquipmentItem
+            key={item.id}
+            item={item}
+            quantity={
+              selectedEquipment[
+                item.manufacturer && item.model
+                  ? item.manufacturer + " " + item.model
+                  : item.description
+              ]
+            }
+            setFieldValue={setFieldValue}
+          />
+        ))}
     </List>
   );
 };

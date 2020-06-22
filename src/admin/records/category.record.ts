@@ -3,8 +3,8 @@ import Category from "../../resources/Category";
 const template = (category: unknown): string[][] =>
   category instanceof Category
     ? [
-        ["Name", category.name],
-        ["Hierarchy", category.path || category.name],
+        ["Name", category.title],
+        ["Parent ID", category.parentId?.toString() || "NULL"],
       ]
     : [["", JSON.stringify(category)]];
 

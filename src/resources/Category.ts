@@ -9,16 +9,18 @@
  */
 interface Category {
   [k: string]: unknown;
-  name: string; // a specific subcategory; the leaf node
-  path: string; // ",root,subcat1,subcat2,"; ""=root
+  id: number;
+  title: string;
+  parentId: number | null; // null => top level category
 }
 
 class Category implements Category {
   static url = "/api/categories";
   constructor(
     category = {
-      name: "",
-      path: "",
+      id: -1,
+      title: "",
+      parentId: null as number | null,
     }
   ) {
     Object.assign(this, category);
