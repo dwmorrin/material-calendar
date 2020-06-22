@@ -9,16 +9,15 @@ import {
 } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import FilterDrawer from "./FilterDrawer";
-import FilterListIcon from "@material-ui/icons/FilterList";
+import TuneIcon from "@material-ui/icons/Tune";
 import EquipmentList from "./EquipmentList";
 import {
   fetchAllEquipmentResources,
-  filterEquipment,
+  filterItems,
   quantizeEquipment,
-  queryEquipment,
   transition,
   useStyles,
-} from "../calendar/equipmentForm";
+} from "../equipmentForm/equipmentForm";
 import {
   EquipmentFormProps,
   EquipmentActionTypes,
@@ -72,7 +71,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
                 onClick={toggleFilterDrawer}
                 aria-label="filter"
               >
-                <FilterListIcon />
+                <TuneIcon />
               </IconButton>
             </Toolbar>
           </List>
@@ -80,9 +79,11 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
         <EquipmentList
           dispatch={dispatch}
           state={state}
-          equipmentList={filterEquipment(
-            queryEquipment(quantizedEquipment, state.searchString),
-            state.filters
+          equipmentList={filterItems(
+            quantizedEquipment,
+            state.searchString,
+            state.selectedTags,
+            state.currentCategory
           )}
           selectedEquipment={selectedEquipment}
         />
