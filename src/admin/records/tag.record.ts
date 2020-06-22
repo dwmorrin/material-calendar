@@ -3,7 +3,7 @@ import Tag from "../../resources/Tag";
 const template = (tag: unknown): string[][] =>
   tag instanceof Tag
     ? [
-        ["Name", tag.name],
+        ["Name", tag.title],
         ["Category", tag.category.title],
       ]
     : [["", JSON.stringify(tag)]];

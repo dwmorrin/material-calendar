@@ -3,7 +3,7 @@ import Category from "./Category";
 interface Tag {
   [k: string]: unknown;
   id: string;
-  name: string;
+  title: string;
   category: Category;
 }
 

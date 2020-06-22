@@ -53,7 +53,7 @@ export const fetchAllEquipmentResources = (
                 payload.selectedTags = payload.tags?.reduce(
                   (filters, tag) => ({
                     ...filters,
-                    [tag.name]: false,
+                    [tag.title]: false,
                   }),
                   {}
                 );
@@ -77,10 +77,9 @@ export const makeValidTags = (tags: Tag[], currentCategory: string): string[] =>
   tags
     .filter(
       (tag) =>
-        tag.category.name === currentCategory ||
-        tag.category.path === currentCategory
+        tag.category.title === currentCategory
     )
-    .map((tag) => tag.name)
+    .map((tag) => tag.title)
     .filter((v, i, a) => a.indexOf(v) === i);
 
 export const makeToggleFilterDrawer = (
@@ -110,7 +109,7 @@ export function queryEquipment(
       (query) =>
         equipment.description.toLowerCase().includes(query) ||
         equipment.category.title.toLowerCase().includes(query) ||
-        equipment.tags.some((tag) => tag.name.toLowerCase().includes(query))
+        equipment.tags.some((tag) => tag.title.toLowerCase().includes(query))
     )
   );
 }
@@ -125,7 +124,7 @@ export function filterEquipment(
     .map((key) => key.trim().toLowerCase());
   return equipment.filter((item) =>
     activeFilters.every((filter) =>
-      item.tags.some((tag) => tag.name.toLowerCase().includes(filter))
+      item.tags.some((tag) => tag.title.toLowerCase().includes(filter))
     )
   );
 }
@@ -166,7 +165,7 @@ const makeTestableItem = (e: Equipment): Equipment => ({
     title: e.category.title.trim().toLowerCase(),
   },
   description: e.description.trim().toLowerCase(),
-  tags: e.tags.map((t) => ({ ...t, name: t.name.trim().toLowerCase() })),
+  tags: e.tags.map((t) => ({ ...t, name: t.title.trim().toLowerCase() })),
 });
 
 export const makeQueryRegExp = (query: string): RegExp =>
@@ -185,7 +184,7 @@ export const makeQueryTest = (query: string): ItemTest => {
       ...tokenize(description),
       ...tokenize(manufacturer),
       ...tokenize(model),
-      ...tags.map((t) => t.name),
+      ...tags.map((t) => t.title),
     ];
     strings.sort();
     const distinct = strings.reduce(

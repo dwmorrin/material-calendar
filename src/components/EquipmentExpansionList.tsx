@@ -60,7 +60,7 @@ const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = (
               .filter(
                 (item) =>
                   item.category.path ||
-                  item.category.name === equipmentList[0].category.title
+                  item.category.title === equipmentList[0].category.title
               )
               .map((item) => (
                 <EquipmentItem
