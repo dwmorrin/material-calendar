@@ -4,8 +4,6 @@ import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import React, { FunctionComponent } from "react";
 import ErrorIcon from "@material-ui/icons/Error";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
 import Equipment from "../resources/Equipment";
 
 const getItemName = (item: Equipment): string =>
@@ -25,12 +23,6 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
 }) => {
   const [errors, setErrors] = React.useState({} as { [k: string]: boolean });
   const itemName = getItemName(item);
-  const selectOptions = Array.from({ length: item.quantity }).map((_, i) => (
-    <MenuItem key={i} value={i}>
-      {i}
-    </MenuItem>
-  ));
-
   const changeValue = (newValue: number): void => {
     if (newValue < 0) return;
     if (newValue > item.quantity) {
@@ -55,16 +47,6 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
             flexDirection: "column",
           }}
         >
-          <Select
-            labelId={itemName + "Quantity Select"}
-            name={"equipment[" + itemName + "]"}
-            value={quantity}
-            onChange={(event): void =>
-              changeValue(event.target.value as number)
-            }
-          >
-            {selectOptions}
-          </Select>
           <br />
           <ButtonGroup
             variant="contained"
