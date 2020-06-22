@@ -19,6 +19,19 @@ import Project from "../resources/Project";
 const stringStartsWithResource = (s: string): boolean =>
   s.indexOf("resource") === 0;
 
+const makeResources = (
+  locations: Location[],
+  projectLocations: Set<number>
+): {}[] =>
+  locations
+    .filter(
+      (location) => projectLocations.has(location.id) || location.selected
+    )
+    .map((location) => ({
+      ...location,
+      id: "" + location.id,
+    }));
+
 const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
@@ -26,7 +39,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   const selectedProjects = state.resources[ResourceKey.Projects].filter(
     (project) => project.selected
   );
-  const projectLocations = new Set();
+  const projectLocations = new Set<number>();
   selectedProjects.forEach((project) =>
     (project as Project).allotments.forEach(({ locationId }) =>
       projectLocations.add(locationId)
@@ -45,7 +58,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
       {!state.loading && (
         <FullCalendar
           ref={state.ref}
-          defaultDate={state.currentStart}
+          defaultDate={"2020-04-14"} //{state.currentStart}
           header={false}
           allDaySlot={false}
           nowIndicator={true}
@@ -91,12 +104,10 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
               );
             }
           }}
-          resources={state.resources[ResourceKey.Locations]
-            .filter(
-              (location) =>
-                projectLocations.has(location.id) || location.selected
-            )
-            .map((location) => ({ ...location, id: "" + location.id }))}
+          resources={makeResources(
+            state.resources[ResourceKey.Locations] as Location[],
+            projectLocations
+          )}
           schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         />
       )}

@@ -4,11 +4,7 @@ import Equipment from "../resources/Equipment";
 import Tag from "../resources/Tag";
 import { ResourceKey } from "../resources/types";
 import Category from "../resources/Category";
-import {
-  EquipmentAction,
-  EquipmentState,
-  EquipmentActionTypes,
-} from "../equipmentForm/types";
+import { EquipmentAction, EquipmentState, EquipmentActionTypes } from "./types";
 
 export const useStyles = makeStyles((theme) => ({
   root: {
@@ -113,8 +109,7 @@ export function queryEquipment(
     queries.every(
       (query) =>
         equipment.description.toLowerCase().includes(query) ||
-        equipment.category.path ||
-        equipment.category.name.toLowerCase().includes(query) ||
+        equipment.category.title.toLowerCase().includes(query) ||
         equipment.tags.some((tag) => tag.name.toLowerCase().includes(query))
     )
   );
@@ -168,9 +163,7 @@ const makeTestableItem = (e: Equipment): Equipment => ({
   model: e.model ? e.model.trim().toLowerCase() : "",
   category: {
     ...e.category,
-    name: `${e.category.path
-      .trim()
-      .toLowerCase()} ${e.category.name.trim().toLowerCase()}`,
+    title: e.category.title.trim().toLowerCase(),
   },
   description: e.description.trim().toLowerCase(),
   tags: e.tags.map((t) => ({ ...t, name: t.name.trim().toLowerCase() })),
@@ -208,8 +201,7 @@ export const makeQueryTest = (query: string): ItemTest => {
 const makeCategoryTest = (category: Category | null): ItemTest =>
   !category
     ? isTruthy
-    : (item: Equipment): boolean =>
-        item.category.name === `${category.path} ${category.name}`;
+    : (item: Equipment): boolean => item.category.title === category.title;
 
 const getSelectedKeys = (dictionary: SelectedDictionary): string[] =>
   Object.keys(dictionary).filter((key) => dictionary[key]);
