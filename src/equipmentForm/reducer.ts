@@ -36,6 +36,11 @@ const selectedFilter: StateHandler = (state, { payload }) => ({
   },
 });
 
+const selectedCategory: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+});
+
 const toggleFilterDrawer: StateHandler = (state) => ({
   ...state,
   filterDrawerIsOpen: !state.filterDrawerIsOpen,
@@ -45,6 +50,7 @@ const reducer: StateHandler = (state, action) =>
   ({
     [EquipmentActionTypes.ChangedSearchString]: changedSearchString,
     [EquipmentActionTypes.ReceivedResource]: receivedResource,
+    [EquipmentActionTypes.SelectedCategory]: selectedCategory,
     [EquipmentActionTypes.SelectedFilter]: selectedFilter,
     [EquipmentActionTypes.ToggleFilterDrawer]: toggleFilterDrawer,
   }[action.type](state, action));

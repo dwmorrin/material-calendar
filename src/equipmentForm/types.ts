@@ -16,6 +16,7 @@ export interface EquipmentState {
 export enum EquipmentActionTypes {
   ChangedSearchString,
   ReceivedResource,
+  SelectedCategory,
   SelectedFilter,
   ToggleFilterDrawer,
 }
