@@ -75,10 +75,7 @@ export const fetchAllEquipmentResources = (
 
 export const makeValidTags = (tags: Tag[], currentCategory: string): string[] =>
   tags
-    .filter(
-      (tag) =>
-        tag.category.title === currentCategory
-    )
+    .filter((tag) => tag.category.title === currentCategory)
     .map((tag) => tag.title)
     .filter((v, i, a) => a.indexOf(v) === i);
 
@@ -210,7 +207,9 @@ const makeTagsTest = (tags: SelectedDictionary): ItemTest => {
   return !selectedTags.length
     ? isTruthy
     : (item: Equipment): boolean =>
-        selectedTags.every((tag) => item.tags.some(({ name }) => tag === name));
+        selectedTags.every((tag) =>
+          item.tags.some(({ title }) => tag === title)
+        );
 };
 
 const makeItemTest = (

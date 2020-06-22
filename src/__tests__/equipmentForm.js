@@ -11,14 +11,14 @@ import {
 const guitar = {
   description: "electric guitar",
   quantity: 1,
-  tags: [{ name: "single-coil" }],
+  tags: [{ title: "single-coil" }],
   category: { title: "instruments", parentId: null },
 };
 
 const mic = {
   description: "condenser mic",
   quantity: 1,
-  tags: [{ name: "condenser" }],
+  tags: [{ title: "condenser" }],
   category: { title: "microphones", parentId: null },
 };
 
