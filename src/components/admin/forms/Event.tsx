@@ -10,8 +10,8 @@ import { List, MenuItem, InputLabel } from "@material-ui/core";
  * value of "location" (singular) is the actual value for the event
  */
 const Template: FunctionComponent<FormValues> = (values) => {
-  const locations = values.locations as string[];
-  const reservable = values.reserable as boolean;
+  const locations = values.__options__?.locations as string[];
+  const reservable = values.reservable as boolean;
   return (
     <List>
       <Field

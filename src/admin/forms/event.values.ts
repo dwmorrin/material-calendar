@@ -5,16 +5,24 @@ import { AdminState, FormValues } from "../types";
 import { deleteKeys } from "../../utils/deleteKeys";
 
 export const values = (state: AdminState): FormValues => {
+  const locations = state.resources[ResourceKey.Locations] as Location[];
   const event = state.resourceInstance as Event;
   return {
     ...event,
-    locations: state.resources[ResourceKey.Locations].map(
-      (l) => (l as Location).title
-    ),
+    location: event.location.title,
+    __options__: {
+      locations: locations.map((l) => l.title),
+    },
   };
 };
 
 export const update = (state: AdminState, values: FormValues): Event => {
+  const locations = state.resources[ResourceKey.Locations] as Location[];
   const event = new Event(state.resourceInstance as Event);
-  return { ...event, ...deleteKeys(values, "locations") };
+  return {
+    ...event,
+    ...deleteKeys(values, "__options__"),
+    location:
+      locations.find((l) => l.title === values.location) || new Location(),
+  };
 };
