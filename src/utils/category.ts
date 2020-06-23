@@ -1,27 +1,25 @@
 import Category from "../resources/Category";
 
+// Function to check if an input id exists in the path (parent,
+// parent's parent, etc) of an input category
 export function checkPath(
   categories: Category[],
-  currentCategory: Category | null,
   id: number,
-  recurse: number | null
+  selectedCategory: Category | null
 ): boolean {
-  //TODO this can be changed to have recurse replace currentCategory and have 3 inputs instead of 4.
-  const checkingCategory = recurse
-    ? categories.find((category) => category.id === recurse)
-    : currentCategory;
-  if (!checkingCategory) {
+  if (!selectedCategory) {
     return false;
   }
-  if (checkingCategory.id === id) {
+  if (selectedCategory.id === id) {
     return true;
   }
-  if (checkingCategory.parentId) {
+  if (selectedCategory.parentId) {
     return checkPath(
       categories,
-      currentCategory,
       id,
-      checkingCategory.parentId
+      categories.find(
+        (category) => category.id === selectedCategory?.parentId
+      ) || null
     );
   }
   return false;

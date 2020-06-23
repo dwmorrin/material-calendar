@@ -26,8 +26,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
   selectedEquipment,
 }) => {
   function changeCategory(selectedCategory: Category): Category | null {
-    // if the category selected is the same as the current category, or 
-    // if it is the parent id of the selectedCategory (which means it is 
+    // if the category selected is the same as the current category, or
+    // if it is the parent id of the selectedCategory (which means it is
     // already open), the user wants to close that expansion
     if (
       selectedCategory.id === state.currentCategory?.parentId ||
@@ -56,9 +56,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
         }
         const expanded = checkPath(
           state.categories,
-          state.currentCategory,
           branch.id,
-          null
+          state.currentCategory,
         );
         return (
           <ExpansionPanel key={branch.id} expanded={expanded}>
