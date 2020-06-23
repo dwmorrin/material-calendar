@@ -6,8 +6,8 @@ import { List } from "@material-ui/core";
 
 const FormTemplate: FunctionComponent<FormValues> = () => (
   <List>
-    <Field fullWidth component={TextField} name="name" label="Name" />
-    <Field fullWidth component={TextField} name="path" label="Hierarchy" />
+    <Field fullWidth component={TextField} name="title" label="Title" />
+    <Field fullWidth component={TextField} name="parentId" label="Parent ID" />
   </List>
 );
 export default FormTemplate;
