@@ -53,4 +53,5 @@ export type ValueDictionary = {
 
 export interface FormValues {
   [k: string]: unknown;
+  __options__?: FormValues;
 }

@@ -7,7 +7,7 @@
 `<ResourceForm>` takes in a `<FormFields>` template as a parameter.
 
 Each database resource should have its own template components, of type
-`<FormFields>` in `/src/components/forms/{{Resource}}.tsx`.
+`<FormFields>` in `/src/components/admin/forms/{{Resource}}.tsx`.
 
 ## `FormValues` and updating the `ResourceInstance`
 
@@ -41,19 +41,21 @@ function for the updater. Keep all such pairs at the top of the file so it is
 clear that we have handled everything. (i.e. we can mentally "cancel out"
 all the pairs, so to speak.)
 
-### choices: dummy options
+### choices: `values.__options__`
 
 Sometimes we want to apply some option from a field of options to our resource.
 The field of options is probably something we have in the external state and
 we need to provide those options to the form.
 
-Currently (open to change) the strategy is to provide "dummy values" that we
-use in the form but don't apply to the resource in the end.
+Currently (open to change as this is a fairly ugly API)
+the strategy is to provide "dummy values" on a `__options__` property.
+The underscores provide a clear delination between values that apply directly
+to a model and values that are external options.
 
 **Take care to not apply the dummy values to the object submitted to the
 database.**
 
-**Do not manipulate the values object. Formik is using this.**
+**Do not manipulate the values object in the component. Formik is using this.**
 
 ```js
 // generalized example
@@ -71,8 +73,8 @@ export const values = (state) => {
   const resource = state.resourceInstance as Resource;
   return {
     ...resource,
-    dummyOptions: optionsGenerator(state),
     calculatedValue: valueHelper(resource, state),
+    __options__: optionsGenerator(state),
   }
 }
 
@@ -84,7 +86,7 @@ export const update = (state, values) => {
     ...values,
     calculatedValue: inverseValueHelper(values, state),
   };
-  delete updated.dummyOptions;
+  delete updated.__options__;
   return updated;
 }
 ```
@@ -96,5 +98,3 @@ export const update = (state, values) => {
 - `<DetailsForm>` (`/src/components/admin/DetailsForm.tsx`) calls the router,
   calls the `valuator`, passes in the `template`, and attaches the `updater` to
   the form submission handler.
-- `<DetailsForm>` will delete the `id` property from the updated object because
-  the database will complain if the new `id` (`""`) is submitted.
