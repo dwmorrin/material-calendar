@@ -25,6 +25,19 @@ class Category implements Category {
   ) {
     Object.assign(this, category);
   }
+
+  static tree(
+    categories: Category[],
+    parentId = null as number | null
+  ): { id: number; title: string; children: unknown }[] {
+    return categories
+      .filter((category) => category.parentId === parentId)
+      .map((category) => ({
+        id: category.id,
+        title: category.title,
+        children: Category.tree(categories, category.id),
+      }));
+  }
 }
 
 export default Category;
