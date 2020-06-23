@@ -48,15 +48,19 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
   if (!state.equipment.length) return null;
   const tree = Category.tree(state.categories, null);
   return (
-    <div>
+    <div
+      style={{
+        textTransform: "capitalize",
+      }}
+    >
       {tree.map(function climb(branch) {
         if (!branch || !equipmentList) {
           return null;
         }
-        const expanded = Category.checkPath(
+        const expanded = Category.isChildOfParent(
           state.categories,
-          branch.id,
           state.currentCategory,
+          branch
         );
         return (
           <ExpansionPanel key={branch.id} expanded={expanded}>
@@ -81,7 +85,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                 }}
               >
                 {branch.children?.map((twig) => climb(twig))}
-              </List>
+              
               {expanded && (
                 <EquipmentStandardList
                   equipmentList={equipmentList.filter(
@@ -91,6 +95,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                   setFieldValue={state.setFieldValue}
                 />
               )}
+              </List>
             </ExpansionPanelDetails>
           </ExpansionPanel>
         );

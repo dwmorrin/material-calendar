@@ -47,6 +47,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
             flexDirection: "column",
           }}
         >
+          {quantity}
           <br />
           <ButtonGroup
             variant="contained"

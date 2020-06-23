@@ -39,31 +39,28 @@ class Category implements Category {
       }));
   }
 
-
-// Function to check if an input id exists in the path (parent,
-// parent's parent, etc) of an input category
-static checkPath(
-  categories: Category[],
-  id: number,
-  selectedCategory: Category | null
-): boolean {
-  if (!selectedCategory) {
+  // Function to check if an input id exists in the path (parent,
+  // parent's parent, etc) of an input category
+  static isChildOfParent(
+    categories: Category[],
+    child: Category | null,
+    parent: Category
+  ): boolean {
+    if (!child) {
+      return false;
+    }
+    if (child.id === parent.id) {
+      return true;
+    }
+    if (child.parentId) {
+      return Category.isChildOfParent(
+        categories,
+        categories.find((category) => category.id === child?.parentId) || null,
+        parent
+      );
+    }
     return false;
   }
-  if (selectedCategory.id === id) {
-    return true;
-  }
-  if (selectedCategory.parentId) {
-    return Category.checkPath(
-      categories,
-      id,
-      categories.find(
-        (category) => category.id === selectedCategory?.parentId
-      ) || null
-    );
-  }
-  return false;
-}
 }
 
 export default Category;
