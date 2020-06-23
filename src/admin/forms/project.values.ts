@@ -4,16 +4,19 @@ import { ResourceKey } from "../../resources/types";
 import { AdminState, FormValues, ValueDictionary } from "../types";
 import { deleteKeys } from "../../utils/deleteKeys";
 
-type Choices = { [k: string]: boolean };
+//! BUG cannot apply boolean to forms, needs to be strings
 // gets choices of group from state, marks which is selected
+type Choices = { [k: string]: boolean };
 const getTitlesSelected = (project: Project, state: AdminState): Choices =>
   state.resources[ResourceKey.Courses].reduce(
-    (dict: ValueDictionary, group): ValueDictionary =>
-      !dict || !group.title
+    (dict: ValueDictionary, course): ValueDictionary =>
+      !dict
         ? {}
+        : !course.title
+        ? dict
         : {
             ...dict,
-            [group.title as string]: project.course.title === group.title,
+            [course.title as string]: project.course.title === course.title,
           },
     {}
   );
@@ -33,7 +36,7 @@ export const values = (state: AdminState): FormValues => {
   const project = state.resourceInstance as Project;
   return {
     ...project,
-    courses: getTitlesSelected(project, state),
+    __options__: { courses: getTitlesSelected(project, state) },
   };
 };
 
@@ -42,7 +45,7 @@ export const update = (state: AdminState, values: FormValues): Project => {
 
   return {
     ...project,
-    ...deleteKeys(values, "groups"),
+    ...deleteKeys(values, "__options__"),
     course: getGroup(getChoice(values.groups as Choices), state),
   };
 };

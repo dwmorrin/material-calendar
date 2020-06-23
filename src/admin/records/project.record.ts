@@ -1,13 +1,17 @@
 import Project from "../../resources/Project";
-import { getFormattedEventInterval } from "../../utils/date";
+import { getFormattedDate, getFormattedEventInterval } from "../../utils/date";
 
 const template = (project: unknown): string[][] =>
   project instanceof Project
     ? [
+        ["ID", project.id.toString()],
         ["Title", project.title],
+        ["Course", project.course.title || "none"],
         ["Duration", getFormattedEventInterval(project.start, project.end)],
-        ["Managers", project.managers.length.toString()],
-        ["Group", project.course.title || "none"],
+        ["Reservations start", getFormattedDate(project.reservationStart)],
+        ["Managers", project.managers.join(", ")],
+        ["Group size", project.groupSize.toString()],
+        ["Allotments", project.allotments.length.toString()],
       ]
     : [["", JSON.stringify(project)]];
 

@@ -10,22 +10,35 @@ import FieldList from "./FieldList";
 // TODO need a radio for the group, not checkbox
 const FormTemplate: FunctionComponent<FormValues> = ({
   managers,
-  members,
-  groups,
+  __options__,
 }) => (
   <List>
     <Field fullWidth component={TextField} name="title" label="Title" />
+    <Field fullWidth component={DatePicker} name="start" label="Start" />
+    <Field fullWidth component={DatePicker} name="end" label="End" />
+    <Field
+      fullWidth
+      component={DatePicker}
+      name="reservationStart"
+      label="Reservations start"
+    />
+    <FieldList name="managers" values={managers as string[]} />
     <Field
       fullWidth
       component={TextField}
-      name="description"
-      label="Description"
+      name="groupSize"
+      label="Group size"
     />
-    <Field fullWidth component={DatePicker} name="start" label="Start" />
-    <Field fullWidth component={DatePicker} name="end" label="End" />
-    <FieldList name="managers" values={managers as string[]} />
-    <FieldList name="members" values={members as string[]} />
-    <CheckboxList name="groups" values={groups as ValueDictionary} />
+    <Field
+      fullWidth
+      component={TextField}
+      name="groupAllottedHours"
+      label="Group allotted hours"
+    />
+    <CheckboxList //! BUG checkboxes value cannot be boolean, needs fix
+      name="course"
+      values={__options__?.courses as ValueDictionary}
+    />
   </List>
 );
 export default FormTemplate;
