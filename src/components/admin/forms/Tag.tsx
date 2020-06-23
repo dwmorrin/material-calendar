@@ -13,10 +13,10 @@ const getCategoryPath = (categories: Category[], id: number): string => {
 
 const FormTemplate: FunctionComponent<FormValues> = ({
   category,
-  categories,
+  __options__,
 }) => (
   <List>
-    <Field fullWidth component={TextField} name="name" label="Name" />
+    <Field fullWidth component={TextField} name="title" label="Title" />
     <Field
       fullWidth
       component={TextField}
@@ -24,7 +24,10 @@ const FormTemplate: FunctionComponent<FormValues> = ({
       label="Category ID"
     />
     <FormLabel>
-      {getCategoryPath(categories as Category[], +(category as Category).id)}
+      {getCategoryPath(
+        __options__?.categories as Category[],
+        +(category as Category).id
+      )}
     </FormLabel>
   </List>
 );
