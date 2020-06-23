@@ -57,6 +57,10 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
         if (!branch || !equipmentList) {
           return null;
         }
+        const contents = Category.hasContents(branch, equipmentList);
+        if (!contents) {
+          return null;
+        }
         const expanded = Category.isChildOfParent(
           state.categories,
           state.currentCategory,
@@ -75,7 +79,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                 })
               }
             >
-              {branch.title}
+                {branch.title + " " + "[" + contents + "]"}
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <List
@@ -85,16 +89,16 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                 }}
               >
                 {branch.children?.map((twig) => climb(twig))}
-              
-              {expanded && (
-                <EquipmentStandardList
-                  equipmentList={equipmentList.filter(
-                    (item) => item.category.id === branch.id
-                  )}
-                  selectedEquipment={selectedEquipment}
-                  setFieldValue={state.setFieldValue}
-                />
-              )}
+
+                {expanded && (
+                  <EquipmentStandardList
+                    equipmentList={equipmentList.filter(
+                      (item) => item.category.id === branch.id
+                    )}
+                    selectedEquipment={selectedEquipment}
+                    setFieldValue={state.setFieldValue}
+                  />
+                )}
               </List>
             </ExpansionPanelDetails>
           </ExpansionPanel>

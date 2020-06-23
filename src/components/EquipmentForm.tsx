@@ -83,7 +83,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
             quantizedEquipment,
             state.searchString,
             state.selectedTags,
-            state.currentCategory
+            null
           )}
           selectedEquipment={selectedEquipment}
         />
