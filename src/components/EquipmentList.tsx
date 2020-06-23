@@ -79,7 +79,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                 })
               }
             >
-                {branch.title + " " + "[" + contents + "]"}
+                {branch.title + " [" + contents + "]"}
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <List
