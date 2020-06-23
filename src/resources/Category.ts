@@ -12,6 +12,7 @@ interface Category {
   id: number;
   title: string;
   parentId: number | null; // null => top level category
+  children?: Category[];
 }
 
 class Category implements Category {
@@ -29,12 +30,11 @@ class Category implements Category {
   static tree(
     categories: Category[],
     parentId = null as number | null
-  ): { id: number; title: string; children: unknown }[] {
+  ): Category[] {
     return categories
       .filter((category) => category.parentId === parentId)
       .map((category) => ({
-        id: category.id,
-        title: category.title,
+        ...category,
         children: Category.tree(categories, category.id),
       }));
   }
