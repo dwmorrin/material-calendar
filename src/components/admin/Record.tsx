@@ -6,10 +6,19 @@ import {
   CardContent,
   CardActions,
   IconButton,
+  makeStyles,
 } from "@material-ui/core";
 import { AdminAction, AdminUIProps } from "../../admin/types";
 import { ResourceInstance } from "../../resources/types";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+
+const useStyles = makeStyles({
+  record: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+});
 
 interface RecordTemplate {
   document: ResourceInstance;
@@ -18,14 +27,9 @@ interface RecordTemplate {
 const Record: FunctionComponent<
   RecordTemplate & Pick<AdminUIProps, "dispatch">
 > = ({ dispatch, document, template }) => {
+  const classes = useStyles();
   return (
-    <Card
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-      }}
-    >
+    <Card className={classes.record}>
       <CardContent>
         <List>
           {template.map(([key, value], index) => (

@@ -10,22 +10,35 @@ import {
 import Record from "./Record";
 import templateRouter from "../../admin/records/router";
 import { dispatchFile } from "../../admin/dispatch";
-import { getRecordsPerPage } from "../../admin/documentBrowser";
+import {
+  DEFAULT_RECORD_HEIGHT,
+  getRecordsPerPage,
+} from "../../admin/documentBrowser";
 
 const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
   dispatch,
   state,
 }) => {
-  const [recordsPerPage, setRecordsPerPage] = useState(getRecordsPerPage());
-
-  const calculateAndSetRecordsPerPage = (): void => {
-    setRecordsPerPage(getRecordsPerPage());
-  };
+  const [recordHeight, setRecordHeight] = useState(DEFAULT_RECORD_HEIGHT);
+  const [recordsPerPage, setRecordsPerPage] = useState(
+    getRecordsPerPage(DEFAULT_RECORD_HEIGHT)
+  );
 
   useEffect(() => {
+    const calculateAndSetRecordsPerPage = (): void => {
+      setRecordsPerPage(getRecordsPerPage(recordHeight));
+    };
     window.addEventListener("resize", calculateAndSetRecordsPerPage);
     return (): void =>
       window.removeEventListener("resize", calculateAndSetRecordsPerPage);
+  }, [recordHeight]);
+
+  useEffect(() => {
+    const height =
+      document.querySelector(".MuiCard-root")?.clientHeight ||
+      DEFAULT_RECORD_HEIGHT;
+    setRecordHeight(height);
+    setRecordsPerPage(getRecordsPerPage(height));
   }, []);
 
   const { recordPage: page } = state;
