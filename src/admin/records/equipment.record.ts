@@ -3,9 +3,10 @@ import Equipment from "../../resources/Equipment";
 const template = (equip: unknown): string[][] =>
   equip instanceof Equipment
     ? [
+        ["ID", equip.id.toString()],
         ["Description", equip.description],
-        // ["Manufacturer", equip.manufacturer || "none"],
-        // ["Model", equip.model || "none"],
+        ["Manufacturer", equip.manufacturer || "none"],
+        ["Model", equip.model || "none"],
         ["SKU", equip.sku || "none"],
         // ["Serial #", equip.serial || "none"],
         // ["Barcode", equip.barcode || "none"],
