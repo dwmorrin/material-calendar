@@ -7,7 +7,7 @@
  * Use TAGS for properties that are not hierchial.
  * Continuing the guitar example, tag the type of pickups, color, etc.
  */
-import Equipment from "../resources/Equipment"
+import Equipment from "../resources/Equipment";
 interface Category {
   [k: string]: unknown;
   id: number;
@@ -63,20 +63,36 @@ class Category implements Category {
     return false;
   }
 
-static hasContents(
-  category: Category | null,
-  equipment: Equipment[]
-): number {
-  if (!category) {
-    return 0;
-  }
-  const sum = equipment.filter((item) => item.category.id === category.id).length;
+  static hasContents(
+    category: Category | null,
+    equipment: Equipment[]
+  ): number {
+    if (!category) {
+      return 0;
+    }
+    const sum = equipment.filter((item) => item.category.id === category.id)
+      .length;
 
-  if (category.children) {
-    return sum + category.children.map((child) => {return Category.hasContents(child,equipment);}).reduce((a, b) => a + b, 0);
+    if (category.children) {
+      return (
+        sum +
+        category.children
+          .map((child) => {
+            return Category.hasContents(child, equipment);
+          })
+          .reduce((a, b) => a + b, 0)
+      );
+    }
+    return sum;
   }
-  return sum;
-}
+  static path(categories: Category[], leaf?: Category): string {
+    if (!leaf) return "";
+    if (leaf.parentId === null) return leaf.title;
+    return `${Category.path(
+      categories,
+      categories.find((c) => c.id === leaf.parentId)
+    )} > ${leaf.title}`;
+  }
 }
 
 export default Category;

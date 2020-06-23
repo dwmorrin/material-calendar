@@ -89,3 +89,9 @@ const categoryTrees = [
 test("tree", () => {
   expect(Category.tree(categories)).toEqual(categoryTrees);
 });
+
+test("path", () => {
+  expect(
+    Category.path(categories, { id: 24, title: "electric", parentId: 23 })
+  ).toEqual("instruments and controllers > guitar > electric");
+});
