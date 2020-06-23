@@ -2,7 +2,6 @@ import React, { FunctionComponent } from "react";
 import Equipment from "../resources/Equipment";
 import EquipmentStandardList from "./EquipmentStandardList";
 import { EquipmentState, EquipmentAction } from "../equipmentForm/types";
-import { checkPath } from "../utils/category";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
@@ -54,7 +53,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
         if (!branch || !equipmentList) {
           return null;
         }
-        const expanded = checkPath(
+        const expanded = Category.checkPath(
           state.categories,
           branch.id,
           state.currentCategory,

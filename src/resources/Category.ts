@@ -38,6 +38,32 @@ class Category implements Category {
         children: Category.tree(categories, category.id),
       }));
   }
+
+
+// Function to check if an input id exists in the path (parent,
+// parent's parent, etc) of an input category
+static checkPath(
+  categories: Category[],
+  id: number,
+  selectedCategory: Category | null
+): boolean {
+  if (!selectedCategory) {
+    return false;
+  }
+  if (selectedCategory.id === id) {
+    return true;
+  }
+  if (selectedCategory.parentId) {
+    return Category.checkPath(
+      categories,
+      id,
+      categories.find(
+        (category) => category.id === selectedCategory?.parentId
+      ) || null
+    );
+  }
+  return false;
+}
 }
 
 export default Category;
