@@ -1,16 +1,28 @@
 import Category from "../resources/Category";
 
-export function makeTree(categories: Category[], parentId: number | null): {'id': number;'title': string; 'children': unknown}[] {
-  const treeDict: {'id': number; 'title': string; 'children': unknown}[] = [];
-  // get the list of top level categories. This is only needed the first time this function is run, not for any recursoive parts
-  categories
-    .filter((category) => category.parentId == parentId)
-    .forEach(function (category) {
-      treeDict.push({
-        id: category.id,
-        title: category.title,
-        children: makeTree(categories, category.id),
-      });
-    });
-  return treeDict;
+export function checkPath(
+  categories: Category[],
+  currentCategory: Category | null,
+  id: number,
+  recurse: number | null
+): boolean {
+  //TODO this can be changed to have recurse replace currentCategory and have 3 inputs instead of 4.
+  const checkingCategory = recurse
+    ? categories.find((category) => category.id === recurse)
+    : currentCategory;
+  if (!checkingCategory) {
+    return false;
+  }
+  if (checkingCategory.id === id) {
+    return true;
+  }
+  if (checkingCategory.parentId) {
+    return checkPath(
+      categories,
+      currentCategory,
+      id,
+      checkingCategory.parentId
+    );
+  }
+  return false;
 }
