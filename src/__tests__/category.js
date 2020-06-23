@@ -95,3 +95,13 @@ test("path", () => {
     Category.path(categories, { id: 24, title: "electric", parentId: 23 })
   ).toEqual("instruments and controllers > guitar > electric");
 });
+
+test("isChildOfParent", () => {
+  expect(
+    Category.isChildOfParent(
+      categories,
+      { id: 24, title: "electric", parentId: 23 },
+      { id: 23, title: "guitar", parentId: 20 }
+    )
+  ).toBe(true);
+});
