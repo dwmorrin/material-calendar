@@ -57,8 +57,9 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
       {state.loading && <CircularProgress />}
       {!state.loading && (
         <FullCalendar
+          timeZone="UTC"
           ref={state.ref}
-          defaultDate={"2020-04-14"} //{state.currentStart}
+          defaultDate={state.currentStart}
           header={false}
           allDaySlot={false}
           nowIndicator={true}
