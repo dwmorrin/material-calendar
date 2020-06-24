@@ -44,7 +44,8 @@ export const submitHandler = (
 export const makeInitialValues = (
   state: CalendarState
 ): { [k: string]: unknown } => {
-  const project = (state.resources[ResourceKey.Projects] as Project[])[0];
+  const project =
+    (state.resources[ResourceKey.Projects] as Project[])[0] || new Project();
   return {
     phone: "",
     description: "",
