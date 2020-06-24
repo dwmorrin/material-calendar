@@ -11,15 +11,27 @@ import {
 const guitar = {
   description: "electric guitar",
   quantity: 1,
-  tags: [{ title: "single-coil" }],
-  category: { title: "instruments", parentId: null },
+  tags: [{
+    title: "single-coil"
+  }],
+  category: {
+    id: 1,
+    title: "instruments",
+    parentId: null
+  },
 };
 
 const mic = {
   description: "condenser mic",
   quantity: 1,
-  tags: [{ title: "condenser" }],
-  category: { title: "microphones", parentId: null },
+  tags: [{
+    title: "condenser"
+  }],
+  category: {
+    id: 2,
+    title: "microphones",
+    parentId: null
+  },
 };
 
 test("query with nothing returns all input", () => {
@@ -44,7 +56,9 @@ test("query matches tags", () => {
 
 test("filter matches tags", () => {
   const equipment = [guitar, mic];
-  const filters = { "single-coil": true };
+  const filters = {
+    "single-coil": true
+  };
   expect(filterEquipment(equipment, filters)).toEqual([guitar]);
 });
 
@@ -82,13 +96,19 @@ test("filterItems by query", () => {
 });
 
 test("filterItems by tags", () => {
-  expect(filterItems([guitar, mic], "", { "single-coil": true })).toEqual([
+  expect(filterItems([guitar, mic], "", {
+    "single-coil": true
+  })).toEqual([
     guitar,
   ]);
 });
 
 test("filterItems by category", () => {
   expect(
-    filterItems([guitar, mic], "", {}, { title: "instruments", parentId: null })
+    filterItems([guitar, mic], "", {}, {
+      id: 1,
+      title: "instruments",
+      parentId: null
+    })
   ).toEqual([guitar]);
 });
