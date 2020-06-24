@@ -13,6 +13,11 @@ import {
 } from "./category.values";
 import CategoryForm from "../../components/admin/forms/Category";
 import {
+  values as courseValues,
+  update as courseUpdate,
+} from "./course.values";
+import CourseForm from "../../components/admin/forms/Course";
+import {
   values as equipmentValues,
   update as equipmentUpdate,
 } from "./equiment.values";
@@ -38,17 +43,11 @@ import { values as tagValues, update as tagUpdate } from "./tag.values";
 import TagForm from "../../components/admin/forms/Tag";
 import { values as userValues, update as userUpdate } from "./user.values";
 import UserForm from "../../components/admin/forms/User";
-
-//! placeholders for resources that don't have form interfaces
-import EmptyForm from "../../components/admin/forms/Empty";
-import User from "../../resources/User";
-const newUserUpdater = (): User => new User();
-// TODO create interfaces for anything using `empty`
-const empty = {
-  valuator: (): {} => ({}),
-  template: EmptyForm,
-  updater: newUserUpdater,
-};
+import {
+  values as groupValues,
+  update as groupUpdate,
+} from "./userGroup.values";
+import GroupForm from "../../components/admin/forms/UserGroup";
 
 /**
  * router generates values and a template to render some database resource
@@ -67,6 +66,11 @@ const router = (
       valuator: categoryValues,
       updater: categoryUpdate,
     },
+    [ResourceKey.Courses]: {
+      template: CourseForm,
+      valuator: courseValues,
+      updater: courseUpdate,
+    },
     [ResourceKey.Equipment]: {
       template: EquipmentForm,
       valuator: equipmentValues,
@@ -77,7 +81,11 @@ const router = (
       valuator: eventValues,
       updater: eventUpdate,
     },
-    [ResourceKey.Groups]: empty,
+    [ResourceKey.Groups]: {
+      template: GroupForm,
+      valuator: groupValues,
+      updater: groupUpdate,
+    },
     [ResourceKey.Locations]: {
       template: LocationForm,
       valuator: locationValues,
@@ -88,7 +96,6 @@ const router = (
       valuator: projectValues,
       updater: projectUpdate,
     },
-    [ResourceKey.Courses]: empty,
     [ResourceKey.Reservations]: {
       template: ReservationForm,
       valuator: reservationValues,
