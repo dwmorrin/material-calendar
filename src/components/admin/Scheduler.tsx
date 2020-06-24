@@ -104,6 +104,7 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
             { day: "numeric" },
           ]}
           // ETC
+          timeZone="UTC"
           nowIndicator={true}
           height="parent"
           plugins={[resourceTimelinePlugin, interactionPlugin]}
