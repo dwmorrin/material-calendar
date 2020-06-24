@@ -1,6 +1,6 @@
 import { DateInput } from "@fullcalendar/core/datelib/env";
 
-function isDate(date?: DateInput): date is Date {
+export function isDate(date?: DateInput): date is Date {
   return (
     !!date &&
     typeof date !== "string" &&
@@ -10,7 +10,7 @@ function isDate(date?: DateInput): date is Date {
   );
 }
 
-function dateInputToNumber(dateInput?: DateInput): number {
+export function dateInputToNumber(dateInput?: DateInput): number {
   if (typeof dateInput === "string") return +new Date(dateInput);
   if (isDate(dateInput)) return +dateInput;
   if (typeof dateInput === "number") return dateInput;
@@ -32,34 +32,72 @@ export function getFormattedDate(d: string | Date): string {
     month: "2-digit",
     day: "2-digit",
     year: "numeric",
+    timeZone: "UTC",
   });
+}
+
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getUTCFullYear() === b.getUTCFullYear() &&
+    a.getUTCMonth() === b.getUTCMonth() &&
+    a.getUTCDate() === b.getUTCDate()
+  );
 }
 
 export function getFormattedEventInterval(
   start: string | Date,
   end: string | Date
 ): string {
-  if (typeof start === "string") {
-    start = new Date(start);
-  }
-  if (typeof end === "string") {
-    end = new Date(end);
-  }
-  if (start === undefined) start = new Date();
-  if (end === undefined) end = new Date();
-  const sameDay =
-    start.getFullYear() === end.getFullYear() &&
-    start.getMonth() === end.getMonth() &&
-    start.getDate() === end.getDate();
+  const _start = !isDate(start) ? new Date(start) : start;
+  const _end = !isDate(end) ? new Date(end) : end;
+  const hasNoTimeInfo =
+    typeof start === "string" && /^\d{4}-\d{2}-\d{2}$/.test(start);
+  const sameDay = isSameDay(_start, _end);
 
-  const dateFormat = { weekday: "long", day: "numeric", month: "long" };
-  const timeFormat = { hour12: true, timeStyle: "short" };
-  const startFormatted = `${start.toLocaleDateString(
-    "en-US",
-    dateFormat
-  )} \u00B7 ${start.toLocaleTimeString("en-US", timeFormat)}`;
-  const endFormatted = `${
-    !sameDay ? end.toLocaleDateString("en-US", dateFormat) + " \u00B7 " : ""
-  }${end.toLocaleTimeString("en-US", timeFormat)}`;
-  return `${startFormatted} - ${endFormatted}`;
+  const dateFormat = {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  };
+  const timeFormat = { hour12: true, timeStyle: "short", timeZone: "UTC" };
+  const timeDelimiter = " \u00B7 ";
+  const intervalDelimiter = " - ";
+
+  const startDateString = _start.toLocaleDateString("en-US", dateFormat);
+  const startTimeString = hasNoTimeInfo
+    ? ""
+    : _start.toLocaleTimeString("en-US", timeFormat);
+  const endDateString = sameDay
+    ? ""
+    : _end.toLocaleDateString("en-US", dateFormat);
+  const endTimeString = hasNoTimeInfo
+    ? ""
+    : _end.toLocaleTimeString("en-US", timeFormat);
+
+  // hasNoTimeInfo && sameDay make for 4 possibilities:
+  if (hasNoTimeInfo && sameDay) {
+    return startDateString;
+  }
+  if (hasNoTimeInfo && !sameDay) {
+    return startDateString + intervalDelimiter + endDateString;
+  }
+  if (!hasNoTimeInfo && sameDay) {
+    return (
+      startDateString +
+      timeDelimiter +
+      startTimeString +
+      intervalDelimiter +
+      endTimeString
+    );
+  }
+  return (
+    startDateString +
+    timeDelimiter +
+    startTimeString +
+    intervalDelimiter +
+    endDateString +
+    timeDelimiter +
+    endTimeString
+  );
 }
