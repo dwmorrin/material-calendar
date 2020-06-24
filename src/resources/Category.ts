@@ -8,6 +8,7 @@
  * Continuing the guitar example, tag the type of pickups, color, etc.
  */
 import Equipment from "../resources/Equipment";
+import Tag from "../resources/Tag";
 interface Category {
   [k: string]: unknown;
   id: number;
@@ -85,6 +86,25 @@ class Category implements Category {
     }
     return sum;
   }
+
+  static existsOnCategoryOrChildren(
+    category: Category | null,
+    item: Equipment | Tag
+  ): boolean {
+    if (!category) {
+      return false;
+    }
+    if (item.category.id === category.id) {
+      return true;
+    }
+    if (category.children) {
+      return category.children.some((child) =>
+        Category.existsOnCategoryOrChildren(child, item)
+      );
+    }
+    return false;
+  }
+
   static path(categories: Category[], leaf?: Category): string {
     if (!leaf) return "";
     if (leaf.parentId === null) return leaf.title;

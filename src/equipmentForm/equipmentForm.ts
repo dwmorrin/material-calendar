@@ -197,7 +197,8 @@ export const makeQueryTest = (query: string): ItemTest => {
 const makeCategoryTest = (category: Category | null): ItemTest =>
   !category
     ? isTruthy
-    : (item: Equipment): boolean => item.category.title === category.title;
+    : (item: Equipment): boolean =>
+        Category.existsOnCategoryOrChildren(category, item);
 
 const getSelectedKeys = (dictionary: SelectedDictionary): string[] =>
   Object.keys(dictionary).filter((key) => dictionary[key]);
