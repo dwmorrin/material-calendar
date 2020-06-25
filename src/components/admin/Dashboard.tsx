@@ -13,10 +13,7 @@ import fetchAllResources from "../../utils/fetchAllResources";
 import Scheduler from "./Scheduler";
 
 const makeUrlsForAllResources = (): string[] =>
-  Resources.reduce(
-    (urls, resource, index) => [...urls, `${resource.url}?context=${index}`],
-    [] as string[]
-  );
+  Resources.map((resource, index) => `${resource.url}?context=${index}`);
 
 const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
