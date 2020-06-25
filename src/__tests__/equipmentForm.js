@@ -7,32 +7,49 @@ import {
   makeQueryTest,
 } from "../equipmentForm/equipmentForm";
 
-// Test fixtures: TAKE CARE THAT YOU DO NOT MUTATE THESE!!
+//------ TEST FIXTURES ---------//
+//--- Categories
+const instrumentsCategory = {
+  id: 1,
+  title: "instruments",
+  parentId: null,
+};
+Object.freeze(instrumentsCategory);
+
+const microphonesCategory = {
+  id: 2,
+  title: "microphones",
+  parentId: null,
+};
+Object.freeze(microphonesCategory);
+
+//--- Tags
+const singleCoilTag = { title: "single-coil" };
+Object.freeze(singleCoilTag);
+
+const condenserTag = {
+  title: "condenser",
+};
+Object.freeze(condenserTag);
+
+//--- Items
 const guitar = {
   description: "electric guitar",
   quantity: 1,
-  tags: [{
-    title: "single-coil"
-  }],
-  category: {
-    id: 1,
-    title: "instruments",
-    parentId: null
-  },
+  tags: [singleCoilTag],
+  category: instrumentsCategory,
 };
+Object.freeze(guitar);
 
 const mic = {
   description: "condenser mic",
   quantity: 1,
-  tags: [{
-    title: "condenser"
-  }],
-  category: {
-    id: 2,
-    title: "microphones",
-    parentId: null
-  },
+  tags: [condenserTag],
+  category: microphonesCategory,
 };
+Object.freeze(mic);
+
+//--------- TESTS ----------------//
 
 test("query with nothing returns all input", () => {
   const equipment = [guitar];
@@ -57,7 +74,7 @@ test("query matches tags", () => {
 test("filter matches tags", () => {
   const equipment = [guitar, mic];
   const filters = {
-    "single-coil": true
+    "single-coil": true,
   };
   expect(filterEquipment(equipment, filters)).toEqual([guitar]);
 });
@@ -96,19 +113,15 @@ test("filterItems by query", () => {
 });
 
 test("filterItems by tags", () => {
-  expect(filterItems([guitar, mic], "", {
-    "single-coil": true
-  })).toEqual([
-    guitar,
-  ]);
+  expect(
+    filterItems([guitar, mic], "", {
+      "single-coil": true,
+    })
+  ).toEqual([guitar]);
 });
 
 test("filterItems by category", () => {
-  expect(
-    filterItems([guitar, mic], "", {}, {
-      id: 1,
-      title: "instruments",
-      parentId: null
-    })
-  ).toEqual([guitar]);
+  expect(filterItems([guitar, mic], "", {}, instrumentsCategory)).toEqual([
+    guitar,
+  ]);
 });
