@@ -3,6 +3,11 @@ import { ResourceKey } from "../resources/types";
 
 type StateHandler = (state: AdminState, action: Action) => AdminState;
 
+const closeBackups: StateHandler = (state) => ({
+  ...state,
+  backupsIsOpen: false,
+});
+
 const closeDetail: StateHandler = (state) => ({
   ...state,
   detailIsOpen: false,
@@ -20,6 +25,11 @@ const error: StateHandler = (state, { payload, meta }) => {
   }
   return state;
 };
+
+const openBackups: StateHandler = (state) => ({
+  ...state,
+  backupsIsOpen: true,
+});
 
 const openDetail: StateHandler = (state) => ({
   ...state,
@@ -117,9 +127,11 @@ const toggleDrawer: StateHandler = (state) => ({
 
 const reducer: StateHandler = (state, action) =>
   ({
+    [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
     [AdminAction.CloseFileImport]: closeFileImport,
     [AdminAction.Error]: error,
+    [AdminAction.OpenBackups]: openBackups,
     [AdminAction.OpenDetail]: openDetail,
     [AdminAction.OpenScheduler]: openScheduler,
     [AdminAction.OpenedFile]: openedFile,

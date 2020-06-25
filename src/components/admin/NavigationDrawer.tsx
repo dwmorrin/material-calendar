@@ -131,6 +131,20 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
               </ListItem>
             ))}
           </ExpansionPanel>
+          <ExpansionPanel>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+              onClick={(event): void => event.stopPropagation()}
+            >
+              Utilities
+            </ExpansionPanelSummary>
+            <ListItem
+              button
+              onClick={(): void => dispatch({ type: AdminAction.OpenBackups })}
+            >
+              Backups
+            </ListItem>
+          </ExpansionPanel>
         </List>
       </Fragment>
     </SwipeableDrawer>

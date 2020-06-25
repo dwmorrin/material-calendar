@@ -11,6 +11,7 @@ import AdminDetailsForm from "./DetailsForm";
 import FileImport from "./FileImport";
 import fetchAllResources from "../../utils/fetchAllResources";
 import Scheduler from "./Scheduler";
+import Backups from "./Backups";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
@@ -38,6 +39,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       )}
       <AdminDetailsForm dispatch={dispatch} state={state} />
       <FileImport dispatch={dispatch} state={state} />
+      <Backups dispatch={dispatch} state={state} />
     </div>
   );
 };

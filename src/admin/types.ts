@@ -8,9 +8,11 @@ export interface Action {
 }
 
 export enum AdminAction {
+  CloseBackups,
   CloseDetail,
   CloseFileImport,
   Error,
+  OpenBackups,
   OpenDetail,
   OpenScheduler,
   OpenedFile,
@@ -27,6 +29,7 @@ export enum AdminAction {
 
 export interface AdminState {
   // UI state
+  backupsIsOpen: boolean;
   detailIsOpen: boolean;
   drawerIsOpen: boolean;
   error?: {};
