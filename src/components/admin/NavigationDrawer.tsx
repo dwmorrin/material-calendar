@@ -1,8 +1,17 @@
-import React, { FunctionComponent } from "react";
-import { SwipeableDrawer, Typography, List, ListItem } from "@material-ui/core";
+import React, { FunctionComponent, Fragment } from "react";
+import {
+  SwipeableDrawer,
+  Typography,
+  List,
+  ListItem,
+  ExpansionPanel,
+  ExpansionPanelSummary,
+} from "@material-ui/core";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AdminAction, AdminUIProps } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import Location from "../../resources/Location";
+import { enumKeys } from "../../utils/enumKeys";
 
 const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
   dispatch,
@@ -81,97 +90,49 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
       onClick={toggleDrawer}
       onKeyDown={toggleDrawer}
     >
-      <div role="navigation">
+      <Fragment>
         <Typography variant="h5">
           {process.env.REACT_APP_ADMIN_DRAWER_TITLE}
         </Typography>
         <List>
-          <ListItem
-            button
-            onClick={(): void => dispatch({ type: AdminAction.OpenScheduler })}
-          >
-            Scheduler Calendar
-          </ListItem>
-          {locations.map((location) => (
-            <ListItem
-              key={location.id}
-              button
-              onClick={selectSchedulerLocation}
-              data-location={location.id}
-            >{`- ${location.title}`}</ListItem>
-          ))}
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Users}
-          >
-            Users
-          </ListItem>
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Groups}
-          >
-            - Groups
-          </ListItem>
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Locations}
-          >
-            Locations
-          </ListItem>
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Projects}
-          >
-            Projects
-          </ListItem>
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Courses}
-          >
-            - Courses
-          </ListItem>
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Events}
-          >
-            Events
-          </ListItem>
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Reservations}
-          >
-            Reservations
-          </ListItem>
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Equipment}
-          >
-            Equipment
-          </ListItem>
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Categories}
-          >
-            - Categories
-          </ListItem>
-          <ListItem
-            button
-            onClick={fetchResource}
-            data-resource={ResourceKey.Tags}
-          >
-            - Tags
-          </ListItem>
+          <ExpansionPanel>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+              onClick={(event): void => event.stopPropagation()}
+            >
+              Scheduler
+            </ExpansionPanelSummary>
+            {locations.map((location) => (
+              <ListItem
+                key={location.id}
+                button
+                onClick={selectSchedulerLocation}
+                data-location={location.id}
+              >
+                {location.title}
+              </ListItem>
+            ))}
+          </ExpansionPanel>
+          <ExpansionPanel>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+              onClick={(event): void => event.stopPropagation()}
+            >
+              Database resources
+            </ExpansionPanelSummary>
+            {enumKeys(ResourceKey).map((key) => (
+              <ListItem
+                key={key}
+                button
+                onClick={fetchResource}
+                data-resource={key}
+              >
+                {ResourceKey[key]}
+              </ListItem>
+            ))}
+          </ExpansionPanel>
         </List>
-      </div>
+      </Fragment>
     </SwipeableDrawer>
   );
 };
