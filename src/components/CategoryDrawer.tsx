@@ -43,8 +43,9 @@ const CategoryDrawer: FunctionComponent<CategoryDrawerProps> = ({
             });
           }}
         >
-          {state.previousCategory[state.previousCategory.length - 1]?.title ||
-            "All Items"}
+          {"Return to " +
+            (state.previousCategory[state.previousCategory.length - 1]?.title ||
+              "All Items")}
         </Button>
       )}
       {items?.map((item) => (

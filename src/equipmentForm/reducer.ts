@@ -6,6 +6,7 @@ import Tag from "../resources/Tag";
 export const initialState = {
   filterDrawerIsOpen: false,
   categoryDrawerIsOpen: false,
+  categoryDrawerView: false,
   searchString: "",
   equipment: [] as Equipment[],
   tags: [] as Tag[],
@@ -57,6 +58,11 @@ const returnToPreviousCategory: StateHandler = (state) => ({
   currentCategory: state.previousCategory.pop() || null,
 });
 
+const clearCategoryHistory: StateHandler = (state) => ({
+  ...state,
+  previousCategory: [],
+});
+
 const toggleFilterDrawer: StateHandler = (state) => ({
   ...state,
   filterDrawerIsOpen: !state.filterDrawerIsOpen,
@@ -67,15 +73,22 @@ const toggleCategoryDrawer: StateHandler = (state) => ({
   categoryDrawerIsOpen: !state.categoryDrawerIsOpen,
 });
 
+const toggleEquipmentViewMode: StateHandler = (state) => ({
+  ...state,
+  categoryDrawerView: !state.categoryDrawerView,
+});
+
 const reducer: StateHandler = (state, action) =>
   ({
     [EquipmentActionTypes.ChangedSearchString]: changedSearchString,
     [EquipmentActionTypes.ReceivedResource]: receivedResource,
     [EquipmentActionTypes.SelectedCategory]: selectedCategory,
     [EquipmentActionTypes.ReturnToPreviousCategory]: returnToPreviousCategory,
+    [EquipmentActionTypes.ClearCategoryHistory]: clearCategoryHistory,
     [EquipmentActionTypes.SelectedFilter]: selectedFilter,
     [EquipmentActionTypes.ToggleFilterDrawer]: toggleFilterDrawer,
     [EquipmentActionTypes.ToggleCategoryDrawer]: toggleCategoryDrawer,
+    [EquipmentActionTypes.ToggleEquipmentViewMode]: toggleEquipmentViewMode,
   }[action.type](state, action));
 
 export default reducer;

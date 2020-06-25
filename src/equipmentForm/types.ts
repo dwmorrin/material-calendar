@@ -5,6 +5,7 @@ import Tag from "../resources/Tag";
 export interface EquipmentState {
   filterDrawerIsOpen: boolean;
   categoryDrawerIsOpen: boolean;
+  categoryDrawerView: boolean;
   searchString: string;
   equipment: Equipment[];
   tags: Tag[];
@@ -20,9 +21,11 @@ export enum EquipmentActionTypes {
   ReceivedResource,
   SelectedCategory,
   ReturnToPreviousCategory,
+  ClearCategoryHistory,
   SelectedFilter,
   ToggleFilterDrawer,
   ToggleCategoryDrawer,
+  ToggleEquipmentViewMode,
 }
 
 export interface EquipmentAction {

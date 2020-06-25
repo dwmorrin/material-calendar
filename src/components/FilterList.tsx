@@ -3,6 +3,7 @@ import List from "@material-ui/core/List";
 import Box from "@material-ui/core/Box";
 import FilterItem from "./FilterItem";
 import { EquipmentState, EquipmentAction } from "../equipmentForm/types";
+import Category from "../resources/Category";
 
 interface FilterListProps {
   state: EquipmentState;
@@ -13,9 +14,13 @@ const FilterList: FunctionComponent<FilterListProps> = ({
   dispatch,
 }) => {
   // Create list of FilterItems from visible (valid for that category) filters
-  const validTags = state.tags.filter(
-    (tag) => tag.category.id === state.currentCategory?.id
-  );
+  const validTags = state.categoryDrawerView
+    ? state.currentCategory
+      ? state.tags.filter((tag) =>
+          Category.existsOnCategoryOrChildren(state.currentCategory, tag)
+        )
+      : state.tags
+    : state.tags.filter((tag) => tag.category.id === state.currentCategory?.id);
   if (validTags.length < 1) {
     return <Box>{"Please select a category to see applicable filters"}</Box>;
   }
