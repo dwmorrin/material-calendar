@@ -9,12 +9,15 @@ import {
   Button,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
+import GetAppIcon from "@material-ui/icons/GetApp";
+import WarningIcon from "@material-ui/icons/Warning";
 import { AdminAction, AdminUIProps } from "../../admin/types";
-import { prettyPrintFilename } from "../../admin/backups";
+import { prettyPrintFilename, restore, useStyles } from "../../admin/backups";
 import { download } from "../../utils/download";
 
 const Backups: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const [backups, setBackups] = useState([] as string[]);
+  const classes = useStyles();
 
   useEffect(() => {
     fetch("/api/backup")
@@ -36,30 +39,41 @@ const Backups: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
         </IconButton>
         <Typography variant="h5">Database backups</Typography>
       </Toolbar>
-      <Button
-        onClick={(): Promise<void> =>
-          fetch(`/api/backup`, { method: "POST" })
-            .then((response) => response.json())
-            .then(({ data }) => setBackups(data))
-            .catch(console.error)
-        }
-      >
-        Create a new backup
-      </Button>
-      <Typography>Available backups</Typography>
       <List>
+        <Button
+          variant="contained"
+          onClick={(): Promise<void> =>
+            fetch(`/api/backup`, { method: "POST" })
+              .then((response) => response.json())
+              .then(({ data }) => setBackups(data))
+              .catch(console.error)
+          }
+        >
+          Create a new backup
+        </Button>
         {backups.map((filename) => (
-          <ListItem
-            button
-            onClick={(): Promise<void> =>
-              fetch(`/api/backup/${filename}`)
-                .then((response) => response.blob())
-                .then((blob) => download(blob, filename))
-                .catch(console.error)
-            }
-            key={filename}
-          >
-            {prettyPrintFilename(filename)}
+          <ListItem className={classes.item} key={filename}>
+            <Typography>{prettyPrintFilename(filename)}</Typography>
+            <Button
+              variant="contained"
+              startIcon={<GetAppIcon />}
+              onClick={(): Promise<void> =>
+                fetch(`/api/backup/${filename}`)
+                  .then((response) => response.blob())
+                  .then((blob) => download(blob, filename))
+                  .catch(console.error)
+              }
+            >
+              Download
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<WarningIcon />}
+              onClick={(): Promise<void> => restore(filename)}
+            >
+              Restore
+            </Button>
           </ListItem>
         ))}
       </List>
