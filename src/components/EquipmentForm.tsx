@@ -48,7 +48,6 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
 
   const toggleEquipmentCart = (): void =>
     dispatch({ type: EquipmentActionTypes.ToggleEquipmentCart, payload: {} });
-  console.log(state);
   return (
     <Dialog fullScreen open={open} TransitionComponent={transition}>
       <div className={classes.root}>
