@@ -21,14 +21,6 @@ const EquipmentViewToggleMenu: FunctionComponent<EquipmentViewToggleMenuProps> =
 
   const toggleView = (): void => {
     dispatch({
-      type: EquipmentActionTypes.SelectedCategory,
-      payload: {},
-    });
-    dispatch({
-      type: EquipmentActionTypes.ClearCategoryHistory,
-      payload: {},
-    });
-    dispatch({
       type: EquipmentActionTypes.ToggleEquipmentViewMode,
       payload: {},
     });

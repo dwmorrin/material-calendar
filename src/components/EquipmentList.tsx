@@ -61,15 +61,44 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
         if (!contents) {
           return null;
         }
-        const expanded = Category.isChildOfParent(
-          state.categories,
-          state.currentCategory,
-          branch
-        );
+        const expanded =
+          Category.isChildOfParent(
+            state.categories,
+            state.currentCategory,
+            branch
+          ) ||
+          Category.isChildOfParent(
+            state.categories,
+            state.viewedCategory,
+            branch
+          );
         return (
           <ExpansionPanel key={branch.id} expanded={expanded}>
             <ExpansionPanelSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={
+                state.categoryDrawerView ? (
+                  branch.children && branch.children.length > 0 ? (
+                    <ExpandMoreIcon
+                      onClick={(event): void => {
+                        event.stopPropagation();
+                        state.viewedCategory?.id === branch.id
+                          ? dispatch({
+                              type: EquipmentActionTypes.ViewedCategory,
+                              payload: { viewedCategory: null },
+                            })
+                          : dispatch({
+                              type: EquipmentActionTypes.ViewedCategory,
+                              payload: {
+                                viewedCategory: changeCategory(branch),
+                              },
+                            });
+                      }}
+                    />
+                  ) : null
+                ) : (
+                  <ExpandMoreIcon />
+                )
+              }
               aria-controls={branch.title + "expansionPanel"}
               id={branch.title + "expansionPanel"}
               onClick={(): void =>
@@ -79,7 +108,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                 })
               }
             >
-                {branch.title + " [" + contents + "]"}
+              {branch.title + " [" + contents + "]"}
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <List
@@ -90,7 +119,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
               >
                 {branch.children?.map((twig) => climb(twig))}
 
-                {expanded && (
+                {!state.categoryDrawerView && expanded && (
                   <EquipmentStandardList
                     equipmentList={equipmentList.filter(
                       (item) => item.category.id === branch.id
