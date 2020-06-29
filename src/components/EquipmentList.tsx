@@ -24,6 +24,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
   equipmentList,
   selectedEquipment,
 }) => {
+  const tree = Category.tree(state.categories, null);
   function changeCategory(selectedCategory: Category): Category | null {
     // if the category selected is the same as the current category, or
     // if it is the parent id of the selectedCategory (which means it is
@@ -33,20 +34,11 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
       (state.currentCategory &&
         state.currentCategory.id === selectedCategory.id)
     ) {
-      return (
-        state.categories.find(
-          (category) => category.id === selectedCategory.parentId
-        ) || null
-      );
+      return Category.findById(tree, selectedCategory.parentId);
     }
-    return (
-      state.categories.find(
-        (category) => category.id === selectedCategory.id
-      ) || null
-    );
+    return selectedCategory;
   }
   if (!state.equipment.length) return null;
-  const tree = Category.tree(state.categories, null);
   return (
     <div
       style={{

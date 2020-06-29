@@ -64,6 +64,25 @@ class Category implements Category {
     return false;
   }
 
+  static findById(
+    categories: Category[] | null,
+    id: number | null
+  ): Category | null {
+    if (!id || !categories) {
+      return null;
+    }
+    const newCat = categories.find((category) => category.id === id);
+    if (newCat) {
+      return newCat;
+    }
+    const list = categories
+      .filter((category) => category.children && category.children.length > 0)
+      .map((category) => {
+        return Category.findById(category.children || null, id);
+      });
+    return list.find((item) => item?.id === id) || null;
+  }
+
   static hasContents(
     category: Category | null,
     equipment: Equipment[]

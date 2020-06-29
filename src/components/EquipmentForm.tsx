@@ -84,7 +84,12 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
                 <ArrowBackIosIcon />
               </IconButton>
               {state.categoryDrawerView ? (
-                <Typography className={classes.title}>
+                <Typography
+                  style={{
+                    textTransform: "capitalize",
+                  }}
+                  className={classes.title}
+                >
                   {state.currentCategory?.title || "All Categories"}
                 </Typography>
               ) : (
