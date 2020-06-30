@@ -8,7 +8,7 @@ export enum RosterFields {
   PROJECT_TITLE,
 }
 
-interface Course {
+export interface Course {
   title: string;
   catalogId: string;
   section: string;
@@ -16,7 +16,7 @@ interface Course {
   project: { title: string };
 }
 
-interface Student {
+export interface Student {
   name: {
     first: string;
     last: string;
@@ -49,7 +49,7 @@ export class RosterRecord implements RosterRecord {
     Object.assign(this, rosterRecord);
   }
 
-  static Reader(record: RosterRecord, fields: string[], id = -1): void {
+  static read(record: RosterRecord, fields: string[], id = -1): RosterRecord {
     record.id = id;
     const [last, first] = fields[RosterFields.STUDENT_NAME].split(", ");
     record.course = {
@@ -63,6 +63,7 @@ export class RosterRecord implements RosterRecord {
       name: { first, last },
       id: fields[RosterFields.STUDENT_ID],
     };
+    return record;
   }
 }
 
