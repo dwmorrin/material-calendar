@@ -63,6 +63,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
           onOpen={toggleEquipmentCart}
           onClose={toggleEquipmentCart}
           selectedEquipment={selectedEquipment}
+          setFieldValue={state.setFieldValue}
         />
         <AppBar position="sticky">
           <List>
