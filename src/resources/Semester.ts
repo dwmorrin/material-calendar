@@ -1,4 +1,5 @@
 interface Semester {
+  [k: string]: unknown;
   id: number;
   title: string;
   start: string;
@@ -9,7 +10,7 @@ interface Semester {
 class Semester implements Semester {
   static url = "/api/semesters";
   constructor(
-    s = {
+    semester = {
       id: 0,
       title: "",
       start: "",
@@ -17,7 +18,7 @@ class Semester implements Semester {
       active: false,
     }
   ) {
-    Object.assign(this, s);
+    Object.assign(this, semester);
   }
 }
 

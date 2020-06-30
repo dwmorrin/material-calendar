@@ -8,7 +8,7 @@ import { deleteKeys } from "../../utils/deleteKeys";
 // gets choices of group from state, marks which is selected
 type Choices = { [k: string]: boolean };
 const getTitlesSelected = (project: Project, state: AdminState): Choices =>
-  state.resources[ResourceKey.Courses].reduce(
+  (state.resources[ResourceKey.Courses] as Course[]).reduce(
     (dict: ValueDictionary, course): ValueDictionary =>
       !dict
         ? {}

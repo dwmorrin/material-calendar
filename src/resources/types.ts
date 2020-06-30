@@ -5,9 +5,12 @@ import Location from "./Location";
 import Project from "./Project";
 import Course from "./Course";
 import Reservation from "./Reservation";
+import RosterRecord from "./RosterRecord";
+import Semester from "./Semester";
 import Tag from "./Tag";
 import User from "./User";
 import UserGroup from "./UserGroup";
+import VirtualWeek from "./VirtualWeek";
 import { enumKeys } from "../utils/enumKeys";
 
 export type Resource =
@@ -18,9 +21,12 @@ export type Resource =
   | typeof Project
   | typeof Course
   | typeof Reservation
+  | typeof RosterRecord
+  | typeof Semester
   | typeof Tag
   | typeof User
-  | typeof UserGroup;
+  | typeof UserGroup
+  | typeof VirtualWeek;
 
 export type ResourceInstance = InstanceType<Resource>;
 
@@ -33,8 +39,11 @@ export enum ResourceKey {
   Projects,
   Courses,
   Reservations,
+  RosterRecords,
+  Semesters,
   Tags,
   Users,
+  VirtualWeeks,
 }
 
 export const FindResource = (key: ResourceKey): Resource =>
@@ -47,8 +56,11 @@ export const FindResource = (key: ResourceKey): Resource =>
     [ResourceKey.Courses]: Course,
     [ResourceKey.Projects]: Project,
     [ResourceKey.Reservations]: Reservation,
+    [ResourceKey.RosterRecords]: RosterRecord,
+    [ResourceKey.Semesters]: Semester,
     [ResourceKey.Tags]: Tag,
     [ResourceKey.Users]: User,
+    [ResourceKey.VirtualWeeks]: VirtualWeek,
   }[key]);
 
 /**

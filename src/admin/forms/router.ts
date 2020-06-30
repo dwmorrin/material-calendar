@@ -39,6 +39,16 @@ import {
   update as reservationUpdate,
 } from "./reservation.values";
 import ReservationForm from "../../components/admin/forms/Reservation";
+import {
+  values as rosterValues,
+  update as rosterUpdate,
+} from "./roster.values";
+import RosterForm from "../../components/admin/forms/RosterRecord";
+import {
+  values as semesterValues,
+  update as semesterUpdate,
+} from "./semester.values";
+import SemesterForm from "../../components/admin/forms/Semester";
 import { values as tagValues, update as tagUpdate } from "./tag.values";
 import TagForm from "../../components/admin/forms/Tag";
 import { values as userValues, update as userUpdate } from "./user.values";
@@ -48,6 +58,11 @@ import {
   update as groupUpdate,
 } from "./userGroup.values";
 import GroupForm from "../../components/admin/forms/UserGroup";
+import {
+  values as virtualWeekValues,
+  update as virtualWeekUpdate,
+} from "./virtualWeek.values";
+import VirtualWeekForm from "../../components/admin/forms/VirtualWeek";
 
 /**
  * router generates values and a template to render some database resource
@@ -101,6 +116,16 @@ const router = (
       valuator: reservationValues,
       updater: reservationUpdate,
     },
+    [ResourceKey.RosterRecords]: {
+      template: RosterForm,
+      valuator: rosterValues,
+      updater: rosterUpdate,
+    },
+    [ResourceKey.Semesters]: {
+      template: SemesterForm,
+      valuator: semesterValues,
+      updater: semesterUpdate,
+    },
     [ResourceKey.Tags]: {
       template: TagForm,
       valuator: tagValues,
@@ -110,6 +135,11 @@ const router = (
       template: UserForm,
       valuator: userValues,
       updater: userUpdate,
+    },
+    [ResourceKey.VirtualWeeks]: {
+      template: VirtualWeekForm,
+      valuator: virtualWeekValues,
+      updater: virtualWeekUpdate,
     },
   }[key]);
 

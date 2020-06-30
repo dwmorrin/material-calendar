@@ -10,7 +10,7 @@ import {
   processVirtualWeeks,
   processVirtualWeeksAsHoursRemaining,
 } from "../admin/scheduler";
-import VirtualWeek from "../admin/resources/VirtualWeek";
+import VirtualWeek from "../resources/VirtualWeek";
 import Location from "../resources/Location";
 
 test("there are 1e3 * 60 * 60 * 24 ms in a day", () =>

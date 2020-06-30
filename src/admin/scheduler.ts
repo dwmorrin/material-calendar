@@ -1,10 +1,10 @@
 import { AdminAction, Action } from "./types";
-import VirtualWeek from "./resources/VirtualWeek";
+import VirtualWeek from "../resources/VirtualWeek";
 import Project from "../resources/Project";
 import Location from "../resources/Location";
 import { compareDateOrder } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
-import Semester from "./resources/Semester";
+import Semester from "../resources/Semester";
 
 export const fetchVirtualWeeks = (
   locationId: number,

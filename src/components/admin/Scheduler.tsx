@@ -8,8 +8,8 @@ import "@fullcalendar/timeline/main.css";
 import "@fullcalendar/resource-timeline/main.css";
 import { ResourceKey } from "../../resources/types";
 import { AdminUIProps } from "../../admin/types";
-import Semester from "../../admin/resources/Semester";
-import VirtualWeek from "../../admin/resources/VirtualWeek";
+import Semester from "../../resources/Semester";
+import VirtualWeek from "../../resources/VirtualWeek";
 import Project from "../../resources/Project";
 import Location from "../../resources/Location";
 import {

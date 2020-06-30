@@ -1,10 +1,11 @@
 interface VirtualWeek {
+  [k: string]: unknown;
   id: number;
   start: string;
   end: string;
   locationId: number;
-  locationHours: number;
-  projectHours: number;
+  locationHours: number; //! -1 indicates hours calculation was omitted
+  projectHours: number; //! -1 indicates hours calculation was omitted
 }
 
 class VirtualWeek implements VirtualWeek {
@@ -12,7 +13,7 @@ class VirtualWeek implements VirtualWeek {
   static resourceId = "001";
   static hoursRemainingId = "ZZZ";
   constructor(
-    vw = {
+    virtualWeek = {
       id: -1,
       start: "",
       end: "",
@@ -21,7 +22,7 @@ class VirtualWeek implements VirtualWeek {
       projectHours: 0,
     }
   ) {
-    Object.assign(this, vw);
+    Object.assign(this, virtualWeek);
   }
 }
 
