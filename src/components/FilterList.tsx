@@ -15,12 +15,14 @@ const FilterList: FunctionComponent<FilterListProps> = ({
 }) => {
   // Create list of FilterItems from visible (valid for that category) filters
   const validTags = state.categoryDrawerView
-    ? state.currentCategory
+    ? state.selectedCategory
       ? state.tags.filter((tag) =>
-          Category.existsOnCategoryOrChildren(state.currentCategory, tag)
+          Category.existsOnCategoryOrChildren(state.selectedCategory, tag)
         )
       : state.tags
-    : state.tags.filter((tag) => tag.category.id === state.currentCategory?.id);
+    : state.tags.filter(
+        (tag) => tag.category.id === state.selectedCategory?.id
+      );
   if (validTags.length < 1) {
     return <Box>{"Please select a category to see applicable filters"}</Box>;
   }

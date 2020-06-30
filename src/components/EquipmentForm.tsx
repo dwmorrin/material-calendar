@@ -73,10 +73,10 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
                 color="inherit"
                 aria-label="close"
                 onClick={(): void =>
-                  state.categoryDrawerView && state.currentCategory
+                  state.categoryDrawerView && state.selectedCategory
                     ? dispatch({
-                        type: EquipmentActionTypes.SelectedCategory,
-                        payload: { currentCategory: null },
+                        type: EquipmentActionTypes.SelectLastCategory,
+                        payload: {},
                       })
                     : setOpen(false)
                 }
@@ -90,19 +90,11 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
                   }}
                   className={classes.title}
                 >
-                  {state.currentCategory?.title || "All Categories"}
+                  {state.selectedCategory?.title || "All Categories"}
                 </Typography>
               ) : (
                 <Typography className={classes.title}>Equipment</Typography>
               )}
-              <IconButton
-                edge="start"
-                color="inherit"
-                onClick={toggleFilterDrawer}
-                aria-label="filter"
-              >
-                <TuneIcon />
-              </IconButton>
               <IconButton
                 edge="start"
                 color="inherit"
@@ -111,11 +103,21 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
               >
                 <ShoppingCartIcon />
               </IconButton>
+              {(!state.categoryDrawerView || state.selectedCategory) && (
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  onClick={toggleFilterDrawer}
+                  aria-label="filter"
+                >
+                  <TuneIcon />
+                </IconButton>
+              )}
               <EquipmentViewToggleMenu state={state} dispatch={dispatch} />
             </Toolbar>
           </List>
         </AppBar>
-        {(!state.categoryDrawerView || !state.currentCategory) && (
+        {(!state.categoryDrawerView || !state.selectedCategory) && (
           <EquipmentList
             dispatch={dispatch}
             state={state}
@@ -128,14 +130,14 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
             selectedEquipment={selectedEquipment}
           />
         )}
-        {state.categoryDrawerView && state.currentCategory && (
+        {state.categoryDrawerView && state.selectedCategory && (
           <EquipmentStandardList
             setFieldValue={state.setFieldValue}
             equipmentList={filterItems(
               quantizedEquipment,
               state.searchString,
               state.selectedTags,
-              state.currentCategory
+              state.selectedCategory
             )}
             selectedEquipment={selectedEquipment}
           />

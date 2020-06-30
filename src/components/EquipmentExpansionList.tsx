@@ -9,7 +9,7 @@ import Equipment from "../resources/Equipment";
 
 interface EquipmentExpansionListProps {
   equipmentList: Equipment[];
-  currentCategory: string;
+  selectedCategory: string;
   setFieldValue: (field: string, value: number | string | boolean) => void;
   selectedEquipment: {
     [k: string]: number;
@@ -17,19 +17,19 @@ interface EquipmentExpansionListProps {
 }
 const EquipmentExpansionList: FunctionComponent<EquipmentExpansionListProps> = ({
   equipmentList,
-  currentCategory,
+  selectedCategory,
   selectedEquipment,
   setFieldValue,
 }) => {
   // Manage the currently expanded category using string identifiers assigned by parentId
   const changeCategory = (newCategory: string): void =>
     setFieldValue(
-      "currentCategory",
-      newCategory === currentCategory ? "" : newCategory
+      "selectedCategory",
+      newCategory === selectedCategory ? "" : newCategory
     );
 
   // Expand panel when the currently selected category is this EquipmentExpansionList's cateogory (parentId)
-  const expanded = currentCategory.includes(equipmentList[0].category.title);
+  const expanded = selectedCategory.includes(equipmentList[0].category.title);
   return (
     <div
       style={{

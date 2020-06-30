@@ -12,8 +12,8 @@ export const initialState = {
   tags: [] as Tag[],
   categories: [] as Category[],
   selectedTags: {} as { [k: string]: boolean },
-  currentCategory: null,
-  viewedCategory: null,
+  selectedCategory: null,
+  categoryPath: [],
 };
 
 type StateHandler = (
@@ -39,14 +39,61 @@ const selectedFilter: StateHandler = (state, { payload }) => ({
   },
 });
 
-const selectedCategory: StateHandler = (state, { payload }) => ({
+//this should take an index, not an id
+const returnToId = (categoryPath: Category[], id: number): Category[] => {
+  const index = categoryPath.findIndex((cat) => cat.id === id);
+  categoryPath.length = index;
+  return categoryPath;
+};
+
+const handleCategory = (
+  state: EquipmentState,
+  payload: Partial<EquipmentState>
+): Category[] => {
+  let array = state.categoryPath;
+  if (!payload.selectedCategory) {
+    return array;
+  }
+  const newCategory = payload.selectedCategory;
+
+  //this is a new category
+  if (!array.find((entry) => entry.parentId === newCategory.parentId)) {
+    array.push(newCategory);
+  } else {
+    //if the entry already exists in the array, rewind to it
+    if (array.find((entry) => entry.id === newCategory.id)) {
+      array = returnToId(array, newCategory.id);
+    }
+    // if the parentids match, this is a sibling and is no longer part of the path
+    else if (array.find((entry) => entry.parentId === newCategory.parentId)) {
+      array = returnToId(
+        array,
+        array.find((entry) => entry.parentId === newCategory.parentId)?.id || 0
+      );
+      array.push(newCategory);
+    }
+  }
+  return array;
+};
+
+const selectCategory: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
+  previousCategory: handleCategory(state, payload),
 });
 
-const viewedCategory: StateHandler = (state, { payload }) => ({
+const selectLastCategory: StateHandler = (state) => ({
   ...state,
-  ...payload,
+  previousCategory: returnToId(
+    state.categoryPath,
+    state.selectedCategory?.id || 0
+  ),
+  selectedCategory: null,
+});
+
+const viewCategory: StateHandler = (state, { payload }) => ({
+  ...state,
+  previousCategory: handleCategory(state, payload),
 });
 
 const toggleFilterDrawer: StateHandler = (state) => ({
@@ -56,6 +103,8 @@ const toggleFilterDrawer: StateHandler = (state) => ({
 
 const toggleEquipmentViewMode: StateHandler = (state) => ({
   ...state,
+  selectedCategory: null,
+  categoryPath: [],
   categoryDrawerView: !state.categoryDrawerView,
 });
 
@@ -67,8 +116,9 @@ const reducer: StateHandler = (state, action) =>
   ({
     [EquipmentActionTypes.ChangedSearchString]: changedSearchString,
     [EquipmentActionTypes.ReceivedResource]: receivedResource,
-    [EquipmentActionTypes.SelectedCategory]: selectedCategory,
-    [EquipmentActionTypes.ViewedCategory]: viewedCategory,
+    [EquipmentActionTypes.SelectCategory]: selectCategory,
+    [EquipmentActionTypes.SelectLastCategory]: selectLastCategory,
+    [EquipmentActionTypes.ViewCategory]: viewCategory,
     [EquipmentActionTypes.SelectedFilter]: selectedFilter,
     [EquipmentActionTypes.ToggleFilterDrawer]: toggleFilterDrawer,
     [EquipmentActionTypes.ToggleEquipmentViewMode]: toggleEquipmentViewMode,

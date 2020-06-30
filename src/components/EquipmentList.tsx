@@ -25,19 +25,6 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
   selectedEquipment,
 }) => {
   const tree = Category.tree(state.categories, null);
-  function changeCategory(selectedCategory: Category): Category | null {
-    // if the category selected is the same as the current category, or
-    // if it is the parent id of the selectedCategory (which means it is
-    // already open), the user wants to close that expansion
-    if (
-      selectedCategory.id === state.currentCategory?.parentId ||
-      (state.currentCategory &&
-        state.currentCategory.id === selectedCategory.id)
-    ) {
-      return Category.findById(tree, selectedCategory.parentId);
-    }
-    return selectedCategory;
-  }
   if (!state.equipment.length) return null;
   return (
     <div
@@ -54,16 +41,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
           return null;
         }
         const expanded =
-          Category.isChildOfParent(
-            state.categories,
-            state.currentCategory,
-            branch
-          ) ||
-          Category.isChildOfParent(
-            state.categories,
-            state.viewedCategory,
-            branch
-          );
+          state.categoryPath.find((entry) => entry.id === branch.id) !==
+          undefined;
         return (
           <ExpansionPanel key={branch.id} expanded={expanded}>
             <ExpansionPanelSummary
@@ -73,17 +52,12 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                     <ExpandMoreIcon
                       onClick={(event): void => {
                         event.stopPropagation();
-                        state.viewedCategory?.id === branch.id
-                          ? dispatch({
-                              type: EquipmentActionTypes.ViewedCategory,
-                              payload: { viewedCategory: null },
-                            })
-                          : dispatch({
-                              type: EquipmentActionTypes.ViewedCategory,
-                              payload: {
-                                viewedCategory: changeCategory(branch),
-                              },
-                            });
+                        dispatch({
+                          type: EquipmentActionTypes.ViewCategory,
+                          payload: {
+                            selectedCategory: branch,
+                          },
+                        });
                       }}
                     />
                   ) : null
@@ -95,8 +69,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
               id={branch.title + "expansionPanel"}
               onClick={(): void =>
                 dispatch({
-                  type: EquipmentActionTypes.SelectedCategory,
-                  payload: { currentCategory: changeCategory(branch) },
+                  type: EquipmentActionTypes.SelectCategory,
+                  payload: { selectedCategory: branch },
                 })
               }
             >

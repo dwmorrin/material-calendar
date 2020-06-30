@@ -73,9 +73,12 @@ export const fetchAllEquipmentResources = (
   );
 };
 
-export const makeValidTags = (tags: Tag[], currentCategory: string): string[] =>
+export const makeValidTags = (
+  tags: Tag[],
+  selectedCategory: string
+): string[] =>
   tags
-    .filter((tag) => tag.category.title === currentCategory)
+    .filter((tag) => tag.category.title === selectedCategory)
     .map((tag) => tag.title)
     .filter((v, i, a) => a.indexOf(v) === i);
 

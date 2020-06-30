@@ -11,16 +11,17 @@ export interface EquipmentState {
   tags: Tag[];
   categories: Category[];
   selectedTags: { [k: string]: boolean };
-  currentCategory: Category | null;
-  viewedCategory: Category | null;
+  selectedCategory: Category | null;
+  categoryPath: Category[];
   setFieldValue: (field: string, value: number | string | boolean) => void;
 }
 
 export enum EquipmentActionTypes {
   ChangedSearchString,
   ReceivedResource,
-  SelectedCategory,
-  ViewedCategory,
+  SelectCategory,
+  SelectLastCategory,
+  ViewCategory,
   SelectedFilter,
   ToggleFilterDrawer,
   ToggleEquipmentCart,
