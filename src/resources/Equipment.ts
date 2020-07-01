@@ -32,6 +32,7 @@ class Equipment implements Equipment {
     }
   ) {
     Object.assign(this, equip);
+    if (typeof this.model === "number") this.model = String(this.model);
   }
 }
 
