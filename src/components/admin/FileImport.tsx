@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
 import {
+  Container,
   Dialog,
   Toolbar,
   IconButton,
@@ -10,11 +11,22 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  makeStyles,
+  Button,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { csvParse, tsvParse } from "d3-dsv";
 import { AdminAction, AdminUIProps } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
+
+const useStyles = makeStyles({
+  scrollable: {
+    border: "1px solid black",
+    paddingTop: 15,
+    height: "33%",
+    overflow: "scroll",
+  },
+});
 
 const hasTabs = (s: string): boolean =>
   !!s
@@ -32,6 +44,7 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const [delimiter, setDelimiter] = useState(",");
   const [text, setText] = useState("");
   const [parsed, setParsed] = useState(csvParse(""));
+  const classes = useStyles();
 
   useEffect(() => {
     if (typeof state.resourceFile !== "string") return;
@@ -72,26 +85,38 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
           <FormControlLabel value="tab" control={<Radio />} label="Tab" />
         </RadioGroup>
       </FormControl>
+      <FormLabel>
+        Review the records and submit if everything looks OK
+      </FormLabel>
+      <Button variant="contained">Submit</Button>
       <Typography variant="h6" component="h2">
         Headers
       </Typography>
-      <pre>{JSON.stringify(parsed?.columns, null, 2)}</pre>
+      <Container>
+        <pre>{parsed ? parsed.columns.join(", ") : ""}</pre>
+      </Container>
       <Typography variant="h6" component="h2">
         Records
       </Typography>
-      <pre>{JSON.stringify(parsed, null, 2)}</pre>
-      <TextField
-        inputProps={{ style: { fontFamily: "monospace" } }}
-        multiline
-        variant="outlined"
-        label="Edit"
-        value={text}
-        onChange={(event): void => {
-          const { value } = event.target;
-          setText(value);
-          setParsed(delimiter === "," ? csvParse(value) : tsvParse(value));
-        }}
-      />
+      <Container className={classes.scrollable}>
+        <pre>{JSON.stringify(parsed, null, 2)}</pre>
+      </Container>
+      <Typography variant="h6" component="h2">
+        Edit
+      </Typography>
+      <Container className={classes.scrollable}>
+        <TextField
+          inputProps={{ style: { fontFamily: "monospace" } }}
+          fullWidth
+          multiline
+          value={text}
+          onChange={(event): void => {
+            const { value } = event.target;
+            setText(value);
+            setParsed(delimiter === "," ? csvParse(value) : tsvParse(value));
+          }}
+        />
+      </Container>
     </Dialog>
   );
 };

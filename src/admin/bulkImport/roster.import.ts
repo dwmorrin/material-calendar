@@ -84,7 +84,7 @@ const bulkImport = (
         dispatch({
           type: AdminAction.Error,
           payload: {
-            error: "you didn't implement the bulk import success handler",
+            error: "TODO: implement the bulk import success handler",
           },
         })
       )
@@ -92,7 +92,7 @@ const bulkImport = (
         dispatch({
           type: AdminAction.Error,
           payload: {
-            error: "you didn't implmenet the bulk import error handler",
+            error: "TODO: implmenet the bulk import error handler",
           },
         })
       )
