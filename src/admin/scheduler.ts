@@ -220,7 +220,7 @@ export const processVirtualWeeksAsHoursRemaining = (
       title: `${vw.locationHours - vw.projectHours}`,
     }));
 
-const RESOURCE_COLUMN_TEXT_CLASSNAME = "fc-cell-text";
+const RESOURCE_COLUMN_TEXT_CLASSNAME = "fc-datagrid-cell-main";
 
 export const resourceClickHandler = (
   id: string,

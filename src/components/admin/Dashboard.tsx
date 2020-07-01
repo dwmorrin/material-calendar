@@ -1,7 +1,9 @@
 import React, { FunctionComponent, useEffect, useReducer } from "react";
 import { RouteComponentProps } from "@reach/router";
 import { AdminAction } from "../../admin/types";
-import { Resources } from "../../resources/types";
+import Location from "../../resources/Location";
+import Project from "../../resources/Project";
+import { Resources, ResourceKey } from "../../resources/types";
 import reducer from "../../admin/reducer";
 import initialState from "../../admin/initialState";
 import AdminBar from "./Bar";
@@ -33,7 +35,12 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       <AdminBar dispatch={dispatch} state={state} />
       <AdminNavigationDrawer dispatch={dispatch} state={state} />
       {state.schedulerIsOpen ? (
-        <Scheduler dispatch={dispatch} state={state} />
+        <Scheduler
+          dispatch={dispatch}
+          locationId={state.schedulerLocationId}
+          locations={state.resources[ResourceKey.Locations] as Location[]}
+          projects={state.resources[ResourceKey.Projects] as Project[]}
+        />
       ) : (
         <AdminDocumentBrowser dispatch={dispatch} state={state} />
       )}

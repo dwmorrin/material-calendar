@@ -1,119 +1,85 @@
-import React, { FunctionComponent } from "react";
-import { Box, CircularProgress } from "@material-ui/core";
+import React, { FunctionComponent, memo } from "react";
+import { CircularProgress } from "@material-ui/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import "@fullcalendar/core/main.css";
-import "@fullcalendar/daygrid/main.css";
-import "@fullcalendar/list/main.css";
-import "@fullcalendar/timegrid/main.css";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
-import { makeSelectedLocationDict } from "../resources/Location";
 import { ResourceKey } from "../resources/types";
 import Event from "../resources/Event";
-import Location from "../resources/Location";
+import Location, { makeSelectedLocationDict } from "../resources/Location";
 import Project from "../resources/Project";
-
-const stringStartsWithResource = (s: string): boolean =>
-  s.indexOf("resource") === 0;
-
-const makeResources = (
-  locations: Location[],
-  projectLocations: Set<number>
-): {}[] =>
-  locations
-    .filter(
-      (location) => projectLocations.has(location.id) || location.selected
-    )
-    .map((location) => ({
-      ...location,
-      id: "" + location.id,
-    }));
+import {
+  addResourceId,
+  compareCalendarStates,
+  makeResources,
+  makeSelectedLocationIdSet,
+  makeReduceEventsByLocationId,
+  stringStartsWithResource,
+} from "../calendar/calendar";
 
 const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const selectedProjects = state.resources[ResourceKey.Projects].filter(
-    (project) => project.selected
-  );
-  const projectLocations = new Set<number>();
-  selectedProjects.forEach((project) =>
-    (project as Project).allotments.forEach(({ locationId }) =>
-      projectLocations.add(locationId)
-    )
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const projectLocations = makeSelectedLocationIdSet(projects);
+  const events = state.resources[ResourceKey.Events] as Event[];
+  const locations = state.resources[ResourceKey.Locations] as Location[];
+  const byLocationId = makeReduceEventsByLocationId(
+    projectLocations,
+    makeSelectedLocationDict(locations)
   );
 
+  if (state.loading) return <CircularProgress size="100%" thickness={1} />;
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      flex="1"
-      height="93vh" // important for FullCalendar sticky header & scrolling
-    >
-      {state.loading && <CircularProgress />}
-      {!state.loading && (
-        <FullCalendar
-          timeZone="UTC"
-          ref={state.ref}
-          defaultDate={state.currentStart}
-          header={false}
-          allDaySlot={false}
-          nowIndicator={true}
-          height="parent"
-          defaultView="resourceTimeGridDay"
-          eventClick={(info): void => {
-            const event = state.resources[ResourceKey.Events].find(
-              (event) => event.id === +info.event.id
-            );
-            dispatch({
-              type: CalendarAction.OpenEventDetail,
-              payload: { currentEvent: event as Event },
-            });
-          }}
-          plugins={[
-            dayGridPlugin,
-            interactionPlugin,
-            listPlugin,
-            resourceTimeGridPlugin,
-          ]}
-          events={(_, successCallback): void => {
-            // https://fullcalendar.io/docs/events-function
-            if (stringStartsWithResource(state.currentView)) {
-              // FullCalendar's resource system handles locations automatically
-              // so long as we provide a .resourceId prop
-              successCallback(
-                state.resources[ResourceKey.Events].map((event) => ({
-                  ...event,
-                  resourceId: (event as Event).location.id,
-                }))
-              );
-            } else {
-              // We are not using the resource system; we have to manually group locations
-              const selectedLocations = makeSelectedLocationDict(
-                state.resources[ResourceKey.Locations] as Location[]
-              );
-              successCallback(
-                state.resources[ResourceKey.Events].filter(
-                  (event) =>
-                    projectLocations.has((event as Event).location.id) ||
-                    selectedLocations[(event as Event).location.title as string]
-                )
-              );
-            }
-          }}
-          resources={makeResources(
-            state.resources[ResourceKey.Locations] as Location[],
-            projectLocations
-          )}
-          schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
-        />
+    <FullCalendar
+      // RESOURCES
+      resources={makeResources(
+        state.resources[ResourceKey.Locations] as Location[],
+        projectLocations
       )}
-    </Box>
+      // EVENTS
+      events={(_, successCallback): void => {
+        // https://fullcalendar.io/docs/events-function
+        if (stringStartsWithResource(state.currentView)) {
+          // FullCalendar's resource system handles locations automatically
+          // so long as we provide a .resourceId prop
+          successCallback(events.map(addResourceId));
+        } else {
+          // We are not using the resource system; we have to manually group locations
+          successCallback(events.reduce(byLocationId, [] as {}[]));
+        }
+      }}
+      eventClick={(info): void =>
+        dispatch({
+          type: CalendarAction.OpenEventDetail,
+          payload: {
+            currentEvent: events.find((event) => event.id === +info.event.id),
+          },
+        })
+      }
+      // VISIBLE DATE RANGE
+      initialDate={state.currentStart}
+      initialView={state.currentView}
+      // HEADER CONFIG
+      headerToolbar={false}
+      // ETC
+      timeZone="UTC"
+      height="auto"
+      ref={state.ref}
+      allDaySlot={false}
+      nowIndicator={true}
+      plugins={[
+        dayGridPlugin,
+        interactionPlugin,
+        listPlugin,
+        resourceTimeGridPlugin,
+      ]}
+      schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
+    />
   );
 };
 
-export default FullCalendarBox;
+export default memo(FullCalendarBox, compareCalendarStates);

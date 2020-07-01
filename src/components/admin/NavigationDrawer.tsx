@@ -1,6 +1,6 @@
 import React, { FunctionComponent, Fragment } from "react";
 import {
-  SwipeableDrawer,
+  Drawer,
   Typography,
   List,
   ListItem,
@@ -82,11 +82,10 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
   };
 
   return (
-    <SwipeableDrawer
+    <Drawer
       open={state.drawerIsOpen}
       anchor="left"
       onClose={onClose}
-      onOpen={toggleDrawer}
       onClick={toggleDrawer}
       onKeyDown={toggleDrawer}
     >
@@ -147,7 +146,7 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
           </ExpansionPanel>
         </List>
       </Fragment>
-    </SwipeableDrawer>
+    </Drawer>
   );
 };
 

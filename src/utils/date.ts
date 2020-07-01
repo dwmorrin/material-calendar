@@ -1,4 +1,4 @@
-import { DateInput } from "@fullcalendar/core/datelib/env";
+type DateInput = string | number | Date;
 
 export function isDate(date?: DateInput): date is Date {
   return (

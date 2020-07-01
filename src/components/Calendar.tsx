@@ -5,7 +5,6 @@ import React, {
   useReducer,
   useRef,
 } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import { RouteComponentProps, Redirect } from "@reach/router";
 import TemporaryDrawer from "./TemporaryDrawer";
 import CalendarBar from "./CalendarBar";
@@ -20,16 +19,10 @@ import ProjectDashboard from "./ProjectDashboard";
 import { ResourceKey } from "../resources/types";
 import fetchAllResources from "../utils/fetchAllResources";
 import { CalendarAction } from "../calendar/types";
-
-const useStyles = makeStyles(() => ({
-  root: {
-    flexGrow: 1,
-  },
-}));
+import { Box } from "@material-ui/core";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
-  const classes = useStyles();
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
@@ -51,7 +44,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   }, [user]);
   return (
     (user?.username && (
-      <div className={classes.root}>
+      <Box>
         <ProjectDashboard dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />
@@ -60,7 +53,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           <StaticDatePicker dispatch={dispatch} state={state} />
         )}
         <FullCalendarBox dispatch={dispatch} state={state} />
-      </div>
+      </Box>
     )) || <Redirect to="/" replace={true} noThrow={true} />
   );
 };
