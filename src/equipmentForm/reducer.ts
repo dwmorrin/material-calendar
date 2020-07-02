@@ -42,7 +42,9 @@ const selectedFilter: StateHandler = (state, { payload }) => ({
 //this should take an index, not an id
 const returnToId = (categoryPath: Category[], id: number): Category[] => {
   const index = categoryPath.findIndex((cat) => cat.id === id);
-  categoryPath.length = index;
+  if (index >= 0) {
+    categoryPath.length = index;
+  }
   return categoryPath;
 };
 
