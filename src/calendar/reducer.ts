@@ -27,6 +27,11 @@ const closeEventDetail: StateHandler = (state) => ({
   detailIsOpen: false,
 });
 
+const closeEventEditor: StateHandler = (state) => ({
+  ...state,
+  eventEditorIsOpen: false,
+});
+
 const closeProjectDashboard: StateHandler = (state) => ({
   ...state,
   projectDashboardIsOpen: false,
@@ -74,6 +79,18 @@ const openEventDetail: StateHandler = (state, { payload }) => {
   return {
     ...state,
     detailIsOpen: true,
+    currentEvent: payload.currentEvent,
+  };
+};
+
+const openEventEditor: StateHandler = (state, { payload }) => {
+  if (!payload?.currentEvent) {
+    console.error("no event received for event editor");
+    return state;
+  }
+  return {
+    ...state,
+    eventEditorIsOpen: true,
     currentEvent: payload.currentEvent,
   };
 };
@@ -179,6 +196,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CloseReservationForm]: closeReservationForm,
     [CalendarAction.CloseEquipmentForm]: closeEquipmentForm,
     [CalendarAction.CloseEventDetail]: closeEventDetail,
+    [CalendarAction.CloseEventEditor]: closeEventEditor,
     [CalendarAction.CloseProjectDashboard]: closeProjectDashboard,
     [CalendarAction.CloseGroupDashboard]: closeGroupDashboard,
     [CalendarAction.Error]: error,
@@ -186,6 +204,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.OpenReservationForm]: openReservationForm,
     [CalendarAction.OpenEventDetail]: openEventDetail,
+    [CalendarAction.OpenEventEditor]: openEventEditor,
     [CalendarAction.OpenGroupDashboard]: openGroupDashboard,
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,

@@ -20,6 +20,7 @@ import { ResourceKey } from "../resources/types";
 import fetchAllResources from "../utils/fetchAllResources";
 import { CalendarAction } from "../calendar/types";
 import { Box } from "@material-ui/core";
+import EventEditor from "./EventEditor";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
@@ -48,6 +49,11 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         <ProjectDashboard dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />
+        <EventEditor
+          dispatch={dispatch}
+          open={state.eventEditorIsOpen}
+          event={state.currentEvent}
+        />
         <CalendarBar dispatch={dispatch} state={state} />
         {state.pickerShowing && (
           <StaticDatePicker dispatch={dispatch} state={state} />

@@ -15,6 +15,7 @@ export const initialCalendarState: CalendarState = {
   currentView: "resourceTimeGridDay",
   detailIsOpen: false,
   drawerIsOpen: false,
+  eventEditorIsOpen: false,
   groupDashboardIsOpen: false,
   reservationFormIsOpen: false,
   loading: true,

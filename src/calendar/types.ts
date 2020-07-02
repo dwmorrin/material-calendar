@@ -9,6 +9,7 @@ export enum CalendarAction {
   CloseReservationForm,
   CloseEquipmentForm,
   CloseEventDetail,
+  CloseEventEditor,
   CloseProjectDashboard,
   CloseGroupDashboard,
   Error,
@@ -16,6 +17,7 @@ export enum CalendarAction {
   PickedDate,
   OpenReservationForm,
   OpenEventDetail,
+  OpenEventEditor,
   OpenGroupDashboard,
   OpenProjectDashboard,
   ReceivedAllResources,
@@ -40,6 +42,7 @@ export interface CalendarState {
   currentView: string;
   detailIsOpen: boolean;
   drawerIsOpen: boolean;
+  eventEditorIsOpen: boolean;
   error?: Error;
   groupDashboardIsOpen: boolean;
   loading: boolean;

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, memo } from "react";
+import React, { FunctionComponent, memo, useContext } from "react";
 import { CircularProgress, makeStyles, Box } from "@material-ui/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -18,6 +18,7 @@ import {
   makeReduceEventsByLocationId,
   stringStartsWithResource,
 } from "../calendar/calendar";
+import { AuthContext } from "./AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
@@ -27,6 +28,8 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
+  const { user } = useContext(AuthContext);
+  const isAdmin = user && user.roles.includes("admin");
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const projectLocations = makeSelectedLocationIdSet(projects);
   const events = state.resources[ResourceKey.Events] as Event[];
@@ -35,7 +38,6 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
     projectLocations,
     makeSelectedLocationDict(locations)
   );
-
   const classes = useStyles();
 
   if (state.loading) return <CircularProgress size="90%" thickness={1} />;
@@ -73,8 +75,26 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
         initialView={state.currentView}
         // HEADER CONFIG
         headerToolbar={false}
+        // INTERACTIONS
+        selectable={isAdmin}
+        // dateClick={(info): void => alert(`clicked ${info.dateStr}`)}
+        select={({ start, end, resource = { id: -1, title: "" } }): void =>
+          dispatch({
+            type: CalendarAction.OpenEventEditor,
+            payload: {
+              currentEvent: new Event({
+                id: -1,
+                start: start.toJSON().split(".")[0], // removes timezone info
+                end: end.toJSON().split(".")[0], // removes timezone info
+                location: { id: +resource.id, title: resource.title },
+                title: "",
+                reservable: false,
+              }),
+            },
+          })
+        }
         // ETC
-        timeZone="UTC"
+        timeZone="America/New_York"
         height="93vh"
         ref={state.ref}
         allDaySlot={false}
