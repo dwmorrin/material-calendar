@@ -30,7 +30,7 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const classes = useStyles();
   return (
-    <AppBar position="relative">
+    <AppBar>
       <Toolbar className={classes.toolbar}>
         <IconButton
           edge="start"

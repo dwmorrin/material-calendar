@@ -1,5 +1,5 @@
 import React, { FunctionComponent, memo } from "react";
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress, makeStyles, Box } from "@material-ui/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
@@ -19,6 +19,10 @@ import {
   stringStartsWithResource,
 } from "../calendar/calendar";
 
+const useStyles = makeStyles((theme) => ({
+  toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
+}));
+
 const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
@@ -32,53 +36,58 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
     makeSelectedLocationDict(locations)
   );
 
-  if (state.loading) return <CircularProgress size="100%" thickness={1} />;
+  const classes = useStyles();
+
+  if (state.loading) return <CircularProgress size="90%" thickness={1} />;
   return (
-    <FullCalendar
-      // RESOURCES
-      resources={makeResources(
-        state.resources[ResourceKey.Locations] as Location[],
-        projectLocations
-      )}
-      // EVENTS
-      events={(_, successCallback): void => {
-        // https://fullcalendar.io/docs/events-function
-        if (stringStartsWithResource(state.currentView)) {
-          // FullCalendar's resource system handles locations automatically
-          // so long as we provide a .resourceId prop
-          successCallback(events.map(addResourceId));
-        } else {
-          // We are not using the resource system; we have to manually group locations
-          successCallback(events.reduce(byLocationId, [] as {}[]));
+    <Box>
+      <Box className={classes.toolbarSpacer} />
+      <FullCalendar
+        // RESOURCES
+        resources={makeResources(
+          state.resources[ResourceKey.Locations] as Location[],
+          projectLocations
+        )}
+        // EVENTS
+        events={(_, successCallback): void => {
+          // https://fullcalendar.io/docs/events-function
+          if (stringStartsWithResource(state.currentView)) {
+            // FullCalendar's resource system handles locations automatically
+            // so long as we provide a .resourceId prop
+            successCallback(events.map(addResourceId));
+          } else {
+            // We are not using the resource system; we have to manually group locations
+            successCallback(events.reduce(byLocationId, [] as {}[]));
+          }
+        }}
+        eventClick={(info): void =>
+          dispatch({
+            type: CalendarAction.OpenEventDetail,
+            payload: {
+              currentEvent: events.find((event) => event.id === +info.event.id),
+            },
+          })
         }
-      }}
-      eventClick={(info): void =>
-        dispatch({
-          type: CalendarAction.OpenEventDetail,
-          payload: {
-            currentEvent: events.find((event) => event.id === +info.event.id),
-          },
-        })
-      }
-      // VISIBLE DATE RANGE
-      initialDate={state.currentStart}
-      initialView={state.currentView}
-      // HEADER CONFIG
-      headerToolbar={false}
-      // ETC
-      timeZone="UTC"
-      height="auto"
-      ref={state.ref}
-      allDaySlot={false}
-      nowIndicator={true}
-      plugins={[
-        dayGridPlugin,
-        interactionPlugin,
-        listPlugin,
-        resourceTimeGridPlugin,
-      ]}
-      schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
-    />
+        // VISIBLE DATE RANGE
+        initialDate={state.currentStart}
+        initialView={state.currentView}
+        // HEADER CONFIG
+        headerToolbar={false}
+        // ETC
+        timeZone="UTC"
+        height="93vh"
+        ref={state.ref}
+        allDaySlot={false}
+        nowIndicator={true}
+        plugins={[
+          dayGridPlugin,
+          interactionPlugin,
+          listPlugin,
+          resourceTimeGridPlugin,
+        ]}
+        schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
+      />
+    </Box>
   );
 };
 
