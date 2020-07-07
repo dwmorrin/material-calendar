@@ -82,6 +82,11 @@ const Scheduler: FunctionComponent<SchedulerProps> = ({
       eventClick={({ event: { id, title } }): void => {
         window.alert(`ID: ${id}, TITLE: ${title}`);
       }}
+      // INTERACTIONS
+      selectable={true}
+      select={({ start, end, resource = { id: -1, title: "" } }): void =>
+        console.log({ start, end, resource })
+      }
       // VISIBLE DATE RANGE
       initialDate={semester.start}
       initialView="resourceTimelineSemester"
