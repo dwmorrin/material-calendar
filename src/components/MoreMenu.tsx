@@ -14,7 +14,7 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   inAdminApp,
 }) => {
   const { user, setUser } = useContext(AuthContext);
-  const isAdmin = user && user.roles.includes("admin");
+  const isAdmin = process.env.NODE_ENV === "development" || User.isAdmin(user);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = !!anchorEl;
 

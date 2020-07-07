@@ -62,12 +62,9 @@ const login = (
     body: JSON.stringify({ username }),
   })
     .then((response) => response.json())
-    .then(({ data }) => {
-      if (!setUser) {
-        throw new Error("no method to log in user found");
-      }
+    .then(({ data, error }) => {
       if (!data) {
-        throw new Error("not a valid user");
+        throw new Error(error);
       }
       sessionStorage.setItem("username", data.username);
       setUser(new User(data));

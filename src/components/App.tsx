@@ -6,16 +6,14 @@ import SignIn from "./SignIn";
 import Calendar from "./Calendar";
 import Dashboard from "./admin/Dashboard";
 
-function App(): JSX.Element {
-  return (
-    <AuthProvider>
-      <Router>
-        <SignIn path="/" />
-        <Calendar path="/calendar" />
-        <Dashboard path="/admin" />
-      </Router>
-    </AuthProvider>
-  );
-}
+const App = (): JSX.Element => (
+  <AuthProvider>
+    <Router>
+      <SignIn path="/" />
+      <Calendar path="/calendar" />
+      <Dashboard path="/admin" />
+    </Router>
+  </AuthProvider>
+);
 
 export default App;

@@ -26,6 +26,11 @@ class User implements User {
   ) {
     Object.assign(this, user);
   }
+
+  static isAdmin(user?: User): boolean {
+    if (!user) return false;
+    return user.roles.includes("admin");
+  }
 }
 
 export default User;

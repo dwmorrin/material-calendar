@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useEffect, useReducer } from "react";
+import React, {
+  FunctionComponent,
+  useEffect,
+  useReducer,
+  useContext,
+} from "react";
 import { RouteComponentProps } from "@reach/router";
 import { AdminAction } from "../../admin/types";
 import Location from "../../resources/Location";
@@ -14,12 +19,16 @@ import FileImport from "./FileImport";
 import fetchAllResources from "../../utils/fetchAllResources";
 import Scheduler from "./Scheduler";
 import Backups from "./Backups";
+import { AuthContext } from "../AuthContext";
+import { Redirect } from "@reach/router";
+import User from "../../resources/User";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
 
 const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     fetchAllResources(
@@ -30,6 +39,9 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
     );
   }, []);
 
+  if (process.env.NODE_ENV !== "development" && !User.isAdmin(user)) {
+    return <Redirect to="/" replace={true} noThrow={true} />;
+  }
   return (
     <div>
       <AdminBar dispatch={dispatch} state={state} />

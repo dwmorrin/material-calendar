@@ -19,6 +19,7 @@ import {
   stringStartsWithResource,
 } from "../calendar/calendar";
 import { AuthContext } from "./AuthContext";
+import User from "../resources/User";
 
 const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
@@ -29,7 +30,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const { user } = useContext(AuthContext);
-  const isAdmin = user && user.roles.includes("admin");
+  const isAdmin = process.env.NODE_ENV === "development" || User.isAdmin(user);
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const projectLocations = makeSelectedLocationIdSet(projects);
   const events = state.resources[ResourceKey.Events] as Event[];
