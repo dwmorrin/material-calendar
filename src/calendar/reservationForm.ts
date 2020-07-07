@@ -6,7 +6,7 @@ import { CalendarState } from "./types";
 import Project from "../resources/Project";
 import { ResourceKey } from "../resources/types";
 
-export const useStyles = makeStyles(() => ({
+export const useStyles = makeStyles({
   list: {
     display: "flex",
     flexDirection: "column",
@@ -19,7 +19,7 @@ export const useStyles = makeStyles(() => ({
     backgroundColor: "yellow",
     color: "black",
   },
-}));
+});
 
 export const transition = makeTransition("left");
 
