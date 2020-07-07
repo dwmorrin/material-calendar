@@ -78,7 +78,6 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
         headerToolbar={false}
         // INTERACTIONS
         selectable={isAdmin}
-        // dateClick={(info): void => alert(`clicked ${info.dateStr}`)}
         select={({ start, end, resource = { id: -1, title: "" } }): void =>
           dispatch({
             type: CalendarAction.OpenEventEditor,
