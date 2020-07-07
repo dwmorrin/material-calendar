@@ -51,31 +51,32 @@ const Backups: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
         >
           Create a new backup
         </Button>
-        {backups.map((filename) => (
-          <ListItem className={classes.item} key={filename}>
-            <Typography>{prettyPrintFilename(filename)}</Typography>
-            <Button
-              variant="contained"
-              startIcon={<GetAppIcon />}
-              onClick={(): Promise<void> =>
-                fetch(`/api/backup/${filename}`)
-                  .then((response) => response.blob())
-                  .then((blob) => download(blob, filename))
-                  .catch(console.error)
-              }
-            >
-              Download
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              startIcon={<WarningIcon />}
-              onClick={(): Promise<void> => restore(filename)}
-            >
-              Restore
-            </Button>
-          </ListItem>
-        ))}
+        {backups &&
+          backups.map((filename) => (
+            <ListItem className={classes.item} key={filename}>
+              <Typography>{prettyPrintFilename(filename)}</Typography>
+              <Button
+                variant="contained"
+                startIcon={<GetAppIcon />}
+                onClick={(): Promise<void> =>
+                  fetch(`/api/backup/${filename}`)
+                    .then((response) => response.blob())
+                    .then((blob) => download(blob, filename))
+                    .catch(console.error)
+                }
+              >
+                Download
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<WarningIcon />}
+                onClick={(): Promise<void> => restore(filename)}
+              >
+                Restore
+              </Button>
+            </ListItem>
+          ))}
       </List>
     </Dialog>
   );
