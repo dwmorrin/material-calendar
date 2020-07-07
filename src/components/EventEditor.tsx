@@ -10,18 +10,17 @@ import {
 import CloseIcon from "@material-ui/icons/Close";
 import { CalendarAction } from "../calendar/types";
 import Event from "../resources/Event";
-import { Field, Formik, Form, FormikValues } from "formik";
+import { Field, Formik, Form } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker, DateTimePicker } from "formik-material-ui-pickers";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
-import { useStyles } from "../calendar/reservationForm";
-
-interface EventEditorProps {
-  dispatch: (action: { type: CalendarAction; payload?: {} }) => void;
-  open: boolean;
-  event?: Event;
-}
+import {
+  useStyles,
+  initialEventOptions,
+  onSubmit,
+  EventEditorProps,
+} from "../calendar/eventEditor";
 
 const EventEditor: FunctionComponent<EventEditorProps> = ({
   dispatch,
@@ -31,32 +30,7 @@ const EventEditor: FunctionComponent<EventEditorProps> = ({
   const classes = useStyles();
   const initialValues = {
     ...event,
-    __options__: {
-      repeats: false,
-      on: {
-        monday: false,
-        tuesday: false,
-        wednesday: false,
-        thursday: false,
-        friday: false,
-        saturday: false,
-        sunday: false,
-      },
-    },
-  };
-
-  const onSubmit = (values: Event, actions: FormikValues): void => {
-    const updating = values.id > 0;
-    fetch(`${Event.url}${updating ? `/${values.id}` : ""}`, {
-      method: updating ? "PUT" : "POST",
-      body: JSON.stringify(values),
-    })
-      .then((response) => response.json())
-      .then(({ data }) => console.log(data))
-      .catch(console.error)
-      .finally(() => {
-        actions.setSubmitting(false);
-      });
+    __options__: initialEventOptions,
   };
 
   return (
