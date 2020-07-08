@@ -101,3 +101,15 @@ export function getFormattedEventInterval(
     endTimeString
   );
 }
+
+export const yyyymmdd = /\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\d|3[01])/;
+
+const minutesToMilliseconds = (minutes: number): number => minutes * 6e4;
+
+export const unshiftTZ = (date: Date): Date =>
+  new Date(date.getTime() - minutesToMilliseconds(date.getTimezoneOffset()));
+
+export const formatYYYYMMDD = (date: string): string => {
+  if (yyyymmdd.test(date)) return date;
+  return unshiftTZ(new Date(date)).toJSON().replace("T", " ").split(".")[0];
+};
