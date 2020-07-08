@@ -1,5 +1,5 @@
 import { ResourceKey } from "../../resources/types";
-import { AdminAction } from "../types";
+import { AdminAction, AdminState } from "../types";
 import eventImport from "./event.import";
 import rosterImport from "./roster.import";
 
@@ -16,7 +16,8 @@ const router = (
   key: ResourceKey
 ): ((
   dispatch: (action: { type: AdminAction; payload: {} }) => void,
-  data: unknown
+  data: unknown,
+  state?: AdminState
 ) => void) =>
   ({
     [ResourceKey.Categories]: defaultImporter,

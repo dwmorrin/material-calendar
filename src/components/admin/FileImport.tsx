@@ -18,6 +18,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { csvParse, tsvParse } from "d3-dsv";
 import { AdminAction, AdminUIProps } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
+import importRouter from "../../admin/bulkImport/router";
 
 const useStyles = makeStyles({
   scrollable: {
@@ -45,6 +46,7 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const [text, setText] = useState("");
   const [parsed, setParsed] = useState(csvParse(""));
   const classes = useStyles();
+  const onSubmit = importRouter(state.resourceKey);
 
   useEffect(() => {
     if (typeof state.resourceFile !== "string") return;
@@ -54,6 +56,7 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
     setDelimiter(foundTabs ? "tab" : ",");
     setParsed(foundTabs ? tsvParse(file) : csvParse(file));
   }, [state.resourceFile]);
+
   return (
     <Dialog fullScreen={true} open={state.fileImportIsOpen}>
       <Toolbar>
@@ -88,7 +91,12 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
       <FormLabel>
         Review the records and submit if everything looks OK
       </FormLabel>
-      <Button variant="contained">Submit</Button>
+      <Button
+        variant="contained"
+        onClick={(): void => onSubmit(dispatch, parsed)}
+      >
+        Submit
+      </Button>
       <Typography variant="h6" component="h2">
         Headers
       </Typography>
