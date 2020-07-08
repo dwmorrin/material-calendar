@@ -31,6 +31,10 @@ class User implements User {
     if (!user) return false;
     return user.roles.includes("admin");
   }
+  static isManager(user?: User): boolean {
+    if (!user) return false;
+    return user.roles.includes("manager");
+  }
 }
 
 export default User;
