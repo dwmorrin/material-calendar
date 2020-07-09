@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useContext } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   IconButton,
@@ -13,6 +13,7 @@ import {
   List,
   ListItem,
 } from "@material-ui/core";
+import { AuthContext } from "./AuthContext";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeTransition } from "./Transition";
@@ -22,6 +23,7 @@ import ProjectDashboardGroup from "./ProjectDashboardGroup";
 import GroupDashboard from "./GroupDashboard";
 import { ResourceKey } from "../resources/types";
 import Event from "../resources/Event";
+import EditIcon from "@material-ui/icons/Edit";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,6 +33,11 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     height: 10,
   },
+  toolbar: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 }));
 
 const transition = makeTransition("right");
@@ -39,11 +46,13 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
+  const { user } = useContext(AuthContext);
   const classes = useStyles();
   const { currentProject } = state;
   const locations = state.resources[ResourceKey.Locations].filter((location) =>
     currentProject?.allotments.find((a) => a.locationId === location.id)
   );
+  const isManager = process.env.NODE_ENV === "development"; //|| currentProject?.managers.includes(user);
 
   const groupEvents = (state.resources[ResourceKey.Events] as Event[]).filter(
     (event) =>
@@ -73,7 +82,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
       TransitionComponent={transition}
     >
       <GroupDashboard state={state} dispatch={dispatch} />
-      <Toolbar>
+      <Toolbar className={classes.toolbar}>
         <IconButton
           edge="start"
           color="inherit"
@@ -85,6 +94,18 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           <CloseIcon />
         </IconButton>
         <Typography>{currentProject?.title}</Typography>
+        {isManager && (
+          <IconButton
+            onClick={(event): void => {
+              event.stopPropagation();
+              dispatch({
+                type: CalendarAction.OpenProjectForm,
+              });
+            }}
+          >
+            <EditIcon />
+          </IconButton>
+        )}
       </Toolbar>
       <Paper
         style={{

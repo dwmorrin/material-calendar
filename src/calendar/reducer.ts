@@ -40,6 +40,7 @@ const closeEventEditor: StateHandler = (state) => ({
 const closeProjectDashboard: StateHandler = (state) => ({
   ...state,
   projectDashboardIsOpen: false,
+  currentProject: undefined,
 });
 
 const closeGroupDashboard: StateHandler = (state) => ({
@@ -76,10 +77,13 @@ const openReservationForm: StateHandler = (state) => ({
   reservationFormIsOpen: true,
 });
 
-const openProjectForm: StateHandler = (state) => ({
-  ...state,
-  projectFormIsOpen: true,
-});
+const openProjectForm: StateHandler = (state, { payload }) => {
+  return {
+    ...state,
+    currentCourse: payload?.currentCourse,
+    projectFormIsOpen: true,
+  };
+};
 
 const openEventDetail: StateHandler = (state, { payload }) => {
   if (!payload?.currentEvent) {

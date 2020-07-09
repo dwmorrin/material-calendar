@@ -1,5 +1,6 @@
 import Event from "../resources/Event";
 import Project from "../resources/Project";
+import Course from "../resources/Course";
 import FullCalendar from "@fullcalendar/react";
 import UserGroup from "../resources/UserGroup";
 import { ResourceKey, ResourceInstance } from "../resources/types";
@@ -59,6 +60,7 @@ export interface CalendarState {
   currentEvent?: Event;
   currentGroup?: UserGroup;
   currentProject?: Project;
+  currentCourse?: { id: number; title: string };
 }
 
 // https://github.com/redux-utilities/flux-standard-action
@@ -84,6 +86,7 @@ export interface Action {
     currentEvent?: Event;
     currentGroup?: UserGroup;
     currentProject?: Project;
+    currentCourse?: { id: number; title: string };
   };
   error?: boolean;
   meta?: unknown;

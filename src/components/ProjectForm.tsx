@@ -20,10 +20,14 @@ import Course from "../resources/Course";
 import {
   validationSchema,
   makeInitialValues,
+  getValuesFromProject,
   useStyles,
   submitHandler,
   transition,
 } from "../calendar/projectForm";
+import { DatePicker } from "formik-material-ui-pickers";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import MomentUtils from "@date-io/moment";
 
 const ProjectForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -52,118 +56,138 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
         </IconButton>
         <Typography variant="h6">Create a Project</Typography>
       </Toolbar>
-
       <DialogContent>
-        <Formik
-          initialValues={makeInitialValues(state)}
-          onSubmit={submitHandler}
-          validationSchema={validationSchema}
-        >
-          {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
-            <Form className={classes.list} onSubmit={handleSubmit}>
-              <FormLabel>Course:</FormLabel>
-              <Field component={Select} name="course">
-                {courses.map((p) => (
-                  <MenuItem key={p.id} value={p.id}>
-                    {p.title}
-                  </MenuItem>
-                ))}
-              </Field>
-              <FormLabel className={classes.item}>Description</FormLabel>
-              <Field
-                component={TextField}
-                label="Brief Description of the project"
-                name="description"
-                fullWidth
-                variant="filled"
-              />
-              <FormLabel className={classes.item}>Instructions</FormLabel>
-              <Field
-                component={TextField}
-                label="Instructions"
-                name="instructions"
-                fullWidth
-                multiline
-                rows={8}
-                variant="filled"
-              />
-              <FormLabel>Locations:</FormLabel>
-              {locations.map((location) => {
-                return (
-                  <div key={location.title}>
-                    <Checkbox
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>,
-                        checked: boolean
-                      ): void =>
-                        setFieldValue(
-                          "locations[" + location.title + "]",
-                          checked
-                        )
-                      }
-                      name={"locations[" + location.title + "]"}
-                    />
-                    {location.title}
-                  </div>
-                );
-              })}
-              <FormLabel className={classes.item}>Group Size</FormLabel>
-              <Field
-                component={TextField}
-                label="Group Size"
-                name="groupSize"
-                fullWidth
-                variant="filled"
-              />
-              <FormLabel className={classes.item}>Hours Per Group</FormLabel>
-              <Field
-                component={TextField}
-                label="Hours Per Group"
-                name="hoursPerGroup"
-                fullWidth
-                variant="filled"
-              />
-              <FormLabel className={classes.item}>Start Date</FormLabel>
-              <Field
-                component={TextField}
-                name="startDate"
-                type="date"
-                fullWidth
-                variant="filled"
-              />
-              <FormLabel className={classes.item}>End Date</FormLabel>
-              <Field
-                component={TextField}
-                name="endDate"
-                type="date"
-                fullWidth
-                variant="filled"
-              />
-              <FormLabel className={classes.item}>
-                Reserving time allowed starting:
-              </FormLabel>
-              <Field
-                component={TextField}
-                name="reservationStart"
-                type="date"
-                fullWidth
-                variant="filled"
-              />
-              <Button
-                className={classes.item}
-                type="submit"
-                size="small"
-                variant="contained"
-                disableElevation
-                style={{ backgroundColor: "Green", color: "white" }}
-                disabled={isSubmitting}
-              >
-                Confirm Reservation
-              </Button>
-              <pre>{JSON.stringify(values, null, 2)}</pre>
-            </Form>
-          )}
-        </Formik>
+        <MuiPickersUtilsProvider utils={MomentUtils}>
+          <Formik
+            initialValues={
+              getValuesFromProject(state.currentProject) ||
+              makeInitialValues(state)
+            }
+            onSubmit={submitHandler}
+            validationSchema={validationSchema}
+          >
+            {({
+              values,
+              isSubmitting,
+              setFieldValue,
+              handleSubmit,
+            }): unknown => (
+              <Form className={classes.list} onSubmit={handleSubmit}>
+                <FormLabel>Course:</FormLabel>
+                <Field component={Select} name="course">
+                  {courses.map((p) => (
+                    <MenuItem key={p.id} value={p.id}>
+                      {p.title}
+                    </MenuItem>
+                  ))}
+                </Field>
+                <FormLabel className={classes.item}>Project Title</FormLabel>
+                <Field
+                  component={TextField}
+                  label="Project Title"
+                  name="title"
+                  fullWidth
+                  variant="filled"
+                />
+                <FormLabel className={classes.item}>Description</FormLabel>
+                <Field
+                  component={TextField}
+                  label="Brief Description of the project"
+                  name="description"
+                  fullWidth
+                  variant="filled"
+                />
+                <FormLabel className={classes.item}>Instructions</FormLabel>
+                <Field
+                  component={TextField}
+                  label="Instructions"
+                  name="instructions"
+                  fullWidth
+                  multiline
+                  rows={8}
+                  variant="filled"
+                />
+                <FormLabel>Locations:</FormLabel>
+                {locations.map((location) => {
+                  return (
+                    <div key={location.title}>
+                      <Checkbox
+                        onChange={(
+                          event: React.ChangeEvent<HTMLInputElement>,
+                          checked: boolean
+                        ): void =>
+                          setFieldValue(
+                            "locations[" + location.title + "]",
+                            checked
+                          )
+                        }
+                        name={"locations[" + location.title + "]"}
+                      />
+                      {location.title}
+                    </div>
+                  );
+                })}
+                <FormLabel className={classes.item}>Group Size</FormLabel>
+                <Field
+                  component={TextField}
+                  label="Group Size"
+                  name="groupSize"
+                  fullWidth
+                  variant="filled"
+                />
+                <FormLabel className={classes.item}>Hours Per Group</FormLabel>
+                <Field
+                  component={TextField}
+                  label="Hours Per Group"
+                  name="groupAllottedHours"
+                  fullWidth
+                  variant="filled"
+                />
+                <FormLabel className={classes.item}>Start Date</FormLabel>
+                <Field
+                  component={DatePicker}
+                  name="start"
+                  type="date"
+                  format="YYYY-MM-DD"
+                  fullWidth
+                  variant="filled"
+                />
+                <FormLabel className={classes.item}>End Date</FormLabel>
+                <Field
+                  component={DatePicker}
+                  name="end"
+                  type="date"
+                  format="YYYY-MM-DD"
+                  fullWidth
+                  variant="filled"
+                />
+                <FormLabel className={classes.item}>
+                  Reserving time allowed starting:
+                </FormLabel>
+                <Field
+                  component={DatePicker}
+                  name="reservationStart"
+                  type="date"
+                  format="YYYY-MM-DD"
+                  fullWidth
+                  variant="filled"
+                />
+                <Button
+                  className={classes.item}
+                  type="submit"
+                  size="small"
+                  variant="contained"
+                  disableElevation
+                  style={{ backgroundColor: "Green", color: "white" }}
+                  disabled={isSubmitting}
+                >
+                  Confirm Reservation
+                </Button>
+                <pre>{JSON.stringify(values, null, 2)}</pre>
+              </Form>
+            )}
+          </Formik>
+        </MuiPickersUtilsProvider>
       </DialogContent>
     </Dialog>
   );

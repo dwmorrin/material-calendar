@@ -16,12 +16,12 @@ import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
 import initialState from "../calendar/initialState";
 import ProjectDashboard from "./ProjectDashboard";
-import ProjectForm from "./ProjectForm";
 import { ResourceKey } from "../resources/types";
 import fetchAllResources from "../utils/fetchAllResources";
 import { CalendarAction } from "../calendar/types";
 import { Box } from "@material-ui/core";
 import EventEditor from "./EventEditor";
+import ProjectForm from "./ProjectForm";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
@@ -48,9 +48,9 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     (user?.username && (
       <Box>
         <ProjectDashboard dispatch={dispatch} state={state} />
-        <ProjectForm dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />
+        <ProjectForm dispatch={dispatch} state={state} />
         <EventEditor
           dispatch={dispatch}
           open={state.eventEditorIsOpen}

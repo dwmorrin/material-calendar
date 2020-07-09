@@ -9,7 +9,7 @@ export interface Project {
   [k: string]: unknown;
   id: number;
   title: string;
-  course: { title: string };
+  course: { id: number; title: string };
   start: string;
   end: string;
   reservationStart: string;

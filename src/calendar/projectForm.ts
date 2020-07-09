@@ -4,7 +4,9 @@ import { object, string } from "yup";
 import { FormikValues } from "formik";
 import { CalendarState } from "./types";
 import Course from "../resources/Course";
+import Project from "../resources/Project";
 import { ResourceKey } from "../resources/types";
+import { formatYYYYMMDD } from "../utils/date";
 
 export const useStyles = makeStyles({
   list: {
@@ -21,7 +23,7 @@ export const useStyles = makeStyles({
   },
 });
 
-export const transition = makeTransition("left");
+export const transition = makeTransition("right");
 
 export const validationSchema = object().shape({
   description: string().required("Please Enter a description"),
@@ -29,11 +31,6 @@ export const validationSchema = object().shape({
   groupSize: string().required("Please enter a group size"),
   hoursPerGroup: string().required(
     "Please the number of hours available to each group"
-  ),
-  startDate: string().required("Please enter the start date for the Project"),
-  endDate: string().required("Please enter the end date for the Project"),
-  reservationStart: string().required(
-    "Please enter date to open up booking for this project"
   ),
 });
 
@@ -49,17 +46,29 @@ export const submitHandler = (
 export const makeInitialValues = (
   state: CalendarState
 ): { [k: string]: unknown } => {
-  const course =
-    (state.resources[ResourceKey.Courses] as Course[])[0] || new Course();
   return {
-    course: course.id,
+    course: state.currentCourse?.id,
+    title: "",
     description: "",
     instructions: "",
     groupSize: "",
-    hoursPerGroup: "",
-    startDate: "",
-    endDate: "",
-    reservationStart: "",
+    groupAllottedHours: "",
+    start: new Date().toJSON().split("T")[0],
+    end: new Date().toJSON().split("T")[0],
+    reservationStart: new Date().toJSON().split("T")[0],
     locations: {},
+  };
+};
+
+export const getValuesFromProject = (
+  project: Project | undefined
+): { [k: string]: unknown } | null => {
+  if (!project) {
+    return null;
+  }
+  console.log(new Date(project.start).toJSON().split("T")[0]);
+  return {
+    ...project,
+    course: project.course.id,
   };
 };
