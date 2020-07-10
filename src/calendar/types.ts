@@ -63,31 +63,14 @@ export interface CalendarState {
   currentCourse?: { id: number; title: string };
 }
 
+export type PartialCalendarState = Partial<Omit<CalendarState, "resources">> & {
+  resources?: { [k: number]: ResourceInstance[] };
+};
+
 // https://github.com/redux-utilities/flux-standard-action
 export interface Action {
   type: CalendarAction;
-  //! Partial<CalendarState> would work except for resources
-  payload?: {
-    // UI state
-    currentStart?: Date;
-    currentView?: string;
-    detailIsOpen?: boolean;
-    drawerIsOpen?: boolean;
-    error?: Error;
-    groupDashboardIsOpen?: boolean;
-    loading?: boolean;
-    pickerShowing?: boolean;
-    projectDashboardIsOpen?: boolean;
-    ref?: React.RefObject<FullCalendar> | null;
-
-    // Resources
-    //! this needs to be Partial as well
-    resources?: { [k: number]: ResourceInstance[] };
-    currentEvent?: Event;
-    currentGroup?: UserGroup;
-    currentProject?: Project;
-    currentCourse?: { id: number; title: string };
-  };
+  payload?: PartialCalendarState;
   error?: boolean;
   meta?: unknown;
 }

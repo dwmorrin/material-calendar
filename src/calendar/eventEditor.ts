@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/core";
-import { CalendarAction } from "../calendar/types";
+import { CalendarAction, Action } from "../calendar/types";
 import Event from "../resources/Event";
 import { FormikValues } from "formik";
 
@@ -42,7 +42,7 @@ export const onSubmit = (values: Event, actions: FormikValues): void => {
 };
 
 export interface EventEditorProps {
-  dispatch: (action: { type: CalendarAction; payload?: {} }) => void;
+  dispatch: (action: Action) => void;
   open: boolean;
   event?: Event;
 }
