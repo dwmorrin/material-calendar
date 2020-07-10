@@ -1,5 +1,6 @@
 import { CalendarAction, CalendarState, Action } from "./types";
 import { ResourceKey } from "../resources/types";
+import UserGroup from "../resources/UserGroup";
 
 type StateHandler = (state: CalendarState, action: Action) => CalendarState;
 
@@ -72,19 +73,6 @@ const pickedDate: StateHandler = (state, { payload }) => {
   return { ...state, currentStart, pickerShowing: !state.pickerShowing };
 };
 
-const openReservationForm: StateHandler = (state) => ({
-  ...state,
-  reservationFormIsOpen: true,
-});
-
-const openProjectForm: StateHandler = (state, { payload }) => {
-  return {
-    ...state,
-    currentCourse: payload?.currentCourse,
-    projectFormIsOpen: true,
-  };
-};
-
 const openEventDetail: StateHandler = (state, { payload }) => {
   if (!payload?.currentEvent) {
     console.error("no event received for detail view");
@@ -115,10 +103,36 @@ const openGroupDashboard: StateHandler = (state) => ({
   groupDashboardIsOpen: true,
 });
 
-const openProjectDashboard: StateHandler = (state, { payload }) => ({
+const openProjectDashboard: StateHandler = (state, { payload }) => {
+  if (!payload || !payload.currentProject) {
+    console.error("no current project found; cannot open project");
+    return state;
+  }
+  const { currentGroup, resources } = state;
+  const { currentProject } = payload;
+  const groups = resources[ResourceKey.Groups] as UserGroup[];
+  const group =
+    currentGroup ||
+    groups.find((group) => group.projectId === currentProject.id);
+  return {
+    ...state,
+    currentGroup: group,
+    currentProject: currentProject,
+    projectDashboardIsOpen: true,
+  };
+};
+
+const openProjectForm: StateHandler = (state, { payload }) => {
+  return {
+    ...state,
+    currentCourse: payload?.currentCourse,
+    projectFormIsOpen: true,
+  };
+};
+
+const openReservationForm: StateHandler = (state) => ({
   ...state,
-  currentProject: payload?.currentProject,
-  projectDashboardIsOpen: true,
+  reservationFormIsOpen: true,
 });
 
 const receivedAllResources: StateHandler = (state, { payload }) => ({

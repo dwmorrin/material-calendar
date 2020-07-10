@@ -2,7 +2,6 @@ import React, { FunctionComponent, useContext } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   IconButton,
-  makeStyles,
   Dialog,
   Toolbar,
   Typography,
@@ -16,7 +15,6 @@ import {
 import { AuthContext } from "./AuthContext";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { makeTransition } from "./Transition";
 import { getFormattedEventInterval } from "../utils/date";
 import ProjectLocationHours from "./ProjectLocationHours";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
@@ -24,23 +22,11 @@ import GroupDashboard from "./GroupDashboard";
 import { ResourceKey } from "../resources/types";
 import Event from "../resources/Event";
 import EditIcon from "@material-ui/icons/Edit";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  hoursBar: {
-    margin: theme.spacing(1),
-    height: 10,
-  },
-  toolbar: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-}));
-
-const transition = makeTransition("right");
+import {
+  useStyles,
+  compareStartDates,
+  transition,
+} from "../calendar/projectDashboard";
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -48,37 +34,36 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const classes = useStyles();
-  const { currentProject } = state;
-  const locations = state.resources[ResourceKey.Locations].filter((location) =>
+  const {
+    currentProject,
+    currentGroup,
+    projectDashboardIsOpen,
+    resources,
+  } = state;
+  const events = resources[ResourceKey.Events] as Event[];
+  const locations = resources[ResourceKey.Locations].filter((location) =>
     currentProject?.allotments.find((a) => a.locationId === location.id)
   );
-  const isManager = process.env.NODE_ENV === "development"; //|| currentProject?.managers.includes(user);
+  const isManager =
+    process.env.NODE_ENV === "development" || user?.roles.includes("manager");
 
-  const groupEvents = (state.resources[ResourceKey.Events] as Event[]).filter(
+  const groupEvents = events.filter(
     (event) =>
       event.reservation &&
-      state.currentGroup &&
-      event.reservation.groupId === state.currentGroup.id
+      currentGroup &&
+      event.reservation.groupId === currentGroup.id
   );
-  groupEvents.sort((a, b) => {
-    if (typeof a.start !== "string" || typeof b.start !== "string") return 0;
-    const _a = new Date(a.start).getTime();
-    const _b = new Date(b.start).getTime();
-    if (_a < _b) return 1;
-    if (_a > _b) return -1;
-    return 0;
-  });
+  groupEvents.sort(compareStartDates);
   const now = Date.now();
-  const splitPoint = groupEvents.findIndex((event) => {
-    if (typeof event.start !== "string") return false;
-    return new Date(event.start).getTime() < now;
-  });
+  const splitPoint = groupEvents.findIndex(
+    (event) => new Date(event.start).getTime() < now
+  );
 
   return (
     <Dialog
       className={classes.root}
       fullScreen
-      open={state.projectDashboardIsOpen}
+      open={projectDashboardIsOpen}
       TransitionComponent={transition}
     >
       <GroupDashboard state={state} dispatch={dispatch} />
@@ -117,10 +102,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
       >
         <Typography variant="body2">
           {currentProject &&
-            getFormattedEventInterval(
-              currentProject?.start as string | Date,
-              currentProject?.end as string | Date
-            )}
+            getFormattedEventInterval(currentProject.start, currentProject.end)}
         </Typography>
         <Typography variant="body2">
           Managed by {currentProject && currentProject.managers.join(", ")}
@@ -168,10 +150,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           >
             <ListItem>{event.title}</ListItem>
             <ListItem>
-              {getFormattedEventInterval(
-                event.start as string,
-                event.end as string
-              )}
+              {getFormattedEventInterval(event.start, event.end)}
             </ListItem>
           </List>
         ))}
@@ -188,10 +167,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           >
             <ListItem>{event.title}</ListItem>
             <ListItem>
-              {getFormattedEventInterval(
-                event.start as string,
-                event.end as string
-              )}
+              {getFormattedEventInterval(event.start, event.end)}
             </ListItem>
           </List>
         ))}
