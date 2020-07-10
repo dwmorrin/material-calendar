@@ -1,5 +1,6 @@
 import { AdminAction, Action, AdminState, FormValues } from "./types";
-import { ResourceInstance, Resources } from "../resources/types";
+import { ResourceInstance } from "../resources/types";
+import { Resources } from "../resources/Resources";
 import { FormikValues } from "formik";
 
 export const dispatchFile = (

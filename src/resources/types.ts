@@ -11,7 +11,6 @@ import Tag from "./Tag";
 import User from "./User";
 import UserGroup from "./UserGroup";
 import VirtualWeek from "./VirtualWeek";
-import { enumKeys } from "../utils/enumKeys";
 
 export type Resource =
   | typeof Category
@@ -45,25 +44,3 @@ export enum ResourceKey {
   Users,
   VirtualWeeks,
 }
-
-export const FindResource = (key: ResourceKey): Resource =>
-  ({
-    [ResourceKey.Categories]: Category,
-    [ResourceKey.Equipment]: Equipment,
-    [ResourceKey.Events]: Event,
-    [ResourceKey.Groups]: UserGroup,
-    [ResourceKey.Locations]: Location,
-    [ResourceKey.Courses]: Course,
-    [ResourceKey.Projects]: Project,
-    [ResourceKey.Reservations]: Reservation,
-    [ResourceKey.RosterRecords]: RosterRecord,
-    [ResourceKey.Semesters]: Semester,
-    [ResourceKey.Tags]: Tag,
-    [ResourceKey.Users]: User,
-    [ResourceKey.VirtualWeeks]: VirtualWeek,
-  }[key]);
-
-/**
- * Array version of FindResource
- */
-export const Resources = enumKeys(ResourceKey).map(FindResource);

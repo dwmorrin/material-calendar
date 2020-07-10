@@ -1,4 +1,4 @@
-import { FindResource } from "../resources/types";
+import { FindResource } from "../resources/Resources";
 
 type Dispatch = (action: {
   type: number;

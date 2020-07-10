@@ -2,11 +2,8 @@ import React, { FunctionComponent, useEffect, useState } from "react";
 import { Paper, Typography, CircularProgress, Button } from "@material-ui/core";
 import Pager, { getTotalPages } from "../Pager";
 import { AdminUIProps, AdminAction } from "../../admin/types";
-import {
-  ResourceKey,
-  ResourceInstance,
-  Resources,
-} from "../../resources/types";
+import { ResourceKey, ResourceInstance } from "../../resources/types";
+import { Resources } from "../../resources/Resources";
 import Record from "./Record";
 import templateRouter from "../../admin/records/router";
 import { dispatchFile } from "../../admin/dispatch";
