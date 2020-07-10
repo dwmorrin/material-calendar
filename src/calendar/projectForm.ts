@@ -6,7 +6,7 @@ import { CalendarState } from "./types";
 import Course from "../resources/Course";
 import Project from "../resources/Project";
 import { ResourceKey } from "../resources/types";
-import { formatYYYYMMDD } from "../utils/date";
+import { makeDefaultDateInputString } from "../utils/date";
 
 export const useStyles = makeStyles({
   list: {
