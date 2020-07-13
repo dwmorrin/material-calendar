@@ -18,6 +18,7 @@ const initialState: AdminState = {
   fileImportIsOpen: false,
   recordPage: 0,
   schedulerIsOpen: true,
+  snackbarQueue: [],
 
   // resources
   resourceKey: ResourceKey.Users,

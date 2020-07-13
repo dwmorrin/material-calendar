@@ -1,7 +1,65 @@
 import { Action, AdminState, AdminAction } from "./types";
 import { ResourceKey } from "../resources/types";
+import { enqueue, dequeue } from "../utils/queue";
 
 type StateHandler = (state: AdminState, action: Action) => AdminState;
+
+//--------- ERROR HANDLING ---------------
+
+/**
+ * if error should be displayed to the user, add it to the snackbarQueue
+ */
+const errorHandler: StateHandler = (state, { payload, meta }) => {
+  if (!payload || !payload.error) {
+    return {
+      ...state,
+      snackbarQueue: enqueue(state.snackbarQueue, {
+        type: "failure",
+        message: "Something went wrong.",
+        autoHideDuration: null,
+      }),
+    };
+  }
+  switch (meta) {
+    default: {
+      console.error({
+        error: payload?.error,
+        snackbarQueue: state.snackbarQueue,
+        meta,
+      });
+      return {
+        ...state,
+        snackbarQueue: enqueue(state.snackbarQueue, {
+          type: "failure",
+          message: payload?.error?.message,
+          autoHideDuration: null,
+        }),
+      };
+    }
+  }
+};
+
+/**
+ * StateHandler functions can call this to switch control
+ * to the error handler.
+ */
+const errorRedirect = (
+  state: AdminState,
+  action: Action,
+  error: Error,
+  meta?: unknown
+): AdminState =>
+  errorHandler(state, {
+    ...action,
+    meta: meta || action.meta,
+    type: AdminAction.Error,
+    payload: {
+      ...action.payload,
+      error,
+    },
+  });
+
+//--------- NORMAL ACTION HANDLERS ----------
 
 const closeBackups: StateHandler = (state) => ({
   ...state,
@@ -19,11 +77,9 @@ const closeFileImport: StateHandler = (state) => ({
   fileImportIsOpen: false,
 });
 
-const error: StateHandler = (state, { payload, meta }) => {
-  if (payload && payload.error) {
-    console.error({ error: payload.error, meta });
-  }
-  return state;
+const closeSnackbar: StateHandler = (state) => {
+  const [snackbarQueue] = dequeue(state.snackbarQueue);
+  return { ...state, snackbarQueue };
 };
 
 const openBackups: StateHandler = (state) => ({
@@ -41,9 +97,10 @@ const openScheduler: StateHandler = (state) => ({
   schedulerIsOpen: true,
 });
 
-const openedFile: StateHandler = (state, { payload }) => {
+const openedFile: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!payload?.resourceFile) {
-    throw new Error("unable to open file");
+    return errorRedirect(state, action, new Error("unable to open file"));
   }
   return {
     ...state,
@@ -58,14 +115,15 @@ const receivedAllResources: StateHandler = (state, { payload }) => ({
   loading: false,
 });
 
-const receivedResource: StateHandler = (state, { payload, meta }) => {
+const receivedResource: StateHandler = (state, action) => {
+  const { payload, meta } = action;
   const resources = payload?.resources;
   if (!resources) {
-    throw new Error("no resources in payload");
+    return errorRedirect(state, action, new Error("no resources in payload"));
   }
   const resourceKey = meta as ResourceKey;
   if (resourceKey === undefined) {
-    throw new Error("no context given");
+    return errorRedirect(state, action, new Error("no context given"));
   }
   return {
     ...state,
@@ -75,9 +133,10 @@ const receivedResource: StateHandler = (state, { payload, meta }) => {
   };
 };
 
-const selectedDocument: StateHandler = (state, { payload }) => {
+const selectedDocument: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!payload?.resourceInstance) {
-    throw new Error("no document received");
+    return errorRedirect(state, action, new Error("no document received"));
   }
   return {
     ...state,
@@ -86,10 +145,11 @@ const selectedDocument: StateHandler = (state, { payload }) => {
   };
 };
 
-const selectedRecordPage: StateHandler = (state, { payload }) => {
+const selectedRecordPage: StateHandler = (state, action) => {
+  const { payload } = action;
   const recordPage = payload?.recordPage;
   if (recordPage === undefined) {
-    throw new Error("no page number received");
+    return errorRedirect(state, action, new Error("no page number received"));
   }
   return {
     ...state,
@@ -97,10 +157,11 @@ const selectedRecordPage: StateHandler = (state, { payload }) => {
   };
 };
 
-const selectedResource: StateHandler = (state, { payload }) => {
+const selectedResource: StateHandler = (state, action) => {
+  const { payload } = action;
   const resourceKey = payload?.resourceKey;
   if (resourceKey === undefined) {
-    throw new Error("no resource received");
+    return errorRedirect(state, action, new Error("no resource received"));
   }
   return {
     ...state,
@@ -118,7 +179,15 @@ const selectedSchedulerLocation: StateHandler = (state, { payload }) => ({
 
 const submittingDocument: StateHandler = (state) => state;
 
-const submittingDocumentEnd: StateHandler = (state) => state;
+const submittingDocumentEnd: StateHandler = (state) => ({
+  ...state,
+  snackbarIsOpen: true,
+  snackbarQueue: enqueue(state.snackbarQueue, {
+    type: "success",
+    message: "Changes saved",
+    autoHideDuration: 6000,
+  }),
+});
 
 const toggleDrawer: StateHandler = (state) => ({
   ...state,
@@ -130,7 +199,8 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
     [AdminAction.CloseFileImport]: closeFileImport,
-    [AdminAction.Error]: error,
+    [AdminAction.CloseSnackbar]: closeSnackbar,
+    [AdminAction.Error]: errorHandler,
     [AdminAction.OpenBackups]: openBackups,
     [AdminAction.OpenDetail]: openDetail,
     [AdminAction.OpenScheduler]: openScheduler,

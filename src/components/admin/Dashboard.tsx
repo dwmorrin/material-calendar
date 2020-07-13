@@ -23,6 +23,7 @@ import Backups from "./Backups";
 import { AuthContext } from "../AuthContext";
 import { Redirect } from "@reach/router";
 import User from "../../resources/User";
+import Snackbar from "../Snackbar";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
@@ -60,6 +61,11 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       <AdminDetailsForm dispatch={dispatch} state={state} />
       <FileImport dispatch={dispatch} state={state} />
       <Backups dispatch={dispatch} state={state} />
+      <Snackbar
+        dispatch={dispatch}
+        state={state}
+        action={{ type: AdminAction.CloseSnackbar }}
+      />
     </div>
   );
 };

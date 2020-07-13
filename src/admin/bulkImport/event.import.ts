@@ -19,7 +19,7 @@ const processEvent = (event: FlatEvent): FlatEvent => ({
 });
 
 const bulkImport = (
-  dispatch: (action: { type: AdminAction; payload: {} }) => void,
+  dispatch: (action: { type: AdminAction; payload?: {} }) => void,
   events: unknown
 ): void => {
   const errorHandler = (error: Error): void =>
@@ -35,15 +35,7 @@ const bulkImport = (
     .then((response) => response.json())
     .then(({ data, error }) => {
       if (!data) return errorHandler(error);
-      dispatch({
-        type: AdminAction.Error,
-        payload: {
-          error: {
-            message:
-              "You did not implement success handler for event bulk import",
-          },
-        },
-      });
+      dispatch({ type: AdminAction.SubmittingDocumentEnd });
     })
     .catch(errorHandler);
 };

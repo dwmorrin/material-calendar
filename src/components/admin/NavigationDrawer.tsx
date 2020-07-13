@@ -51,7 +51,7 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
     ) {
       return dispatch({
         type: AdminAction.Error,
-        payload: { error: { message: "unexpected resource click handler" } },
+        payload: { error: new Error("unexpected resource click handler") },
         meta: "NAV_DRAWER_CLICK_RESOURCE",
       });
     }
@@ -71,7 +71,7 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
     ) {
       return dispatch({
         type: AdminAction.Error,
-        payload: { error: { message: "unexpected location click handler" } },
+        payload: { error: new Error("unexpected location click handler") },
         meta: "NAV_DRAWER_CLICK_LOCATION",
       });
     }

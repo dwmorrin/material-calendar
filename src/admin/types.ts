@@ -1,4 +1,5 @@
 import { ResourceKey, ResourceInstance } from "../resources/types";
+import { SnackbarState } from "../components/Snackbar";
 
 export interface Action {
   type: AdminAction;
@@ -11,6 +12,7 @@ export enum AdminAction {
   CloseBackups,
   CloseDetail,
   CloseFileImport,
+  CloseSnackbar,
   Error,
   OpenBackups,
   OpenDetail,
@@ -32,11 +34,15 @@ export interface AdminState {
   backupsIsOpen: boolean;
   detailIsOpen: boolean;
   drawerIsOpen: boolean;
-  error?: {};
+  error?: Error;
   fileImportIsOpen: boolean;
   recordPage: number;
   schedulerIsOpen: boolean;
   schedulerLocationId?: number;
+  // // snackbarIsOpen outside snackbar object to avoid rendering message on close
+  // snackbarIsOpen: boolean;
+  // snackbar?: SnackbarState;
+  snackbarQueue: SnackbarState[];
 
   // resources
   resourceFile?: string | ArrayBuffer | null;

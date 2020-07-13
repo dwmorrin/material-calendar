@@ -4,7 +4,7 @@ import eventImport from "./event.import";
 import rosterImport from "./roster.import";
 
 function defaultImporter(
-  dispatch: (action: { type: AdminAction; payload: {} }) => void
+  dispatch: (action: { type: AdminAction; payload?: {} }) => void
 ): void {
   dispatch({
     type: AdminAction.Error,
@@ -15,7 +15,7 @@ function defaultImporter(
 const router = (
   key: ResourceKey
 ): ((
-  dispatch: (action: { type: AdminAction; payload: {} }) => void,
+  dispatch: (action: { type: AdminAction; payload?: {} }) => void,
   data: unknown,
   state?: AdminState
 ) => void) =>
