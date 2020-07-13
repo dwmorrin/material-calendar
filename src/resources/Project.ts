@@ -1,3 +1,4 @@
+import User from "../resources/User";
 export interface ProjectAllotment {
   locationId: number;
   start: string;
@@ -14,7 +15,7 @@ export interface Project {
   end: string;
   reservationStart: string;
   allotments: ProjectAllotment[];
-  managers: string[];
+  managers: Pick<User, "id" | "name" | "username">[];
   open: boolean;
   groupSize: number;
   groupAllottedHours: number;
@@ -33,7 +34,7 @@ export class Project implements Project {
       end: "",
       reservationStart: "",
       allotments: [] as ProjectAllotment[],
-      managers: [] as string[],
+      managers: [] as Pick<User, "id" | "name" | "username">[],
       open: false,
       groupSize: 0,
       groupAllottedHours: 0,

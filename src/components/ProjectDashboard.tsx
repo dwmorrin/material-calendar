@@ -105,7 +105,11 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             getFormattedEventInterval(currentProject.start, currentProject.end)}
         </Typography>
         <Typography variant="body2">
-          Managed by {currentProject && currentProject.managers.join(", ")}
+          Managed by{" "}
+          {currentProject !== undefined &&
+            currentProject.managers
+              .map((manager) => manager.name?.first + " " + manager.name?.last)
+              .join(", ")}
         </Typography>
         <ExpansionPanel defaultExpanded={locations.length === 1}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>

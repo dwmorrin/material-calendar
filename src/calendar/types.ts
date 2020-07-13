@@ -1,6 +1,5 @@
 import Event from "../resources/Event";
 import Project from "../resources/Project";
-import Course from "../resources/Course";
 import FullCalendar from "@fullcalendar/react";
 import UserGroup from "../resources/UserGroup";
 import { ResourceKey, ResourceInstance } from "../resources/types";

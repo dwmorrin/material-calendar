@@ -16,7 +16,6 @@ import ProjectListItem from "./ProjectListItem";
 import Project from "../resources/Project";
 import { dispatchSelectedProjectsByCourse } from "../calendar/dispatch";
 import { CalendarAction } from "../calendar/types";
-import User from "../resources/User";
 
 interface ProjectExpansionListProps extends CalendarUIProps {
   course: { id: number; title: string };
@@ -33,7 +32,9 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
   const checked = projects.every((project) => project.selected);
   const indeterminate =
     !checked && projects.some((project) => project.selected);
-  const isManager = process.env.NODE_ENV === "development"; //|| projects[0].managers === user;
+  const isManager =
+    process.env.NODE_ENV === "development" ||
+    projects[0].managers.some((manager) => manager.id === user?.id);
 
   return (
     <ExpansionPanel defaultExpanded={projects.length === 1}>

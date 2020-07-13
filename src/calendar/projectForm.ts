@@ -3,10 +3,7 @@ import { makeTransition } from "../components/Transition";
 import { object, string } from "yup";
 import { FormikValues } from "formik";
 import { CalendarState } from "./types";
-import Course from "../resources/Course";
 import Project from "../resources/Project";
-import { ResourceKey } from "../resources/types";
-import { makeDefaultDateInputString } from "../utils/date";
 
 export const useStyles = makeStyles({
   list: {
@@ -66,7 +63,6 @@ export const getValuesFromProject = (
   if (!project) {
     return null;
   }
-  console.log(new Date(project.start).toJSON().split("T")[0]);
   return {
     ...project,
     course: project.course.id,

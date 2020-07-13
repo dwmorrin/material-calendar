@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/core";
-import { CalendarAction, Action } from "../calendar/types";
+import { Action } from "../calendar/types";
 import Event from "../resources/Event";
 import { FormikValues } from "formik";
 

@@ -7,16 +7,14 @@ import {
   DialogContent,
   FormLabel,
   IconButton,
-  MenuItem,
   Toolbar,
   Typography,
 } from "@material-ui/core";
-import { Select, TextField } from "formik-material-ui";
+import { TextField } from "formik-material-ui";
 import CloseIcon from "@material-ui/icons/Close";
 import Location from "../resources/Location";
 import { Field, Form, Formik } from "formik";
 import { ResourceKey } from "../resources/types";
-import Course from "../resources/Course";
 import {
   validationSchema,
   makeInitialValues,
@@ -33,7 +31,6 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const courses = state.resources[ResourceKey.Courses] as Course[];
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const classes = useStyles();
 
@@ -73,14 +70,6 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
               handleSubmit,
             }): unknown => (
               <Form className={classes.list} onSubmit={handleSubmit}>
-                <FormLabel>Course:</FormLabel>
-                <Field component={Select} name="course">
-                  {courses.map((p) => (
-                    <MenuItem key={p.id} value={p.id}>
-                      {p.title}
-                    </MenuItem>
-                  ))}
-                </Field>
                 <FormLabel className={classes.item}>Project Title</FormLabel>
                 <Field
                   component={TextField}

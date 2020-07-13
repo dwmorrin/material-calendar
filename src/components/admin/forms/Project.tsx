@@ -6,6 +6,8 @@ import { FormValues, ValueDictionary } from "../../../admin/types";
 import { List } from "@material-ui/core";
 import CheckboxList from "./CheckboxList";
 import FieldList from "./FieldList";
+import { makeManagerList } from "../../../utils/managerList";
+import User from "../../../resources/User";
 
 // TODO need a radio for the group, not checkbox
 const FormTemplate: FunctionComponent<FormValues> = ({
@@ -22,7 +24,12 @@ const FormTemplate: FunctionComponent<FormValues> = ({
       name="reservationStart"
       label="Reservations start"
     />
-    <FieldList name="managers" values={managers as string[]} />
+    <FieldList
+      name="managers"
+      values={makeManagerList(
+        managers as Pick<User, "id" | "name" | "username">[]
+      )}
+    />
     <Field
       fullWidth
       component={TextField}

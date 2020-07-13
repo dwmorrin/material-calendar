@@ -9,7 +9,12 @@ const template = (project: unknown): string[][] =>
         ["Course", project.course.title || "none"],
         ["Duration", getFormattedEventInterval(project.start, project.end)],
         ["Reservations start", getFormattedDate(project.reservationStart)],
-        ["Managers", project.managers.join(", ")],
+        [
+          "Managers",
+          project.managers
+            .map((manager) => manager.name?.first + " " + manager.name?.last)
+            .join(", "),
+        ],
         ["Group size", project.groupSize.toString()],
         ["Allotments", project.allotments.length.toString()],
       ]
