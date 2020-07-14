@@ -57,13 +57,16 @@ test("makeAllotmentSummaryEvent", () =>
     allDay: true,
     id: "allotmentTotal0",
     start: "2020-06-18",
-    end: "2020-06-18",
+    end: "2020-06-19",
     resourceId: 0,
     title: "PROJECT TITLE - Total Hours: 0",
   }));
 
 test("makeAllotmentEventMap", () =>
-  expect(makeAllotmentEventMap({ id: 0 })({ hours: 0 }, 0)).toEqual({
+  expect(
+    makeAllotmentEventMap({ id: 0 })({ end: "2020-06-18", hours: 0 }, 0)
+  ).toEqual({
+    end: "2020-06-19",
     hours: 0,
     id: "allotment0-0",
     resourceId: "Allotments0",
@@ -98,7 +101,7 @@ test("makeAllotments", () =>
   ).toEqual([
     {
       allDay: true,
-      end: "2020-06-18",
+      end: "2020-06-19",
       id: "allotmentTotal0",
       resourceId: 0,
       start: "2020-06-18",
@@ -106,7 +109,7 @@ test("makeAllotments", () =>
     },
     {
       allDay: true,
-      end: "2020-06-18",
+      end: "2020-06-19",
       hours: 0,
       id: "allotment0-0",
       locationId: 0,

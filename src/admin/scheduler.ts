@@ -57,6 +57,12 @@ export const fetchCurrentSemester = (
     );
 };
 
+const addADay = (s: string): string => {
+  const d = new Date(s);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toJSON().split("T")[0];
+};
+
 const MILLISECONDS_PER_DAY = 8.64e7;
 export const millisecondsToDays = (ms: number): number =>
   ms < 0
@@ -127,7 +133,7 @@ export const makeAllotmentSummaryEvent = (
 ): {} => ({
   id: `allotmentTotal${p.id}`,
   start: first.start,
-  end: last.end,
+  end: addADay(last.end),
   resourceId: p.id,
   allDay: true,
   title: `${p.title.replace("Project", "")} - Total Hours: ${total}`,
@@ -138,6 +144,7 @@ export const makeAllotmentEventMap = (p: Project) => (
   index: number
 ): {} => ({
   ...a,
+  end: addADay(a.end),
   id: `allotment${p.id}-${index}`,
   resourceId: `Allotments${p.id}`,
   allDay: true,
@@ -182,12 +189,6 @@ export const makeDailyHours = (location: Location): {}[] => {
     title: "" + dailyHours.hours,
     resourceId: Location.locationHoursId,
   }));
-};
-
-const addADay = (s: string): string => {
-  const d = new Date(s);
-  d.setUTCDate(d.getUTCDate() + 1);
-  return d.toJSON().split("T")[0];
 };
 
 export const processVirtualWeeks = (
