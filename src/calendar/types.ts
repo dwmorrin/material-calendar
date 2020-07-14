@@ -3,16 +3,18 @@ import Project from "../resources/Project";
 import FullCalendar from "@fullcalendar/react";
 import UserGroup from "../resources/UserGroup";
 import { ResourceKey, ResourceInstance } from "../resources/types";
+import { SnackbarState } from "../components/Snackbar";
 
 export enum CalendarAction {
   ChangedView,
-  CloseReservationForm,
-  CloseProjectForm,
   CloseEquipmentForm,
   CloseEventDetail,
   CloseEventEditor,
-  CloseProjectDashboard,
   CloseGroupDashboard,
+  CloseProjectDashboard,
+  CloseProjectForm,
+  CloseReservationForm,
+  CloseSnackbar,
   Error,
   Loading,
   PickedDate,
@@ -53,6 +55,7 @@ export interface CalendarState {
   reservationFormIsOpen: boolean;
   projectFormIsOpen: boolean;
   ref: React.RefObject<FullCalendar> | null;
+  snackbarQueue: SnackbarState[];
 
   // Resources
   resources: { [k in ResourceKey]: ResourceInstance[] };

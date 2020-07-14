@@ -22,6 +22,7 @@ import { CalendarAction } from "../calendar/types";
 import { Box } from "@material-ui/core";
 import EventEditor from "./EventEditor";
 import ProjectForm from "./ProjectForm";
+import Snackbar from "./Snackbar";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
@@ -61,6 +62,11 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           <StaticDatePicker dispatch={dispatch} state={state} />
         )}
         <FullCalendarBox dispatch={dispatch} state={state} />
+        <Snackbar
+          dispatch={dispatch}
+          state={state}
+          action={{ type: CalendarAction.CloseSnackbar }}
+        />
       </Box>
     )) || <Redirect to="/" replace={true} noThrow={true} />
   );

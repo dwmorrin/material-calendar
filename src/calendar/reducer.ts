@@ -1,27 +1,106 @@
 import { CalendarAction, CalendarState, Action } from "./types";
 import { ResourceKey } from "../resources/types";
 import UserGroup from "../resources/UserGroup";
+import { enqueue, dequeue } from "../utils/queue";
 
 type StateHandler = (state: CalendarState, action: Action) => CalendarState;
 
-const changedView: StateHandler = (state, { payload }) => {
+enum ErrorType {
+  MISSING_RESOURCE,
+  IMPOSSIBLE_STATE,
+}
+
+//-------- ERROR HANDLING ---------------
+
+/**
+ * if error should be displayed to the user, add it to the snackbarQueue
+ */
+const errorHandler: StateHandler = (state, { payload, meta }) => {
+  const defaultErrorMessage = "Something went wrong.";
+  if (!payload || !payload.error) {
+    return {
+      ...state,
+      snackbarQueue: enqueue(state.snackbarQueue, {
+        type: "failure",
+        message: defaultErrorMessage,
+        autoHideDuration: null,
+      }),
+    };
+  }
+  switch (meta as ErrorType) {
+    case ErrorType.MISSING_RESOURCE:
+      return {
+        ...state,
+        snackbarQueue: enqueue(state.snackbarQueue, {
+          type: "failure",
+          message:
+            payload?.error?.message ||
+            "We didn't receive all the data from the server, try again later",
+          autoHideDuration: null,
+        }),
+      };
+    case ErrorType.IMPOSSIBLE_STATE:
+      return {
+        ...state,
+        snackbarQueue: enqueue(state.snackbarQueue, {
+          type: "failure",
+          message: `We've encounted a strange bug! The app says: ${payload?.error?.message}`,
+          autoHideDuration: null,
+        }),
+      };
+    default: {
+      console.error({
+        error: payload?.error,
+        snackbarQueue: state.snackbarQueue,
+        meta,
+      });
+      return {
+        ...state,
+        snackbarQueue: enqueue(state.snackbarQueue, {
+          type: "failure",
+          message: payload?.error?.message || defaultErrorMessage,
+          autoHideDuration: null,
+        }),
+      };
+    }
+  }
+};
+
+/**
+ * StateHandler functions can call this to switch control
+ * to the error handler.
+ */
+const errorRedirect = (
+  state: CalendarState,
+  action: Action,
+  message: string,
+  meta?: unknown
+): CalendarState =>
+  errorHandler(state, {
+    ...action,
+    meta: meta || action.meta,
+    type: CalendarAction.Error,
+    payload: {
+      ...action.payload,
+      error: new Error(message),
+    },
+  });
+
+//--------- NORMAL ACTION HANDLERS ----------
+
+const changedView: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!state.ref?.current || !payload?.currentView) {
-    console.error("no calendar ref or no view received in view change request");
-    return state;
+    return errorRedirect(
+      state,
+      action,
+      "no calendar ref or no view received in view change request",
+      ErrorType.IMPOSSIBLE_STATE
+    );
   }
   state.ref.current.getApi().changeView(payload.currentView);
   return { ...state, currentView: payload.currentView };
 };
-
-const closeReservationForm: StateHandler = (state) => ({
-  ...state,
-  reservationFormIsOpen: false,
-});
-
-const closeProjectForm: StateHandler = (state) => ({
-  ...state,
-  projectFormIsOpen: false,
-});
 
 const closeEquipmentForm: StateHandler = (state) => ({
   ...state,
@@ -38,22 +117,30 @@ const closeEventEditor: StateHandler = (state) => ({
   eventEditorIsOpen: false,
 });
 
+const closeGroupDashboard: StateHandler = (state) => ({
+  ...state,
+  groupDashboardIsOpen: false,
+});
+
 const closeProjectDashboard: StateHandler = (state) => ({
   ...state,
   projectDashboardIsOpen: false,
   currentProject: undefined,
 });
 
-const closeGroupDashboard: StateHandler = (state) => ({
+const closeProjectForm: StateHandler = (state) => ({
   ...state,
-  groupDashboardIsOpen: false,
+  projectFormIsOpen: false,
 });
 
-const error: StateHandler = (state, { payload, meta }) => {
-  if (payload && payload.error) {
-    console.error({ error: payload.error, meta });
-  }
-  return state;
+const closeReservationForm: StateHandler = (state) => ({
+  ...state,
+  reservationFormIsOpen: false,
+});
+
+const closeSnackbar: StateHandler = (state) => {
+  const [snackbarQueue] = dequeue(state.snackbarQueue);
+  return { ...state, snackbarQueue };
 };
 
 const loading: StateHandler = (state) => ({
@@ -61,10 +148,15 @@ const loading: StateHandler = (state) => ({
   loading: true,
 });
 
-const pickedDate: StateHandler = (state, { payload }) => {
+const pickedDate: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!payload?.currentStart) {
-    console.error("no date returned from picker");
-    return state;
+    return errorRedirect(
+      state,
+      action,
+      "no date returned from picker",
+      ErrorType.MISSING_RESOURCE
+    );
   }
   const currentStart = payload.currentStart;
   if (state.ref?.current) {
@@ -73,10 +165,15 @@ const pickedDate: StateHandler = (state, { payload }) => {
   return { ...state, currentStart, pickerShowing: !state.pickerShowing };
 };
 
-const openEventDetail: StateHandler = (state, { payload }) => {
+const openEventDetail: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!payload?.currentEvent) {
-    console.error("no event received for detail view");
-    return state;
+    return errorRedirect(
+      state,
+      action,
+      "no event received for detail view",
+      ErrorType.MISSING_RESOURCE
+    );
   }
   return {
     ...state,
@@ -85,10 +182,15 @@ const openEventDetail: StateHandler = (state, { payload }) => {
   };
 };
 
-const openEventEditor: StateHandler = (state, { payload }) => {
+const openEventEditor: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!payload?.currentEvent) {
-    console.error("no event received for event editor");
-    return state;
+    return errorRedirect(
+      state,
+      action,
+      "no event received for event editor",
+      ErrorType.MISSING_RESOURCE
+    );
   }
   return {
     ...state,
@@ -103,10 +205,15 @@ const openGroupDashboard: StateHandler = (state) => ({
   groupDashboardIsOpen: true,
 });
 
-const openProjectDashboard: StateHandler = (state, { payload }) => {
+const openProjectDashboard: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!payload || !payload.currentProject) {
-    console.error("no current project found; cannot open project");
-    return state;
+    return errorRedirect(
+      state,
+      action,
+      "no current project found; cannot open project",
+      ErrorType.MISSING_RESOURCE
+    );
   }
   const { currentGroup, resources } = state;
   const { currentProject } = payload;
@@ -141,14 +248,25 @@ const receivedAllResources: StateHandler = (state, { payload }) => ({
   loading: false,
 });
 
-const receivedResource: StateHandler = (state, { payload, meta }) => {
+const receivedResource: StateHandler = (state, action) => {
+  const { payload, meta } = action;
   const resources = payload?.resources;
   if (!resources) {
-    throw new Error("no resources in payload");
+    return errorRedirect(
+      state,
+      action,
+      "no resources in payload",
+      ErrorType.MISSING_RESOURCE
+    );
   }
   const resourceKey = meta as number;
   if (resourceKey === undefined) {
-    throw new Error("no context given");
+    return errorRedirect(
+      state,
+      action,
+      "no context given",
+      ErrorType.MISSING_RESOURCE
+    );
   }
   return {
     ...state,
@@ -159,18 +277,28 @@ const receivedResource: StateHandler = (state, { payload, meta }) => {
   };
 };
 
-const selectedGroup: StateHandler = (state, { payload }) => {
+const selectedGroup: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!payload?.currentGroup) {
-    console.error("no group in selected group");
-    return state;
+    return errorRedirect(
+      state,
+      action,
+      "no group in selected group",
+      ErrorType.MISSING_RESOURCE
+    );
   }
   return { ...state, currentGroup: payload.currentGroup };
 };
 
-const selectedLocation: StateHandler = (state, { payload }) => {
+const selectedLocation: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!payload?.resources || !payload.resources[ResourceKey.Locations]) {
-    console.error("no locations in selected location");
-    return state;
+    return errorRedirect(
+      state,
+      action,
+      "no locations in selected location",
+      ErrorType.MISSING_RESOURCE
+    );
   }
   sessionStorage.setItem(
     "locations",
@@ -185,10 +313,15 @@ const selectedLocation: StateHandler = (state, { payload }) => {
   };
 };
 
-const selectedProject: StateHandler = (state, { payload }) => {
+const selectedProject: StateHandler = (state, action) => {
+  const { payload } = action;
   if (!payload?.resources || !payload.resources[ResourceKey.Projects]) {
-    console.error("no user projects in selected projects");
-    return state;
+    return errorRedirect(
+      state,
+      action,
+      "no user projects in selected projects",
+      ErrorType.MISSING_RESOURCE
+    );
   }
   return {
     ...state,
@@ -209,10 +342,14 @@ const togglePicker: StateHandler = (state) => ({
   pickerShowing: !state.pickerShowing,
 });
 
-const viewToday: StateHandler = (state) => {
+const viewToday: StateHandler = (state, action) => {
   if (!state.ref?.current) {
-    console.error("no calendar reference");
-    return state;
+    return errorRedirect(
+      state,
+      action,
+      "no calendar reference",
+      ErrorType.IMPOSSIBLE_STATE
+    );
   }
   state.ref.current.getApi().today();
   return { ...state, currentStart: new Date() };
@@ -221,14 +358,15 @@ const viewToday: StateHandler = (state) => {
 const calendarReducer: StateHandler = (state, action) =>
   ({
     [CalendarAction.ChangedView]: changedView,
-    [CalendarAction.CloseProjectForm]: closeProjectForm,
-    [CalendarAction.CloseReservationForm]: closeReservationForm,
     [CalendarAction.CloseEquipmentForm]: closeEquipmentForm,
     [CalendarAction.CloseEventDetail]: closeEventDetail,
     [CalendarAction.CloseEventEditor]: closeEventEditor,
-    [CalendarAction.CloseProjectDashboard]: closeProjectDashboard,
     [CalendarAction.CloseGroupDashboard]: closeGroupDashboard,
-    [CalendarAction.Error]: error,
+    [CalendarAction.CloseProjectDashboard]: closeProjectDashboard,
+    [CalendarAction.CloseProjectForm]: closeProjectForm,
+    [CalendarAction.CloseReservationForm]: closeReservationForm,
+    [CalendarAction.CloseSnackbar]: closeSnackbar,
+    [CalendarAction.Error]: errorHandler,
     [CalendarAction.Loading]: loading,
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.OpenReservationForm]: openReservationForm,

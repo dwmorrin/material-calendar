@@ -24,5 +24,6 @@ export const initialCalendarState: CalendarState = {
   projectDashboardIsOpen: false,
   resources,
   ref: null,
+  snackbarQueue: [],
 };
 export default initialCalendarState;
