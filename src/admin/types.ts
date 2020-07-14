@@ -39,9 +39,6 @@ export interface AdminState {
   recordPage: number;
   schedulerIsOpen: boolean;
   schedulerLocationId?: number;
-  // // snackbarIsOpen outside snackbar object to avoid rendering message on close
-  // snackbarIsOpen: boolean;
-  // snackbar?: SnackbarState;
   snackbarQueue: SnackbarState[];
 
   // resources

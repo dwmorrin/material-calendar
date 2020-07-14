@@ -10,12 +10,13 @@ type StateHandler = (state: AdminState, action: Action) => AdminState;
  * if error should be displayed to the user, add it to the snackbarQueue
  */
 const errorHandler: StateHandler = (state, { payload, meta }) => {
+  const defaultErrorMessage = "Something went wrong.";
   if (!payload || !payload.error) {
     return {
       ...state,
       snackbarQueue: enqueue(state.snackbarQueue, {
         type: "failure",
-        message: "Something went wrong.",
+        message: defaultErrorMessage,
         autoHideDuration: null,
       }),
     };
@@ -31,7 +32,7 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
         ...state,
         snackbarQueue: enqueue(state.snackbarQueue, {
           type: "failure",
-          message: payload?.error?.message,
+          message: payload?.error?.message || defaultErrorMessage,
           autoHideDuration: null,
         }),
       };
