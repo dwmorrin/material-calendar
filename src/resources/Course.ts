@@ -1,9 +1,10 @@
-import User from "../resources/User";
+import { Manager } from "../resources/User";
+
 export interface Course {
   [k: string]: unknown;
   id: number;
   title: string;
-  managers: Pick<User, "id" | "name" | "username">[];
+  managers: Manager[];
 }
 
 export class Course implements Course {
@@ -12,7 +13,7 @@ export class Course implements Course {
     course = {
       id: 0,
       title: "",
-      managers: [] as Pick<User, "id" | "name" | "username">[],
+      managers: [] as Manager[],
     }
   ) {
     Object.assign(this, course);

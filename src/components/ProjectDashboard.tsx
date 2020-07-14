@@ -27,6 +27,7 @@ import {
   compareStartDates,
   transition,
 } from "../calendar/projectDashboard";
+import User from "../resources/User";
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -40,12 +41,18 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
     projectDashboardIsOpen,
     resources,
   } = state;
+
+  if (!user || !currentProject) return null;
+
   const events = resources[ResourceKey.Events] as Event[];
   const locations = resources[ResourceKey.Locations].filter((location) =>
     currentProject?.allotments.find((a) => a.locationId === location.id)
   );
   const isManager =
-    process.env.NODE_ENV === "development" || user?.roles.includes("manager");
+    process.env.NODE_ENV === "development" ||
+    !!currentProject.managers.find(
+      ({ username }) => username === user.username
+    );
 
   const groupEvents = events.filter(
     (event) =>
@@ -101,15 +108,10 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         }}
       >
         <Typography variant="body2">
-          {currentProject &&
-            getFormattedEventInterval(currentProject.start, currentProject.end)}
+          {getFormattedEventInterval(currentProject.start, currentProject.end)}
         </Typography>
         <Typography variant="body2">
-          Managed by{" "}
-          {currentProject !== undefined &&
-            currentProject.managers
-              .map((manager) => manager.name?.first + " " + manager.name?.last)
-              .join(", ")}
+          Managed by {User.getManagerNames(currentProject.managers)}
         </Typography>
         <ExpansionPanel defaultExpanded={locations.length === 1}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
