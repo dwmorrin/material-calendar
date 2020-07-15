@@ -28,7 +28,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   const { currentGroup, currentProject, resources } = state;
   const groups = resources[ResourceKey.Groups];
   const courses = groups.filter(
-    (group) => group.project === currentProject?.id
+    (group) => group.projectId === currentProject?.id
   );
   return (
     <Dialog

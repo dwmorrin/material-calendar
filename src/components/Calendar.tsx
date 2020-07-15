@@ -41,7 +41,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `/api/events?context=${ResourceKey.Events}`,
       `/api/locations?context=${ResourceKey.Locations}`,
       `/api/users/${user.username}/courses?context=${ResourceKey.Courses}`,
-      `/api/users/${user.username}/groups?context=${ResourceKey.Groups}`,
+      `/api/users/groups?context=${ResourceKey.Groups}`,
       `/api/users/${user.username}/projects?context=${ResourceKey.Projects}`
     );
   }, [user]);
