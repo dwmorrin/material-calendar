@@ -34,6 +34,20 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const classes = useStyles();
 
+  function locationIsChecked(
+    values: {
+      [k: string]: unknown;
+    },
+    title: string
+  ): boolean {
+    if (!values["locations"]) {
+      return false;
+    }
+    const selectedlocations: { [k: string]: boolean } =
+      (values["locations"] as { [k: string]: boolean }) || {};
+    return selectedlocations[title];
+  }
+
   return (
     <Dialog
       fullScreen
@@ -101,6 +115,7 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
                   return (
                     <div key={location.title}>
                       <Checkbox
+                        checked={locationIsChecked(values, location.title)}
                         onChange={(
                           event: React.ChangeEvent<HTMLInputElement>,
                           checked: boolean
