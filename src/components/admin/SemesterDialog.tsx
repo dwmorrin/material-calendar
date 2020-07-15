@@ -25,12 +25,12 @@ const SemesterDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const semesters = (resources[ResourceKey.Semesters] as Semester[]).slice();
   semesters.sort(descendingByStart);
   const close = (): void => dispatch({ type: AdminAction.CloseSemesterDialog });
-  const editSemester = (id: number) => (): void =>
+  const editSemester = (id?: number) => (): void =>
     dispatch({
       type: AdminAction.SelectedDocument,
       payload: {
         resourceKey: ResourceKey.Semesters,
-        resourceInstance: semesters.find(byId(id)),
+        resourceInstance: id ? semesters.find(byId(id)) : new Semester(),
         semesterDialogIsOpen: false,
       },
     });
@@ -42,6 +42,7 @@ const SemesterDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   return (
     <Dialog open={semesterDialogIsOpen} fullScreen={true}>
       <Button onClick={close}>Close</Button>
+      <Button onClick={editSemester()}>Create new semester</Button>
       <List>
         {semesters.map(({ id, title, start, end }) => (
           <ListItem key={`semester-${id}`}>
