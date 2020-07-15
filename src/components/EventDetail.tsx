@@ -17,6 +17,7 @@ import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
 import ReservationForm from "./ReservationForm";
+import ListSubheader from "@material-ui/core/ListSubheader";
 
 const transition = makeTransition("left");
 
@@ -54,7 +55,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     );
   const future = new Date(start as string).getTime() > Date.now();
   const equipmentList = reservation?.equipment
-    ? reservation.equipment.split(",").map((item) => item.split(";"))
+    ? Object.entries(reservation.equipment)
     : null;
 
   return (
@@ -92,17 +93,22 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               end as string | Date
             )}
           </Typography>
+
+          {equipmentList && (
+            <List
+              subheader={
+                <ListSubheader component="div" id="nested-list-subheader">
+                  Requested Equipment
+                </ListSubheader>
+              }
+            >
+              {equipmentList.map(([title, quantity]) => (
+                <ListItem key={title}>{title + ": " + quantity}</ListItem>
+              ))}
+            </List>
+          )}
         </section>
-        {equipmentList && (
-          <List>
-            {equipmentList.map(([description, sku, quantity]) => (
-              <ListItem
-                key={sku}
-              >{`${description} ${sku} ${quantity}`}</ListItem>
-            ))}
-          </List>
-        )}
-        {open && (
+        {future && (userOwns || open) && (
           <Button
             key="MakeBooking"
             style={{
@@ -118,22 +124,20 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               });
             }}
           >
-            Reserve this time
+            {userOwns ? "Modify Reservation" : "Reserve this time"}
           </Button>
         )}
         {userOwns && future && (
           <div>
             <Button
-              variant="contained"
-              style={{ marginBottom: 30, alignSelf: "center" }}
+              key="CancelBooking"
+              style={{
+                backgroundColor: "Red",
+                color: "white",
+                maxWidth: "400px",
+              }}
             >
-              Reserve equipment
-            </Button>
-            <Button
-              variant="contained"
-              style={{ marginBottom: 30, alignSelf: "center" }}
-            >
-              Cancel this reservation
+              Cancel Reservation
             </Button>
           </div>
         )}

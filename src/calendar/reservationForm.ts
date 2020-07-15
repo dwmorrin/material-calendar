@@ -4,6 +4,7 @@ import { object, string } from "yup";
 import { FormikValues } from "formik";
 import { CalendarState } from "./types";
 import Project from "../resources/Project";
+import Event from "../resources/Event";
 import { ResourceKey } from "../resources/types";
 
 export const useStyles = makeStyles({
@@ -56,5 +57,26 @@ export const makeInitialValues = (
     hasNotes: "no",
     hasEquipment: "no",
     equipment: {},
+  };
+};
+
+export const getValuesFromReservation = (
+  event: Event | undefined
+): { [k: string]: unknown } | null => {
+  if (!event?.reservation) {
+    return null;
+  }
+  //notes not yet implemented
+  return {
+    ...event.reservation,
+    project: event.reservation.projectId,
+    description: event.reservation.description,
+    phone: event.reservation.contact,
+    liveRoom: event.reservation.liveRoom ? "yes" : "no",
+    guests: event.reservation.guests,
+    hasGuests: event.reservation.guests ? "yes" : "no",
+    hasNotes: "no",
+    equipment: event.reservation.equipment,
+    hasEquipment: event.reservation.equipment ? "yes" : "no",
   };
 };

@@ -26,6 +26,7 @@ import {
   useStyles,
   submitHandler,
   transition,
+  getValuesFromReservation,
 } from "../calendar/reservationForm";
 
 const RadioYesNo: FunctionComponent<{
@@ -73,7 +74,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
 
       <DialogContent>
         <Formik
-          initialValues={makeInitialValues(state)}
+          initialValues={
+            getValuesFromReservation(state.currentEvent) ||
+            makeInitialValues(state)
+          }
           onSubmit={submitHandler}
           validationSchema={validationSchema}
         >

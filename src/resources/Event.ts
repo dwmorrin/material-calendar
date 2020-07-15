@@ -1,7 +1,13 @@
 export interface ReservationInfo {
   id: number;
+  projectId: number;
   groupId: number;
-  equipment?: string;
+  description: string;
+  liveRoom: boolean;
+  guests: string;
+  notes: string;
+  contact: string;
+  equipment?: { [k: string]: number };
 }
 
 interface Event {
@@ -16,6 +22,16 @@ interface Event {
 }
 
 class Event implements Event {
+  static createQuantity(oldEquipmentList: string): { [k: string]: number } {
+    const equipmentList: { [k: string]: number } = {};
+    const items = oldEquipmentList.split(",");
+    items.forEach(
+      (item) =>
+        (equipmentList[item.split(";")[0]] = parseInt(item.split(";")[2]))
+    );
+    return equipmentList;
+  }
+
   static url = "/api/events";
   constructor(
     event = {
@@ -28,6 +44,11 @@ class Event implements Event {
     }
   ) {
     Object.assign(this, event);
+    //convert old equipment list formats to the new format
+    if (typeof this.reservation?.equipment === "string")
+      this.reservation.equipment = Event.createQuantity(
+        this.reservation.equipment
+      );
   }
 }
 
