@@ -17,7 +17,9 @@ const initialState: AdminState = {
   drawerIsOpen: false,
   fileImportIsOpen: false,
   recordPage: 0,
+  ref: null,
   schedulerIsOpen: true,
+  semesterDialogIsOpen: false,
   snackbarQueue: [],
 
   // resources

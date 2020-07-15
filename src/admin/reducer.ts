@@ -83,6 +83,11 @@ const closeSnackbar: StateHandler = (state) => {
   return { ...state, snackbarQueue };
 };
 
+const closeSemesterDialog: StateHandler = (state) => ({
+  ...state,
+  semesterDialogIsOpen: false,
+});
+
 const openBackups: StateHandler = (state) => ({
   ...state,
   backupsIsOpen: true,
@@ -98,17 +103,16 @@ const openScheduler: StateHandler = (state) => ({
   schedulerIsOpen: true,
 });
 
-const openedFile: StateHandler = (state, action) => {
-  const { payload } = action;
-  if (!payload?.resourceFile) {
-    return errorRedirect(state, action, new Error("unable to open file"));
-  }
-  return {
-    ...state,
-    fileImportIsOpen: true,
-    resourceFile: payload.resourceFile,
-  };
-};
+const openSemesterDialog: StateHandler = (state) => ({
+  ...state,
+  semesterDialogIsOpen: true,
+});
+
+const openedFile: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+  fileImportIsOpen: true,
+});
 
 const receivedAllResources: StateHandler = (state, { payload }) => ({
   ...state,
@@ -134,49 +138,48 @@ const receivedResource: StateHandler = (state, action) => {
   };
 };
 
-const selectedDocument: StateHandler = (state, action) => {
-  const { payload } = action;
-  if (!payload?.resourceInstance) {
-    return errorRedirect(state, action, new Error("no document received"));
-  }
-  return {
-    ...state,
-    detailIsOpen: true,
-    resourceInstance: payload.resourceInstance,
-  };
-};
+const selectedDocument: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+  detailIsOpen: true,
+});
 
-const selectedRecordPage: StateHandler = (state, action) => {
-  const { payload } = action;
-  const recordPage = payload?.recordPage;
-  if (recordPage === undefined) {
-    return errorRedirect(state, action, new Error("no page number received"));
-  }
-  return {
-    ...state,
-    recordPage,
-  };
-};
+const selectedRecordPage: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+});
 
-const selectedResource: StateHandler = (state, action) => {
-  const { payload } = action;
-  const resourceKey = payload?.resourceKey;
-  if (resourceKey === undefined) {
-    return errorRedirect(state, action, new Error("no resource received"));
-  }
-  return {
-    ...state,
-    schedulerIsOpen: false,
-    resourceKey,
-    recordPage: 0,
-  };
-};
+const selectedResource: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+  schedulerIsOpen: false,
+  recordPage: 0,
+});
 
 const selectedSchedulerLocation: StateHandler = (state, { payload }) => ({
   ...state,
+  ...payload,
   schedulerIsOpen: true,
-  schedulerLocationId: payload?.schedulerLocationId,
 });
+
+const selectedSemester: StateHandler = (state, action) => {
+  if (!state.ref?.current) {
+    return errorRedirect(state, action, new Error("no ref to calendar"));
+  }
+  if (!action.payload?.selectedSemester?.start) {
+    return errorRedirect(
+      state,
+      action,
+      new Error("null or invalid semester selected")
+    );
+  }
+  state.ref.current.getApi().gotoDate(action.payload.selectedSemester.start);
+  return {
+    ...state,
+    ...action.payload,
+    semesterDialogIsOpen: false,
+  };
+};
 
 const submittingDocument: StateHandler = (state) => state;
 
@@ -200,11 +203,13 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
     [AdminAction.CloseFileImport]: closeFileImport,
+    [AdminAction.CloseSemesterDialog]: closeSemesterDialog,
     [AdminAction.CloseSnackbar]: closeSnackbar,
     [AdminAction.Error]: errorHandler,
     [AdminAction.OpenBackups]: openBackups,
     [AdminAction.OpenDetail]: openDetail,
     [AdminAction.OpenScheduler]: openScheduler,
+    [AdminAction.OpenSemesterDialog]: openSemesterDialog,
     [AdminAction.OpenedFile]: openedFile,
     [AdminAction.ReceivedAllResources]: receivedAllResources,
     [AdminAction.ReceivedResource]: receivedResource,
@@ -212,6 +217,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.SelectedRecordPage]: selectedRecordPage,
     [AdminAction.SelectedResource]: selectedResource,
     [AdminAction.SelectedSchedulerLocation]: selectedSchedulerLocation,
+    [AdminAction.SelectedSemester]: selectedSemester,
     [AdminAction.SubmittingDocument]: submittingDocument,
     [AdminAction.SubmittingDocumentEnd]: submittingDocumentEnd,
     [AdminAction.ToggleDrawer]: toggleDrawer,

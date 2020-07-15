@@ -1,10 +1,29 @@
-import { AdminAction, Action } from "./types";
+import { AdminAction, Action, AdminUIProps } from "./types";
 import VirtualWeek from "../resources/VirtualWeek";
 import Project from "../resources/Project";
 import Location from "../resources/Location";
 import { compareDateOrder } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
-import Semester from "../resources/Semester";
+
+/**
+ * 2nd argument to React.memo
+ * explicitly declare what state FullCalendar depends on for rendering
+ */
+export const compareCalendarStates = (
+  prevProps: AdminUIProps,
+  nextProps: AdminUIProps
+): boolean => {
+  const prevState = prevProps.state;
+  const nextState = nextProps.state;
+  const compareDeep = (a: unknown, b: unknown): boolean =>
+    JSON.stringify(a) === JSON.stringify(b);
+  return (
+    prevState.ref === nextState.ref &&
+    prevState.schedulerLocationId === nextState.schedulerLocationId &&
+    prevState.selectedSemester === nextState.selectedSemester &&
+    compareDeep(prevState.resources, nextState.resources)
+  );
+};
 
 export const fetchVirtualWeeks = (
   locationId: number,
@@ -37,22 +56,6 @@ export const fetchDefaultLocation = (
         type: AdminAction.Error,
         payload: { error },
         meta: "DEFAULT_LOCATION_FETCH",
-      })
-    );
-};
-
-export const fetchCurrentSemester = (
-  dispatch: (action: Action) => void,
-  setSemester: (s: Semester) => void
-): void => {
-  fetch(`${Semester.url}/current`)
-    .then((response) => response.json())
-    .then(({ data }) => setSemester(new Semester(data)))
-    .catch((error) =>
-      dispatch({
-        type: AdminAction.Error,
-        payload: { error },
-        meta: "CURRENT_SEMESTER_FETCH",
       })
     );
 };

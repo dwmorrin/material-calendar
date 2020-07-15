@@ -6,6 +6,7 @@ import {
   ListItem,
   ExpansionPanel,
   ExpansionPanelSummary,
+  Button,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AdminAction, AdminUIProps } from "../../admin/types";
@@ -101,6 +102,15 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
             >
               Scheduler
             </ExpansionPanelSummary>
+            <ListItem>
+              <Button
+                onClick={(): void =>
+                  dispatch({ type: AdminAction.OpenSemesterDialog })
+                }
+              >
+                Set current semester
+              </Button>
+            </ListItem>
             {locations.map((location) => (
               <ListItem
                 key={location.id}

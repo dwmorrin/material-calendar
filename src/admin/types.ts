@@ -1,5 +1,7 @@
 import { ResourceKey, ResourceInstance } from "../resources/types";
 import { SnackbarState } from "../components/Snackbar";
+import Semester from "../resources/Semester";
+import FullCalendar from "@fullcalendar/react";
 
 export interface Action {
   type: AdminAction;
@@ -12,11 +14,13 @@ export enum AdminAction {
   CloseBackups,
   CloseDetail,
   CloseFileImport,
+  CloseSemesterDialog,
   CloseSnackbar,
   Error,
   OpenBackups,
   OpenDetail,
   OpenScheduler,
+  OpenSemesterDialog,
   OpenedFile,
   ReceivedAllResources,
   ReceivedResource,
@@ -24,6 +28,7 @@ export enum AdminAction {
   SelectedRecordPage,
   SelectedResource,
   SelectedSchedulerLocation,
+  SelectedSemester,
   SubmittingDocument,
   SubmittingDocumentEnd,
   ToggleDrawer,
@@ -37,11 +42,14 @@ export interface AdminState {
   error?: Error;
   fileImportIsOpen: boolean;
   recordPage: number;
+  ref: React.RefObject<FullCalendar> | null;
   schedulerIsOpen: boolean;
   schedulerLocationId?: number;
+  semesterDialogIsOpen: boolean;
   snackbarQueue: SnackbarState[];
 
   // resources
+  selectedSemester?: Semester;
   resourceFile?: string | ArrayBuffer | null;
   resourceKey: ResourceKey;
   resourceInstance?: ResourceInstance;

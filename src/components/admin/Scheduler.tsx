@@ -8,6 +8,7 @@ import VirtualWeek from "../../resources/VirtualWeek";
 import Project from "../../resources/Project";
 import Location from "../../resources/Location";
 import {
+  compareCalendarStates,
   daysInInterval,
   fetchVirtualWeeks,
   makeAllotments,
@@ -17,29 +18,26 @@ import {
   processVirtualWeeksAsHoursRemaining,
   resourceClickHandler,
   fetchDefaultLocation,
-  fetchCurrentSemester,
 } from "../../admin/scheduler";
-import { AdminAction } from "../../admin/types";
+import { AdminUIProps, AdminAction } from "../../admin/types";
+import { ResourceKey } from "../../resources/types";
 
-interface SchedulerProps {
-  dispatch: (action: { type: AdminAction }) => void;
-  locationId?: number;
-  locations: Location[];
-  projects: Project[];
-}
+const mostRecent = (a: Semester, b: Semester): Semester =>
+  new Date(b.start).valueOf() - new Date(a.start).valueOf() < 0 ? a : b;
 
-const Scheduler: FunctionComponent<SchedulerProps> = ({
-  dispatch,
-  locationId,
-  locations,
-  projects,
-}) => {
+const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
+  const { schedulerLocationId: locationId, selectedSemester, ref } = state;
+  const locations = state.resources[ResourceKey.Locations] as Location[];
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const semesters = state.resources[ResourceKey.Semesters] as Semester[];
   const [virtualWeeks, setVirtualWeeks] = useState([] as VirtualWeek[]);
-  const [semester, setSemester] = useState(new Semester());
   const [defaultLocationId, setDefaultLocationId] = useState(-1);
+
+  const semester =
+    selectedSemester || semesters.reduce(mostRecent, new Semester());
+
   useEffect(() => {
     fetchDefaultLocation(dispatch, setDefaultLocationId);
-    fetchCurrentSemester(dispatch, setSemester);
   }, [dispatch]);
 
   useEffect(() => {
@@ -66,11 +64,21 @@ const Scheduler: FunctionComponent<SchedulerProps> = ({
     ...processVirtualWeeksAsHoursRemaining(virtualWeeks, selectedLocationId),
   ];
 
-  return semester.start ? (
+  if (!semester.start) {
+    return <CircularProgress />;
+  }
+
+  return (
     <FullCalendar
       // RESOURCES
       resources={resources}
-      resourceAreaHeaderContent={location.title}
+      resourceAreaHeaderContent={`${location.title} \u00B7 ${semester.title}`}
+      resourceAreaHeaderDidMount={({ el }): void => {
+        el.style.cursor = "pointer";
+        el.addEventListener("click", () =>
+          dispatch({ type: AdminAction.OpenSemesterDialog })
+        );
+      }}
       resourceOrder="id" // TODO user preference; create an order prop
       resourcesInitiallyExpanded={false} // TODO user preference
       resourceLabelDidMount={({ resource: { id, title }, el }): void => {
@@ -93,7 +101,7 @@ const Scheduler: FunctionComponent<SchedulerProps> = ({
       views={{
         resourceTimelineSemester: {
           type: "resourceTimeline",
-          dayCount: numberOfDays + 1,
+          dayCount: numberOfDays,
         },
       }}
       // HEADER CONFIG
@@ -109,11 +117,10 @@ const Scheduler: FunctionComponent<SchedulerProps> = ({
       nowIndicator={true}
       height="auto"
       plugins={[resourceTimelinePlugin, interactionPlugin]}
+      ref={ref}
       schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
     />
-  ) : (
-    <CircularProgress />
   );
 };
 
-export default memo(Scheduler);
+export default memo(Scheduler, compareCalendarStates);

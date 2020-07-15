@@ -3,12 +3,10 @@ import React, {
   useEffect,
   useReducer,
   useContext,
+  useRef,
 } from "react";
 import { RouteComponentProps } from "@reach/router";
 import { AdminAction } from "../../admin/types";
-import Location from "../../resources/Location";
-import Project from "../../resources/Project";
-import { ResourceKey } from "../../resources/types";
 import { Resources } from "../../resources/Resources";
 import reducer from "../../admin/reducer";
 import initialState from "../../admin/initialState";
@@ -23,13 +21,18 @@ import Backups from "./Backups";
 import { AuthContext } from "../AuthContext";
 import { Redirect } from "@reach/router";
 import User from "../../resources/User";
+import SemesterDialog from "./SemesterDialog";
 import Snackbar from "../Snackbar";
+import FullCalendar from "@fullcalendar/react";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
 
 const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, {
+    ...initialState,
+    ref: useRef<FullCalendar>(null),
+  });
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -49,18 +52,14 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       <AdminBar dispatch={dispatch} state={state} />
       <AdminNavigationDrawer dispatch={dispatch} state={state} />
       {state.schedulerIsOpen ? (
-        <Scheduler
-          dispatch={dispatch}
-          locationId={state.schedulerLocationId}
-          locations={state.resources[ResourceKey.Locations] as Location[]}
-          projects={state.resources[ResourceKey.Projects] as Project[]}
-        />
+        <Scheduler dispatch={dispatch} state={state} />
       ) : (
         <AdminDocumentBrowser dispatch={dispatch} state={state} />
       )}
       <AdminDetailsForm dispatch={dispatch} state={state} />
       <FileImport dispatch={dispatch} state={state} />
       <Backups dispatch={dispatch} state={state} />
+      <SemesterDialog dispatch={dispatch} state={state} />
       <Snackbar
         dispatch={dispatch}
         state={state}
