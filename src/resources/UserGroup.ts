@@ -17,7 +17,13 @@ interface UserGroup {
 
 class UserGroup implements UserGroup {
   static makeTitle(members: GroupMember[]): string {
+    if (members.length === 1) {
+      return members[0].name.first + " " + members[0].name.last;
+    }
     const lastNames = members.map((member) => member.name.last);
+    if (lastNames.length < 3) {
+      return lastNames.join(" and ");
+    }
     return lastNames.slice(0, -1).join(", ") + ", and " + lastNames.slice(-1);
   }
   static url = "/api/users/groups";

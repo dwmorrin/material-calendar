@@ -73,7 +73,9 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
       open={projectDashboardIsOpen}
       TransitionComponent={transition}
     >
-      <GroupDashboard state={state} dispatch={dispatch} />
+      {state.groupDashboardIsOpen && (
+        <GroupDashboard state={state} dispatch={dispatch} />
+      )}
       <Toolbar className={classes.toolbar}>
         <IconButton
           edge="start"

@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useState, useEffect } from "react";
 import {
   Dialog,
   Toolbar,
@@ -17,7 +17,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import { getFormattedEventInterval } from "../utils/date";
-import { ResourceKey } from "../resources/types";
+import UserGroup from "../resources/UserGroup";
 
 const transition = makeTransition("right");
 
@@ -25,10 +25,25 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   state,
   dispatch,
 }) => {
-  const { currentGroup, currentProject, resources } = state;
-  const groups = resources[ResourceKey.Groups].filter(
-    (group) => group.projectId === currentProject?.id
-  );
+  const { currentGroup, currentProject } = state;
+  const [groups, setGroups] = useState([] as UserGroup[]);
+  useEffect(() => {
+    if (!currentProject?.id) return;
+    fetch(`/api/projects/${currentProject.id}/groups`)
+      .then((response) => response.json())
+      .then(({ error, data, context }) => {
+        if (error || !data) {
+          return dispatch({
+            type: CalendarAction.Error,
+            payload: { error },
+            meta: context,
+          });
+        }
+        setGroups(
+          data.map((group: UserGroup) => new UserGroup(group)) as UserGroup[]
+        );
+      });
+  }, [currentProject, dispatch]);
   return (
     <Dialog
       fullScreen
