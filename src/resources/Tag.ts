@@ -8,7 +8,7 @@ interface Tag {
 }
 
 class Tag implements Tag {
-  static url = "/api/tag";
+  static url = "/api/tags";
   constructor(tag = { id: "", title: "", category: new Category() }) {
     Object.assign(this, tag);
   }
