@@ -1,4 +1,5 @@
 import { FindResource } from "../resources/Resources";
+import { ResourceKey } from "../resources/types";
 
 type Dispatch = (action: {
   type: number;
@@ -16,21 +17,32 @@ const dispatchError = (dispatch: Dispatch, type: number, error: Error): void =>
 const dispatchAllResources = (
   dispatch: Dispatch,
   type: number,
-  dataArray: { data: unknown[]; context: string }[]
+  responses: { data?: unknown[]; context?: string; error?: Error }[]
 ): void =>
   dispatch({
     type,
     payload: {
       resources: {
-        ...dataArray.reduce(
-          (all, { data, context }) => ({
+        ...responses.reduce((all, { data, context, error }) => {
+          if (typeof context !== "string") {
+            throw new Error(
+              "Server did not provide context for our data request"
+            );
+          }
+          if (!Array.isArray(data)) {
+            throw new Error(
+              `While looking for ${ResourceKey[+context]} data, we received: ${
+                error?.message || "unknown error"
+              }`
+            );
+          }
+          return {
             ...all,
             [+context]: data.map(
               (d) => new (FindResource(+context))(d as never)
             ),
-          }),
-          {}
-        ),
+          };
+        }, {}),
       },
     },
   });

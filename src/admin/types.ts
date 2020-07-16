@@ -36,6 +36,7 @@ export enum AdminAction {
 
 export interface AdminState {
   // UI state
+  appIsBroken: boolean;
   backupsIsOpen: boolean;
   detailIsOpen: boolean;
   drawerIsOpen: boolean;

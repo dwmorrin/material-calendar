@@ -12,6 +12,7 @@ export const resources = ({
 
 const initialState: AdminState = {
   // UI state
+  appIsBroken: false,
   backupsIsOpen: false,
   detailIsOpen: false,
   drawerIsOpen: false,

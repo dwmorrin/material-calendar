@@ -22,6 +22,18 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
     };
   }
   switch (meta) {
+    case "FETCH_ALL_RESOURCES_REJECTED":
+      return {
+        ...state,
+        appIsBroken: true,
+        error: payload?.error,
+        snackbarQueue: enqueue(state.snackbarQueue, {
+          type: "failure",
+          message:
+            "Sorry, something is wrong in the server! Contact tech support",
+          autoHideDuration: null,
+        }),
+      };
     default: {
       console.error({
         error: payload?.error,
