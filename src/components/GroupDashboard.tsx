@@ -26,8 +26,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
 }) => {
   const { currentGroup, currentProject, resources } = state;
-  const groups = resources[ResourceKey.Groups];
-  const courses = groups.filter(
+  const groups = resources[ResourceKey.Groups].filter(
     (group) => group.projectId === currentProject?.id
   );
   return (
@@ -92,7 +91,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="body1">Other groups</Typography>
             </ExpansionPanelSummary>
-            {courses
+            {groups
               ?.filter((group) => group.id !== currentGroup?.id)
               .map((group) => (
                 <ListItem

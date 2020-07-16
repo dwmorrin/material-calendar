@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useState, useContext } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   Button,
@@ -16,6 +16,7 @@ import { RadioGroup, Select, TextField } from "formik-material-ui";
 import CloseIcon from "@material-ui/icons/Close";
 import UserGroup from "../resources/UserGroup";
 import { Field, Form, Formik } from "formik";
+import { AuthContext } from "./AuthContext";
 import EquipmentForm from "./EquipmentForm";
 import QuantityList from "./QuantityList";
 import { ResourceKey } from "../resources/types";
@@ -47,8 +48,12 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
+  const { user } = useContext(AuthContext);
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
-  const groups = state.resources[ResourceKey.Groups] as UserGroup[];
+  const allGroups = state.resources[ResourceKey.Groups] as UserGroup[];
+  const groups = allGroups.filter((group) =>
+    group.members.some((member) => member.username === user?.username)
+  );
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const classes = useStyles();
 
