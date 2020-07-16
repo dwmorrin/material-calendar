@@ -8,5 +8,5 @@ export const values = (state: AdminState): FormValues => {
 
 export const update = (state: AdminState, values: FormValues): Semester => {
   const semester = new Semester(state.resourceInstance as Semester);
-  return { ...semester, ...values };
+  return { ...semester, ...values, name: values.title };
 };
