@@ -16,7 +16,7 @@ export const useStyles = makeStyles({
 
 //! TODO this needs a modal confirmation, loading, and success/failure handling
 export const restore = (filename: string): Promise<void> =>
-  fetch(`/api/backup/restore/${filename}`, { method: "POST" })
+  fetch(`/api/backups/restore/${filename}`, { method: "POST" })
     .then((response) => response.json())
     .then(({ data }) => console.log(data))
     .catch(console.error);

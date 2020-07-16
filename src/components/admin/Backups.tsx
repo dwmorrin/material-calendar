@@ -20,7 +20,7 @@ const Backups: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    fetch("/api/backup")
+    fetch("/api/backups")
       .then((response) => response.json())
       .then(({ data }) => setBackups(data))
       .catch(console.error);
@@ -43,7 +43,7 @@ const Backups: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
         <Button
           variant="contained"
           onClick={(): Promise<void> =>
-            fetch(`/api/backup`, { method: "POST" })
+            fetch(`/api/backups`, { method: "POST" })
               .then((response) => response.json())
               .then(({ data }) => setBackups(data))
               .catch(console.error)
@@ -59,7 +59,7 @@ const Backups: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
                 variant="contained"
                 startIcon={<GetAppIcon />}
                 onClick={(): Promise<void> =>
-                  fetch(`/api/backup/${filename}`)
+                  fetch(`/api/backups/${filename}`)
                     .then((response) => response.blob())
                     .then((blob) => download(blob, filename))
                     .catch(console.error)
