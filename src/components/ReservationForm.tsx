@@ -50,6 +50,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
+  const findGroup = (id: number): UserGroup | undefined => {
+    return groups.find((group) => group.projectId === id);
+  };
+  new UserGroup();
   const classes = useStyles();
 
   return (
@@ -84,7 +88,16 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
             <Form className={classes.list} onSubmit={handleSubmit}>
               <FormLabel>Project:</FormLabel>
-              <Field component={Select} name="project">
+              <Field
+                component={Select}
+                name="project"
+                onClick={(event: { target: { value: number } }): void => {
+                  setFieldValue(
+                    "groupId",
+                    findGroup(event.target.value)?.id || values.groupId
+                  );
+                }}
+              >
                 {projects.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
                     {p.title}
