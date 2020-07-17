@@ -113,7 +113,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           {getFormattedEventInterval(currentProject.start, currentProject.end)}
         </Typography>
         <Typography variant="body2">
-          Managed by {User.getManagerNames(currentProject.managers)}
+          Managed by {User.getManagerNames(currentProject.managers).join(", ")}
         </Typography>
         <ExpansionPanel defaultExpanded={locations.length === 1}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
