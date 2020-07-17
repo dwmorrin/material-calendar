@@ -45,7 +45,14 @@ const Backups: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
           onClick={(): Promise<void> =>
             fetch(`/api/backups`, { method: "POST" })
               .then((response) => response.json())
-              .then(({ data }) => setBackups(data))
+              .then(({ error, data }) => {
+                if (error || !data)
+                  return dispatch({
+                    type: AdminAction.Error,
+                    payload: { error },
+                  });
+                setBackups(data);
+              })
               .catch(console.error)
           }
         >

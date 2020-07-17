@@ -41,7 +41,9 @@ export const dispatchOneResource = (
     body: deleting ? null : JSON.stringify(updater(state, values)),
   })
     .then((response) => response.json())
-    .then(({ data }) => {
+    .then(({ error, data }) => {
+      if (error || !data)
+        return dispatch({ type: AdminAction.Error, payload: { error } });
       dispatch({
         type: AdminAction.ReceivedResource,
         payload: {

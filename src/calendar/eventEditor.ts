@@ -34,7 +34,10 @@ export const onSubmit = (values: Event, actions: FormikValues): void => {
     body: JSON.stringify(values),
   })
     .then((response) => response.json())
-    .then(({ data }) => console.log(data))
+    .then(({ error, data }) => {
+      if (error) return console.error(error);
+      console.log(data);
+    })
     .catch(console.error)
     .finally(() => {
       actions.setSubmitting(false);
