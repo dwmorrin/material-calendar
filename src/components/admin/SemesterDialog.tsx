@@ -1,16 +1,25 @@
 import React, { FC } from "react";
 import {
   Button,
+  ButtonBase,
   Dialog,
+  List,
   ListItem,
   Typography,
-  List,
-  ButtonBase,
+  makeStyles,
 } from "@material-ui/core";
+import AddIcon from "@material-ui/icons/Add";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import Semester from "../../resources/Semester";
 import { getFormattedEventInterval } from "../../utils/date";
+
+const useStyles = makeStyles({
+  semesterListItem: {
+    display: "flex",
+    justifyContent: "space-between",
+  },
+});
 
 const descendingByStart = (
   { start: a }: Semester,
@@ -21,6 +30,7 @@ const byId = (id: number) => (semester: Semester): boolean =>
   semester.id === id;
 
 const SemesterDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
+  const classes = useStyles();
   const { resources, semesterDialogIsOpen } = state;
   const semesters = (resources[ResourceKey.Semesters] as Semester[]).slice();
   semesters.sort(descendingByStart);
@@ -40,12 +50,18 @@ const SemesterDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       payload: { selectedSemester: semesters.find(byId(id)) },
     });
   return (
-    <Dialog open={semesterDialogIsOpen} fullScreen={true}>
+    <Dialog open={semesterDialogIsOpen}>
       <Button onClick={close}>Close</Button>
-      <Button onClick={editSemester()}>Create new semester</Button>
+      <Button
+        variant="contained"
+        startIcon={<AddIcon />}
+        onClick={editSemester()}
+      >
+        Create new semester
+      </Button>
       <List>
         {semesters.map(({ id, title, start, end }) => (
-          <ListItem key={`semester-${id}`}>
+          <ListItem key={`semester-${id}`} className={classes.semesterListItem}>
             <ButtonBase onClick={setSemester(id)}>
               <Typography variant="h6">{title}</Typography>
               <Typography variant="subtitle1" style={{ marginLeft: 20 }}>
