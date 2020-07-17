@@ -3,18 +3,21 @@ import { ResourceInstance } from "../resources/types";
 import { Resources } from "../resources/Resources";
 import { FormikValues } from "formik";
 
+const filePickerErrorAction = {
+  type: AdminAction.Error,
+  meta: "FILE_PICKER",
+};
+
 export const dispatchFile = (
-  dispatch: (action: { type: number; payload: {} }) => void
+  dispatch: (action: Action) => void
 ): ((event: React.ChangeEvent<HTMLInputElement>) => void) => (event): void => {
-  const errorAlert = (): void =>
-    window.alert("Unable to open the selected file.");
-  const files = event.target.files;
+  const { files } = event.target;
   if (!files) {
-    errorAlert();
-    return;
+    return dispatch(filePickerErrorAction);
   }
+  if (!files.length) return; // user picked, then cancelled the next picker
   const reader = new FileReader();
-  reader.onerror = errorAlert;
+  reader.onerror = (): void => dispatch(filePickerErrorAction);
   reader.onload = (): void =>
     dispatch({
       type: AdminAction.OpenedFile,

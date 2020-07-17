@@ -76,7 +76,12 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
       </Typography>
       <Button onClick={handleNewDocument}>Create new {title}</Button>
       <Typography variant="body2">Bulk upload:</Typography>
-      <input type="file" name="file" onChange={dispatchFile(dispatch)} />
+      <input
+        type="file"
+        name="file"
+        accept=".txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
+        onChange={dispatchFile(dispatch)}
+      />
       {resources.length ? (
         resources.map((record: ResourceInstance, index) => (
           <Record

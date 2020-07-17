@@ -22,6 +22,15 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
     };
   }
   switch (meta) {
+    case "FILE_PICKER":
+      return {
+        ...state,
+        snackbarQueue: enqueue(state.snackbarQueue, {
+          type: "failure",
+          message: "Unable to open file!",
+          autoHideDuration: 6000,
+        }),
+      };
     case "FETCH_ALL_RESOURCES_REJECTED":
       return {
         ...state,
