@@ -129,3 +129,15 @@ export const formatForMySQL = (date: string): string => {
  */
 export const makeDefaultDateInputString = (date = new Date()): string =>
   unshiftTZ(date).toJSON().split("T")[0];
+
+export function setDefaultDates<T, K extends keyof T>(
+  obj: T,
+  ...dateKeys: K[]
+): T {
+  const defaultDate = makeDefaultDateInputString();
+  const copy = { ...obj };
+  dateKeys.forEach((key) => {
+    if (!copy[key]) copy[key] = defaultDate as never;
+  });
+  return copy;
+}
