@@ -42,9 +42,9 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
 
   useEffect(() => {
     fetchVirtualWeeks(
-      locationId || defaultLocationId,
       dispatch,
-      setVirtualWeeks
+      setVirtualWeeks,
+      locationId || defaultLocationId
     );
   }, [dispatch, defaultLocationId, locationId]);
 

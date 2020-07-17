@@ -26,15 +26,18 @@ export const compareCalendarStates = (
 };
 
 export const fetchVirtualWeeks = (
-  locationId: number,
   dispatch: (action: Action) => void,
-  setVirtualWeeks: (vws: VirtualWeek[]) => void
+  setVirtualWeeks: (vws: VirtualWeek[]) => void,
+  locationId?: number
 ): void => {
-  fetch(`${VirtualWeek.url}/${locationId}`)
+  if (locationId === undefined || locationId < 1) return;
+  fetch(`${Location.url}/${locationId}/virtualweeks`)
     .then((response) => response.json())
-    .then(({ data }) =>
-      setVirtualWeeks(data.map((vw: VirtualWeek) => new VirtualWeek(vw)))
-    )
+    .then(({ error, data }) => {
+      if (error)
+        return dispatch({ type: AdminAction.Error, payload: { error } });
+      setVirtualWeeks(data.map((vw: VirtualWeek) => new VirtualWeek(vw)));
+    })
     .catch((error) =>
       dispatch({
         type: AdminAction.Error,
@@ -50,7 +53,11 @@ export const fetchDefaultLocation = (
 ): void => {
   fetch(`${Location.url}/default`)
     .then((response) => response.json())
-    .then(({ data }) => setDefaultLocationId(data.id))
+    .then(({ error, data }) => {
+      if (error)
+        return dispatch({ type: AdminAction.Error, payload: { error } });
+      setDefaultLocationId(data[0].id);
+    })
     .catch((error) =>
       dispatch({
         type: AdminAction.Error,
