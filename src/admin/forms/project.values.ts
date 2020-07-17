@@ -3,6 +3,7 @@ import Course from "../../resources/Course";
 import { ResourceKey } from "../../resources/types";
 import { AdminState, FormValues, ValueDictionary } from "../types";
 import { deleteKeys } from "../../utils/deleteKeys";
+import { setDefaultDates } from "../../utils/date";
 
 //! BUG cannot apply boolean to forms, needs to be strings
 // gets choices of group from state, marks which is selected
@@ -32,23 +33,11 @@ const getGroup = (title: string, state: AdminState): Course => {
   return deleteKeys(found as Course, "projects") as Course;
 };
 
-const makeDefaultDateString = (): string => new Date().toJSON().split("T")[0];
-
-// default project dates are set to empty string, this sets them to now
-const setDefaultDates = (project: Project): Project => {
-  const copy = { ...project };
-  const defaultDate = makeDefaultDateString();
-  ["start", "end", "reservationStart"].forEach((key) => {
-    if (!copy[key]) copy[key] = defaultDate;
-  });
-  return copy;
-};
-
 export const values = (state: AdminState): FormValues => {
   const project = state.resourceInstance as Project;
 
   return {
-    ...setDefaultDates(project),
+    ...setDefaultDates(project, "start", "end", "reservationStart"),
     __options__: { courses: getTitlesSelected(project, state) },
   };
 };
