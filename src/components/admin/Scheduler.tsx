@@ -98,6 +98,7 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
       // VISIBLE DATE RANGE
       initialDate={semester.start}
       initialView="resourceTimelineSemester"
+      slotDuration={{ days: 1 }}
       views={{
         resourceTimelineSemester: {
           type: "resourceTimeline",
