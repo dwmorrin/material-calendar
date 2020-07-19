@@ -156,6 +156,12 @@ const receivedResource: StateHandler = (state, action) => {
     detailIsOpen: !!payload?.resourceInstance,
     resourceInstance: payload?.resourceInstance,
     resources: { ...state.resources, [resourceKey]: resources[resourceKey] },
+    snackbarIsOpen: true,
+    snackbarQueue: enqueue(state.snackbarQueue, {
+      type: "success",
+      message: "Changes saved",
+      autoHideDuration: 6000,
+    }),
   };
 };
 
@@ -204,15 +210,7 @@ const selectedSemester: StateHandler = (state, action) => {
 
 const submittingDocument: StateHandler = (state) => state;
 
-const submittingDocumentEnd: StateHandler = (state) => ({
-  ...state,
-  snackbarIsOpen: true,
-  snackbarQueue: enqueue(state.snackbarQueue, {
-    type: "success",
-    message: "Changes saved",
-    autoHideDuration: 6000,
-  }),
-});
+const submittingDocumentEnd: StateHandler = (state) => state;
 
 const toggleDrawer: StateHandler = (state) => ({
   ...state,
