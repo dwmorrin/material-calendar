@@ -102,15 +102,6 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
             >
               Scheduler
             </ExpansionPanelSummary>
-            <ListItem>
-              <Button
-                onClick={(): void =>
-                  dispatch({ type: AdminAction.OpenSemesterDialog })
-                }
-              >
-                Set current semester
-              </Button>
-            </ListItem>
             {locations.map((location) => (
               <ListItem
                 key={location.id}
