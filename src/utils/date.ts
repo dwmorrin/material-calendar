@@ -124,11 +124,35 @@ export const formatForMySQL = (date: string): string => {
 };
 
 /**
+ * Calls .toJSON for YYYY-mm-ddddTHH:MM:SS.MMMTZ format, then removes
+ * the trailing ".MMMTZ" info to remove timezone info.
+ *
+ * This is useful for coercing dates for FullCalendar and date/time pickers.
+ */
+export const removeTZInfo = (date: Date): string => date.toJSON().split(".")[0];
+
+export const makeDateTimeInputString = ({
+  date = new Date(),
+  hours,
+  minutes,
+  unshift = true,
+}: {
+  date?: Date;
+  hours?: number;
+  minutes?: number;
+  unshift?: boolean;
+} = {}): string => {
+  if (typeof hours === "number") date.setHours(hours);
+  if (typeof minutes === "number") date.setMinutes(minutes);
+  return removeTZInfo(unshift ? unshiftTZ(date) : date);
+};
+
+/**
  * get a "YYYY-mm-dd" formatted date string
  * @param date normal use is to leave this undefined
  */
 export const makeDefaultDateInputString = (date = new Date()): string =>
-  unshiftTZ(date).toJSON().split("T")[0];
+  makeDateTimeInputString({ date }).split("T")[0];
 
 export function setDefaultDates<T, K extends keyof T>(
   obj: T,
