@@ -99,6 +99,11 @@ const closeFileImport: StateHandler = (state) => ({
   fileImportIsOpen: false,
 });
 
+const closeLocationHoursDialog: StateHandler = (state) => ({
+  ...state,
+  locationHoursDialogIsOpen: false,
+});
+
 const closeSnackbar: StateHandler = (state) => {
   const [snackbarQueue] = dequeue(state.snackbarQueue);
   return { ...state, snackbarQueue };
@@ -117,6 +122,12 @@ const openBackups: StateHandler = (state) => ({
 const openDetail: StateHandler = (state) => ({
   ...state,
   detailIsOpen: true,
+});
+
+const openLocationHoursDialog: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+  locationHoursDialogIsOpen: true,
 });
 
 const openScheduler: StateHandler = (state) => ({
@@ -222,11 +233,13 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
     [AdminAction.CloseFileImport]: closeFileImport,
+    [AdminAction.CloseLocationHoursDialog]: closeLocationHoursDialog,
     [AdminAction.CloseSemesterDialog]: closeSemesterDialog,
     [AdminAction.CloseSnackbar]: closeSnackbar,
     [AdminAction.Error]: errorHandler,
     [AdminAction.OpenBackups]: openBackups,
     [AdminAction.OpenDetail]: openDetail,
+    [AdminAction.OpenLocationHoursDialog]: openLocationHoursDialog,
     [AdminAction.OpenScheduler]: openScheduler,
     [AdminAction.OpenSemesterDialog]: openSemesterDialog,
     [AdminAction.OpenedFile]: openedFile,

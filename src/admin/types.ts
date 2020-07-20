@@ -1,4 +1,5 @@
 import { ResourceKey, ResourceInstance } from "../resources/types";
+import { LocationHoursState } from "../components/admin/LocationHoursDialog";
 import { SnackbarState } from "../components/Snackbar";
 import Semester from "../resources/Semester";
 import FullCalendar from "@fullcalendar/react";
@@ -14,10 +15,12 @@ export enum AdminAction {
   CloseBackups,
   CloseDetail,
   CloseFileImport,
+  CloseLocationHoursDialog,
   CloseSemesterDialog,
   CloseSnackbar,
   Error,
   OpenBackups,
+  OpenLocationHoursDialog,
   OpenDetail,
   OpenScheduler,
   OpenSemesterDialog,
@@ -42,6 +45,8 @@ export interface AdminState {
   drawerIsOpen: boolean;
   error?: Error;
   fileImportIsOpen: boolean;
+  locationHoursDialogIsOpen: boolean;
+  locationHoursState?: LocationHoursState;
   recordPage: number;
   ref: React.RefObject<FullCalendar> | null;
   schedulerIsOpen: boolean;

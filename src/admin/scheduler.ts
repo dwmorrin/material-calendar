@@ -4,6 +4,56 @@ import Project from "../resources/Project";
 import Location from "../resources/Location";
 import { compareDateOrder } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
+import Semester from "../resources/Semester";
+
+//--- TYPES ---
+
+type Allotment = {
+  start: string;
+  end: string;
+  hours: number;
+};
+
+interface EventProps {
+  event: {
+    id: string;
+    title: string;
+    start: Date | null;
+    extendedProps: { [k: string]: unknown };
+  };
+}
+
+type ProjectResource = {
+  eventBackgroundColor?: string;
+  id: string;
+  title: string;
+  parentId?: string;
+};
+
+interface SelectProps {
+  start: Date;
+  end: Date;
+  resource?: {
+    id: string;
+    title?: string;
+    extendedProps?: { [k: string]: unknown };
+  };
+}
+
+//--- MODULE CONSTANTS ---
+
+const RESOURCE_COLUMN_TEXT_CLASSNAME = "fc-datagrid-cell-main";
+const MILLISECONDS_PER_DAY = 8.64e7;
+
+//--- MODULE FUNCTIONS ---
+
+const addADay = (s: string): string => {
+  const d = new Date(s);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toJSON().split("T")[0];
+};
+
+//--- EXPORTED FUNCTIONS ---
 
 /**
  * 2nd argument to React.memo
@@ -23,6 +73,26 @@ export const compareCalendarStates = (
     prevState.selectedSemester === nextState.selectedSemester &&
     compareDeep(prevState.resources, nextState.resources)
   );
+};
+
+export const fetchDefaultLocation = (
+  dispatch: (action: Action) => void,
+  setDefaultLocationId: (id: number) => void
+): void => {
+  fetch(`${Location.url}/default`)
+    .then((response) => response.json())
+    .then(({ error, data }) => {
+      if (error)
+        return dispatch({ type: AdminAction.Error, payload: { error } });
+      setDefaultLocationId(data[0].id);
+    })
+    .catch((error) =>
+      dispatch({
+        type: AdminAction.Error,
+        payload: { error },
+        meta: "DEFAULT_LOCATION_FETCH",
+      })
+    );
 };
 
 export const fetchVirtualWeeks = (
@@ -47,33 +117,6 @@ export const fetchVirtualWeeks = (
     );
 };
 
-export const fetchDefaultLocation = (
-  dispatch: (action: Action) => void,
-  setDefaultLocationId: (id: number) => void
-): void => {
-  fetch(`${Location.url}/default`)
-    .then((response) => response.json())
-    .then(({ error, data }) => {
-      if (error)
-        return dispatch({ type: AdminAction.Error, payload: { error } });
-      setDefaultLocationId(data[0].id);
-    })
-    .catch((error) =>
-      dispatch({
-        type: AdminAction.Error,
-        payload: { error },
-        meta: "DEFAULT_LOCATION_FETCH",
-      })
-    );
-};
-
-const addADay = (s: string): string => {
-  const d = new Date(s);
-  d.setUTCDate(d.getUTCDate() + 1);
-  return d.toJSON().split("T")[0];
-};
-
-const MILLISECONDS_PER_DAY = 8.64e7;
 export const millisecondsToDays = (ms: number): number =>
   ms < 0
     ? Math.ceil(ms / MILLISECONDS_PER_DAY)
@@ -84,13 +127,6 @@ export const daysInInterval = (start: string, end: string): number => {
     new Date(end).valueOf() - new Date(start).valueOf()
   );
   return inclusive + 1 * (inclusive < 0 ? -1 : 1);
-};
-
-type ProjectResource = {
-  eventBackgroundColor?: string;
-  id: string;
-  title: string;
-  parentId?: string;
 };
 
 export const makeResources = (
@@ -127,12 +163,6 @@ export const makeResources = (
       eventBackgroundColor: "grey",
     },
   ];
-};
-
-type Allotment = {
-  start: string;
-  end: string;
-  hours: number;
 };
 
 export const makeAllotmentSummaryEvent = (
@@ -193,11 +223,13 @@ export const makeAllotments = (projects: Project[], locationId: number): {}[] =>
 
 export const makeDailyHours = (location: Location): {}[] => {
   return location.hours.map((dailyHours) => ({
-    id: `dh${dailyHours.id}`,
+    id: `${Location.locationHoursId}-${dailyHours.id}`,
     start: dailyHours.date,
     allDay: true,
     title: "" + dailyHours.hours,
     resourceId: Location.locationHoursId,
+    // dailyHours: { start: dailyHours.start, end: dailyHours.end },
+    extendedProps: { start: dailyHours.start, end: dailyHours.end },
   }));
 };
 
@@ -231,7 +263,10 @@ export const processVirtualWeeksAsHoursRemaining = (
       title: `${vw.locationHours - vw.projectHours}`,
     }));
 
-const RESOURCE_COLUMN_TEXT_CLASSNAME = "fc-datagrid-cell-main";
+export const mostRecent = (a: Semester, b: Semester): Semester =>
+  new Date(b.start).valueOf() - new Date(a.start).valueOf() < 0 ? a : b;
+
+//--- EVENT HANDLERS ---
 
 export const resourceClickHandler = (
   id: string,
@@ -245,5 +280,68 @@ export const resourceClickHandler = (
     )
   ) {
     window.alert(`ID: ${id}, TITLE: ${title}`);
+  }
+};
+
+export const eventClick = (
+  dispatch: (action: Action) => void,
+  location: Location
+) => ({ event: { id, title, start, extendedProps } }: EventProps): void => {
+  if (!start)
+    return dispatch({
+      type: AdminAction.Error,
+      payload: {
+        error: new Error(`Event with id ${id} is missing start info`),
+      },
+    });
+  if (id.startsWith(Location.locationHoursId))
+    return dispatch({
+      type: AdminAction.OpenLocationHoursDialog,
+      payload: {
+        locationHoursState: {
+          select: {
+            start,
+            end: ((): Date => {
+              const end = new Date(start.getTime());
+              end.setDate(start.getDate() + 1);
+              return end;
+            })(),
+          },
+          time: {
+            start: (extendedProps.start as string) || "09:00:00",
+            end: (extendedProps.end as string) || "17:00:00",
+          },
+          location,
+        },
+      },
+    });
+  console.group("Unhandled scheduler event click");
+  console.log({ id, title, start, extendedProps });
+  console.groupEnd();
+};
+
+export const selectionHandler = (
+  dispatch: (action: Action) => void,
+  location: Location
+) => ({ start, end, resource = { id: "" } }: SelectProps): void => {
+  switch (resource.id) {
+    case Location.locationHoursId:
+      return dispatch({
+        type: AdminAction.OpenLocationHoursDialog,
+        payload: {
+          locationHoursState: {
+            select: { start, end },
+            location,
+            time: {
+              start: (resource.extendedProps?.start as string) || "09:00:00",
+              end: (resource.extendedProps?.end as string) || "17:00:00",
+            },
+          },
+        },
+      });
+    default:
+      console.group("Unhandled Scheduler selection");
+      console.log({ start, end, resource });
+      console.groupEnd();
   }
 };

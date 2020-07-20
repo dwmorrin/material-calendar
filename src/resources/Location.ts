@@ -37,6 +37,14 @@ export interface LocationGroups {
   [k: string]: Location[];
 }
 
+export interface LocationHours {
+  id: number;
+  hours: number;
+  date: string;
+  start?: string; // MySQL TIME format "00:00:00", e.g. 08:00:00 for 8 AM
+  end?: string; // MySQL TIME format "00:00:00", e.g. 25:00:00 for 1 AM next day
+}
+
 export const makeSelectedLocationDict = (
   locations: Location[]
 ): LocationDictionary => {
@@ -70,21 +78,41 @@ interface Location {
   title: string;
   groupId: string; // for UI, to group by categories
   selected?: boolean;
-  hours: { id: number; date: string; hours: number }[];
+  hours: LocationHours[];
 }
 
 class Location implements Location {
   static url = "/api/locations";
-  static locationHoursId = "002"; // magic number to set scheduler order
+  static locationHoursId = "002-LocationHours"; // magic number to set scheduler order
   constructor(
     location = {
       id: 0,
       title: "",
       groupId: "",
-      hours: [] as { id: number; date: string; hours: number }[],
+      hours: [] as LocationHours[],
     }
   ) {
-    Object.assign(this, location);
+    Object.assign(this, {
+      ...location,
+      hours: location.hours.map(Location.locationHoursAdapter),
+    });
+  }
+
+  /**
+   * legacy database only stores an integer amount of hours, but does not record
+   * how that number is derived, i.e. the start and end times.
+   * This applies a default start/end to legacy data.
+   */
+  static locationHoursAdapter(locationHours: LocationHours): LocationHours {
+    if (locationHours.start && locationHours.end) return locationHours;
+    const defaultStartHour = 9;
+    const makeDefaultTimeString = (hour = defaultStartHour): string =>
+      hour.toString().padStart(2, "0") + ":00:00";
+    return {
+      ...locationHours,
+      start: makeDefaultTimeString(),
+      end: makeDefaultTimeString(defaultStartHour + locationHours.hours),
+    };
   }
 }
 

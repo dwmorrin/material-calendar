@@ -122,15 +122,24 @@ test("makeAllotments", () =>
 test("makeDailyHours", () =>
   expect(
     makeDailyHours({
-      hours: [{ date: "2020-06-18", id: 0, hours: 0 }],
+      hours: [
+        {
+          date: "2020-06-18",
+          id: 0,
+          hours: 0,
+          start: "09:00:00",
+          end: "17:00:00",
+        },
+      ],
     })
   ).toEqual([
     {
-      id: "dh0",
-      start: "2020-06-18",
       allDay: true,
-      title: "0",
+      extendedProps: { start: "09:00:00", end: "17:00:00" },
+      id: `${Location.locationHoursId}-0`,
       resourceId: Location.locationHoursId,
+      start: "2020-06-18",
+      title: "0",
     },
   ]));
 

@@ -10,20 +10,20 @@ import Location from "../../resources/Location";
 import {
   compareCalendarStates,
   daysInInterval,
+  eventClick,
+  fetchDefaultLocation,
   fetchVirtualWeeks,
   makeAllotments,
   makeDailyHours,
   makeResources,
+  mostRecent,
   processVirtualWeeks,
   processVirtualWeeksAsHoursRemaining,
   resourceClickHandler,
-  fetchDefaultLocation,
+  selectionHandler,
 } from "../../admin/scheduler";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
-
-const mostRecent = (a: Semester, b: Semester): Semester =>
-  new Date(b.start).valueOf() - new Date(a.start).valueOf() < 0 ? a : b;
 
 const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const { schedulerLocationId: locationId, selectedSemester, ref } = state;
@@ -87,14 +87,10 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
       }}
       // EVENTS
       events={events}
-      eventClick={({ event: { id, title } }): void => {
-        window.alert(`ID: ${id}, TITLE: ${title}`);
-      }}
-      // INTERACTIONS
+      eventClick={eventClick(dispatch, location)}
+      // SELECTIONS
       selectable={true}
-      select={({ start, end, resource = { id: -1, title: "" } }): void =>
-        console.log({ start, end, resource })
-      }
+      select={selectionHandler(dispatch, location)}
       // VISIBLE DATE RANGE
       initialDate={semester.start}
       initialView="resourceTimelineSemester"
