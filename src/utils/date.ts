@@ -162,6 +162,8 @@ export function setDefaultDates<T, K extends keyof T>(
   const copy = { ...obj };
   dateKeys.forEach((key) => {
     if (!copy[key]) copy[key] = defaultDate as never;
+    if (typeof copy[key] === "string")
+      copy[key] = ((copy[key] as unknown) as string).split(".")[0] as never;
   });
   return copy;
 }
