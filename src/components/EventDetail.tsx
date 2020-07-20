@@ -102,8 +102,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 </ListSubheader>
               }
             >
-              {equipmentList.map(([title, quantity]) => (
-                <ListItem key={title}>{title + ": " + quantity}</ListItem>
+              {equipmentList.map(([id, item]) => (
+                <ListItem key={id}>{item.name + ": " + item.quantity}</ListItem>
               ))}
             </List>
           )}

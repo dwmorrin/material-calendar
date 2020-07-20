@@ -27,19 +27,59 @@ import reducer, { initialState } from "../equipmentForm/reducer";
 import EquipmentViewToggleMenu from "./EquipmentViewToggleMenu";
 import EquipmentCart from "./EquipmentCart";
 import EquipmentStandardList from "./EquipmentStandardList";
+import Equipment from "../resources/Equipment";
 
 const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   open,
   setOpen,
   selectedEquipment,
   setFieldValue,
+  event,
 }) => {
   const [state, dispatch] = React.useReducer(reducer, {
     ...initialState,
     setFieldValue,
   });
   const classes = useStyles();
-  const quantizedEquipment = quantizeEquipment(state.equipment);
+  const quantizedEquipment = quantizeEquipment(
+    Equipment.availableItems(state.equipment, event)
+  );
+  //const quantizedEquipment = quantizeEquipment(state.equipment);
+  //console.log(quantizedEquipment);
+
+  const reserveEquipment = (id: number, quantity: number): void => {
+    let quantityToReserve = quantity;
+    const reservationArray: {
+      [k: string]: number;
+    } = {};
+    //wipe the exiting values
+    state.equipment
+      .filter((item) => item.modelId === id)
+      .forEach((item) =>
+        setFieldValue("equipmentReservation[" + item.id + "]", 0)
+      );
+    while (quantityToReserve > 0) {
+      const item = state.equipment
+        .filter((item) => !reservationArray[item.id])
+        .find((item) => item.modelId === id);
+      if (!item) {
+        return undefined;
+      }
+      if (item.quantity >= quantityToReserve) {
+        reservationArray[item.id] = quantityToReserve;
+        quantityToReserve = 0;
+      } else {
+        reservationArray[item.id] = item.quantity;
+        quantityToReserve = quantityToReserve - item.quantity;
+      }
+    }
+    Object.keys(reservationArray).forEach((item) =>
+      setFieldValue(
+        "equipmentReservation[" + item + "]",
+        reservationArray[item]
+      )
+    );
+  };
 
   useEffect(() => fetchAllEquipmentResources(dispatch), []);
 
@@ -120,6 +160,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
         </AppBar>
         {(!state.categoryDrawerView || !state.selectedCategory) && (
           <EquipmentList
+            reserveEquipment={reserveEquipment}
             dispatch={dispatch}
             state={state}
             equipmentList={filterItems(
@@ -133,6 +174,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
         )}
         {state.categoryDrawerView && state.selectedCategory && (
           <EquipmentStandardList
+            reserveEquipment={reserveEquipment}
             setFieldValue={state.setFieldValue}
             equipmentList={filterItems(
               quantizedEquipment,

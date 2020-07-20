@@ -171,11 +171,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               />
               {values.hasEquipment === "yes" && (
                 <section className={classes.list}>
-                  <QuantityList
-                    selectedEquipment={
-                      values.equipment as { [k: string]: number }
-                    }
-                  />
+                  <QuantityList selectedEquipment={values.equipment} />
                   <Button
                     className={classes.addEquipment}
                     size="small"
@@ -184,7 +180,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                     disabled={isSubmitting}
                     onClick={(): void => setEquipmentFormIsOpen(true)}
                   >
-                    Add Equipment
+                    {Object.keys(values.equipment).length > 0
+                      ? "Add/Remove Equipment"
+                      : "Add Equipment"}
                   </Button>
                 </section>
               )}
@@ -199,14 +197,13 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               >
                 Confirm Reservation
               </Button>
-              {values.hasEquipment === "yes" && (
+              {values.hasEquipment === "yes" && state.currentEvent && (
                 <EquipmentForm
                   open={equipmentFormIsOpen}
                   setOpen={setEquipmentFormIsOpen}
-                  selectedEquipment={
-                    values.equipment as { [k: string]: number }
-                  }
+                  selectedEquipment={values.equipment}
                   setFieldValue={setFieldValue}
+                  event={state.currentEvent}
                 />
               )}
               <pre>{JSON.stringify(values, null, 2)}</pre>

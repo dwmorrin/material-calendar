@@ -1,6 +1,7 @@
 import Category from "../resources/Category";
 import Equipment from "../resources/Equipment";
 import Tag from "../resources/Tag";
+import Event from "../resources/Event";
 
 export interface EquipmentState {
   filterDrawerIsOpen: boolean;
@@ -13,7 +14,23 @@ export interface EquipmentState {
   selectedTags: { [k: string]: boolean };
   selectedCategory: Category | null;
   categoryPath: Category[];
-  setFieldValue: (field: string, value: number | string | boolean) => void;
+  setFieldValue: (
+    field: string,
+    value:
+      | string
+      | number
+      | boolean
+      | {
+          name: string;
+          quantity: number;
+          items?:
+            | {
+                id: number;
+                quantity: number;
+              }[]
+            | undefined;
+        }
+  ) => void;
 }
 
 export enum EquipmentActionTypes {
@@ -38,7 +55,28 @@ export interface EquipmentFormProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   selectedEquipment: {
-    [k: string]: number;
+    [k: string]: {
+      name: string;
+      quantity: number;
+      items?: { id: number; quantity: number }[];
+    };
   };
-  setFieldValue: (field: string, value: number | string | boolean) => void;
+  setFieldValue: (
+    field: string,
+    value:
+      | string
+      | number
+      | boolean
+      | {
+          name: string;
+          quantity: number;
+          items?:
+            | {
+                id: number;
+                quantity: number;
+              }[]
+            | undefined;
+        }
+  ) => void;
+  event: Event;
 }

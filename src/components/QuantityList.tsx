@@ -3,12 +3,20 @@ import { List, ListItem, Typography } from "@material-ui/core";
 
 interface QuantityListProps {
   selectedEquipment: {
-    [k: string]: number;
+    [k: string]: {
+      name: string;
+      quantity: number;
+      items?: { id: number; quantity: number }[];
+    };
   };
 }
-const FilterList: FunctionComponent<QuantityListProps> = ({ selectedEquipment }) => {
-  const selectedItems = Object.keys(selectedEquipment).filter(function (key: string) {
-    return selectedEquipment[key] > 0;
+const FilterList: FunctionComponent<QuantityListProps> = ({
+  selectedEquipment,
+}) => {
+  const selectedItems = Object.keys(selectedEquipment).filter(function (
+    key: string
+  ) {
+    return selectedEquipment[key].quantity > 0;
   });
   // Get list of elements to be reserved and display them nicely
   return (
@@ -29,8 +37,12 @@ const FilterList: FunctionComponent<QuantityListProps> = ({ selectedEquipment })
               textTransform: "capitalize",
             }}
           >
-            {selectedItems.map((item) => (
-              <ListItem key={item}>{item + ": " + selectedEquipment[item]}</ListItem>
+            {selectedItems.map((key) => (
+              <ListItem key={key}>
+                {selectedEquipment[key].name +
+                  ": " +
+                  selectedEquipment[key].quantity}
+              </ListItem>
             ))}
           </div>
         ) : (

@@ -5,15 +5,37 @@ import Equipment from "../resources/Equipment";
 
 interface EquipmentStandardListProps {
   equipmentList?: Equipment[];
+  reserveEquipment: (id: number, quantity: number) => void;
   selectedEquipment: {
-    [k: string]: number;
+    [k: string]: {
+      name: string;
+      quantity: number;
+      items?: { id: number; quantity: number }[];
+    };
   };
-  setFieldValue: (field: string, value: number | string | boolean) => void;
+  setFieldValue: (
+    field: string,
+    value:
+      | string
+      | number
+      | boolean
+      | {
+          name: string;
+          quantity: number;
+          items?:
+            | {
+                id: number;
+                quantity: number;
+              }[]
+            | undefined;
+        }
+  ) => void;
 }
 const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
   equipmentList,
   selectedEquipment,
   setFieldValue,
+  reserveEquipment,
 }) => {
   // Create list of single elements. may not work properly for singletons
   return (
@@ -28,14 +50,9 @@ const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
           <EquipmentItem
             key={item.id}
             item={item}
-            quantity={
-              selectedEquipment[
-                item.manufacturer && item.model
-                  ? item.manufacturer + " " + item.model
-                  : item.description
-              ]
-            }
+            values={selectedEquipment[item.modelId]}
             setFieldValue={setFieldValue}
+            reserveEquipment={reserveEquipment}
           />
         ))}
     </List>

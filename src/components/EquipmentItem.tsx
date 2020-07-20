@@ -13,23 +13,50 @@ const getItemName = (item: Equipment): string =>
 
 interface EquipmentItemProps {
   item: Equipment;
-  quantity: number;
-  setFieldValue: (field: string, value: number | string | boolean) => void;
+  values: {
+    name: string;
+    quantity: number;
+    items?: { id: number; quantity: number }[];
+  };
+  setFieldValue: (
+    field: string,
+    value:
+      | string
+      | number
+      | boolean
+      | {
+          name: string;
+          quantity: number;
+          items?:
+            | {
+                id: number;
+                quantity: number;
+              }[]
+            | undefined;
+        }
+  ) => void;
+  reserveEquipment: (id: number, quantity: number) => void;
 }
 const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   item,
-  quantity = 0,
+  values,
   setFieldValue,
 }) => {
   const [errors, setErrors] = React.useState({} as { [k: string]: boolean });
   const itemName = getItemName(item);
+  if (!values) {
+    values = { name: itemName, quantity: 0 };
+  }
   const changeValue = (newValue: number): void => {
     if (newValue < 0) return;
     if (newValue > item.quantity) {
       return setErrors({ ...errors, itemName: true });
     }
     if (itemName in errors) setErrors({ ...errors, itemName: false });
-    setFieldValue("equipment[" + itemName + "]", newValue);
+    setFieldValue("equipment[" + String(item.modelId) + "]", {
+      ...values,
+      quantity: newValue,
+    });
   };
 
   return (
@@ -47,7 +74,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
             flexDirection: "column",
           }}
         >
-          {quantity}
+          {values.quantity}
           <br />
           <ButtonGroup
             variant="contained"
@@ -57,14 +84,14 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
           >
             <Button
               onClick={(): void => {
-                changeValue(quantity - 1);
+                changeValue(values.quantity - 1);
               }}
             >
               -
             </Button>
             <Button
               onClick={(): void => {
-                changeValue(quantity + 1);
+                changeValue(values.quantity + 1);
               }}
             >
               +

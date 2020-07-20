@@ -13,9 +13,14 @@ import Category from "../resources/Category";
 interface EquipmentListProps {
   state: EquipmentState;
   dispatch: (action: EquipmentAction) => void;
+  reserveEquipment: (id: number, quantity: number) => void;
   equipmentList: Equipment[] | undefined;
   selectedEquipment: {
-    [k: string]: number;
+    [k: string]: {
+      name: string;
+      quantity: number;
+      items?: { id: number; quantity: number }[];
+    };
   };
 }
 const EquipmentList: FunctionComponent<EquipmentListProps> = ({
@@ -23,6 +28,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
   dispatch,
   equipmentList,
   selectedEquipment,
+  reserveEquipment,
 }) => {
   const tree = Category.tree(state.categories, null);
   if (!state.equipment.length) return null;
@@ -92,6 +98,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                     )}
                     selectedEquipment={selectedEquipment}
                     setFieldValue={state.setFieldValue}
+                    reserveEquipment={reserveEquipment}
                   />
                 )}
               </List>
