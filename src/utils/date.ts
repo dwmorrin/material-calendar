@@ -1,5 +1,16 @@
 type DateInput = string | number | Date;
 
+interface Time {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
+export const stringifyTime = (time: Time): string => {
+  const pad = (n: number): string => n.toString().padStart(2, "0");
+  return `${pad(time.hours)}:${pad(time.minutes)}:${pad(time.seconds)}`;
+};
+
 export function isDate(date?: DateInput): date is Date {
   return (
     !!date &&
@@ -167,3 +178,42 @@ export function setDefaultDates<T, K extends keyof T>(
   });
   return copy;
 }
+
+export const parseTime = (timeString: string): Time =>
+  timeString.split(":").reduce(
+    (time, str, index) => ({
+      ...time,
+      [index === 0 ? "hours" : index === 1 ? "minutes" : "seconds"]: +str,
+    }),
+    {} as Time
+  );
+
+/**
+ * Returns time string in "00:00:00" format
+ */
+export const getTimeFromDate = (date: Date | string): string =>
+  unshiftTZ(new Date(date)).toJSON().split(/T|\./)[1];
+
+export const parseTimeFromDate = (date: Date | string): Time =>
+  parseTime(getTimeFromDate(date));
+
+/**
+ * If Time.hours and Time.minutes are equal, returns false since times are same,
+ * not earlier/later.
+ * @param earlier - the Time assumed to be earlier (true if earlier)
+ * @param later  - the Time assumed to be earlier (true if later)
+ */
+export const compareTimeInputOrder = (earlier: Time, later: Time): boolean => {
+  if (earlier.hours !== later.hours) return earlier.hours < later.hours;
+  if (earlier.minutes !== later.minutes) return earlier.minutes < later.minutes;
+  return false; // Times are equal to the minutes; they are same, not earlier/later
+};
+
+export const hoursDifference = (earlier: Time, later: Time): number => {
+  const laterHours =
+    later.hours +
+    (compareTimeInputOrder(earlier, later) ? 0 : 24) +
+    later.minutes / 60;
+  const earlierHours = earlier.hours + earlier.minutes / 60;
+  return Math.floor(laterHours - earlierHours);
+};

@@ -1,8 +1,10 @@
 import {
   compareDateOrder,
+  compareTimeInputOrder,
   dateInputToNumber,
   getFormattedDate,
   getFormattedEventInterval,
+  hoursDifference,
   isDate,
   yyyymmdd,
   unshiftTZ,
@@ -96,4 +98,24 @@ test("default date input string", () => {
   expect(+year).toBe(nycAt11PM.getFullYear());
   expect(+month).toBe(nycAt11PM.getMonth() + 1);
   expect(+date).toBe(nycAt11PM.getDate());
+});
+
+const nineThirty = Object.freeze({ hours: 9, minutes: 30, seconds: 0 });
+const tenOClock = Object.freeze({ hours: 10, minutes: 0, seconds: 0 });
+const tenThirty = Object.freeze({ hours: 10, minutes: 30, seconds: 0 });
+const nineOClock = Object.freeze({ hours: 9, minutes: 0, seconds: 0 });
+const nineTwentyNine = Object.freeze({ hours: 9, minutes: 29, seconds: 0 });
+
+test("time input order", () => {
+  expect(compareTimeInputOrder(nineThirty, nineThirty)).toBe(false);
+  expect(compareTimeInputOrder(nineThirty, tenOClock)).toBe(true);
+  expect(compareTimeInputOrder(nineThirty, nineOClock)).toBe(false);
+  expect(compareTimeInputOrder(nineThirty, nineTwentyNine)).toBe(false);
+});
+
+test("hours difference", () => {
+  expect(hoursDifference(nineThirty, nineThirty)).toBe(24);
+  expect(hoursDifference(nineThirty, nineOClock)).toBe(23);
+  expect(hoursDifference(nineThirty, nineTwentyNine)).toBe(23);
+  expect(hoursDifference(nineThirty, tenThirty)).toBe(1);
 });
