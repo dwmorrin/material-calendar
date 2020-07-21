@@ -37,8 +37,8 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
     selectedSemester || semesters.reduce(mostRecent, new Semester());
 
   useEffect(() => {
-    fetchDefaultLocation(dispatch, setDefaultLocationId);
-  }, [dispatch]);
+    if (!locationId) fetchDefaultLocation(dispatch, setDefaultLocationId);
+  }, [dispatch, locationId]);
 
   useEffect(() => {
     fetchVirtualWeeks(

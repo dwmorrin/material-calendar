@@ -84,7 +84,12 @@ export const fetchDefaultLocation = (
     .then(({ error, data }) => {
       if (error)
         return dispatch({ type: AdminAction.Error, payload: { error } });
-      setDefaultLocationId(data[0].id);
+      const id = data[0].id;
+      setDefaultLocationId(id);
+      dispatch({
+        type: AdminAction.SelectedSchedulerLocation,
+        payload: { schedulerLocationId: id },
+      });
     })
     .catch((error) =>
       dispatch({
