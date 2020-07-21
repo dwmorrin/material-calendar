@@ -43,6 +43,8 @@ export interface LocationHours {
   date: string;
   start?: string; // MySQL TIME format "00:00:00", e.g. 08:00:00 for 8 AM
   end?: string; // MySQL TIME format "00:00:00", e.g. 25:00:00 for 1 AM next day
+  semesterId?: number; // legacy data
+  locationId?: number; // legacy data
 }
 
 export const makeSelectedLocationDict = (
