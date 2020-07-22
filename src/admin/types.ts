@@ -1,8 +1,8 @@
 import { ResourceKey, ResourceInstance } from "../resources/types";
-import { LocationHoursState } from "../components/admin/LocationHoursDialog";
 import { SnackbarState } from "../components/Snackbar";
 import Semester from "../resources/Semester";
 import FullCalendar from "@fullcalendar/react";
+import Location from "../resources/Location";
 
 export interface Action {
   type: AdminAction;
@@ -74,4 +74,10 @@ export type ValueDictionary = {
 export interface FormValues {
   [k: string]: unknown;
   __options__?: FormValues;
+}
+
+export interface LocationHoursState {
+  select: { start: Date; end: Date };
+  time: { start: string; end: string };
+  location: Location;
 }

@@ -17,8 +17,12 @@ import { Field, Formik, Form } from "formik";
 import { CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker, TimePicker } from "formik-material-ui-pickers";
 import { AdminUIProps, AdminAction } from "../../admin/types";
-import Location from "../../resources/Location";
-import { makeDateTimeInputString } from "../../utils/date";
+import {
+  makeDateTimeInputString,
+  parseTime,
+  subtractOneDay,
+} from "../../utils/date";
+import { makeOnSubmit } from "../../admin/locationHoursDialog";
 
 const DraggablePaper: FC = (props: PaperProps) => (
   <Draggable
@@ -29,28 +33,27 @@ const DraggablePaper: FC = (props: PaperProps) => (
   </Draggable>
 );
 
-export interface LocationHoursState {
-  select: { start: Date; end: Date };
-  time: { start: string; end: string };
-  location: Location;
-}
-
 const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
-  const { locationHoursState } = state;
-  if (!locationHoursState) return null;
+  const { locationHoursState, selectedSemester, schedulerLocationId } = state;
+  if (
+    !locationHoursState ||
+    !selectedSemester ||
+    schedulerLocationId === undefined
+  )
+    return null;
+
   const { location: currentLocation, select, time } = locationHoursState;
-  const parseTime = (
-    timeString: string
-  ): { hours: number; minutes: number; seconds: number } =>
-    timeString.split(":").reduce(
-      (time, str, index) => ({
-        ...time,
-        [index === 0 ? "hours" : index === 1 ? "minutes" : "seconds"]: +str,
-      }),
-      {} as { hours: number; minutes: number; seconds: number }
-    );
+
   const close = (): void =>
     dispatch({ type: AdminAction.CloseLocationHoursDialog });
+
+  const onSubmit = makeOnSubmit(
+    dispatch,
+    state,
+    selectedSemester,
+    schedulerLocationId
+  );
+
   const initialValues = {
     start: makeDateTimeInputString({
       hours: parseTime(time.start).hours,
@@ -62,7 +65,10 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
     }),
     from: {
       start: makeDateTimeInputString({ date: select.start, unshift: false }),
-      end: makeDateTimeInputString({ date: select.end, unshift: false }),
+      end: makeDateTimeInputString({
+        date: subtractOneDay(select.end), // select has exclusive end
+        unshift: false,
+      }),
       allSemester: false,
     },
     repeat: {
@@ -75,6 +81,7 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       sunday: false,
     },
   };
+
   return (
     <Dialog
       open={state.locationHoursDialogIsOpen}
@@ -87,89 +94,94 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       </DialogTitle>
       <DialogContent>
         <MuiPickersUtilsProvider utils={MomentUtils}>
-          <Formik initialValues={initialValues} onSubmit={close}>
-            <Form>
-              <Box>
-                <Field component={TimePicker} name="start" label="Start" />
-                <Field component={TimePicker} name="end" label="End" />
-              </Box>
-              <Box style={{ display: "flex", flexDirection: "column" }}>
-                <FormLabel>Apply to date range</FormLabel>
-                <Field component={DatePicker} name="from.start" label="Start" />
-                <Field
-                  component={DatePicker}
-                  name="from.end"
-                  label="End (Exclusive)"
-                />
-                <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
-                  name="from.allSemester"
-                  Label={{
-                    label: "Apply to entire semester",
-                  }}
-                  checked={initialValues.from.allSemester}
-                />
-              </Box>
-              <Box>
-                <FormLabel>Repeat on</FormLabel>
-                <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
-                  name="repeat.monday"
-                  Label={{ label: "M" }}
-                  checked={initialValues.repeat.monday}
-                />
-                <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
-                  name="repeat.tuesday"
-                  Label={{ label: "T" }}
-                  checked={initialValues.repeat.tuesday}
-                />
-                <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
-                  name="repeat.wednesday"
-                  Label={{ label: "W" }}
-                  checked={initialValues.repeat.wednesday}
-                />
-                <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
-                  name="repeat.thursday"
-                  Label={{ label: "Th" }}
-                  checked={initialValues.repeat.thursday}
-                />
-                <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
-                  name="repeat.friday"
-                  Label={{ label: "F" }}
-                  checked={initialValues.repeat.friday}
-                />
-                <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
-                  name="repeat.saturday"
-                  Label={{ label: "Sa" }}
-                  checked={initialValues.repeat.saturday}
-                />
-                <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
-                  name="repeat.sunday"
-                  Label={{ label: "Su" }}
-                  checked={initialValues.repeat.sunday}
-                />
-              </Box>
-            </Form>
+          <Formik initialValues={initialValues} onSubmit={onSubmit}>
+            {({ handleSubmit }): unknown => (
+              <Form onSubmit={handleSubmit}>
+                <Box>
+                  <Field component={TimePicker} name="start" label="Start" />
+                  <Field component={TimePicker} name="end" label="End" />
+                </Box>
+                <Box style={{ display: "flex", flexDirection: "column" }}>
+                  <FormLabel>Apply to date range</FormLabel>
+                  <Field
+                    component={DatePicker}
+                    name="from.start"
+                    label="Start"
+                  />
+                  <Field component={DatePicker} name="from.end" label="End" />
+                  <Field
+                    type="checkbox"
+                    component={CheckboxWithLabel}
+                    name="from.allSemester"
+                    Label={{
+                      label: "Apply to entire semester",
+                    }}
+                    checked={initialValues.from.allSemester}
+                  />
+                </Box>
+                <Box>
+                  <FormLabel>Repeat on</FormLabel>
+                  <Field
+                    type="checkbox"
+                    component={CheckboxWithLabel}
+                    name="repeat.monday"
+                    Label={{ label: "M" }}
+                    checked={initialValues.repeat.monday}
+                  />
+                  <Field
+                    type="checkbox"
+                    component={CheckboxWithLabel}
+                    name="repeat.tuesday"
+                    Label={{ label: "T" }}
+                    checked={initialValues.repeat.tuesday}
+                  />
+                  <Field
+                    type="checkbox"
+                    component={CheckboxWithLabel}
+                    name="repeat.wednesday"
+                    Label={{ label: "W" }}
+                    checked={initialValues.repeat.wednesday}
+                  />
+                  <Field
+                    type="checkbox"
+                    component={CheckboxWithLabel}
+                    name="repeat.thursday"
+                    Label={{ label: "Th" }}
+                    checked={initialValues.repeat.thursday}
+                  />
+                  <Field
+                    type="checkbox"
+                    component={CheckboxWithLabel}
+                    name="repeat.friday"
+                    Label={{ label: "F" }}
+                    checked={initialValues.repeat.friday}
+                  />
+                  <Field
+                    type="checkbox"
+                    component={CheckboxWithLabel}
+                    name="repeat.saturday"
+                    Label={{ label: "Sa" }}
+                    checked={initialValues.repeat.saturday}
+                  />
+                  <Field
+                    type="checkbox"
+                    component={CheckboxWithLabel}
+                    name="repeat.sunday"
+                    Label={{ label: "Su" }}
+                    checked={initialValues.repeat.sunday}
+                  />
+                </Box>
+                <DialogActions>
+                  <Button onClick={close}>Cancel</Button>
+                  <Button variant="contained" type="submit">
+                    Submit
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
           </Formik>
         </MuiPickersUtilsProvider>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={close}>Close</Button>
-      </DialogActions>
     </Dialog>
   );
 };
