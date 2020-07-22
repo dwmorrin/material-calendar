@@ -32,9 +32,18 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const semesters = state.resources[ResourceKey.Semesters] as Semester[];
   const [virtualWeeks, setVirtualWeeks] = useState([] as VirtualWeek[]);
   const [defaultLocationId, setDefaultLocationId] = useState(-1);
+  const defaultSemester = semesters.reduce(mostRecent, new Semester());
+  const semester = selectedSemester || defaultSemester;
 
-  const semester =
-    selectedSemester || semesters.reduce(mostRecent, new Semester());
+  useEffect(() => {
+    if (!selectedSemester && ref?.current)
+      dispatch({
+        type: AdminAction.SelectedSemester,
+        payload: {
+          selectedSemester: defaultSemester,
+        },
+      });
+  }, [dispatch, selectedSemester, semesters, ref, defaultSemester]);
 
   useEffect(() => {
     if (!locationId) fetchDefaultLocation(dispatch, setDefaultLocationId);
@@ -50,6 +59,10 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
 
   const selectedLocationId = locationId || defaultLocationId;
 
+  if (!semester?.start) {
+    return <CircularProgress />;
+  }
+
   const location =
     locations.find((location) => location.id === selectedLocationId) ||
     new Location();
@@ -63,10 +76,6 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
     ...dailyHours,
     ...processVirtualWeeksAsHoursRemaining(virtualWeeks, selectedLocationId),
   ];
-
-  if (!semester.start) {
-    return <CircularProgress />;
-  }
 
   return (
     <FullCalendar
