@@ -217,3 +217,30 @@ export const hoursDifference = (earlier: Time, later: Time): number => {
   const earlierHours = earlier.hours + earlier.minutes / 60;
   return Math.floor(laterHours - earlierHours);
 };
+
+/**
+ * returns iterator, expected usage is [...dateGenerator(start, end)]
+ * Optional 3rd parameter will generate days on the specified days only.
+ * e.g. [0,6] would generate Saturday and Sunday dates only.
+ * @param start - YYYY-mm-dd format
+ * @param end - YYYY-mm-dd format
+ * @param days - optional array of numbers: see Date.prototype.getUTCDay()
+ */
+export const dateGenerator = (
+  start: string,
+  end: string,
+  days = [] as number[]
+): { [Symbol.iterator](): Generator<string> } => {
+  const currentDate = new Date(start);
+  const endValue = new Date(end).valueOf();
+  return {
+    *[Symbol.iterator](): Generator<string> {
+      while (endValue >= currentDate.valueOf()) {
+        if (!days.length || days.includes(currentDate.getUTCDay())) {
+          yield currentDate.toJSON().split("T")[0];
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    },
+  };
+};

@@ -1,6 +1,7 @@
 import {
   compareDateOrder,
   compareTimeInputOrder,
+  dateGenerator,
   dateInputToNumber,
   getFormattedDate,
   getFormattedEventInterval,
@@ -118,4 +119,17 @@ test("hours difference", () => {
   expect(hoursDifference(nineThirty, nineOClock)).toBe(23);
   expect(hoursDifference(nineThirty, nineTwentyNine)).toBe(23);
   expect(hoursDifference(nineThirty, tenThirty)).toBe(1);
+});
+
+test("date generator", () => {
+  expect([...dateGenerator("2020-09-03", "2020-09-05")]).toEqual([
+    "2020-09-03",
+    "2020-09-04",
+    "2020-09-05",
+  ]);
+  expect([...dateGenerator("2020-09-03", "2020-09-15", [2, 3])]).toEqual([
+    "2020-09-08",
+    "2020-09-09",
+    "2020-09-15",
+  ]);
 });
