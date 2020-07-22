@@ -244,3 +244,9 @@ export const dateGenerator = (
     },
   };
 };
+
+export const subtractOneDay = (date: Date): Date => {
+  const copy = new Date(date);
+  copy.setUTCDate(copy.getUTCDate() - 1);
+  return copy;
+};
