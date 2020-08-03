@@ -1,3 +1,5 @@
+import { add, lightFormat } from "date-fns/fp";
+
 type DateInput = string | number | Date;
 
 interface Time {
@@ -5,6 +7,10 @@ interface Time {
   minutes: number;
   seconds: number;
 }
+
+const add1Day = add({ days: 1 });
+
+export const formatJSON = lightFormat("yyyy-MM-dd'T'HH:mm:ss");
 
 export const stringifyTime = (time: Time): string => {
   const pad = (n: number): string => n.toString().padStart(2, "0");
@@ -245,8 +251,44 @@ export const dateGenerator = (
   };
 };
 
+export interface EventDuration {
+  start: Date;
+  end: Date;
+}
+interface EventGeneratorProps extends EventDuration {
+  until: Date;
+  days: number[];
+}
+
+export const eventGenerator = ({
+  start,
+  end,
+  until,
+  days,
+}: EventGeneratorProps): {
+  [Symbol.iterator](): Generator<{ start: string; end: string }>;
+} => ({
+  *[Symbol.iterator](): Generator<{ start: string; end: string }> {
+    const untilValue = until.valueOf();
+    while (untilValue >= start.valueOf()) {
+      if (!days.length || days.includes(start.getUTCDay())) {
+        yield {
+          start: formatJSON(start),
+          end: formatJSON(end),
+        };
+      }
+      start = add1Day(start);
+      end = add1Day(end);
+    }
+  },
+});
+
 export const subtractOneDay = (date: Date): Date => {
   const copy = new Date(date);
   copy.setUTCDate(copy.getUTCDate() - 1);
   return copy;
 };
+
+export const trimTZ = (dateString: string): string => dateString.split(".")[0];
+
+export const ISO = "YYYY-MM-DDTHH:mm:ss";

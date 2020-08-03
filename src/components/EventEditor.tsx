@@ -14,13 +14,14 @@ import { Field, Formik, Form } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker, DateTimePicker } from "formik-material-ui-pickers";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
 import {
   useStyles,
   initialEventOptions,
-  onSubmit,
+  makeOnSubmit,
   EventEditorProps,
 } from "../calendar/eventEditor";
+import DateFnsUtils from "@date-io/date-fns";
+import { trimTZ } from "../utils/date";
 
 const EventEditor: FunctionComponent<EventEditorProps> = ({
   dispatch,
@@ -30,8 +31,11 @@ const EventEditor: FunctionComponent<EventEditorProps> = ({
   const classes = useStyles();
   const initialValues = {
     ...event,
+    start: new Date(trimTZ(event.start)),
+    end: new Date(trimTZ(event.end)),
     __options__: initialEventOptions,
   };
+  const onSubmit = makeOnSubmit(dispatch);
 
   return (
     <Dialog open={open}>
@@ -48,7 +52,7 @@ const EventEditor: FunctionComponent<EventEditorProps> = ({
         </IconButton>
         <Typography variant="h6">Edit {event.location.title} event</Typography>
       </Toolbar>
-      <MuiPickersUtilsProvider utils={MomentUtils}>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Formik initialValues={initialValues} onSubmit={onSubmit}>
           {({ values }): unknown => (
             <Form className={classes.list}>

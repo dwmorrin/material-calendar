@@ -81,3 +81,9 @@ export type CalendarUIProps = {
   dispatch: (action: Action) => void;
   state: CalendarState;
 };
+
+export type ApiResponse = {
+  error?: Error;
+  data?: unknown;
+  context?: unknown;
+};
