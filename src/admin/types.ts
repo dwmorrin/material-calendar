@@ -81,3 +81,9 @@ export interface LocationHoursState {
   time: { start: string; end: string };
   location: Location;
 }
+
+export interface ApiResponse {
+  error?: Error;
+  data?: unknown;
+  context?: unknown;
+}

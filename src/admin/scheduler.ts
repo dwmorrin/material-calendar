@@ -226,17 +226,15 @@ export const makeAllotments = (projects: Project[], locationId: number): {}[] =>
     return allots;
   }, [] as {}[]);
 
-export const makeDailyHours = (location: Location): {}[] => {
-  return location.hours.map((dailyHours) => ({
+export const makeDailyHours = (location: Location): {}[] =>
+  location.hours.map((dailyHours) => ({
     id: `${Location.locationHoursId}-${dailyHours.id}`,
     start: dailyHours.date,
     allDay: true,
     title: "" + dailyHours.hours,
     resourceId: Location.locationHoursId,
-    // dailyHours: { start: dailyHours.start, end: dailyHours.end },
     extendedProps: { start: dailyHours.start, end: dailyHours.end },
   }));
-};
 
 export const processVirtualWeeks = (
   virtualWeeks: VirtualWeek[],
@@ -299,7 +297,7 @@ export const eventClick = (
         error: new Error(`Event with id ${id} is missing start info`),
       },
     });
-  if (id.startsWith(Location.locationHoursId))
+  if (id.startsWith(Location.locationHoursId)) {
     return dispatch({
       type: AdminAction.OpenLocationHoursDialog,
       payload: {
@@ -320,6 +318,7 @@ export const eventClick = (
         },
       },
     });
+  }
   console.group("Unhandled scheduler event click");
   console.log({ id, title, start, extendedProps });
   console.groupEnd();

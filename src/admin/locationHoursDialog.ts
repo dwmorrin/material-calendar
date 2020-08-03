@@ -1,5 +1,11 @@
 import { FormikValues } from "formik";
-import { FormValues, Action, AdminAction, AdminState } from "./types";
+import {
+  FormValues,
+  Action,
+  AdminAction,
+  AdminState,
+  ApiResponse,
+} from "./types";
 import Location, { LocationHours } from "../resources/Location";
 import Semester from "../resources/Semester";
 import {
@@ -7,6 +13,7 @@ import {
   hoursDifference,
   parseTimeFromDate,
   stringifyTime,
+  trimTZ,
 } from "../utils/date";
 import { ResourceKey } from "../resources/types";
 
@@ -31,6 +38,13 @@ export const mapRepeatToNumber = (repeat: string): number => {
   }
 };
 
+const getRepeats = (repeats: FormValues): number[] =>
+  Object.entries(repeats).reduce(
+    (days, [day, selected]) =>
+      selected ? [...days, mapRepeatToNumber(day)] : days,
+    [] as number[]
+  );
+
 export const makeOnSubmit = (
   dispatch: (action: Action) => void,
   state: AdminState,
@@ -54,21 +68,38 @@ export const makeOnSubmit = (
     end: stringifyTime(end),
   });
 
-  const getRepeats = (repeats: FormValues): number[] =>
-    Object.entries(repeats).reduce(
-      (days, [day, selected]) =>
-        selected ? [...days, mapRepeatToNumber(day)] : days,
-      [] as number[]
-    );
   const repeats = getRepeats(values.repeat as FormValues);
   const range = from.allSemester ? semester : from;
   const hours = [
-    ...dateGenerator(
-      range.start.split(".")[0], // remove TZ info
-      range.end.split(".")[0],
-      repeats
-    ),
+    ...dateGenerator(trimTZ(range.start), trimTZ(range.end), repeats),
   ].map(makeDailyHours);
+
+  const dispatchError = (error: Error): void =>
+    dispatch({ type: AdminAction.Error, payload: { error } });
+
+  const dispatchUpdatedLocations = ({ error, data }: ApiResponse): void => {
+    if (error) return dispatchError(error);
+    dispatch({
+      type: AdminAction.ReceivedResource,
+      payload: {
+        resources: {
+          ...state.resources,
+          [ResourceKey.Locations]: data as Location[],
+        },
+      },
+      meta: ResourceKey.Locations,
+    });
+  };
+
+  const handleData = ({ error }: ApiResponse): void => {
+    if (error) return dispatchError(error);
+    fetch(`${Location.url}`)
+      .then((response) => response.json())
+      .then(dispatchUpdatedLocations)
+      .catch(dispatchError);
+  };
+
+  const cleanup = (): void => actions.setSubmitting(false);
 
   fetch(`${Location.url}/${locationId}/hours/bulk`, {
     method: "POST",
@@ -76,29 +107,7 @@ export const makeOnSubmit = (
     headers: { "Content-Type": "application/json" },
   })
     .then((response) => response.json())
-    .then(({ error }) => {
-      if (error)
-        return dispatch({ type: AdminAction.Error, payload: { error } });
-      fetch(`${Location.url}`)
-        .then((response) => response.json())
-        .then(({ error, data }) => {
-          if (error)
-            return dispatch({ type: AdminAction.Error, payload: { error } });
-          dispatch({
-            type: AdminAction.ReceivedResource,
-            payload: {
-              resources: {
-                ...state.resources,
-                [ResourceKey.Locations]: data,
-              },
-            },
-            meta: ResourceKey.Locations,
-          });
-        })
-        .catch((error) =>
-          dispatch({ type: AdminAction.Error, payload: { error } })
-        );
-    })
-    .catch((error) => dispatch({ type: AdminAction.Error, payload: { error } }))
-    .finally(() => actions.setSubmitting(false));
+    .then(handleData)
+    .catch(dispatchError)
+    .finally(cleanup);
 };
