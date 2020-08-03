@@ -35,7 +35,9 @@ test("daysInInterval returns negative days", () =>
   expect(daysInInterval("2020-06-21", "2020-06-19")).toEqual(-3));
 
 test("makeResources", () =>
-  expect(makeResources([], 0)).toEqual([
+  expect(
+    makeResources([], 0, { start: "2020-01-01", end: "2020-01-30" })
+  ).toEqual([
     { id: VirtualWeek.resourceId, title: "Virtual Weeks" },
     { id: Location.locationHoursId, title: "Daily Location Hours" },
     {

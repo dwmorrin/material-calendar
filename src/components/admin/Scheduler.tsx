@@ -68,7 +68,7 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
     new Location();
   const numberOfDays = daysInInterval(semester.start, semester.end);
   const dailyHours = makeDailyHours(location);
-  const resources = makeResources(projects, selectedLocationId);
+  const resources = makeResources(projects, selectedLocationId, semester);
   const allotments = makeAllotments(projects, selectedLocationId);
   const events = [
     ...processVirtualWeeks(virtualWeeks, selectedLocationId),

@@ -5,6 +5,8 @@ import Location from "../resources/Location";
 import { compareDateOrder } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";
+import { parseJSON } from "date-fns";
+import { areIntervalsOverlapping } from "date-fns/fp";
 
 //--- TYPES ---
 
@@ -136,11 +138,23 @@ export const daysInInterval = (start: string, end: string): number => {
 
 export const makeResources = (
   projects: Project[],
-  locationId: number
+  locationId: number,
+  semester: Semester
 ): ProjectResource[] => {
+  const overlapsSemester = areIntervalsOverlapping({
+    start: parseJSON(semester.start),
+    end: parseJSON(semester.end),
+  });
   const getColor = scaleOrdinal(schemeCategory10);
-  const projectsOfInterest = projects.filter((p) =>
-    p.allotments.some((a) => a.locationId === locationId)
+  const projectsOfInterest = projects.filter(
+    (project) =>
+      overlapsSemester({
+        start: parseJSON(project.start),
+        end: parseJSON(project.end),
+      }) &&
+      project.allotments.some(
+        (allotment) => allotment.locationId === locationId
+      )
   );
   return [
     {
