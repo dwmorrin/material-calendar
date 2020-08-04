@@ -2,10 +2,11 @@ import { AdminAction, Action, AdminState, FormValues } from "./types";
 import { ResourceInstance } from "../resources/types";
 import { Resources } from "../resources/Resources";
 import { FormikValues } from "formik";
+import { ErrorType } from "../utils/error";
 
 const filePickerErrorAction = {
   type: AdminAction.Error,
-  meta: "FILE_PICKER",
+  meta: ErrorType.FILE_PICKER,
 };
 
 export const dispatchFile = (

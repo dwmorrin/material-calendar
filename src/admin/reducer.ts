@@ -1,6 +1,7 @@
 import { Action, AdminState, AdminAction } from "./types";
 import { ResourceKey } from "../resources/types";
 import { enqueue, dequeue } from "../utils/queue";
+import { ErrorType } from "../utils/error";
 
 type StateHandler = (state: AdminState, action: Action) => AdminState;
 
@@ -21,8 +22,8 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
       }),
     };
   }
-  switch (meta) {
-    case "FILE_PICKER":
+  switch (meta as ErrorType) {
+    case ErrorType.FILE_PICKER:
       return {
         ...state,
         snackbarQueue: enqueue(state.snackbarQueue, {
@@ -31,21 +32,22 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
           autoHideDuration: 6000,
         }),
       };
-    case "FETCH_ALL_RESOURCES_REJECTED":
+    case ErrorType.MISSING_RESOURCE:
       return {
         ...state,
         appIsBroken: true,
-        error: payload?.error,
+        error: payload.error,
         snackbarQueue: enqueue(state.snackbarQueue, {
           type: "failure",
           message:
-            "Sorry, something is wrong in the server! Contact tech support",
+            payload.error.message ||
+            "We didn't receive all the data from the server, try again later",
           autoHideDuration: null,
         }),
       };
     default: {
       console.error({
-        error: payload?.error,
+        error: payload.error,
         snackbarQueue: state.snackbarQueue,
         meta,
       });
@@ -53,7 +55,7 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
         ...state,
         snackbarQueue: enqueue(state.snackbarQueue, {
           type: "failure",
-          message: payload?.error?.message || defaultErrorMessage,
+          message: payload.error.message || defaultErrorMessage,
           autoHideDuration: null,
         }),
       };

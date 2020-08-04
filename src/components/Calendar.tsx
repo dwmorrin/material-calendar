@@ -23,6 +23,7 @@ import { Box } from "@material-ui/core";
 import EventEditor from "./EventEditor";
 import ProjectForm from "./ProjectForm";
 import Snackbar from "./Snackbar";
+import ErrorPage from "./ErrorPage";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
@@ -48,6 +49,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   return (
     (user?.username && (
       <Box>
+        <ErrorPage open={state.appIsBroken} error={state.error} />
         <ProjectDashboard dispatch={dispatch} state={state} />
         <TemporaryDrawer dispatch={dispatch} state={state} />
         <EventDetail dispatch={dispatch} state={state} />

@@ -42,6 +42,7 @@ export type CalendarView =
 
 export interface CalendarState {
   // UI state
+  appIsBroken: boolean;
   currentStart: Date;
   currentView: string;
   detailIsOpen: boolean;

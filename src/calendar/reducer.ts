@@ -2,13 +2,9 @@ import { CalendarAction, CalendarState, Action } from "./types";
 import { ResourceKey } from "../resources/types";
 import UserGroup from "../resources/UserGroup";
 import { enqueue, dequeue } from "../utils/queue";
+import { ErrorType } from "../utils/error";
 
 type StateHandler = (state: CalendarState, action: Action) => CalendarState;
-
-enum ErrorType {
-  MISSING_RESOURCE,
-  IMPOSSIBLE_STATE,
-}
 
 //-------- ERROR HANDLING ---------------
 
@@ -31,10 +27,12 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
     case ErrorType.MISSING_RESOURCE:
       return {
         ...state,
+        appIsBroken: true,
+        error: payload.error,
         snackbarQueue: enqueue(state.snackbarQueue, {
           type: "failure",
           message:
-            payload?.error?.message ||
+            payload.error.message ||
             "We didn't receive all the data from the server, try again later",
           autoHideDuration: null,
         }),
@@ -42,15 +40,17 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
     case ErrorType.IMPOSSIBLE_STATE:
       return {
         ...state,
+        appIsBroken: true,
+        error: payload.error,
         snackbarQueue: enqueue(state.snackbarQueue, {
           type: "failure",
-          message: `We've encounted a strange bug! The app says: ${payload?.error?.message}`,
+          message: `We've encounted a strange bug! The app says: ${payload.error.message}`,
           autoHideDuration: null,
         }),
       };
     default: {
       console.error({
-        error: payload?.error,
+        error: payload.error,
         snackbarQueue: state.snackbarQueue,
         meta,
       });
@@ -58,7 +58,7 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
         ...state,
         snackbarQueue: enqueue(state.snackbarQueue, {
           type: "failure",
-          message: payload?.error?.message || defaultErrorMessage,
+          message: payload.error.message || defaultErrorMessage,
           autoHideDuration: null,
         }),
       };

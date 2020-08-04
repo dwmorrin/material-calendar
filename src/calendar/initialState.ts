@@ -11,6 +11,7 @@ const resources = ({
 } as unknown) as { [k in ResourceKey]: ResourceInstance[] };
 
 export const initialCalendarState: CalendarState = {
+  appIsBroken: false,
   currentStart: new Date(),
   currentView: "resourceTimeGridDay",
   detailIsOpen: false,

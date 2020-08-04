@@ -1,5 +1,6 @@
 import { FindResource } from "../resources/Resources";
 import { ResourceKey } from "../resources/types";
+import { ErrorType } from "../utils/error";
 
 type Dispatch = (action: {
   type: number;
@@ -11,7 +12,7 @@ const dispatchError = (dispatch: Dispatch, type: number, error: Error): void =>
   dispatch({
     type,
     payload: { error },
-    meta: "FETCH_ALL_RESOURCES_REJECTED",
+    meta: ErrorType.MISSING_RESOURCE,
   });
 
 const dispatchAllResources = (

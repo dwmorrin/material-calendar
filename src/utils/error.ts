@@ -1,0 +1,5 @@
+export enum ErrorType {
+  FILE_PICKER,
+  IMPOSSIBLE_STATE,
+  MISSING_RESOURCE,
+}
