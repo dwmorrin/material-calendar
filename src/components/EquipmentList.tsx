@@ -17,7 +17,6 @@ interface EquipmentListProps {
   equipmentList: Equipment[] | undefined;
   selectedEquipment: {
     [k: string]: {
-      name: string;
       quantity: number;
       items?: { id: number; quantity: number }[];
     };

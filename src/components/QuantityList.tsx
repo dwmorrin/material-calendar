@@ -4,7 +4,6 @@ import { List, ListItem, Typography } from "@material-ui/core";
 interface QuantityListProps {
   selectedEquipment: {
     [k: string]: {
-      name: string;
       quantity: number;
       items?: { id: number; quantity: number }[];
     };
@@ -39,9 +38,7 @@ const FilterList: FunctionComponent<QuantityListProps> = ({
           >
             {selectedItems.map((key) => (
               <ListItem key={key}>
-                {selectedEquipment[key].name +
-                  ": " +
-                  selectedEquipment[key].quantity}
+                {key + ": " + selectedEquipment[key].quantity}
               </ListItem>
             ))}
           </div>

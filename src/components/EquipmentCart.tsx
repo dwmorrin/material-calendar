@@ -11,7 +11,6 @@ interface EquipmentCartProps {
   onOpen: () => void;
   selectedEquipment: {
     [k: string]: {
-      name: string;
       quantity: number;
       items?: { id: number; quantity: number }[];
     };
@@ -23,7 +22,6 @@ interface EquipmentCartProps {
       | number
       | boolean
       | {
-          name: string;
           quantity: number;
           items?:
             | {
@@ -74,7 +72,7 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
             ));
             return (
               <div
-                key={selectedEquipment[key].name}
+                key={key}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -83,9 +81,9 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
                 }}
               >
                 <ListItem>
-                  <ListItemText primary={selectedEquipment[key].name} />
+                  <ListItemText primary={key} />
                   <Select
-                    labelId={selectedEquipment[key].name + "Quantity Select"}
+                    labelId={key + "Quantity Select"}
                     name={"equipment[" + key + "]"}
                     value={selectedEquipment[key].quantity}
                     onChange={(event): void =>

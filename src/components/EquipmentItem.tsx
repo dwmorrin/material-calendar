@@ -14,7 +14,6 @@ const getItemName = (item: Equipment): string =>
 interface EquipmentItemProps {
   item: Equipment;
   values: {
-    name: string;
     quantity: number;
     items?: { id: number; quantity: number }[];
   };
@@ -25,7 +24,6 @@ interface EquipmentItemProps {
       | number
       | boolean
       | {
-          name: string;
           quantity: number;
           items?:
             | {
@@ -45,7 +43,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   const [errors, setErrors] = React.useState({} as { [k: string]: boolean });
   const itemName = getItemName(item);
   if (!values) {
-    values = { name: itemName, quantity: 0 };
+    values = { quantity: 0 };
   }
   const changeValue = (newValue: number): void => {
     if (newValue < 0) return;
@@ -53,7 +51,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
       return setErrors({ ...errors, itemName: true });
     }
     if (itemName in errors) setErrors({ ...errors, itemName: false });
-    setFieldValue("equipment[" + String(item.modelId) + "]", {
+    setFieldValue("equipment[" + itemName + "]", {
       ...values,
       quantity: newValue,
     });

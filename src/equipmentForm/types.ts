@@ -21,7 +21,6 @@ export interface EquipmentState {
       | number
       | boolean
       | {
-          name: string;
           quantity: number;
           items?:
             | {
@@ -56,7 +55,6 @@ export interface EquipmentFormProps {
   setOpen: (open: boolean) => void;
   selectedEquipment: {
     [k: string]: {
-      name: string;
       quantity: number;
       items?: { id: number; quantity: number }[];
     };
@@ -68,7 +66,6 @@ export interface EquipmentFormProps {
       | number
       | boolean
       | {
-          name: string;
           quantity: number;
           items?:
             | {

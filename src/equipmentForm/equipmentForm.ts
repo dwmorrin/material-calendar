@@ -138,12 +138,33 @@ const copyAndSortByDescription = (array: Equipment[]): Equipment[] => {
   return copy;
 };
 
+const byManufacturerandModel = (a: Equipment, b: Equipment): number =>
+  (a.manufacturer || "") + " " + (a.model || "") <
+  (b.manufacturer || "") + " " + (b.model || "")
+    ? -1
+    : (a.manufacturer || "") + " " + (a.model || "") <
+      (b.manufacturer || "") + " " + (b.model || "")
+    ? 1
+    : 0;
+const copyAndSortByManufacturerandModel = (array: Equipment[]): Equipment[] => {
+  const copy = array.slice();
+  copy.sort(byManufacturerandModel);
+  return copy;
+};
+
 export function quantizeEquipment(equipment: Equipment[]): Equipment[] {
   if (!equipment.length) return [];
-  const toBeQuantized = copyAndSortByDescription(equipment);
+  const toBeQuantized = copyAndSortByManufacturerandModel(
+    copyAndSortByDescription(equipment)
+  );
   const quantized = [{ ...toBeQuantized[0] }];
   for (let i = 1; i < toBeQuantized.length; ++i) {
-    if (toBeQuantized[i].description === last(quantized).description) {
+    if (
+      toBeQuantized[i].manufacturer && toBeQuantized[i].model
+        ? toBeQuantized[i].manufacturer + " " + toBeQuantized[i].model ===
+          last(quantized).manufacturer + " " + last(quantized).model
+        : toBeQuantized[i].description === last(quantized).description
+    ) {
       last(quantized).quantity += toBeQuantized[i].quantity;
     } else {
       quantized.push({ ...toBeQuantized[i] });

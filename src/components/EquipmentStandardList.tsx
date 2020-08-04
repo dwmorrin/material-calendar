@@ -8,7 +8,6 @@ interface EquipmentStandardListProps {
   reserveEquipment: (id: number, quantity: number) => void;
   selectedEquipment: {
     [k: string]: {
-      name: string;
       quantity: number;
       items?: { id: number; quantity: number }[];
     };
@@ -20,7 +19,6 @@ interface EquipmentStandardListProps {
       | number
       | boolean
       | {
-          name: string;
           quantity: number;
           items?:
             | {
@@ -50,7 +48,13 @@ const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
           <EquipmentItem
             key={item.id}
             item={item}
-            values={selectedEquipment[item.modelId]}
+            values={
+              selectedEquipment[
+                item.manufacturer && item.model
+                  ? item.manufacturer + " " + item.model
+                  : item.description
+              ]
+            }
             setFieldValue={setFieldValue}
             reserveEquipment={reserveEquipment}
           />

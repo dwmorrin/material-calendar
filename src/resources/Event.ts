@@ -10,7 +10,6 @@ export interface ReservationInfo {
   // this and the same in the EquipmentItem should be changed so that it is a dictionary of objects.
   equipment?: {
     [k: string]: {
-      name: string;
       quantity: number;
       items?: { id: number; quantity: number }[];
     };

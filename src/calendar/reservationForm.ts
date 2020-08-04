@@ -47,7 +47,10 @@ export function getCurrentEquipment(): Equipment[] | null {
 
 export function getEquipmentIds(
   requests: {
-    [k: number]: any;
+    [k: string]: {
+      quantity: number;
+      items?: { id: number; quantity: number }[];
+    };
   },
   event: Event
 ): {
@@ -70,12 +73,16 @@ export function getEquipmentIds(
     .then(() => {
       const filteredList = Equipment.availableItems(equipmentList, event);
       Object.keys(requests).forEach((key) => {
-        const id = Number(key);
-        let quantityToReserve = requests[id].quantity;
+        let quantityToReserve = requests[key].quantity;
         while (quantityToReserve > 0) {
           const item = filteredList
             .filter((item) => !newList[item.id])
-            .find((item) => item.modelId === id);
+            .find(
+              (item) =>
+                (item.manufacturer && item.model
+                  ? item.manufacturer + " " + item.model
+                  : item.description) === key
+            );
           if (!item) {
             // This is an error, no item found with given modelId
             return null;
@@ -139,13 +146,15 @@ export const submitHandler = (
     ...values,
     equipment: getEquipmentIds(
       values.equipment as {
-        [k: number]: any;
+        [k: string]: {
+          quantity: number;
+          items?: { id: number; quantity: number }[];
+        };
       },
       values.event as Event
     ),
   };
   actions.setSubmitting(true);
-  console.log(updater(values));
   console.log(JSON.stringify(updater(values)));
   fetch(`/api/reservations${values.id ? `/${values.id}` : ""}`, {
     method: values.id ? "PUT" : "POST",
@@ -188,7 +197,6 @@ export const makeInitialValues = (
   hasNotes: string;
   equipment: {
     [k: string]: {
-      name: string;
       quantity: number;
       items?: { id: number; quantity: number }[];
     };
@@ -231,7 +239,6 @@ export const getValuesFromReservation = (
   notes: string;
   equipment: {
     [k: string]: {
-      name: string;
       quantity: number;
       items?: { id: number; quantity: number }[];
     };
@@ -241,7 +248,6 @@ export const getValuesFromReservation = (
   if (!event?.reservation) {
     return null;
   }
-  //notes not yet implemented
   return {
     id: event.reservation.id,
     event: event.id,
