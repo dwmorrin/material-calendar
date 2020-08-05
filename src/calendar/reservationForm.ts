@@ -60,9 +60,6 @@ export function getEquipmentIds(
   const newList: {
     [k: string]: number;
   } = {};
-  // To work properly, this needs to be modified to exclude any equipment
-  // that is unavailable at that requested reservation time. This should also
-  // be done in the UI
   fetch(`/api/equipment`)
     .then((response) => response.json())
     .then((data) => {
@@ -73,9 +70,23 @@ export function getEquipmentIds(
     .then(() => {
       const filteredList = Equipment.availableItems(equipmentList, event);
       Object.keys(requests).forEach((key) => {
-        let quantityToReserve = requests[key].quantity;
+        // TODO Determine why this can't be used directly with a ternary of ||
+        // when setting quantityToReserve
+        const items: { id: number; quantity: number }[] =
+          requests[key].items || [];
+        // Put the current reservations into the reservation form.
+        items.forEach((item) => (newList[item.id] = item.quantity));
+        // set the quantity to reserve to the quantity to change from
+        // the current reservation. If it is positive, reserve more, if it is
+        // negative, set item reservations to 0 until the
+        // requests[key].quantity is equal to the sum of requests[key].items
+        // quantities
+        let quantityToReserve =
+          requests[key].quantity -
+          items.map((item) => item.quantity).reduce((a, b) => a + b, 0);
         while (quantityToReserve > 0) {
           const item = filteredList
+            // This filter may not be working.
             .filter((item) => !newList[item.id])
             .find(
               (item) =>
@@ -93,6 +104,24 @@ export function getEquipmentIds(
           } else {
             newList[item.id] = item.quantity;
             quantityToReserve = quantityToReserve - item.quantity;
+          }
+        }
+        for (let i = 0; quantityToReserve < 0; ++i) {
+          const item = items[i];
+          // if we need to remove more than this item's quantity
+          if (Math.abs(quantityToReserve) >= item.quantity) {
+            // bring quantityToReserve closer to 0 by adding the item's
+            // quantity as it is removed
+            quantityToReserve = quantityToReserve + item.quantity;
+            // set this requested item's quantity to 0
+            newList[item.id] = 0;
+          }
+          // if we can reduce this single item to satisfy quantityToReserve
+          else {
+            //reduce the item by the quantityToReserve
+            newList[item.id] = item.quantity + quantityToReserve;
+            // set quantity to reserve to 0, we are done
+            quantityToReserve = 0;
           }
         }
       });
