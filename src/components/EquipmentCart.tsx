@@ -63,11 +63,18 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
       {selectedItems.length > 0 ? (
         <List>
           {selectedItems.map((key) => {
+            const maxQuantity =
+              state.equipment.find(
+                (item) =>
+                  (item.manufacturer && item.model
+                    ? item.manufacturer + " " + item.model
+                    : item.description) === key
+              )?.quantity || selectedEquipment[key].quantity;
             const selectOptions = Array.from({
-              length: selectedEquipment[key].quantity + 1,
+              length: maxQuantity + 1,
             }).map((_, i) => (
               <MenuItem key={i} value={i}>
-                {i}
+                {i === 0 ? "0 (Delete)" : i}
               </MenuItem>
             ));
             return (

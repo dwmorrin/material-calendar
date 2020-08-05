@@ -98,13 +98,15 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
           onClose={toggleFilterDrawer}
           closeDrawer={toggleFilterDrawer}
         />
-        <EquipmentCart
-          state={state}
-          onOpen={toggleEquipmentCart}
-          onClose={toggleEquipmentCart}
-          selectedEquipment={selectedEquipment}
-          setFieldValue={state.setFieldValue}
-        />
+        {state.equipmentCartIsOpen && (
+          <EquipmentCart
+            state={{ ...state, equipment: quantizedEquipment }}
+            onOpen={toggleEquipmentCart}
+            onClose={toggleEquipmentCart}
+            selectedEquipment={selectedEquipment}
+            setFieldValue={state.setFieldValue}
+          />
+        )}
         <AppBar position="sticky">
           <List>
             <Toolbar>
