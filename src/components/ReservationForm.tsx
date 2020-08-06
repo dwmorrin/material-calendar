@@ -55,6 +55,8 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   };
   new UserGroup();
   const classes = useStyles();
+  const closeForm = (): void =>
+    dispatch({ type: CalendarAction.CloseReservationForm });
 
   return (
     <Dialog
@@ -82,7 +84,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
             getValuesFromReservation(state.currentEvent) ||
             makeInitialValues(state)
           }
-          onSubmit={submitHandler}
+          onSubmit={submitHandler(closeForm)}
           validationSchema={validationSchema}
         >
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (

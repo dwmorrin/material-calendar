@@ -71,7 +71,7 @@ export function getEquipmentIds(
       const filteredList = Equipment.availableItems(equipmentList, event);
       Object.keys(requests).forEach((key) => {
         // TODO Determine why this can't be used directly with a ternary of ||
-        // when setting quantityToReserve
+        // when setting quantityToChange
         const items: { id: number; quantity: number }[] =
           requests[key].items || [];
         // Put the current reservations into the reservation form.
@@ -81,12 +81,11 @@ export function getEquipmentIds(
         // negative, set item reservations to 0 until the
         // requests[key].quantity is equal to the sum of requests[key].items
         // quantities
-        let quantityToReserve =
+        let quantityToChange =
           requests[key].quantity -
           items.map((item) => item.quantity).reduce((a, b) => a + b, 0);
-        while (quantityToReserve > 0) {
+        while (quantityToChange > 0) {
           const item = filteredList
-            // This filter may not be working.
             .filter((item) => !newList[item.id])
             .find(
               (item) =>
@@ -98,30 +97,30 @@ export function getEquipmentIds(
             // This is an error, no item found with given modelId
             return null;
           }
-          if (item.quantity >= quantityToReserve) {
-            newList[item.id] = quantityToReserve;
-            quantityToReserve = 0;
+          if (item.quantity >= quantityToChange) {
+            newList[item.id] = quantityToChange;
+            quantityToChange = 0;
           } else {
             newList[item.id] = item.quantity;
-            quantityToReserve = quantityToReserve - item.quantity;
+            quantityToChange = quantityToChange - item.quantity;
           }
         }
-        for (let i = 0; quantityToReserve < 0; ++i) {
+        for (let i = 0; quantityToChange < 0; ++i) {
           const item = items[i];
           // if we need to remove more than this item's quantity
-          if (Math.abs(quantityToReserve) >= item.quantity) {
-            // bring quantityToReserve closer to 0 by adding the item's
+          if (Math.abs(quantityToChange) >= item.quantity) {
+            // bring quantityToChange closer to 0 by adding the item's
             // quantity as it is removed
-            quantityToReserve = quantityToReserve + item.quantity;
+            quantityToChange = quantityToChange + item.quantity;
             // set this requested item's quantity to 0
             newList[item.id] = 0;
           }
-          // if we can reduce this single item to satisfy quantityToReserve
+          // if we can reduce this single item to satisfy quantityToChange
           else {
-            //reduce the item by the quantityToReserve
-            newList[item.id] = item.quantity + quantityToReserve;
+            //reduce the item by the quantityToChange
+            newList[item.id] = item.quantity + quantityToChange;
             // set quantity to reserve to 0, we are done
-            quantityToReserve = 0;
+            quantityToChange = 0;
           }
         }
       });
@@ -167,7 +166,7 @@ export const makeEquipmentRequests = (
   });
 };
 
-export const submitHandler = (
+export const submitHandler = (closeForm: () => void) => (
   values: { [k: string]: unknown },
   actions: FormikValues
 ): void => {
@@ -209,6 +208,7 @@ export const submitHandler = (
     .catch(console.error)
     .finally(() => {
       actions.setSubmitting(false);
+      closeForm();
     });
 };
 
