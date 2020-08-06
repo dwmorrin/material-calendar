@@ -16,6 +16,7 @@ export enum CalendarAction {
   CloseReservationForm,
   CloseSnackbar,
   Error,
+  DisplayMessage,
   Loading,
   PickedDate,
   OpenReservationForm,
@@ -49,6 +50,7 @@ export interface CalendarState {
   drawerIsOpen: boolean;
   eventEditorIsOpen: boolean;
   error?: Error;
+  message: string;
   groupDashboardIsOpen: boolean;
   loading: boolean;
   pickerShowing: boolean;

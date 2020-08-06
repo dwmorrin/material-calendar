@@ -66,6 +66,20 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
   }
 };
 
+const displayMessage: StateHandler = (state, { payload }) => {
+  if (!payload || !payload.message) {
+    return state;
+  }
+  return {
+    ...state,
+    snackbarQueue: enqueue(state.snackbarQueue, {
+      type: "success",
+      message: payload.message || "",
+      autoHideDuration: null,
+    }),
+  };
+};
+
 /**
  * StateHandler functions can call this to switch control
  * to the error handler.
@@ -366,6 +380,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CloseProjectForm]: closeProjectForm,
     [CalendarAction.CloseReservationForm]: closeReservationForm,
     [CalendarAction.CloseSnackbar]: closeSnackbar,
+    [CalendarAction.DisplayMessage]: displayMessage,
     [CalendarAction.Error]: errorHandler,
     [CalendarAction.Loading]: loading,
     [CalendarAction.PickedDate]: pickedDate,

@@ -166,10 +166,10 @@ export const makeEquipmentRequests = (
   });
 };
 
-export const submitHandler = (closeForm: () => void) => (
-  values: { [k: string]: unknown },
-  actions: FormikValues
-): void => {
+export const submitHandler = (
+  closeForm: () => void,
+  displayMessage: (message: string) => void
+) => (values: { [k: string]: unknown }, actions: FormikValues): void => {
   values = {
     ...values,
     equipment: getEquipmentIds(
@@ -208,6 +208,11 @@ export const submitHandler = (closeForm: () => void) => (
     .catch(console.error)
     .finally(() => {
       actions.setSubmitting(false);
+      displayMessage(
+        values.id
+          ? "Your Reservation has been updated!"
+          : "Your Reservation has been made!"
+      );
       closeForm();
     });
 };

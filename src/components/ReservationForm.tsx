@@ -58,6 +58,12 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   const closeForm = (): void =>
     dispatch({ type: CalendarAction.CloseReservationForm });
 
+  const displayMessage = (message: string): void =>
+    dispatch({
+      type: CalendarAction.DisplayMessage,
+      payload: { message: message },
+    });
+
   return (
     <Dialog
       fullScreen
@@ -69,9 +75,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
           edge="start"
           color="inherit"
           aria-label="close"
-          onClick={(): void =>
-            dispatch({ type: CalendarAction.CloseReservationForm })
-          }
+          onClick={closeForm}
         >
           <CloseIcon />
         </IconButton>
@@ -84,7 +88,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
             getValuesFromReservation(state.currentEvent) ||
             makeInitialValues(state)
           }
-          onSubmit={submitHandler(closeForm)}
+          onSubmit={submitHandler(closeForm, displayMessage)}
           validationSchema={validationSchema}
         >
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
