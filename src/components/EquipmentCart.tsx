@@ -109,8 +109,8 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
         </List>
       ) : (
         <div>
-          You haven't reserved any equipment yet! Select some equipment from the
-          list below!
+          You haven&apos;t reserved any equipment yet! Select some equipment
+          from the list below!
         </div>
       )}
     </SwipeableDrawer>

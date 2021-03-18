@@ -63,7 +63,10 @@ export const parseRoster = (
 };
 
 const bulkImport = (
-  dispatch: (action: { type: AdminAction; payload: {} }) => void,
+  dispatch: (action: {
+    type: AdminAction;
+    payload: Record<string, unknown>;
+  }) => void,
   rosterString: unknown
 ): void => {
   if (typeof rosterString !== "string") return;

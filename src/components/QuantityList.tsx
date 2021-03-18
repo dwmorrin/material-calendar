@@ -44,8 +44,8 @@ const FilterList: FunctionComponent<QuantityListProps> = ({
           </div>
         ) : (
           <div>
-            You haven't reserved any equipment yet! Click the button below to
-            add equipment to your cart
+            You haven&apos;t reserved any equipment yet! Click the button below
+            to add equipment to your cart
           </div>
         )}
       </List>

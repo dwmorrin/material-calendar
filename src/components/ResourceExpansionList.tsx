@@ -45,7 +45,7 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
           control={<Checkbox indeterminate={indeterminate} />}
           label={groupId}
           onClick={(event): void => event.stopPropagation()}
-          onChange={(event: React.ChangeEvent<{}>, checked): void => {
+          onChange={(event: React.ChangeEvent<unknown>, checked): void => {
             event.stopPropagation();
             dispatchSelectedLocation(state, dispatch, groupId, checked);
           }}

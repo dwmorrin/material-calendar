@@ -8,5 +8,5 @@ const onlyNumbersReducer = (nums: number[], x: string | number): number[] =>
  * corresponding to the enum, so you can create arrays that the enum can index.
  * @param keys TypeScript enum
  */
-export const enumKeys = (keys: {}): number[] =>
-  Object.keys(keys).reduce(onlyNumbersReducer, []);
+export const enumKeys = (keys: unknown): number[] =>
+  Object.keys(keys as string[]).reduce(onlyNumbersReducer, []);

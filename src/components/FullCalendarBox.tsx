@@ -15,7 +15,7 @@ import {
   compareCalendarStates,
   makeResources,
   makeSelectedLocationIdSet,
-  makeReduceEventsByLocationId,
+  getEventsByLocationId,
   stringStartsWithResource,
 } from "../calendar/calendar";
 import { AuthContext } from "./AuthContext";
@@ -35,7 +35,8 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
   const projectLocations = makeSelectedLocationIdSet(projects);
   const events = state.resources[ResourceKey.Events] as Event[];
   const locations = state.resources[ResourceKey.Locations] as Location[];
-  const byLocationId = makeReduceEventsByLocationId(
+  const byLocationId = getEventsByLocationId(
+    events,
     projectLocations,
     makeSelectedLocationDict(locations)
   );
@@ -60,7 +61,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
             successCallback(events.map(addResourceId));
           } else {
             // We are not using the resource system; we have to manually group locations
-            successCallback(events.reduce(byLocationId, [] as {}[]));
+            successCallback(byLocationId);
           }
         }}
         eventClick={(info): void =>

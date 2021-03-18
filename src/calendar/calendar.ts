@@ -3,7 +3,7 @@ import Event from "../resources/Event";
 import Location, { LocationDictionary } from "../resources/Location";
 import Project from "../resources/Project";
 
-export const addResourceId = (event: Event): {} => ({
+export const addResourceId = (event: Event): Omit<Event, "id"> => ({
   ...event,
   resourceId: event.location.id,
 });
@@ -32,14 +32,14 @@ export const compareCalendarStates = (
 export const makeResources = (
   locations: Location[],
   projectLocations: Set<number>
-): {}[] =>
+): Omit<Location, "id">[] =>
   locations
     .filter(
       (location) => projectLocations.has(location.id) || location.selected
     )
     .map((location) => ({
       ...location,
-      id: "" + location.id,
+      id: String(location.id),
     }));
 
 export const makeSelectedLocationIdSet = (projects: Project[]): Set<number> => {
@@ -52,14 +52,24 @@ export const makeSelectedLocationIdSet = (projects: Project[]): Set<number> => {
   return set;
 };
 
-export const makeReduceEventsByLocationId = (
+/**
+ * "reducing by hand" because TS would not infer type of events.reduce() as an Array
+ */
+export const getEventsByLocationId = (
+  events: Event[],
   projectLocationIds: Set<number>,
   selectedLocations: LocationDictionary
-) => (events: {}[], event: Event): {}[] =>
-  projectLocationIds.has(event.location.id) ||
-  selectedLocations[event.location.title]
-    ? [...events, { ...event, id: String(event.id) }]
-    : events;
+): Omit<Event, "id">[] => {
+  const result: Omit<Event, "id">[] = [];
+  for (const event of events) {
+    if (
+      projectLocationIds.has(event.location.id) ||
+      selectedLocations[event.location.title]
+    )
+      result.push({ ...event, id: String(event.id) });
+  }
+  return result;
+};
 
 export const stringStartsWithResource = (s: string): boolean =>
   s.indexOf("resource") === 0;

@@ -32,7 +32,7 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
         control={<Checkbox />}
         label={<ListItemText primary={project.title} />}
         onClick={(event): void => event.stopPropagation()}
-        onChange={(event: React.ChangeEvent<{}>, checked): void => {
+        onChange={(event: React.ChangeEvent<unknown>, checked): void => {
           event.stopPropagation();
           dispatchSelectedProject(state, dispatch, project.id, checked);
         }}

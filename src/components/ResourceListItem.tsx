@@ -26,7 +26,7 @@ const ResourceListItem: FunctionComponent<ResourceListItemProps> = ({
         checked={location.selected || false}
         key={location.id}
         onClick={(event): void => event.stopPropagation()}
-        onChange={(event: React.ChangeEvent<{}>, checked): void => {
+        onChange={(event: React.ChangeEvent<unknown>, checked): void => {
           event.stopPropagation();
           dispatchSelectedLocationGroup(state, dispatch, location.id, checked);
         }}

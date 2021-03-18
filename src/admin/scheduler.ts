@@ -42,6 +42,16 @@ interface SelectProps {
   };
 }
 
+type SchedulerEventProps = {
+  id: string;
+  start: string;
+  end?: string;
+  resourceId: string;
+  allDay: boolean;
+  title: string;
+  extendedProps?: { [k: string]: unknown };
+};
+
 //--- MODULE CONSTANTS ---
 
 const RESOURCE_COLUMN_TEXT_CLASSNAME = "fc-datagrid-cell-main";
@@ -189,11 +199,11 @@ export const makeAllotmentSummaryEvent = (
   first: Allotment,
   last: Allotment,
   total: number
-): {} => ({
+): SchedulerEventProps => ({
   id: `allotmentTotal${p.id}`,
   start: first.start,
   end: addADay(last.end),
-  resourceId: p.id,
+  resourceId: String(p.id),
   allDay: true,
   title: `${p.title.replace("Project", "")} - Total Hours: ${total}`,
 });
@@ -201,7 +211,7 @@ export const makeAllotmentSummaryEvent = (
 export const makeAllotmentEventMap = (p: Project) => (
   a: Allotment,
   index: number
-): {} => ({
+): SchedulerEventProps => ({
   ...a,
   end: addADay(a.end),
   id: `allotment${p.id}-${index}`,
@@ -222,7 +232,10 @@ export const getFirstLastAndTotalFromAllotments = (
   ];
 };
 
-export const makeAllotments = (projects: Project[], locationId: number): {}[] =>
+export const makeAllotments = (
+  projects: Project[],
+  locationId: number
+): SchedulerEventProps[] =>
   projects.reduce((allots, p) => {
     const ofInterest = p.allotments.filter((a) => a.locationId === locationId);
     if (!ofInterest.length) return allots;
@@ -238,9 +251,9 @@ export const makeAllotments = (projects: Project[], locationId: number): {}[] =>
     allots.push(makeAllotmentSummaryEvent(p, first, last, total));
     allots.push(...ofInterest.map(makeAllotmentEventMap(p)));
     return allots;
-  }, [] as {}[]);
+  }, [] as SchedulerEventProps[]);
 
-export const makeDailyHours = (location: Location): {}[] =>
+export const makeDailyHours = (location: Location): SchedulerEventProps[] =>
   location.hours.map((dailyHours) => ({
     id: `${Location.locationHoursId}-${dailyHours.id}`,
     start: dailyHours.date,
@@ -253,7 +266,7 @@ export const makeDailyHours = (location: Location): {}[] =>
 export const processVirtualWeeks = (
   virtualWeeks: VirtualWeek[],
   locationId: number
-): {}[] =>
+): SchedulerEventProps[] =>
   virtualWeeks
     .filter((vw) => vw.locationId === locationId)
     .map((vw) => ({
@@ -268,7 +281,7 @@ export const processVirtualWeeks = (
 export const processVirtualWeeksAsHoursRemaining = (
   virtualWeeks: VirtualWeek[],
   locationId: number
-): {}[] =>
+): SchedulerEventProps[] =>
   virtualWeeks
     .filter((vw) => vw.locationId === locationId)
     .map((vw) => ({

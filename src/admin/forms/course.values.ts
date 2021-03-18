@@ -9,5 +9,8 @@ export const values = (state: AdminState): FormValues => {
 
 export const update = (state: AdminState, values: FormValues): Course => {
   const course = new Course(state.resourceInstance as Course);
-  return { ...course, ...deleteKeys(values, "__options__") };
+  return {
+    ...course,
+    ...deleteKeys(values, "__options__"),
+  };
 };

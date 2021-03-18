@@ -64,18 +64,18 @@ const bars = (
   scales: AllotmentScales
 ): AllotmentBar[] => {
   const b = allotments.map((a) => {
-    const x = scales.x(new Date(a.start));
-    const y = scales.y(a.hours);
+    const x = scales.x(new Date(a.start)) as number;
+    const y = scales.y(a.hours) as number;
     return {
       x,
       y,
-      width: scales.x(new Date(a.end)) - x,
-      height: scales.y(0) - y,
-      color: scales.color(a.hours),
+      width: (scales.x(new Date(a.end)) as number) - x,
+      height: (scales.y(0) as number) - y,
+      color: scales.color(a.hours) as string,
     };
   });
   b.push({
-    x: scales.x(today),
+    x: scales.x(today) as number,
     y: margin.top / 2,
     width: 2,
     height: height - margin.bottom,

@@ -52,7 +52,7 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
           control={<Checkbox indeterminate={indeterminate} />}
           label={<ListItemText primary={course.title} />}
           onClick={(event): void => event.stopPropagation()}
-          onChange={(event: React.ChangeEvent<{}>, checked): void => {
+          onChange={(event: React.ChangeEvent<unknown>, checked): void => {
             event.stopPropagation();
             dispatchSelectedProjectsByCourse(
               state,

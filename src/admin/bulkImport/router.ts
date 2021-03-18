@@ -4,18 +4,24 @@ import eventImport from "./event.import";
 import rosterImport from "./roster.import";
 
 function defaultImporter(
-  dispatch: (action: { type: AdminAction; payload?: {} }) => void
+  dispatch: (action: {
+    type: AdminAction;
+    payload?: Partial<AdminState>;
+  }) => void
 ): void {
   dispatch({
     type: AdminAction.Error,
-    payload: { error: "resource has no bulk importer defined" },
+    payload: { error: new Error("resource has no bulk importer defined") },
   });
 }
 
 const router = (
   key: ResourceKey
 ): ((
-  dispatch: (action: { type: AdminAction; payload?: {} }) => void,
+  dispatch: (action: {
+    type: AdminAction;
+    payload?: Partial<AdminState>;
+  }) => void,
   data: unknown,
   state?: AdminState
 ) => void) =>

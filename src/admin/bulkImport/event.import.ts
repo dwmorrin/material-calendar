@@ -1,4 +1,4 @@
-import { AdminAction } from "../types";
+import { AdminAction, AdminState } from "../types";
 import Event from "../../resources/Event";
 import { formatForMySQL } from "../../utils/date";
 
@@ -19,11 +19,14 @@ const processEvent = (event: FlatEvent): FlatEvent => ({
 });
 
 const bulkImport = (
-  dispatch: (action: { type: AdminAction; payload?: {} }) => void,
+  dispatch: (action: {
+    type: AdminAction;
+    payload?: Partial<AdminState>;
+  }) => void,
   events: unknown
 ): void => {
   const errorHandler = (error: Error): void =>
-    dispatch({ type: AdminAction.Error, payload: error });
+    dispatch({ type: AdminAction.Error, payload: { error } });
   const body = JSON.stringify((events as FlatEvent[]).map(processEvent));
   fetch(`${Event.url}/bulk`, {
     method: "POST",
