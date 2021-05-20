@@ -96,12 +96,14 @@ export const fetchDefaultLocation = (
     .then(({ error, data }) => {
       if (error)
         return dispatch({ type: AdminAction.Error, payload: { error } });
-      const id = data[0].id;
-      setDefaultLocationId(id);
-      dispatch({
-        type: AdminAction.SelectedSchedulerLocation,
-        payload: { schedulerLocationId: id },
-      });
+      if (data.length) {
+        const id = data[0].id;
+        setDefaultLocationId(id);
+        dispatch({
+          type: AdminAction.SelectedSchedulerLocation,
+          payload: { schedulerLocationId: id },
+        });
+      }
     })
     .catch((error) =>
       dispatch({
@@ -208,17 +210,16 @@ export const makeAllotmentSummaryEvent = (
   title: `${p.title.replace("Project", "")} - Total Hours: ${total}`,
 });
 
-export const makeAllotmentEventMap = (p: Project) => (
-  a: Allotment,
-  index: number
-): SchedulerEventProps => ({
-  ...a,
-  end: addADay(a.end),
-  id: `allotment${p.id}-${index}`,
-  resourceId: `Allotments${p.id}`,
-  allDay: true,
-  title: "" + a.hours,
-});
+export const makeAllotmentEventMap =
+  (p: Project) =>
+  (a: Allotment, index: number): SchedulerEventProps => ({
+    ...a,
+    end: addADay(a.end),
+    id: `allotment${p.id}-${index}`,
+    resourceId: `Allotments${p.id}`,
+    allDay: true,
+    title: "" + a.hours,
+  });
 
 export const getFirstLastAndTotalFromAllotments = (
   [first, last, total]: [Allotment, Allotment, number],
@@ -239,15 +240,10 @@ export const makeAllotments = (
   projects.reduce((allots, p) => {
     const ofInterest = p.allotments.filter((a) => a.locationId === locationId);
     if (!ofInterest.length) return allots;
-    const [
-      first,
-      last,
-      total,
-    ] = ofInterest.reduce(getFirstLastAndTotalFromAllotments, [{}, {}, 0] as [
-      Allotment,
-      Allotment,
-      number
-    ]);
+    const [first, last, total] = ofInterest.reduce(
+      getFirstLastAndTotalFromAllotments,
+      [{}, {}, 0] as [Allotment, Allotment, number]
+    );
     allots.push(makeAllotmentSummaryEvent(p, first, last, total));
     allots.push(...ofInterest.map(makeAllotmentEventMap(p)));
     return allots;
@@ -298,81 +294,79 @@ export const mostRecent = (a: Semester, b: Semester): Semester =>
 
 //--- EVENT HANDLERS ---
 
-export const resourceClickHandler = (
-  id: string,
-  title: string
-): ((this: GlobalEventHandlers, ev: MouseEvent) => unknown) | null => (
-  event
-): void => {
-  if (
-    (event.target as HTMLElement).classList.contains(
-      RESOURCE_COLUMN_TEXT_CLASSNAME
-    )
-  ) {
-    window.alert(`ID: ${id}, TITLE: ${title}`);
-  }
-};
+export const resourceClickHandler =
+  (
+    id: string,
+    title: string
+  ): ((this: GlobalEventHandlers, ev: MouseEvent) => unknown) | null =>
+  (event): void => {
+    if (
+      (event.target as HTMLElement).classList.contains(
+        RESOURCE_COLUMN_TEXT_CLASSNAME
+      )
+    ) {
+      window.alert(`ID: ${id}, TITLE: ${title}`);
+    }
+  };
 
-export const eventClick = (
-  dispatch: (action: Action) => void,
-  location: Location
-) => ({ event: { id, title, start, extendedProps } }: EventProps): void => {
-  if (!start)
-    return dispatch({
-      type: AdminAction.Error,
-      payload: {
-        error: new Error(`Event with id ${id} is missing start info`),
-      },
-    });
-  if (id.startsWith(Location.locationHoursId)) {
-    return dispatch({
-      type: AdminAction.OpenLocationHoursDialog,
-      payload: {
-        locationHoursState: {
-          select: {
-            start,
-            end: ((): Date => {
-              const end = new Date(start.getTime());
-              end.setDate(start.getDate() + 1);
-              return end;
-            })(),
-          },
-          time: {
-            start: (extendedProps.start as string) || "09:00:00",
-            end: (extendedProps.end as string) || "17:00:00",
-          },
-          location,
+export const eventClick =
+  (dispatch: (action: Action) => void, location: Location) =>
+  ({ event: { id, title, start, extendedProps } }: EventProps): void => {
+    if (!start)
+      return dispatch({
+        type: AdminAction.Error,
+        payload: {
+          error: new Error(`Event with id ${id} is missing start info`),
         },
-      },
-    });
-  }
-  console.group("Unhandled scheduler event click");
-  console.log({ id, title, start, extendedProps });
-  console.groupEnd();
-};
-
-export const selectionHandler = (
-  dispatch: (action: Action) => void,
-  location: Location
-) => ({ start, end, resource = { id: "" } }: SelectProps): void => {
-  switch (resource.id) {
-    case Location.locationHoursId:
+      });
+    if (id.startsWith(Location.locationHoursId)) {
       return dispatch({
         type: AdminAction.OpenLocationHoursDialog,
         payload: {
           locationHoursState: {
-            select: { start, end },
-            location,
-            time: {
-              start: (resource.extendedProps?.start as string) || "09:00:00",
-              end: (resource.extendedProps?.end as string) || "17:00:00",
+            select: {
+              start,
+              end: ((): Date => {
+                const end = new Date(start.getTime());
+                end.setDate(start.getDate() + 1);
+                return end;
+              })(),
             },
+            time: {
+              start: (extendedProps.start as string) || "09:00:00",
+              end: (extendedProps.end as string) || "17:00:00",
+            },
+            location,
           },
         },
       });
-    default:
-      console.group("Unhandled Scheduler selection");
-      console.log({ start, end, resource });
-      console.groupEnd();
-  }
-};
+    }
+    console.group("Unhandled scheduler event click");
+    console.log({ id, title, start, extendedProps });
+    console.groupEnd();
+  };
+
+export const selectionHandler =
+  (dispatch: (action: Action) => void, location: Location) =>
+  ({ start, end, resource = { id: "" } }: SelectProps): void => {
+    switch (resource.id) {
+      case Location.locationHoursId:
+        return dispatch({
+          type: AdminAction.OpenLocationHoursDialog,
+          payload: {
+            locationHoursState: {
+              select: { start, end },
+              location,
+              time: {
+                start: (resource.extendedProps?.start as string) || "09:00:00",
+                end: (resource.extendedProps?.end as string) || "17:00:00",
+              },
+            },
+          },
+        });
+      default:
+        console.group("Unhandled Scheduler selection");
+        console.log({ start, end, resource });
+        console.groupEnd();
+    }
+  };
