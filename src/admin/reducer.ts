@@ -257,4 +257,11 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.ToggleDrawer]: toggleDrawer,
   }[action.type](state, action));
 
+// const logger: StateHandler = (state, action) => {
+//   console.log({ state, action });
+//   return reducer(state, action);
+// };
+
+// export default logger;
+
 export default reducer;
