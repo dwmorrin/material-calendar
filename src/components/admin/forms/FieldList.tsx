@@ -9,6 +9,11 @@ const FieldList: FunctionComponent<{ name: string; values: string[] }> = ({
   name,
   values,
 }) => {
+  // splitting "contact.email" but also works with "email"
+  const [first, last] = ((s: string): string[] => {
+    const a = s.split(".");
+    return [a[0], a[a.length - 1]];
+  })(name);
   return (
     <Box
       style={{
@@ -24,7 +29,7 @@ const FieldList: FunctionComponent<{ name: string; values: string[] }> = ({
                   component={TextField}
                   name={`${name}[${index}]`}
                   // only show label on the first item
-                  label={index ? null : name[0].toUpperCase() + name.slice(1)}
+                  label={index ? null : first[0].toUpperCase() + first.slice(1)}
                 />
                 <IconButton onClick={(): void => remove(index)}>
                   <DeleteIcon />
@@ -37,7 +42,7 @@ const FieldList: FunctionComponent<{ name: string; values: string[] }> = ({
               startIcon={<AddIcon />}
               variant="contained"
             >
-              Add {name}
+              Add {last}
             </Button>
           </div>
         )}
