@@ -36,7 +36,12 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const semester = selectedSemester || defaultSemester;
 
   useEffect(() => {
-    if (!selectedSemester && ref?.current)
+    if (!semesters.length) {
+      dispatch({
+        type: AdminAction.SelectedResource,
+        payload: { resourceKey: ResourceKey.Semesters },
+      });
+    } else if (!selectedSemester && ref?.current)
       dispatch({
         type: AdminAction.SelectedSemester,
         payload: {
