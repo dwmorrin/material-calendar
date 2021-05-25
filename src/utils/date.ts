@@ -1,4 +1,5 @@
 import { add, lightFormat } from "date-fns/fp";
+import { formatISO9075, parse } from "date-fns";
 
 type DateInput = string | number | Date;
 
@@ -131,6 +132,11 @@ const minutesToMilliseconds = (minutes: number): number => minutes * 6e4;
 export const unshiftTZ = (date: Date): Date =>
   new Date(date.getTime() - minutesToMilliseconds(date.getTimezoneOffset()));
 
+export const formatSQLDate = (date = new Date()): string =>
+  formatISO9075(date, { representation: "date" });
+
+export const parseSQLDate = (dateStr: string): Date =>
+  parse(dateStr, "yyyy-MM-dd", new Date());
 /**
  * formats a date string to "YYYY-mm-dd HH:MM:SS" format for MySQL storage
  * @param date a valid date string for Date.parse()
@@ -164,18 +170,11 @@ export const makeDateTimeInputString = ({
   return removeTZInfo(unshift ? unshiftTZ(date) : date);
 };
 
-/**
- * get a "YYYY-mm-dd" formatted date string
- * @param date normal use is to leave this undefined
- */
-export const makeDefaultDateInputString = (date = new Date()): string =>
-  makeDateTimeInputString({ date }).split("T")[0];
-
 export function setDefaultDates<T, K extends keyof T>(
   obj: T,
   ...dateKeys: K[]
 ): T {
-  const defaultDate = makeDefaultDateInputString();
+  const defaultDate = formatISO9075(new Date());
   const copy = { ...obj };
   dateKeys.forEach((key) => {
     if (!copy[key]) copy[key] = defaultDate as never;

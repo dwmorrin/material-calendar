@@ -10,7 +10,6 @@ import {
   yyyymmdd,
   unshiftTZ,
   formatForMySQL,
-  makeDefaultDateInputString,
 } from "../utils/date";
 
 test("isDate identifies Date objects", () => {
@@ -90,15 +89,6 @@ test("format for MySQL", () => {
   const expected = "2020-09-03 09:00:00";
   expect(formatForMySQL(expected)).toBe(expected);
   expect(formatForMySQL(localDateString)).toBe(expected);
-});
-
-// this fails if method uses .toISO/JSON and timezone shifting isn't accounted for
-test("default date input string", () => {
-  const nycAt11PM = new Date("2020-09-03T23:00:00.000-04:00");
-  const [year, month, date] = makeDefaultDateInputString(nycAt11PM).split("-");
-  expect(+year).toBe(nycAt11PM.getFullYear());
-  expect(+month).toBe(nycAt11PM.getMonth() + 1);
-  expect(+date).toBe(nycAt11PM.getDate());
 });
 
 const nineThirty = Object.freeze({ hours: 9, minutes: 30, seconds: 0 });
