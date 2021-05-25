@@ -3,7 +3,7 @@ import { Box, Dialog } from "@material-ui/core";
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 import { CalendarAction, CalendarUIProps } from "../calendar/types";
-import MomentUtils from "@date-io/moment";
+import DateFnUtils from "@date-io/date-fns";
 
 const StaticDatePicker: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -17,13 +17,13 @@ const StaticDatePicker: FunctionComponent<CalendarUIProps> = ({
       }}
     >
       <Box>
-        <MuiPickersUtilsProvider utils={MomentUtils}>
+        <MuiPickersUtilsProvider utils={DateFnUtils}>
           <DatePicker
             value={state.currentStart}
             onChange={(date: MaterialUiPickersDate): void => {
               dispatch({
                 type: CalendarAction.PickedDate,
-                payload: { currentStart: date?.toDate() },
+                payload: { currentStart: date || new Date() },
               });
             }}
             variant="static"

@@ -1,3 +1,5 @@
+import { formatSQLDate } from "../utils/date";
+
 interface Semester {
   [k: string]: unknown;
   id: number;
@@ -13,9 +15,9 @@ class Semester implements Semester {
     semester = {
       id: 0,
       title: "",
-      start: "",
-      end: "",
-      active: false,
+      start: formatSQLDate(),
+      end: formatSQLDate(),
+      active: true,
     }
   ) {
     Object.assign(this, semester);

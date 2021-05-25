@@ -95,7 +95,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
           })
         }
         // ETC
-        timeZone="America/New_York"
+        timeZone={process.env.REACT_APP_TZ}
         height="93vh"
         ref={state.ref}
         allDaySlot={false}

@@ -11,7 +11,7 @@ import {
   Box,
 } from "@material-ui/core";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
+import DateFnUtils from "@date-io/date-fns";
 import Draggable from "react-draggable";
 import { Field, Formik, Form } from "formik";
 import { CheckboxWithLabel } from "formik-material-ui";
@@ -93,7 +93,7 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
         Daily Hours for {currentLocation.title}
       </DialogTitle>
       <DialogContent>
-        <MuiPickersUtilsProvider utils={MomentUtils}>
+        <MuiPickersUtilsProvider utils={DateFnUtils}>
           <Formik initialValues={initialValues} onSubmit={onSubmit}>
             {({ handleSubmit }): unknown => (
               <Form onSubmit={handleSubmit}>

@@ -6,7 +6,7 @@ import { AdminAction, AdminUIProps } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import ResourceForm from "./forms/ResourceForm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
+import DateFnUtils from "@date-io/date-fns";
 import formRouter from "../../admin/forms/router";
 import { dispatchOneResource } from "../../admin/dispatch";
 
@@ -34,7 +34,7 @@ const AdminDetailsForm: FunctionComponent<AdminUIProps> = ({
           ResourceKey[state.resourceKey]
         }`}</Typography>
       </Toolbar>
-      <MuiPickersUtilsProvider utils={MomentUtils}>
+      <MuiPickersUtilsProvider utils={DateFnUtils}>
         <Formik
           initialValues={valuator(state)}
           onSubmit={dispatchOneResource(dispatch, state, updater)}

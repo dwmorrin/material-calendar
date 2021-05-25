@@ -17,7 +17,7 @@ const FormTemplate: FunctionComponent<FormValues> = (values) => {
         component={CheckboxWithLabel}
         name="active"
         Label={{
-          label: 'Semester is "active" (not exactly sure what that means...)',
+          label: "Active (visible on calendar)",
         }}
         checked={active}
       />

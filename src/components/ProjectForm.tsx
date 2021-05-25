@@ -25,7 +25,7 @@ import {
 } from "../calendar/projectForm";
 import { DatePicker } from "formik-material-ui-pickers";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
+import DateFnUtils from "@date-io/date-fns";
 
 const ProjectForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -68,7 +68,7 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
         <Typography variant="h6">Create a Project</Typography>
       </Toolbar>
       <DialogContent>
-        <MuiPickersUtilsProvider utils={MomentUtils}>
+        <MuiPickersUtilsProvider utils={DateFnUtils}>
           <Formik
             initialValues={
               getValuesFromProject(state.currentProject) ||
