@@ -2,8 +2,6 @@ import React, { FC } from "react";
 import {
   Button,
   Dialog,
-  Paper,
-  PaperProps,
   DialogTitle,
   DialogActions,
   DialogContent,
@@ -12,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
-import Draggable from "react-draggable";
+import DraggablePaper from "../../components/DraggablePaper";
 import { Field, Formik, Form } from "formik";
 import { CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker, TimePicker } from "formik-material-ui-pickers";
@@ -23,15 +21,6 @@ import {
   subtractOneDay,
 } from "../../utils/date";
 import { makeOnSubmit } from "../../admin/locationHoursDialog";
-
-const DraggablePaper: FC = (props: PaperProps) => (
-  <Draggable
-    handle="#draggable-dialog-title"
-    cancel={'[class*="MuiDialogContent-root"]'}
-  >
-    <Paper {...props} />
-  </Draggable>
-);
 
 const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const { locationHoursState, selectedSemester, schedulerLocationId } = state;
