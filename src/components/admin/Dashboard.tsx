@@ -26,6 +26,7 @@ import LocationHoursDialog from "./LocationHoursDialog";
 import Snackbar from "../Snackbar";
 import FullCalendar from "@fullcalendar/react";
 import ErrorPage from "../ErrorPage";
+import { CircularProgress } from "@material-ui/core";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
@@ -49,6 +50,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   if (process.env.NODE_ENV !== "development" && !User.isAdmin(user)) {
     return <Redirect to="/" replace={true} noThrow={true} />;
   }
+  if (state.loading) return <CircularProgress />;
   return (
     <div>
       <AdminBar dispatch={dispatch} state={state} />

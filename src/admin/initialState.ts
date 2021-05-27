@@ -6,9 +6,9 @@ import { enumKeys } from "../utils/enumKeys";
  * coerce the ResourceKey enum into a dictionary to hold all our resources
  * enum => [0,1,...] => {0: [], 1: [], ...}
  */
-export const resources = ({
+export const resources = {
   ...enumKeys(ResourceKey).map(() => [] as ResourceInstance[]),
-} as unknown) as { [k in ResourceKey]: ResourceInstance[] };
+} as unknown as { [k in ResourceKey]: ResourceInstance[] };
 
 const initialState: AdminState = {
   // UI state
@@ -17,6 +17,7 @@ const initialState: AdminState = {
   detailIsOpen: false,
   drawerIsOpen: false,
   fileImportIsOpen: false,
+  loading: true,
   locationHoursDialogIsOpen: false,
   recordPage: 0,
   ref: null,

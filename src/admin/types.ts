@@ -45,6 +45,7 @@ export interface AdminState {
   drawerIsOpen: boolean;
   error?: Error;
   fileImportIsOpen: boolean;
+  loading: boolean;
   locationHoursDialogIsOpen: boolean;
   locationHoursState?: LocationHoursState;
   recordPage: number;
