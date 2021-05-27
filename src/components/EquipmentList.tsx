@@ -2,9 +2,9 @@ import React, { FunctionComponent } from "react";
 import Equipment from "../resources/Equipment";
 import EquipmentStandardList from "./EquipmentStandardList";
 import { EquipmentState, EquipmentAction } from "../equipmentForm/types";
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import Accordion from "@material-ui/core/Accordion";
+import AccordionSummary from "@material-ui/core/AccordionSummary";
+import AccordionDetails from "@material-ui/core/AccordionDetails";
 import List from "@material-ui/core/List";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { EquipmentActionTypes } from "../equipmentForm/types";
@@ -49,8 +49,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
           state.categoryPath.find((entry) => entry.id === branch.id) !==
           undefined;
         return (
-          <ExpansionPanel key={branch.id} expanded={expanded}>
-            <ExpansionPanelSummary
+          <Accordion key={branch.id} expanded={expanded}>
+            <AccordionSummary
               expandIcon={
                 state.categoryDrawerView ? (
                   branch.children && branch.children.length > 0 ? (
@@ -70,8 +70,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                   <ExpandMoreIcon />
                 )
               }
-              aria-controls={branch.title + "expansionPanel"}
-              id={branch.title + "expansionPanel"}
+              aria-controls={branch.title + "Accordion"}
+              id={branch.title + "Accordion"}
               onClick={(): void =>
                 dispatch({
                   type: EquipmentActionTypes.SelectCategory,
@@ -80,8 +80,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
               }
             >
               {branch.title + " [" + contents + "]"}
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
+            </AccordionSummary>
+            <AccordionDetails>
               <List
                 style={{
                   flexDirection: "column",
@@ -101,8 +101,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                   />
                 )}
               </List>
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
+            </AccordionDetails>
+          </Accordion>
         );
       })}
     </div>

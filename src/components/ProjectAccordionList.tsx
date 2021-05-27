@@ -2,9 +2,9 @@ import React, { FunctionComponent, useContext } from "react";
 import { CalendarUIProps } from "../calendar/types";
 import {
   Button,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   List,
   ListItemText,
   FormControlLabel,
@@ -17,12 +17,12 @@ import Project from "../resources/Project";
 import { dispatchSelectedProjectsByCourse } from "../calendar/dispatch";
 import { CalendarAction } from "../calendar/types";
 
-interface ProjectExpansionListProps extends CalendarUIProps {
+interface ProjectAccordionListProps extends CalendarUIProps {
   course: { id: number; title: string };
   projects: Project[];
 }
 
-const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
+const ProjectAccordionList: FunctionComponent<ProjectAccordionListProps> = ({
   dispatch,
   state,
   course,
@@ -37,8 +37,8 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
     projects[0].managers.some((manager) => manager.id === user?.id);
 
   return (
-    <ExpansionPanel defaultExpanded={projects.length === 1}>
-      <ExpansionPanelSummary
+    <Accordion defaultExpanded={projects.length === 1}>
+      <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-label="Expand"
         aria-controls="additional-actions1-content"
@@ -62,8 +62,8 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
             );
           }}
         />
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails>
+      </AccordionSummary>
+      <AccordionDetails>
         <List>
           {projects.map((project) => (
             <ProjectListItem
@@ -88,9 +88,9 @@ const ProjectExpansionList: FunctionComponent<ProjectExpansionListProps> = ({
             </Button>
           )}
         </List>
-      </ExpansionPanelDetails>
-    </ExpansionPanel>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
-export default ProjectExpansionList;
+export default ProjectAccordionList;

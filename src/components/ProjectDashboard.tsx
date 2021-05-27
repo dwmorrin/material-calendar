@@ -6,9 +6,9 @@ import {
   Toolbar,
   Typography,
   Paper,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   List,
   ListItem,
 } from "@material-ui/core";
@@ -35,12 +35,8 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const classes = useStyles();
-  const {
-    currentProject,
-    currentGroup,
-    projectDashboardIsOpen,
-    resources,
-  } = state;
+  const { currentProject, currentGroup, projectDashboardIsOpen, resources } =
+    state;
 
   if (!user || !currentProject) return null;
 
@@ -115,12 +111,12 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         <Typography variant="body2">
           Managed by {User.getManagerNames(currentProject.managers).join(", ")}
         </Typography>
-        <ExpansionPanel defaultExpanded={locations.length === 1}>
-          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+        <Accordion defaultExpanded={locations.length === 1}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="body1">Location Hours</Typography>
-          </ExpansionPanelSummary>
+          </AccordionSummary>
           {locations.map((location) => (
-            <ExpansionPanelDetails
+            <AccordionDetails
               key={`${location.id}`}
               style={{ display: "flex", flexDirection: "column" }}
             >
@@ -134,17 +130,17 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                   ) || []
                 }
               />
-            </ExpansionPanelDetails>
+            </AccordionDetails>
           ))}
-        </ExpansionPanel>
-        <ExpansionPanel defaultExpanded>
-          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+        </Accordion>
+        <Accordion defaultExpanded>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="body1">Group Info</Typography>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
+          </AccordionSummary>
+          <AccordionDetails>
             <ProjectDashboardGroup dispatch={dispatch} state={state} />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+          </AccordionDetails>
+        </Accordion>
         <Typography>Upcoming Sessions</Typography>
         {groupEvents.slice(0, splitPoint).map((event) => (
           <List

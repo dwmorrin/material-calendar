@@ -8,8 +8,8 @@ import {
   Button,
   List,
   ListItem,
-  ExpansionPanel,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionSummary,
   Box,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
@@ -102,10 +102,10 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
           </Button>
         </Box>
         <List>
-          <ExpansionPanel defaultExpanded>
-            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+          <Accordion defaultExpanded>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="body1">Other groups</Typography>
-            </ExpansionPanelSummary>
+            </AccordionSummary>
             {groups
               ?.filter((group) => group.id !== currentGroup?.id)
               .map((group) => (
@@ -126,7 +126,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                   </Button>
                 </ListItem>
               ))}
-          </ExpansionPanel>
+          </Accordion>
         </List>
       </Paper>
     </Dialog>

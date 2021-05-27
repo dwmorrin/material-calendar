@@ -4,8 +4,8 @@ import {
   Typography,
   List,
   ListItem,
-  ExpansionPanel,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionSummary,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AdminAction, AdminUIProps } from "../../admin/types";
@@ -94,13 +94,13 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
           {process.env.REACT_APP_ADMIN_DRAWER_TITLE}
         </Typography>
         <List>
-          <ExpansionPanel>
-            <ExpansionPanelSummary
+          <Accordion>
+            <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               onClick={(event): void => event.stopPropagation()}
             >
               Scheduler
-            </ExpansionPanelSummary>
+            </AccordionSummary>
             {locations.length ? (
               locations.map((location) => (
                 <ListItem
@@ -127,14 +127,14 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
                 Create a new location
               </ListItem>
             )}
-          </ExpansionPanel>
-          <ExpansionPanel>
-            <ExpansionPanelSummary
+          </Accordion>
+          <Accordion>
+            <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               onClick={(event): void => event.stopPropagation()}
             >
               Database resources
-            </ExpansionPanelSummary>
+            </AccordionSummary>
             {enumKeys(ResourceKey).map((key) => (
               <ListItem
                 key={key}
@@ -145,21 +145,21 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
                 {ResourceKey[key]}
               </ListItem>
             ))}
-          </ExpansionPanel>
-          <ExpansionPanel>
-            <ExpansionPanelSummary
+          </Accordion>
+          <Accordion>
+            <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               onClick={(event): void => event.stopPropagation()}
             >
               Utilities
-            </ExpansionPanelSummary>
+            </AccordionSummary>
             <ListItem
               button
               onClick={(): void => dispatch({ type: AdminAction.OpenBackups })}
             >
               Backups
             </ListItem>
-          </ExpansionPanel>
+          </Accordion>
         </List>
       </Fragment>
     </Drawer>

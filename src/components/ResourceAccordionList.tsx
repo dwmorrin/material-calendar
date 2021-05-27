@@ -1,10 +1,10 @@
 import React, { FunctionComponent } from "react";
 import { CalendarUIProps } from "../calendar/types";
 import {
-  ExpansionPanel,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionSummary,
   FormControlLabel,
-  ExpansionPanelDetails,
+  AccordionDetails,
   List,
   Checkbox,
 } from "@material-ui/core";
@@ -14,10 +14,10 @@ import Location from "../resources/Location";
 import { ResourceKey } from "../resources/types";
 import { dispatchSelectedLocation } from "../calendar/dispatch";
 
-interface ResourceExpansionListProps extends CalendarUIProps {
+interface ResourceAccordionListProps extends CalendarUIProps {
   groupId: string;
 }
-const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
+const ResourceAccordionList: FunctionComponent<ResourceAccordionListProps> = ({
   dispatch,
   state,
   groupId,
@@ -30,8 +30,8 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
   const indeterminate =
     !checked && groupLocations.some((location) => location.selected);
   return (
-    <ExpansionPanel>
-      <ExpansionPanelSummary
+    <Accordion>
+      <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-label="Expand"
         aria-controls="additional-actions1-content"
@@ -50,8 +50,8 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
             dispatchSelectedLocation(state, dispatch, groupId, checked);
           }}
         />
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails>
+      </AccordionSummary>
+      <AccordionDetails>
         <List>
           {locations
             .filter((location) => location.groupId === groupId)
@@ -64,9 +64,9 @@ const ResourceExpansionList: FunctionComponent<ResourceExpansionListProps> = ({
               />
             ))}
         </List>
-      </ExpansionPanelDetails>
-    </ExpansionPanel>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
-export default ResourceExpansionList;
+export default ResourceAccordionList;

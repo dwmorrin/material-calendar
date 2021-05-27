@@ -2,8 +2,8 @@ import React, { FunctionComponent } from "react";
 import { CalendarUIProps } from "../calendar/types";
 import { locationGroupReducer } from "../resources/Location";
 import ResourceListItem from "./ResourceListItem";
-import ResourceExpansionList from "./ResourceExpansionList";
-import { ExpansionPanelSummary, ExpansionPanel } from "@material-ui/core";
+import ResourceAccordionList from "./ResourceAccordionList";
+import { AccordionSummary, Accordion } from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import Location from "../resources/Location";
 
@@ -18,7 +18,7 @@ const ResourceList: FunctionComponent<CalendarUIProps> = ({
     <div>
       {groups &&
         Object.keys(groups).map((key) => (
-          <ResourceExpansionList
+          <ResourceAccordionList
             key={`${key}_exp_list`}
             dispatch={dispatch}
             state={state}
@@ -26,15 +26,15 @@ const ResourceList: FunctionComponent<CalendarUIProps> = ({
           />
         ))}
       {singletons.map((location) => (
-        <ExpansionPanel key={`${location.id}_list_item`}>
-          <ExpansionPanelSummary style={{ padding: 0 }}>
+        <Accordion key={`${location.id}_list_item`}>
+          <AccordionSummary style={{ padding: 0 }}>
             <ResourceListItem
               dispatch={dispatch}
               state={state}
               location={location}
             />
-          </ExpansionPanelSummary>
-        </ExpansionPanel>
+          </AccordionSummary>
+        </Accordion>
       ))}
     </div>
   );

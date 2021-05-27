@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { CalendarUIProps } from "../calendar/types";
-import ProjectExpansionList from "./ProjectExpansionList";
+import ProjectAccordionList from "./ProjectAccordionList";
 import { Typography } from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
@@ -17,7 +17,7 @@ const ProjectList: FunctionComponent<CalendarUIProps> = ({
       {projects.length ? <Typography variant="body1">Projects</Typography> : ""}
       {courses &&
         courses.map((course, index) => (
-          <ProjectExpansionList
+          <ProjectAccordionList
             key={`${index}_exp_list`}
             dispatch={dispatch}
             state={state}
