@@ -101,16 +101,32 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
             >
               Scheduler
             </ExpansionPanelSummary>
-            {locations.map((location) => (
+            {locations.length ? (
+              locations.map((location) => (
+                <ListItem
+                  key={location.id}
+                  button
+                  onClick={selectSchedulerLocation}
+                  data-location={location.id}
+                >
+                  {location.title}
+                </ListItem>
+              ))
+            ) : (
               <ListItem
-                key={location.id}
+                key="newLocationButton"
                 button
-                onClick={selectSchedulerLocation}
-                data-location={location.id}
+                data-location={ResourceKey.Locations}
+                onClick={(): void =>
+                  dispatch({
+                    type: AdminAction.SelectedResource,
+                    payload: { resourceKey: ResourceKey.Locations },
+                  })
+                }
               >
-                {location.title}
+                Create a new location
               </ListItem>
-            ))}
+            )}
           </ExpansionPanel>
           <ExpansionPanel>
             <ExpansionPanelSummary
