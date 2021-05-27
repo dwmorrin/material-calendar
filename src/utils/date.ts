@@ -73,12 +73,22 @@ export function getFormattedEventInterval(
   const sameDay = isSameDay(_start, _end);
 
   const dateFormat = {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
+    weekday: "long" as "long" | "short" | "narrow" | undefined,
+    day: "numeric" as "numeric" | "2-digit" | undefined,
+    month: "long" as
+      | "numeric"
+      | "2-digit"
+      | "long"
+      | "short"
+      | "narrow"
+      | undefined,
     timeZone: "UTC",
   };
-  const timeFormat = { hour12: true, timeStyle: "short", timeZone: "UTC" };
+  const timeFormat = {
+    hour12: true,
+    timeStyle: "short" as "long" | "short" | "full" | "medium" | undefined,
+    timeZone: "UTC",
+  };
   const timeDelimiter = " \u00B7 ";
   const intervalDelimiter = " - ";
 
@@ -179,7 +189,7 @@ export function setDefaultDates<T, K extends keyof T>(
   dateKeys.forEach((key) => {
     if (!copy[key]) copy[key] = defaultDate as never;
     if (typeof copy[key] === "string")
-      copy[key] = ((copy[key] as unknown) as string).split(".")[0] as never;
+      copy[key] = (copy[key] as unknown as string).split(".")[0] as never;
   });
   return copy;
 }
