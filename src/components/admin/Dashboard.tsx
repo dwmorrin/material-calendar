@@ -23,6 +23,7 @@ import { Redirect } from "@reach/router";
 import User from "../../resources/User";
 import SemesterDialog from "./SemesterDialog";
 import LocationHoursDialog from "./LocationHoursDialog";
+import VirtualWeeksDialog from "./VirtualWeeksDialog";
 import Snackbar from "../Snackbar";
 import FullCalendar from "@fullcalendar/react";
 import ErrorPage from "../ErrorPage";
@@ -65,6 +66,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       <Backups dispatch={dispatch} state={state} />
       <SemesterDialog dispatch={dispatch} state={state} />
       <LocationHoursDialog dispatch={dispatch} state={state} />
+      <VirtualWeeksDialog dispatch={dispatch} state={state} />
       <ErrorPage open={state.appIsBroken} error={state.error} />
       <Snackbar
         dispatch={dispatch}

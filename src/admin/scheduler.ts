@@ -349,19 +349,28 @@ export const eventClick =
 export const selectionHandler =
   (dispatch: (action: Action) => void, location: Location) =>
   ({ start, end, resource = { id: "" } }: SelectProps): void => {
+    const locationHoursState = {
+      select: { start, end },
+      location,
+      time: {
+        start: (resource.extendedProps?.start as string) || "09:00:00",
+        end: (resource.extendedProps?.end as string) || "17:00:00",
+      },
+    };
+
     switch (resource.id) {
       case Location.locationHoursId:
         return dispatch({
           type: AdminAction.OpenLocationHoursDialog,
           payload: {
-            locationHoursState: {
-              select: { start, end },
-              location,
-              time: {
-                start: (resource.extendedProps?.start as string) || "09:00:00",
-                end: (resource.extendedProps?.end as string) || "17:00:00",
-              },
-            },
+            locationHoursState,
+          },
+        });
+      case VirtualWeek.resourceId:
+        return dispatch({
+          type: AdminAction.OpenVirtualWeeksDialog,
+          payload: {
+            locationHoursState,
           },
         });
       default:

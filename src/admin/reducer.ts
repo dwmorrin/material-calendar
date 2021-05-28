@@ -116,6 +116,11 @@ const closeSemesterDialog: StateHandler = (state) => ({
   semesterDialogIsOpen: false,
 });
 
+const closeVirtualWeeksDialog: StateHandler = (state) => ({
+  ...state,
+  virtualWeeksDialogIsOpen: false,
+});
+
 const openBackups: StateHandler = (state) => ({
   ...state,
   backupsIsOpen: true,
@@ -140,6 +145,12 @@ const openScheduler: StateHandler = (state) => ({
 const openSemesterDialog: StateHandler = (state) => ({
   ...state,
   semesterDialogIsOpen: true,
+});
+
+const openVirtualWeeksDialog: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+  virtualWeeksDialogIsOpen: true,
 });
 
 const openedFile: StateHandler = (state, { payload }) => ({
@@ -238,12 +249,14 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseLocationHoursDialog]: closeLocationHoursDialog,
     [AdminAction.CloseSemesterDialog]: closeSemesterDialog,
     [AdminAction.CloseSnackbar]: closeSnackbar,
+    [AdminAction.CloseVirtualWeeksDialog]: closeVirtualWeeksDialog,
     [AdminAction.Error]: errorHandler,
     [AdminAction.OpenBackups]: openBackups,
     [AdminAction.OpenDetail]: openDetail,
     [AdminAction.OpenLocationHoursDialog]: openLocationHoursDialog,
     [AdminAction.OpenScheduler]: openScheduler,
     [AdminAction.OpenSemesterDialog]: openSemesterDialog,
+    [AdminAction.OpenVirtualWeeksDialog]: openVirtualWeeksDialog,
     [AdminAction.OpenedFile]: openedFile,
     [AdminAction.ReceivedAllResources]: receivedAllResources,
     [AdminAction.ReceivedResource]: receivedResource,

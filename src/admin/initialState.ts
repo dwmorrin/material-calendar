@@ -24,6 +24,7 @@ const initialState: AdminState = {
   schedulerIsOpen: true,
   semesterDialogIsOpen: false,
   snackbarQueue: [],
+  virtualWeeksDialogIsOpen: false,
 
   // resources
   resourceKey: ResourceKey.Users,
