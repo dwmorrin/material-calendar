@@ -6,20 +6,14 @@ import {
   DialogActions,
   DialogContent,
   FormLabel,
-  Box,
 } from "@material-ui/core";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
+import { eachDayOfInterval, format, parseJSON } from "date-fns";
 import DraggablePaper from "../../components/DraggablePaper";
-import { Field, Formik, Form } from "formik";
-import { CheckboxWithLabel } from "formik-material-ui";
-import { DatePicker, TimePicker } from "formik-material-ui-pickers";
+import { Field, Formik, Form, FieldArray } from "formik";
+import { TextField } from "formik-material-ui";
 import { AdminUIProps, AdminAction } from "../../admin/types";
-import {
-  makeDateTimeInputString,
-  parseTime,
-  subtractOneDay,
-} from "../../utils/date";
 import { makeOnSubmit } from "../../admin/locationHoursDialog";
 
 const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
@@ -31,7 +25,7 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   )
     return null;
 
-  const { location: currentLocation, select, time } = locationHoursState;
+  const { location: currentLocation } = locationHoursState;
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseLocationHoursDialog });
@@ -43,33 +37,10 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
     schedulerLocationId
   );
 
-  const initialValues = {
-    start: makeDateTimeInputString({
-      hours: parseTime(time.start).hours,
-      minutes: 0,
-    }),
-    end: makeDateTimeInputString({
-      hours: parseTime(time.end).hours,
-      minutes: 0,
-    }),
-    from: {
-      start: makeDateTimeInputString({ date: select.start, unshift: false }),
-      end: makeDateTimeInputString({
-        date: subtractOneDay(select.end), // select has exclusive end
-        unshift: false,
-      }),
-      allSemester: false,
-    },
-    repeat: {
-      monday: false,
-      tuesday: false,
-      wednesday: false,
-      thursday: false,
-      friday: false,
-      saturday: false,
-      sunday: false,
-    },
-  };
+  const days = eachDayOfInterval({
+    start: parseJSON(selectedSemester.start),
+    end: parseJSON(selectedSemester.end),
+  }).map((date) => ({ date, hours: 0 }));
 
   return (
     <Dialog
@@ -83,83 +54,38 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       </DialogTitle>
       <DialogContent>
         <MuiPickersUtilsProvider utils={DateFnUtils}>
-          <Formik initialValues={initialValues} onSubmit={onSubmit}>
-            {({ handleSubmit }): unknown => (
+          <Formik initialValues={{ days }} onSubmit={onSubmit}>
+            {({ handleSubmit, values }): unknown => (
               <Form onSubmit={handleSubmit}>
-                <Box>
-                  <Field component={TimePicker} name="start" label="Start" />
-                  <Field component={TimePicker} name="end" label="End" />
-                </Box>
-                <Box style={{ display: "flex", flexDirection: "column" }}>
-                  <FormLabel>Apply to date range</FormLabel>
-                  <Field
-                    component={DatePicker}
-                    name="from.start"
-                    label="Start"
-                  />
-                  <Field component={DatePicker} name="from.end" label="End" />
-                  <Field
-                    type="checkbox"
-                    component={CheckboxWithLabel}
-                    name="from.allSemester"
-                    Label={{
-                      label: "Apply to entire semester",
-                    }}
-                    checked={initialValues.from.allSemester}
-                  />
-                </Box>
-                <Box>
-                  <FormLabel>Repeat on</FormLabel>
-                  <Field
-                    type="checkbox"
-                    component={CheckboxWithLabel}
-                    name="repeat.monday"
-                    Label={{ label: "M" }}
-                    checked={initialValues.repeat.monday}
-                  />
-                  <Field
-                    type="checkbox"
-                    component={CheckboxWithLabel}
-                    name="repeat.tuesday"
-                    Label={{ label: "T" }}
-                    checked={initialValues.repeat.tuesday}
-                  />
-                  <Field
-                    type="checkbox"
-                    component={CheckboxWithLabel}
-                    name="repeat.wednesday"
-                    Label={{ label: "W" }}
-                    checked={initialValues.repeat.wednesday}
-                  />
-                  <Field
-                    type="checkbox"
-                    component={CheckboxWithLabel}
-                    name="repeat.thursday"
-                    Label={{ label: "Th" }}
-                    checked={initialValues.repeat.thursday}
-                  />
-                  <Field
-                    type="checkbox"
-                    component={CheckboxWithLabel}
-                    name="repeat.friday"
-                    Label={{ label: "F" }}
-                    checked={initialValues.repeat.friday}
-                  />
-                  <Field
-                    type="checkbox"
-                    component={CheckboxWithLabel}
-                    name="repeat.saturday"
-                    Label={{ label: "Sa" }}
-                    checked={initialValues.repeat.saturday}
-                  />
-                  <Field
-                    type="checkbox"
-                    component={CheckboxWithLabel}
-                    name="repeat.sunday"
-                    Label={{ label: "Su" }}
-                    checked={initialValues.repeat.sunday}
-                  />
-                </Box>
+                <FieldArray
+                  name="days"
+                  render={(): JSX.Element => (
+                    <div>
+                      {(values as { days: { date: Date; hours: number }[] })
+                        ?.days?.length
+                        ? (values as {
+                            days: { date: Date; hours: number }[];
+                          }).days.map((_, i) => (
+                            <div
+                              key={`hoursInput${i}`}
+                              style={{
+                                gridTemplateColumns: "200px 30px",
+                                display: "grid",
+                              }}
+                            >
+                              <FormLabel>
+                                {format(days[i].date, "yyyy-MM-dd [ccc]")}
+                              </FormLabel>
+                              <Field
+                                component={TextField}
+                                name={`days[${i}].hours`}
+                              />
+                            </div>
+                          ))
+                        : null}
+                    </div>
+                  )}
+                />
                 <DialogActions>
                   <Button onClick={close}>Cancel</Button>
                   <Button variant="contained" type="submit">
