@@ -32,23 +32,26 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const semesters = state.resources[ResourceKey.Semesters] as Semester[];
   const [virtualWeeks, setVirtualWeeks] = useState([] as VirtualWeek[]);
   const [defaultLocationId, setDefaultLocationId] = useState(-1);
-  const defaultSemester = semesters.reduce(mostRecent, new Semester());
-  const semester = selectedSemester || defaultSemester;
+  const semester =
+    selectedSemester ||
+    (semesters.length ? semesters.reduce(mostRecent) : undefined);
 
   useEffect(() => {
     if (!semesters.length) {
+      // user needs to create a semester; navigate them to that view
       dispatch({
         type: AdminAction.SelectedResource,
         payload: { resourceKey: ResourceKey.Semesters },
       });
-    } else if (!selectedSemester && ref?.current)
+    } else if (!selectedSemester && semester && ref?.current)
+      // we've automatically "selected" a semester, so update state accordingly
       dispatch({
         type: AdminAction.SelectedSemester,
         payload: {
-          selectedSemester: defaultSemester,
+          selectedSemester: semester,
         },
       });
-  }, [dispatch, selectedSemester, semesters, ref, defaultSemester]);
+  }, [dispatch, selectedSemester, semesters, semester, ref]);
 
   useEffect(() => {
     if (!locationId) fetchDefaultLocation(dispatch, setDefaultLocationId);
