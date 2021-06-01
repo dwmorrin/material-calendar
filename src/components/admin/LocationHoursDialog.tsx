@@ -10,7 +10,8 @@ import {
 } from "@material-ui/core";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
-import { eachDayOfInterval, format, parseJSON } from "date-fns";
+import { eachDayOfInterval, format } from "date-fns";
+import { formatSQLDate, parseSQLDate } from "../../utils/date";
 import DraggablePaper from "../../components/DraggablePaper";
 import { Field, Formik, Form, FieldArray } from "formik";
 import { TextField } from "formik-material-ui";
@@ -52,9 +53,14 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   );
 
   const days = eachDayOfInterval({
-    start: parseJSON(selectedSemester.start),
-    end: parseJSON(selectedSemester.end),
-  }).map((date) => ({ date, hours: 0 }));
+    start: parseSQLDate(selectedSemester.start),
+    end: parseSQLDate(selectedSemester.end),
+  }).map((date) => ({
+    date,
+    hours:
+      currentLocation.hours.find((h) => h.date === formatSQLDate(date))
+        ?.hours || 0,
+  }));
 
   return (
     <Dialog
