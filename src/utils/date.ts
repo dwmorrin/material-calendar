@@ -12,11 +12,7 @@ interface Time {
 const add1Day = add({ days: 1 });
 
 export const formatJSON = lightFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-export const stringifyTime = (time: Time): string => {
-  const pad = (n: number): string => n.toString().padStart(2, "0");
-  return `${pad(time.hours)}:${pad(time.minutes)}:${pad(time.seconds)}`;
-};
+export const formatSlashed = lightFormat("MM/dd/yyyy");
 
 export function isDate(date?: DateInput): date is Date {
   return (
@@ -44,14 +40,9 @@ export function compareDateOrder(
 
 export function getFormattedDate(d: string | Date): string {
   if (typeof d === "string") {
-    d = new Date(d);
+    d = parse(d, "yyyy-MM-dd", new Date());
   }
-  return d.toLocaleDateString("en-US", {
-    month: "2-digit",
-    day: "2-digit",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  return formatSlashed(d);
 }
 
 function isSameDay(a: Date, b: Date): boolean {
@@ -156,30 +147,6 @@ export const formatForMySQL = (date: string): string => {
   return unshiftTZ(new Date(date)).toJSON().replace("T", " ").split(".")[0];
 };
 
-/**
- * Calls .toJSON for YYYY-mm-ddddTHH:MM:SS.MMMTZ format, then removes
- * the trailing ".MMMTZ" info to remove timezone info.
- *
- * This is useful for coercing dates for FullCalendar and date/time pickers.
- */
-export const removeTZInfo = (date: Date): string => date.toJSON().split(".")[0];
-
-export const makeDateTimeInputString = ({
-  date = new Date(),
-  hours,
-  minutes,
-  unshift = true,
-}: {
-  date?: Date;
-  hours?: number;
-  minutes?: number;
-  unshift?: boolean;
-} = {}): string => {
-  if (typeof hours === "number") date.setHours(hours);
-  if (typeof minutes === "number") date.setMinutes(minutes);
-  return removeTZInfo(unshift ? unshiftTZ(date) : date);
-};
-
 export function setDefaultDates<T, K extends keyof T>(
   obj: T,
   ...dateKeys: K[]
@@ -189,7 +156,7 @@ export function setDefaultDates<T, K extends keyof T>(
   dateKeys.forEach((key) => {
     if (!copy[key]) copy[key] = defaultDate as never;
     if (typeof copy[key] === "string")
-      copy[key] = (copy[key] as unknown as string).split(".")[0] as never;
+      copy[key] = ((copy[key] as unknown) as string).split(".")[0] as never;
   });
   return copy;
 }
@@ -202,63 +169,6 @@ export const parseTime = (timeString: string): Time =>
     }),
     {} as Time
   );
-
-/**
- * Returns time string in "00:00:00" format
- */
-export const getTimeFromDate = (date: Date | string): string =>
-  unshiftTZ(new Date(date)).toJSON().split(/T|\./)[1];
-
-export const parseTimeFromDate = (date: Date | string): Time =>
-  parseTime(getTimeFromDate(date));
-
-/**
- * If Time.hours and Time.minutes are equal, returns false since times are same,
- * not earlier/later.
- * @param earlier - the Time assumed to be earlier (true if earlier)
- * @param later  - the Time assumed to be earlier (true if later)
- */
-export const compareTimeInputOrder = (earlier: Time, later: Time): boolean => {
-  if (earlier.hours !== later.hours) return earlier.hours < later.hours;
-  if (earlier.minutes !== later.minutes) return earlier.minutes < later.minutes;
-  return false; // Times are equal to the minutes; they are same, not earlier/later
-};
-
-export const hoursDifference = (earlier: Time, later: Time): number => {
-  const laterHours =
-    later.hours +
-    (compareTimeInputOrder(earlier, later) ? 0 : 24) +
-    later.minutes / 60;
-  const earlierHours = earlier.hours + earlier.minutes / 60;
-  return Math.floor(laterHours - earlierHours);
-};
-
-/**
- * returns iterator, expected usage is [...dateGenerator(start, end)]
- * Optional 3rd parameter will generate days on the specified days only.
- * e.g. [0,6] would generate Saturday and Sunday dates only.
- * @param start - YYYY-mm-dd format
- * @param end - YYYY-mm-dd format
- * @param days - optional array of numbers: see Date.prototype.getUTCDay()
- */
-export const dateGenerator = (
-  start: string,
-  end: string,
-  days = [] as number[]
-): { [Symbol.iterator](): Generator<string> } => {
-  const currentDate = new Date(start);
-  const endValue = new Date(end).valueOf();
-  return {
-    *[Symbol.iterator](): Generator<string> {
-      while (endValue >= currentDate.valueOf()) {
-        if (!days.length || days.includes(currentDate.getUTCDay())) {
-          yield currentDate.toJSON().split("T")[0];
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-    },
-  };
-};
 
 export interface EventDuration {
   start: Date;
@@ -299,5 +209,3 @@ export const subtractOneDay = (date: Date): Date => {
 };
 
 export const trimTZ = (dateString: string): string => dateString.split(".")[0];
-
-export const ISO = "YYYY-MM-DDTHH:mm:ss";
