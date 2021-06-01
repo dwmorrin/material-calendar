@@ -6,6 +6,7 @@ import {
   DialogActions,
   DialogContent,
   FormLabel,
+  makeStyles,
 } from "@material-ui/core";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
@@ -16,8 +17,21 @@ import { TextField } from "formik-material-ui";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { makeOnSubmit } from "../../admin/locationHoursDialog";
 
+const useStyles = makeStyles({
+  locationHoursInput: {
+    gridTemplateColumns: "200px 30px",
+    display: "grid",
+  },
+});
+
+// how the date appears in the input: 2021-06-01 [Tue]
+const dateLabelFormat = "yyyy-MM-dd [ccc]";
+
 const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const { locationHoursState, selectedSemester, schedulerLocationId } = state;
+
+  const classes = useStyles();
+
   if (
     !locationHoursState ||
     !selectedSemester ||
@@ -67,14 +81,11 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                             days: { date: Date; hours: number }[];
                           }).days.map((_, i) => (
                             <div
+                              className={classes.locationHoursInput}
                               key={`hoursInput${i}`}
-                              style={{
-                                gridTemplateColumns: "200px 30px",
-                                display: "grid",
-                              }}
                             >
                               <FormLabel>
-                                {format(days[i].date, "yyyy-MM-dd [ccc]")}
+                                {format(days[i].date, dateLabelFormat)}
                               </FormLabel>
                               <Field
                                 component={TextField}
