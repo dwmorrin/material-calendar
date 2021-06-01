@@ -25,6 +25,7 @@ export const dispatchFile = (
       payload: { resourceFile: reader.result },
     });
   reader.readAsText(files[0]);
+  event.target.value = ""; // resets file picker button
 };
 
 export const dispatchOneResource = (

@@ -99,6 +99,7 @@ const closeDetail: StateHandler = (state) => ({
 const closeFileImport: StateHandler = (state) => ({
   ...state,
   fileImportIsOpen: false,
+  resourceFile: null,
 });
 
 const closeLocationHoursDialog: StateHandler = (state) => ({
