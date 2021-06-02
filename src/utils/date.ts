@@ -1,5 +1,5 @@
 import { add, lightFormat } from "date-fns/fp";
-import { formatISO9075, parse } from "date-fns";
+import { formatISO9075, parse, parseISO } from "date-fns";
 
 type DateInput = string | number | Date;
 
@@ -9,10 +9,34 @@ interface Time {
   seconds: number;
 }
 
+export const yyyymmdd = /\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\d|3[01])/;
+
 const add1Day = add({ days: 1 });
+
+const sqlFormat = {
+  date: "yyyy-MM-dd",
+  time: "HH:mm:ss",
+  datetime: "yyyy-MM-dd HH:mm:ss",
+};
 
 export const formatJSON = lightFormat("yyyy-MM-dd'T'HH:mm:ss");
 export const formatSlashed = lightFormat("MM/dd/yyyy");
+
+export const formatSQLDate = (date = new Date()): string =>
+  formatISO9075(date, { representation: "date" });
+
+export const parseSQLDate = (dateStr: string): Date =>
+  parse(dateStr, sqlFormat.date, new Date());
+
+export const parseSQLDatetime = (dateStr: string): Date =>
+  parse(dateStr, sqlFormat.datetime, new Date());
+
+// Formats a FullCalendar (FC) event "dateStr" into local Date object
+export const parseFCString = (fcStr: string): Date => parseISO(fcStr);
+
+// Formats a FullCalendar (FC) event "dateStr" into a SQL format string
+export const formatFCString = (fcStr: string): string =>
+  formatISO9075(parseFCString(fcStr));
 
 export function isDate(date?: DateInput): date is Date {
   return (
@@ -40,7 +64,9 @@ export function compareDateOrder(
 
 export function getFormattedDate(d: string | Date): string {
   if (typeof d === "string") {
-    d = parse(d, "yyyy-MM-dd", new Date());
+    d = parseSQLDate(d);
+    if (isNaN(d.valueOf()))
+      throw new Error(`unknown date string format: "${d}"`);
   }
   return formatSlashed(d);
 }
@@ -121,8 +147,6 @@ export function getFormattedEventInterval(
   );
 }
 
-export const yyyymmdd = /\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\d|3[01])/;
-
 const minutesToMilliseconds = (minutes: number): number => minutes * 6e4;
 
 /**
@@ -133,11 +157,6 @@ const minutesToMilliseconds = (minutes: number): number => minutes * 6e4;
 export const unshiftTZ = (date: Date): Date =>
   new Date(date.getTime() - minutesToMilliseconds(date.getTimezoneOffset()));
 
-export const formatSQLDate = (date = new Date()): string =>
-  formatISO9075(date, { representation: "date" });
-
-export const parseSQLDate = (dateStr: string): Date =>
-  parse(dateStr, "yyyy-MM-dd", new Date());
 /**
  * formats a date string to "YYYY-mm-dd HH:MM:SS" format for MySQL storage
  * @param date a valid date string for Date.parse()
