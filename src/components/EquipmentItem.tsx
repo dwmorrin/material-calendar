@@ -81,6 +81,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
             size="small"
           >
             <Button
+              disabled={values.quantity - 1 < 0}
               onClick={(): void => {
                 changeValue(values.quantity - 1);
               }}
@@ -88,6 +89,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
               -
             </Button>
             <Button
+              disabled={values.quantity + 1 > item.quantity}
               onClick={(): void => {
                 changeValue(values.quantity + 1);
               }}
