@@ -60,7 +60,7 @@ test("makeAllotmentSummaryEvent", () =>
     id: "allotmentTotal0",
     start: "2020-06-18",
     end: "2020-06-19",
-    resourceId: 0,
+    resourceId: "0",
     title: "PROJECT TITLE - Total Hours: 0",
   }));
 
@@ -105,7 +105,7 @@ test("makeAllotments", () =>
       allDay: true,
       end: "2020-06-19",
       id: "allotmentTotal0",
-      resourceId: 0,
+      resourceId: "0",
       start: "2020-06-18",
       title: "PROJECT TITLE - Total Hours: 0",
     },

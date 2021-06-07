@@ -1,11 +1,8 @@
 import {
   compareDateOrder,
-  compareTimeInputOrder,
-  dateGenerator,
   dateInputToNumber,
   getFormattedDate,
   getFormattedEventInterval,
-  hoursDifference,
   isDate,
   yyyymmdd,
   unshiftTZ,
@@ -89,37 +86,4 @@ test("format for MySQL", () => {
   const expected = "2020-09-03 09:00:00";
   expect(formatForMySQL(expected)).toBe(expected);
   expect(formatForMySQL(localDateString)).toBe(expected);
-});
-
-const nineThirty = Object.freeze({ hours: 9, minutes: 30, seconds: 0 });
-const tenOClock = Object.freeze({ hours: 10, minutes: 0, seconds: 0 });
-const tenThirty = Object.freeze({ hours: 10, minutes: 30, seconds: 0 });
-const nineOClock = Object.freeze({ hours: 9, minutes: 0, seconds: 0 });
-const nineTwentyNine = Object.freeze({ hours: 9, minutes: 29, seconds: 0 });
-
-test("time input order", () => {
-  expect(compareTimeInputOrder(nineThirty, nineThirty)).toBe(false);
-  expect(compareTimeInputOrder(nineThirty, tenOClock)).toBe(true);
-  expect(compareTimeInputOrder(nineThirty, nineOClock)).toBe(false);
-  expect(compareTimeInputOrder(nineThirty, nineTwentyNine)).toBe(false);
-});
-
-test("hours difference", () => {
-  expect(hoursDifference(nineThirty, nineThirty)).toBe(24);
-  expect(hoursDifference(nineThirty, nineOClock)).toBe(23);
-  expect(hoursDifference(nineThirty, nineTwentyNine)).toBe(23);
-  expect(hoursDifference(nineThirty, tenThirty)).toBe(1);
-});
-
-test("date generator", () => {
-  expect([...dateGenerator("2020-09-03", "2020-09-05")]).toEqual([
-    "2020-09-03",
-    "2020-09-04",
-    "2020-09-05",
-  ]);
-  expect([...dateGenerator("2020-09-03", "2020-09-15", [2, 3])]).toEqual([
-    "2020-09-08",
-    "2020-09-09",
-    "2020-09-15",
-  ]);
 });
