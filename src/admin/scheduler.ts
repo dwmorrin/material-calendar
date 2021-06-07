@@ -2,7 +2,7 @@ import { AdminAction, Action, AdminUIProps } from "./types";
 import VirtualWeek from "../resources/VirtualWeek";
 import Project from "../resources/Project";
 import Location from "../resources/Location";
-import { compareDateOrder } from "../utils/date";
+import { compareDateOrder, parseSQLDate } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";
 import { parseJSON } from "date-fns";
@@ -210,16 +210,17 @@ export const makeAllotmentSummaryEvent = (
   title: `${p.title.replace("Project", "")} - Total Hours: ${total}`,
 });
 
-export const makeAllotmentEventMap =
-  (p: Project) =>
-  (a: Allotment, index: number): SchedulerEventProps => ({
-    ...a,
-    end: addADay(a.end),
-    id: `allotment${p.id}-${index}`,
-    resourceId: `Allotments${p.id}`,
-    allDay: true,
-    title: "" + a.hours,
-  });
+export const makeAllotmentEventMap = (p: Project) => (
+  a: Allotment,
+  index: number
+): SchedulerEventProps => ({
+  ...a,
+  end: addADay(a.end),
+  id: `allotment${p.id}-${index}`,
+  resourceId: `Allotments${p.id}`,
+  allDay: true,
+  title: "" + a.hours,
+});
 
 export const getFirstLastAndTotalFromAllotments = (
   [first, last, total]: [Allotment, Allotment, number],
@@ -240,10 +241,15 @@ export const makeAllotments = (
   projects.reduce((allots, p) => {
     const ofInterest = p.allotments.filter((a) => a.locationId === locationId);
     if (!ofInterest.length) return allots;
-    const [first, last, total] = ofInterest.reduce(
-      getFirstLastAndTotalFromAllotments,
-      [{}, {}, 0] as [Allotment, Allotment, number]
-    );
+    const [
+      first,
+      last,
+      total,
+    ] = ofInterest.reduce(getFirstLastAndTotalFromAllotments, [{}, {}, 0] as [
+      Allotment,
+      Allotment,
+      number
+    ]);
     allots.push(makeAllotmentSummaryEvent(p, first, last, total));
     allots.push(...ofInterest.map(makeAllotmentEventMap(p)));
     return allots;
@@ -294,88 +300,125 @@ export const mostRecent = (a: Semester, b: Semester): Semester =>
 
 //--- EVENT HANDLERS ---
 
-export const resourceClickHandler =
-  (
-    id: string,
-    title: string
-  ): ((this: GlobalEventHandlers, ev: MouseEvent) => unknown) | null =>
-  (event): void => {
-    if (
-      (event.target as HTMLElement).classList.contains(
-        RESOURCE_COLUMN_TEXT_CLASSNAME
-      )
-    ) {
-      window.alert(`ID: ${id}, TITLE: ${title}`);
-    }
-  };
-
-export const eventClick =
-  (dispatch: (action: Action) => void, location: Location) =>
-  ({ event: { id, title, start, extendedProps } }: EventProps): void => {
-    if (!start)
-      return dispatch({
-        type: AdminAction.Error,
-        payload: {
-          error: new Error(`Event with id ${id} is missing start info`),
-        },
-      });
-    if (id.startsWith(Location.locationHoursId)) {
-      return dispatch({
-        type: AdminAction.OpenLocationHoursDialog,
-        payload: {
-          locationHoursState: {
-            select: {
-              start,
-              end: ((): Date => {
-                const end = new Date(start.getTime());
-                end.setDate(start.getDate() + 1);
-                return end;
-              })(),
-            },
-            time: {
-              start: (extendedProps.start as string) || "09:00:00",
-              end: (extendedProps.end as string) || "17:00:00",
-            },
-            location,
-          },
-        },
-      });
-    }
-    console.group("Unhandled scheduler event click");
-    console.log({ id, title, start, extendedProps });
-    console.groupEnd();
-  };
-
-export const selectionHandler =
-  (dispatch: (action: Action) => void, location: Location) =>
-  ({ start, end, resource = { id: "" } }: SelectProps): void => {
-    const locationHoursState = {
-      select: { start, end },
-      location,
-      time: {
-        start: (resource.extendedProps?.start as string) || "09:00:00",
-        end: (resource.extendedProps?.end as string) || "17:00:00",
-      },
-    };
-
-    switch (resource.id) {
-      case Location.locationHoursId:
+export const resourceClickHandler = ({
+  id,
+  title,
+  dispatch,
+  location,
+  semester,
+}: {
+  id: string;
+  title: string;
+  dispatch: (a: Action) => void;
+  location: Location;
+  semester: Semester;
+}): ((this: GlobalEventHandlers, ev: MouseEvent) => unknown) | null => (
+  event
+): void => {
+  if (
+    (event.target as HTMLElement).classList.contains(
+      RESOURCE_COLUMN_TEXT_CLASSNAME
+    )
+  ) {
+    switch (id) {
+      case Location.locationHoursId: {
+        const start = parseSQLDate(semester.start);
         return dispatch({
           type: AdminAction.OpenLocationHoursDialog,
           payload: {
-            locationHoursState,
+            locationHoursState: {
+              select: {
+                start,
+                end: ((): Date => {
+                  const end = new Date(start.getTime());
+                  end.setDate(start.getDate() + 1);
+                  return end;
+                })(),
+              },
+              time: {
+                start: "09:00:00",
+                end: "17:00:00",
+              },
+              location,
+            },
           },
         });
-      case VirtualWeek.resourceId:
-        return dispatch({
-          type: AdminAction.OpenVirtualWeeksDialog,
-          payload: {
-            locationHoursState,
-          },
-        });
+      }
       default:
-        console.group("Unhandled Scheduler selection");
-        console.log({ start, end, resource });
-        console.groupEnd();
+        console.log(`no handler for ID: ${id}, TITLE: ${title}`);
     }
+  }
+};
+
+export const eventClick = (
+  dispatch: (action: Action) => void,
+  location: Location
+) => ({ event: { id, title, start, extendedProps } }: EventProps): void => {
+  if (!start)
+    return dispatch({
+      type: AdminAction.Error,
+      payload: {
+        error: new Error(`Event with id ${id} is missing start info`),
+      },
+    });
+  if (id.startsWith(Location.locationHoursId)) {
+    return dispatch({
+      type: AdminAction.OpenLocationHoursDialog,
+      payload: {
+        locationHoursState: {
+          select: {
+            start,
+            end: ((): Date => {
+              const end = new Date(start.getTime());
+              end.setDate(start.getDate() + 1);
+              return end;
+            })(),
+          },
+          time: {
+            start: (extendedProps.start as string) || "09:00:00",
+            end: (extendedProps.end as string) || "17:00:00",
+          },
+          location,
+        },
+      },
+    });
+  }
+  console.group("Unhandled scheduler event click");
+  console.log({ id, title, start, extendedProps });
+  console.groupEnd();
+};
+
+export const selectionHandler = (
+  dispatch: (action: Action) => void,
+  location: Location
+) => ({ start, end, resource = { id: "" } }: SelectProps): void => {
+  const locationHoursState = {
+    select: { start, end },
+    location,
+    time: {
+      start: (resource.extendedProps?.start as string) || "09:00:00",
+      end: (resource.extendedProps?.end as string) || "17:00:00",
+    },
   };
+
+  switch (resource.id) {
+    case Location.locationHoursId:
+      return dispatch({
+        type: AdminAction.OpenLocationHoursDialog,
+        payload: {
+          locationHoursState,
+        },
+      });
+    case VirtualWeek.resourceId:
+      return dispatch({
+        type: AdminAction.OpenVirtualWeeksDialog,
+        payload: {
+          locationHoursState,
+        },
+      });
+    default:
+      console.group("Unhandled Scheduler selection");
+      console.log({ start, end, resource });
+      console.groupEnd();
+  }
+};

@@ -108,7 +108,13 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
         resourcesInitiallyExpanded={false} // TODO user preference
         resourceLabelDidMount={({ resource: { id, title }, el }): void => {
           el.style.cursor = "default"; //! TODO move to CSS
-          el.onclick = resourceClickHandler(id, title);
+          el.onclick = resourceClickHandler({
+            id,
+            title,
+            dispatch,
+            location,
+            semester,
+          });
         }}
         // EVENTS
         events={events}
