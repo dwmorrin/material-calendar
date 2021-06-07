@@ -24,26 +24,29 @@ export interface Project {
   selected?: boolean;
 }
 
+const defaultProject = {
+  id: 0,
+  title: "",
+  course: { title: "" },
+  start: "",
+  end: "",
+  reservationStart: "",
+  allotments: [] as ProjectAllotment[],
+  locations: {},
+  managers: [] as Manager[],
+  open: false,
+  groupSize: 0,
+  groupAllottedHours: 0,
+};
+
 export class Project implements Project {
   static url = "/api/projects";
   static collectionKey = "projects";
-  constructor(
-    project = {
-      id: 0,
-      title: "",
-      course: { title: "" },
-      start: "",
-      end: "",
-      reservationStart: "",
-      allotments: [] as ProjectAllotment[],
-      managers: [] as Manager[],
-      open: false,
-      groupSize: 0,
-      groupAllottedHours: 0,
-    }
-  ) {
+  constructor(project = defaultProject) {
     Object.assign(this, project);
   }
 }
+
+export { defaultProject };
 
 export default Project;

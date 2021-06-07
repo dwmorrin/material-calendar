@@ -4,7 +4,7 @@ import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import interactionPlugin from "@fullcalendar/interaction";
 import Semester from "../../resources/Semester";
 import VirtualWeek from "../../resources/VirtualWeek";
-import Project from "../../resources/Project";
+import Project, { defaultProject } from "../../resources/Project";
 import Location from "../../resources/Location";
 import {
   compareCalendarStates,
@@ -23,7 +23,8 @@ import {
 } from "../../admin/scheduler";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
-import { Snackbar } from "@material-ui/core";
+import { Fab, Snackbar } from "@material-ui/core";
+import AddIcon from "@material-ui/icons/Add";
 
 const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const { schedulerLocationId: locationId, selectedSemester, ref } = state;
@@ -148,6 +149,24 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
         ref={ref}
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
       />
+      <Fab
+        variant="extended"
+        onClick={(): void =>
+          //! consider adding action "jump to document"
+          dispatch({
+            type: AdminAction.SelectedDocument,
+            payload: {
+              resourceKey: ResourceKey.Projects,
+              resourceInstance: new Project({
+                ...defaultProject,
+                locations: { [String(location.id)]: true },
+              }),
+            },
+          })
+        }
+      >
+        <AddIcon /> Add project
+      </Fab>
     </>
   );
 };
