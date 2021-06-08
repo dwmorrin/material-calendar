@@ -28,7 +28,8 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
       onClick={(event): void => event.stopPropagation()}
     >
       <FormControlLabel
-        checked={project.selected || false}
+        //TODO state should track selected Projects (removed project.selected)
+        checked={false}
         control={<Checkbox />}
         label={<ListItemText primary={project.title} />}
         onClick={(event): void => event.stopPropagation()}

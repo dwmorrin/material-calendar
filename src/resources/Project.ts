@@ -18,7 +18,6 @@ export interface Project {
   open: boolean;
   groupSize: number;
   groupAllottedHours: number;
-  selected?: boolean;
 }
 
 const defaultProject = {
