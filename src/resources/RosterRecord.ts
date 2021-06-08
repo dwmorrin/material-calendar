@@ -38,10 +38,7 @@ export class RosterRecord implements RosterRecord {
     rosterRecord = {
       course: {
         title: "",
-        catalogId: "",
-        section: "",
         instructor: "",
-        project: { title: "" },
       },
       student: { name: { first: "", last: "" }, id: "" },
     }
