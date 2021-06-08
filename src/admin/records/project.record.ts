@@ -1,5 +1,4 @@
 import Project from "../../resources/Project";
-import User from "../../resources/User";
 import { getFormattedDate, getFormattedEventInterval } from "../../utils/date";
 
 const template = (project: unknown): string[][] =>
@@ -10,7 +9,6 @@ const template = (project: unknown): string[][] =>
         ["Course", project.course.title || "none"],
         ["Duration", getFormattedEventInterval(project.start, project.end)],
         ["Reservations start", getFormattedDate(project.reservationStart)],
-        ["Managers", User.getManagerNames(project.managers).join(", ")],
         ["Group size", project.groupSize.toString()],
         ["Allotments", project.allotments.length.toString()],
       ]

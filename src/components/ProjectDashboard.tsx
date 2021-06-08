@@ -21,13 +21,11 @@ import ProjectDashboardGroup from "./ProjectDashboardGroup";
 import GroupDashboard from "./GroupDashboard";
 import { ResourceKey } from "../resources/types";
 import Event from "../resources/Event";
-import EditIcon from "@material-ui/icons/Edit";
 import {
   useStyles,
   compareStartDates,
   transition,
 } from "../calendar/projectDashboard";
-import User from "../resources/User";
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -44,11 +42,6 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   const locations = resources[ResourceKey.Locations].filter((location) =>
     currentProject?.allotments.find((a) => a.locationId === location.id)
   );
-  const isManager =
-    process.env.NODE_ENV === "development" ||
-    !!currentProject.managers.find(
-      ({ username }) => username === user.username
-    );
 
   const groupEvents = events.filter(
     (event) =>
@@ -84,18 +77,6 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           <CloseIcon />
         </IconButton>
         <Typography>{currentProject?.title}</Typography>
-        {isManager && (
-          <IconButton
-            onClick={(event): void => {
-              event.stopPropagation();
-              dispatch({
-                type: CalendarAction.OpenProjectForm,
-              });
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-        )}
       </Toolbar>
       <Paper
         style={{
@@ -107,9 +88,6 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
       >
         <Typography variant="body2">
           {getFormattedEventInterval(currentProject.start, currentProject.end)}
-        </Typography>
-        <Typography variant="body2">
-          Managed by {User.getManagerNames(currentProject.managers).join(", ")}
         </Typography>
         <Accordion defaultExpanded={locations.length === 1}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>

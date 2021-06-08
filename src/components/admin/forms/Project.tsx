@@ -5,14 +5,9 @@ import { DatePicker } from "formik-material-ui-pickers";
 import { FormValues, ValueDictionary } from "../../../admin/types";
 import { List } from "@material-ui/core";
 import CheckboxList from "./CheckboxList";
-import FieldList from "./FieldList";
-import User, { Manager } from "../../../resources/User";
 
 // TODO need a radio for the group, not checkbox
-const FormTemplate: FunctionComponent<FormValues> = ({
-  managers,
-  __options__,
-}) => (
+const FormTemplate: FunctionComponent<FormValues> = ({ __options__ }) => (
   <List>
     <Field fullWidth component={TextField} name="title" label="Title" />
     <Field fullWidth component={DatePicker} name="start" label="Start" />
@@ -22,10 +17,6 @@ const FormTemplate: FunctionComponent<FormValues> = ({
       component={DatePicker}
       name="reservationStart"
       label="Reservations start"
-    />
-    <FieldList
-      name="managers"
-      values={User.getManagerUsernames(managers as Manager[])}
     />
     <Field
       fullWidth

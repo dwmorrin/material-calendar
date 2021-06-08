@@ -1,5 +1,3 @@
-import { Manager } from "../resources/User";
-
 export interface ProjectAllotment {
   locationId: number;
   start: string;
@@ -17,7 +15,6 @@ export interface Project {
   reservationStart: string;
   allotments: ProjectAllotment[];
   locations: { [k: string]: boolean };
-  managers: Manager[];
   open: boolean;
   groupSize: number;
   groupAllottedHours: number;
@@ -33,7 +30,6 @@ const defaultProject = {
   reservationStart: "",
   allotments: [] as ProjectAllotment[],
   locations: {},
-  managers: [] as Manager[],
   open: false,
   groupSize: 0,
   groupAllottedHours: 0,
