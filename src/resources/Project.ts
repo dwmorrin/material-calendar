@@ -14,7 +14,7 @@ export interface Project {
   end: string;
   reservationStart: string;
   allotments: ProjectAllotment[];
-  locations: { [k: string]: boolean };
+  locationIds: number[];
   open: boolean;
   groupSize: number;
   groupAllottedHours: number;
@@ -29,7 +29,7 @@ const defaultProject = {
   end: "",
   reservationStart: "",
   allotments: [] as ProjectAllotment[],
-  locations: {},
+  locationIds: [] as number[],
   open: false,
   groupSize: 0,
   groupAllottedHours: 0,
