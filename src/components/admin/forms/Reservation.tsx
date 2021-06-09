@@ -1,11 +1,12 @@
 import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField } from "formik-material-ui";
-import { FormValues } from "../../../admin/types";
+import { FormTemplateProps } from "../../../admin/types";
 import { List, FormLabel } from "@material-ui/core";
 import Event from "../../../resources/Event";
 import Project from "../../../resources/Project";
 import { deleteKeys } from "../../../utils/deleteKeys";
+import { ResourceKey } from "../../../resources/types";
 
 const getEventById = (events: Event[], id: number): Event =>
   events.find((e) => e.id === id) || new Event();
@@ -15,10 +16,9 @@ const getProjectById = (projects: Project[], id: number): Project =>
     "allotments"
   ) as Project;
 
-const FormTemplate: FunctionComponent<FormValues> = ({
-  __options__,
-  eventId,
-  projectId,
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({
+  state,
+  values,
 }) => (
   <List>
     <Field
@@ -31,7 +31,10 @@ const FormTemplate: FunctionComponent<FormValues> = ({
     <FormLabel>Event details</FormLabel>
     <pre>
       {JSON.stringify(
-        getEventById(__options__?.events as Event[], Number(eventId)),
+        getEventById(
+          state.resources[ResourceKey.Events] as Event[],
+          Number(values.eventId)
+        ),
         null,
         2
       )}
@@ -45,7 +48,10 @@ const FormTemplate: FunctionComponent<FormValues> = ({
     <FormLabel>Project details</FormLabel>
     <pre>
       {JSON.stringify(
-        getProjectById(__options__?.projects as Project[], Number(projectId)),
+        getProjectById(
+          state.resources[ResourceKey.Projects] as Project[],
+          Number(values.projectId)
+        ),
         null,
         2
       )}

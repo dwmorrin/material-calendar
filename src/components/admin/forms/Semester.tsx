@@ -2,10 +2,10 @@ import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker } from "formik-material-ui-pickers";
-import { FormValues } from "../../../admin/types";
+import { FormTemplateProps } from "../../../admin/types";
 import { List } from "@material-ui/core";
 
-const FormTemplate: FunctionComponent<FormValues> = (values) => {
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({values}) => {
   const { active } = values;
   return (
     <List>

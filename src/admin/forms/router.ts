@@ -5,7 +5,7 @@
  *   big.
  */
 import { FunctionComponent } from "react";
-import { AdminState, FormValues } from "../types";
+import { AdminState, FormTemplateProps, FormValues } from "../types";
 import { ResourceKey, ResourceInstance } from "../../resources/types";
 import {
   values as categoryValues,
@@ -20,7 +20,7 @@ import CourseForm from "../../components/admin/forms/Course";
 import {
   values as equipmentValues,
   update as equipmentUpdate,
-} from "./equiment.values";
+} from "./equipment.values";
 import EquipmentForm from "../../components/admin/forms/Equipment";
 import { values as eventValues, update as eventUpdate } from "./event.values";
 import EventForm from "../../components/admin/forms/Event";
@@ -72,7 +72,7 @@ const router = (
   key: ResourceKey
 ): {
   valuator: (state: AdminState) => FormValues;
-  template: FunctionComponent<FormValues>;
+  template: FunctionComponent<FormTemplateProps>;
   updater: (state: AdminState, values: FormValues) => ResourceInstance;
 } =>
   ({

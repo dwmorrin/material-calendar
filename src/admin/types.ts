@@ -77,7 +77,11 @@ export type ValueDictionary = {
 
 export interface FormValues {
   [k: string]: unknown;
-  __options__?: FormValues;
+}
+
+export interface FormTemplateProps {
+  values: FormValues;
+  state: AdminState;
 }
 
 export interface LocationHoursState {

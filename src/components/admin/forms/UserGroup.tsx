@@ -1,16 +1,13 @@
 import React, { FunctionComponent } from "react";
 import { Field, FieldArray } from "formik";
 import { TextField } from "formik-material-ui";
-import { FormValues } from "../../../admin/types";
+import { FormTemplateProps } from "../../../admin/types";
 import { List, FormLabel, Box, IconButton, Button } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
 import User from "../../../resources/User";
 
-const FormTemplate: FunctionComponent<FormValues> = ({
-  members,
-  reservedHours,
-}) => (
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({ values }) => (
   <List>
     <Field
       fullWidth
@@ -23,7 +20,7 @@ const FormTemplate: FunctionComponent<FormValues> = ({
       <FieldArray name="members">
         {({ push, remove }): JSX.Element => (
           <div>
-            {(members as User[]).map((_, index) => (
+            {(values.members as User[]).map((_, index) => (
               <div key={index}>
                 <Field
                   component={TextField}
@@ -47,9 +44,8 @@ const FormTemplate: FunctionComponent<FormValues> = ({
         )}
       </FieldArray>
     </Box>
-    {/* reserved hours is calculated, not editable */}
     <FormLabel>Reserved hours</FormLabel>
-    <p>{String(reservedHours)}</p>
+    <p>{String(values.reservedHours)}</p>
   </List>
 );
 

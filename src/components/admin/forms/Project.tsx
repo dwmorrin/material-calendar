@@ -1,39 +1,75 @@
 import React, { FunctionComponent } from "react";
-import { Field } from "formik";
-import { TextField } from "formik-material-ui";
+import { Field, FieldArray } from "formik";
+import { TextField, RadioGroup, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker } from "formik-material-ui-pickers";
-import { FormValues, ValueDictionary } from "../../../admin/types";
-import { List } from "@material-ui/core";
-import CheckboxList from "./CheckboxList";
+import { FormTemplateProps } from "../../../admin/types";
+import { FormControlLabel, FormLabel, List, Radio } from "@material-ui/core";
+import { ResourceKey } from "../../../resources/types";
+import Course from "../../../resources/Course";
+import Location from "../../../resources/Location";
 
-// TODO need a radio for the group, not checkbox
-const FormTemplate: FunctionComponent<FormValues> = ({ __options__ }) => (
-  <List>
-    <Field fullWidth component={TextField} name="title" label="Title" />
-    <Field fullWidth component={DatePicker} name="start" label="Start" />
-    <Field fullWidth component={DatePicker} name="end" label="End" />
-    <Field
-      fullWidth
-      component={DatePicker}
-      name="reservationStart"
-      label="Reservations start"
-    />
-    <Field
-      fullWidth
-      component={TextField}
-      name="groupSize"
-      label="Group size"
-    />
-    <Field
-      fullWidth
-      component={TextField}
-      name="groupAllottedHours"
-      label="Group allotted hours"
-    />
-    <CheckboxList //! BUG checkboxes value cannot be boolean, needs fix
-      name="course"
-      values={__options__?.courses as ValueDictionary}
-    />
-  </List>
-);
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({ state }) => {
+  const courses = state.resources[ResourceKey.Courses] as Course[];
+  const locations = state.resources[ResourceKey.Locations] as Location[];
+  const locationValues = locations.reduce(
+    (dict, { id, title }) => ({ ...dict, [title]: String(id) }),
+    {} as { [k: string]: string }
+  );
+  return (
+    <List>
+      <Field fullWidth component={TextField} name="title" label="Title" />
+      <Field fullWidth component={DatePicker} name="start" label="Start" />
+      <Field fullWidth component={DatePicker} name="end" label="End" />
+      <Field
+        fullWidth
+        component={DatePicker}
+        name="reservationStart"
+        label="Reservations start"
+      />
+      <Field
+        fullWidth
+        component={TextField}
+        name="groupSize"
+        label="Group size"
+      />
+      <Field
+        fullWidth
+        component={TextField}
+        name="groupAllottedHours"
+        label="Group allotted hours"
+      />
+      <FormLabel>Course</FormLabel>
+      <Field component={RadioGroup} name="course.title">
+        {courses.map((course, index) => (
+          <FormControlLabel
+            key={`${course.title}${index}`}
+            label={course.title}
+            value={course.title}
+            control={<Radio />}
+          />
+        ))}
+        <FormControlLabel label="None" value="" control={<Radio />} />
+      </Field>
+      <FormLabel>Locations</FormLabel>
+      <FieldArray
+        name="locationIds"
+        render={(): JSX.Element => (
+          <>
+            {Object.entries(locationValues).map(([label, value], index) => (
+              <div key={index}>
+                <Field
+                  type="checkbox"
+                  component={CheckboxWithLabel}
+                  name={"locationIds"}
+                  Label={{ label }}
+                  value={value}
+                />
+              </div>
+            ))}
+          </>
+        )}
+      />
+    </List>
+  );
+};
 export default FormTemplate;

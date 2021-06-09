@@ -1,10 +1,10 @@
 import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField } from "formik-material-ui";
-import { FormValues } from "../../../admin/types";
+import { FormTemplateProps } from "../../../admin/types";
 import { List } from "@material-ui/core";
 
-const FormTemplate: FunctionComponent<FormValues> = () => (
+const FormTemplate: FunctionComponent<FormTemplateProps> = () => (
   <List>
     <Field fullWidth component={TextField} name="start" label="Start" />
     <Field fullWidth component={TextField} name="end" label="End" />

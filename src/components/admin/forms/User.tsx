@@ -1,17 +1,24 @@
 import React, { FunctionComponent } from "react";
-import { Field } from "formik";
-import { TextField } from "formik-material-ui";
-import { FormValues, ValueDictionary } from "../../../admin/types";
+import { Field, FieldArray } from "formik";
+import { CheckboxWithLabel, TextField } from "formik-material-ui";
+import { FormTemplateProps, FormValues } from "../../../admin/types";
 import { List } from "@material-ui/core";
-import CheckboxList from "./CheckboxList";
 import FieldList from "./FieldList";
+import { ResourceKey } from "../../../resources/types";
+import Project from "../../../resources/Project";
 
-const FormTemplate: FunctionComponent<FormValues> = ({
-  contact,
-  roles,
-  projects,
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({
+  values,
+  state,
 }) => {
-  const { email, phone } = contact as { email: string[]; phone: string[] };
+  const projects = (state.resources[ResourceKey.Projects] as Project[]).reduce(
+    (dict, { title, id }) => ({ ...dict, [title]: String(id) }),
+    {} as { [k: string]: string }
+  );
+  const { email, phone } = (values as FormValues).contact as {
+    email: string[];
+    phone: string[];
+  };
   return (
     <List>
       <Field component={TextField} name="name.first" label="First" />
@@ -20,8 +27,25 @@ const FormTemplate: FunctionComponent<FormValues> = ({
       <Field fullWidth component={TextField} name="username" label="Username" />
       <FieldList name="contact.email" values={email} />
       <FieldList name="contact.phone" values={phone} />
-      <FieldList name="roles" values={roles as string[]} />
-      <CheckboxList name="projects" values={projects as ValueDictionary} />
+      <FieldList name="roles" values={values.roles as string[]} />
+      <FieldArray
+        name="projects"
+        render={(): JSX.Element => (
+          <>
+            {Object.entries(projects).map(([label, value], index) => (
+              <div key={index}>
+                <Field
+                  type="checkbox"
+                  component={CheckboxWithLabel}
+                  name={"projects.index.title"}
+                  Label={{ label }}
+                  value={value}
+                />
+              </div>
+            ))}
+          </>
+        )}
+      />
     </List>
   );
 };

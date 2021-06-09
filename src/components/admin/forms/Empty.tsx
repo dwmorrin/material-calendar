@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from "react";
 import { List } from "@material-ui/core";
-import { FormValues } from "../../../admin/types";
+import { FormTemplateProps } from "../../../admin/types";
 
-const FormTemplate: FunctionComponent<FormValues> = () => (
+const FormTemplate: FunctionComponent<FormTemplateProps> = () => (
   <List>
     <div>
       Yikes, we do not have an interface for updating this resource yet...

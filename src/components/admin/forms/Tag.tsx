@@ -1,9 +1,10 @@
 import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField } from "formik-material-ui";
-import { FormValues } from "../../../admin/types";
+import { FormTemplateProps } from "../../../admin/types";
 import { List, FormLabel } from "@material-ui/core";
 import Category from "../../../resources/Category";
+import { ResourceKey } from "../../../resources/types";
 
 const getCategoryPath = (categories: Category[], id: number): string => {
   const found = categories.find((c) => c.id === id);
@@ -11,9 +12,9 @@ const getCategoryPath = (categories: Category[], id: number): string => {
   return Category.path(categories, found);
 };
 
-const FormTemplate: FunctionComponent<FormValues> = ({
-  category,
-  __options__,
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({
+  state,
+  values,
 }) => (
   <List>
     <Field fullWidth component={TextField} name="title" label="Title" />
@@ -25,8 +26,8 @@ const FormTemplate: FunctionComponent<FormValues> = ({
     />
     <FormLabel>
       {getCategoryPath(
-        __options__?.categories as Category[],
-        +(category as Category).id
+        state.resources[ResourceKey.Categories] as Category[],
+        (values.category as Category).id
       )}
     </FormLabel>
   </List>

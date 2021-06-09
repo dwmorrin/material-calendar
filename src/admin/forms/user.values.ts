@@ -5,25 +5,6 @@ import { AdminState, FormValues, ValueDictionary } from "../types";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 
-const makeSelectedProjectDict = (
-  projects: Project[],
-  user: User
-): ValueDictionary =>
-  projects.reduce(
-    (dictionary: ValueDictionary, project): ValueDictionary =>
-      dictionary
-        ? {
-            ...dictionary,
-            [project.title]: user.projects
-              ? (user.projects as Partial<Project>[]).findIndex(
-                  (p) => p.id === project.id
-                ) > -1
-              : false,
-          }
-        : {},
-    {}
-  );
-
 const getSelectedProjectIds = (
   projects: Project[],
   selected: ValueDictionary
@@ -56,10 +37,6 @@ export const values = (state: AdminState): FormValues => {
     ...user,
     name,
     contact,
-    projects: makeSelectedProjectDict(
-      state.resources[ResourceKey.Projects] as Project[],
-      user
-    ),
   };
 };
 
@@ -70,6 +47,7 @@ export const values = (state: AdminState): FormValues => {
 export const update = (state: AdminState, values: FormValues): User => ({
   ...new User(state.resourceInstance as User),
   ...values,
+  //! TODO this has not been updated since changing the template!!
   projects: getSelectedProjectIds(
     state.resources[ResourceKey.Projects] as Project[],
     values.projects as ValueDictionary

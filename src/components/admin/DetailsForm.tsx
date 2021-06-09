@@ -40,7 +40,9 @@ const AdminDetailsForm: FunctionComponent<AdminUIProps> = ({
           onSubmit={dispatchOneResource(dispatch, state, updater)}
         >
           {(props): JSX.Element => (
-            <ResourceForm {...props} FormFields={template} />
+            <>
+              <ResourceForm {...props} FormFields={template} state={state} />
+            </>
           )}
         </Formik>
       </MuiPickersUtilsProvider>

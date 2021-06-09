@@ -2,15 +2,16 @@ import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField, CheckboxWithLabel, Select } from "formik-material-ui";
 import { DatePicker } from "formik-material-ui-pickers";
-import { FormValues } from "../../../admin/types";
+import { FormTemplateProps } from "../../../admin/types";
 import { List, MenuItem, InputLabel } from "@material-ui/core";
+import { ResourceKey } from "../../../resources/types";
+import Location from "../../../resources/Location";
 
 /**
- * dummy value "locations" populates select; value of "locations" ignored
  * value of "location" (singular) is the actual value for the event
  */
-const Template: FunctionComponent<FormValues> = (values) => {
-  const locations = values.__options__?.locations as string[];
+const Template: FunctionComponent<FormTemplateProps> = ({ state, values }) => {
+  const locations = state.resources[ResourceKey.Locations] as Location[];
   const reservable = values.reservable as boolean;
   return (
     <List>
@@ -24,12 +25,12 @@ const Template: FunctionComponent<FormValues> = (values) => {
       <InputLabel htmlFor="eventLocation">Location</InputLabel>
       <Field
         component={Select}
-        name="location"
+        name="location.title"
         inputProps={{ id: "eventLocation" }}
       >
-        {locations.map((loc) => (
-          <MenuItem key={loc} value={loc}>
-            {loc}
+        {locations.map(({ title }) => (
+          <MenuItem key={title} value={title}>
+            {title}
           </MenuItem>
         ))}
       </Field>
