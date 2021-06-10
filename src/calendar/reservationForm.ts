@@ -166,59 +166,63 @@ export const makeEquipmentRequests = (
   });
 };
 
-export const submitHandler = (
-  closeForm: () => void,
-  displayMessage: (message: string) => void
-) => (values: { [k: string]: unknown }, actions: FormikValues): void => {
-  values = {
-    ...values,
-    equipment: getEquipmentIds(
-      values.equipment as {
-        [k: string]: {
-          quantity: number;
-          items?: { id: number; quantity: number }[];
-        };
-      },
-      values.event as Event
-    ),
-  };
-  actions.setSubmitting(true);
-  console.log(JSON.stringify(updater(values)));
-  fetch(`/api/reservations${values.id ? `/${values.id}` : ""}`, {
-    method: values.id ? "PUT" : "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updater(values)),
-  })
-    .then((response) => response.json())
-    .then(({ error, data, context }) => {
-      console.log({ error, data, context });
-      console.log(data);
-      fetch(`/api/reservations/equipment/${data.id || values.id}`, {
-        method: values.id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          makeEquipmentRequests(
-            values.equipment as Record<string, unknown>,
-            values.id || data.id
-          )
-        ),
-      })
-        .then((response) => response.json())
-        .then(({ error, data, context }) => {
-          console.log({ error, data, context });
-        });
+export const submitHandler =
+  (closeForm: () => void, displayMessage: (message: string) => void) =>
+  (values: { [k: string]: unknown }, actions: FormikValues): void => {
+    values = {
+      ...values,
+      equipment: getEquipmentIds(
+        values.equipment as {
+          [k: string]: {
+            quantity: number;
+            items?: { id: number; quantity: number }[];
+          };
+        },
+        values.event as Event
+      ),
+    };
+    actions.setSubmitting(true);
+    console.log(JSON.stringify(updater(values)));
+    fetch(`/api/reservations${values.id ? `/${values.id}` : ""}`, {
+      method: values.id ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updater(values)),
     })
-    .catch(console.error)
-    .finally(() => {
-      actions.setSubmitting(false);
-      displayMessage(
-        values.id
-          ? "Your Reservation has been updated!"
-          : "Your Reservation has been made!"
-      );
-      closeForm();
-    });
-};
+      .then((response) => response.json())
+      .then(({ error, data, context }) => {
+        console.log({ error, data, context });
+        console.log(data);
+        if (
+          Object.entries(values.equipment as Record<string, unknown>).length !==
+          0
+        ) {
+          fetch(`/api/reservations/equipment/${data.id || values.id}`, {
+            method: values.id ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(
+              makeEquipmentRequests(
+                values.equipment as Record<string, unknown>,
+                values.id || data.id
+              )
+            ),
+          })
+            .then((response) => response.json())
+            .then(({ error, data, context }) => {
+              console.log({ error, data, context });
+            });
+        }
+      })
+      .catch(console.error)
+      .finally(() => {
+        actions.setSubmitting(false);
+        displayMessage(
+          values.id
+            ? "Your Reservation has been updated!"
+            : "Your Reservation has been made!"
+        );
+        closeForm();
+      });
+  };
 
 export const makeInitialValues = (
   state: CalendarState
