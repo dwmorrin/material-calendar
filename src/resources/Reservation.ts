@@ -6,7 +6,7 @@ interface ActionDetails {
 
 interface Reservation {
   [k: string]: unknown;
-  id: 0;
+  id: number;
   description: string;
   eventId: number;
   projectId: number;
