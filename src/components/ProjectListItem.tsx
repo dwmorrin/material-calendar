@@ -45,7 +45,7 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
           event.stopPropagation();
           dispatch({
             type: CalendarAction.OpenProjectDashboard,
-            payload: { ...state, currentProject: project },
+            payload: { ...state, currentProjectId: project.id },
           });
         }}
       >

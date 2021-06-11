@@ -26,6 +26,7 @@ import {
   compareStartDates,
   transition,
 } from "../calendar/projectDashboard";
+import Project from "../resources/Project";
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -33,8 +34,14 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const classes = useStyles();
-  const { currentProject, currentGroup, projectDashboardIsOpen, resources } =
-    state;
+  const { projectDashboardIsOpen, resources } = state;
+  const currentGroup = (
+    state.resources[ResourceKey.Projects] as Project[]
+  ).find((project) => project.id === state.currentGroupId);
+
+  const currentProject = (
+    state.resources[ResourceKey.Projects] as Project[]
+  ).find((project) => project.id === state.currentProjectId);
 
   if (!user || !currentProject) return null;
 
@@ -126,7 +133,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             onClick={(): void =>
               dispatch({
                 type: CalendarAction.OpenEventDetail,
-                payload: { currentEvent: event },
+                payload: { currentEventId: event.id },
               })
             }
           >
@@ -143,7 +150,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             onClick={(): void =>
               dispatch({
                 type: CalendarAction.OpenEventDetail,
-                payload: { currentEvent: event },
+                payload: { currentEventId: event.id },
               })
             }
           >

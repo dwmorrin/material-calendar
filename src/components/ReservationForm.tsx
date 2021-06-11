@@ -28,6 +28,7 @@ import {
   transition,
   getValuesFromReservation,
 } from "../calendar/reservationForm";
+import Event from "../resources/Event";
 
 const RadioYesNo: FunctionComponent<{
   label: string;
@@ -47,6 +48,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
+  const currentEvent = (state.resources[ResourceKey.Events] as Event[]).find(
+    (event) => event.id === state.currentEventId
+  );
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
@@ -63,6 +67,10 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
       type: CalendarAction.DisplayMessage,
       payload: { message: message },
     });
+
+  if (!currentEvent) {
+    return null;
+  }
 
   return (
     <Dialog
@@ -85,8 +93,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
       <DialogContent>
         <Formik
           initialValues={
-            getValuesFromReservation(state.currentEvent) ||
-            makeInitialValues(state)
+            getValuesFromReservation(currentEvent) || makeInitialValues(state)
           }
           onSubmit={submitHandler(closeForm, displayMessage)}
           validationSchema={validationSchema}
@@ -203,13 +210,13 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
               >
                 Confirm Reservation
               </Button>
-              {values.hasEquipment === "yes" && state.currentEvent && (
+              {values.hasEquipment === "yes" && currentEvent && (
                 <EquipmentForm
                   open={equipmentFormIsOpen}
                   setOpen={setEquipmentFormIsOpen}
                   selectedEquipment={values.equipment}
                   setFieldValue={setFieldValue}
-                  event={state.currentEvent}
+                  event={currentEvent}
                 />
               )}
               <pre>{JSON.stringify(values, null, 2)}</pre>

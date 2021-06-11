@@ -3,6 +3,7 @@ import { ResourceKey } from "../resources/types";
 import UserGroup from "../resources/UserGroup";
 import { enqueue, dequeue } from "../utils/queue";
 import { ErrorType } from "../utils/error";
+import Project from "../resources/Project";
 
 type StateHandler = (state: CalendarState, action: Action) => CalendarState;
 
@@ -139,7 +140,7 @@ const closeGroupDashboard: StateHandler = (state) => ({
 const closeProjectDashboard: StateHandler = (state) => ({
   ...state,
   projectDashboardIsOpen: false,
-  currentProject: undefined,
+  currentProjectId: undefined,
 });
 
 const closeProjectForm: StateHandler = (state) => ({
@@ -181,64 +182,68 @@ const pickedDate: StateHandler = (state, action) => {
 
 const openEventDetail: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.currentEvent) {
+  if (!payload?.currentEventId) {
     return errorRedirect(
       state,
       action,
-      "no event received for detail view",
+      "no event ID received for detail view",
       ErrorType.MISSING_RESOURCE
     );
   }
   return {
     ...state,
     detailIsOpen: true,
-    currentEvent: payload.currentEvent,
+    currentEventId: payload.currentEventId,
   };
 };
 
 const openEventEditor: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.currentEvent) {
+  if (!payload?.currentEventId) {
     return errorRedirect(
       state,
       action,
-      "no event received for event editor",
+      "no event ID received for event editor",
       ErrorType.MISSING_RESOURCE
     );
   }
   return {
     ...state,
     eventEditorIsOpen: true,
-    currentEvent: payload.currentEvent,
+    currentEventId: payload.currentEventId,
   };
 };
 
 const openGroupDashboard: StateHandler = (state) => ({
   ...state,
-  // currentProject: payload?.currentProject,
   groupDashboardIsOpen: true,
 });
 
 const openProjectDashboard: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload || !payload.currentProject) {
+  console.log(payload);
+  if (!payload || !payload.currentProjectId) {
     return errorRedirect(
       state,
       action,
-      "no current project found; cannot open project",
+      "no current project id found; cannot open project",
       ErrorType.MISSING_RESOURCE
     );
   }
-  const { currentGroup, resources } = state;
-  const { currentProject } = payload;
+  const { resources } = state;
+  const currentGroup = (
+    state.resources[ResourceKey.Projects] as Project[]
+  ).find((project) => project.id === state.currentGroupId);
+
+  const { currentProjectId } = payload;
   const groups = resources[ResourceKey.Groups] as UserGroup[];
   const group =
     currentGroup ||
-    groups.find((group) => group.projectId === currentProject.id);
+    groups.find((group) => group.projectId === currentProjectId);
   return {
     ...state,
     currentGroup: group,
-    currentProject: currentProject,
+    currentProjectId: currentProjectId,
     projectDashboardIsOpen: true,
   };
 };
@@ -246,7 +251,7 @@ const openProjectDashboard: StateHandler = (state, action) => {
 const openProjectForm: StateHandler = (state, { payload }) => {
   return {
     ...state,
-    currentCourse: payload?.currentCourse,
+    currentCourseId: payload?.currentCourseId,
     projectFormIsOpen: true,
   };
 };
@@ -293,7 +298,7 @@ const receivedResource: StateHandler = (state, action) => {
 
 const selectedGroup: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.currentGroup) {
+  if (!payload?.currentGroupId) {
     return errorRedirect(
       state,
       action,
@@ -301,7 +306,7 @@ const selectedGroup: StateHandler = (state, action) => {
       ErrorType.MISSING_RESOURCE
     );
   }
-  return { ...state, currentGroup: payload.currentGroup };
+  return { ...state, currentGroup: payload.currentGroupId };
 };
 
 const selectedLocation: StateHandler = (state, action) => {

@@ -68,7 +68,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
           dispatch({
             type: CalendarAction.OpenEventDetail,
             payload: {
-              currentEvent: events.find((event) => event.id === +info.event.id),
+              currentEventId: +info.event.id,
             },
           })
         }
@@ -83,14 +83,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
           dispatch({
             type: CalendarAction.OpenEventEditor,
             payload: {
-              currentEvent: new Event({
-                id: -1,
-                start: start.toJSON().split(".")[0], // removes timezone info
-                end: end.toJSON().split(".")[0], // removes timezone info
-                location: { id: +resource.id, title: resource.title },
-                title: "",
-                reservable: false,
-              }),
+              currentEventId: -1,
             },
           })
         }

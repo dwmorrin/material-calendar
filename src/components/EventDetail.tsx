@@ -18,6 +18,7 @@ import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
 import ReservationForm from "./ReservationForm";
 import ListSubheader from "@material-ui/core/ListSubheader";
+import Event from "../resources/Event";
 
 const transition = makeTransition("left");
 
@@ -25,7 +26,14 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  if (!state.currentEvent || !state.currentEvent.location) {
+  if (!state.currentEventId) {
+    return null;
+  }
+
+  const currentEvent = (state.resources[ResourceKey.Events] as Event[]).find(
+    (event) => event.id === state.currentEventId);
+
+  if (!currentEvent) {
     return null;
   }
   const {
@@ -35,7 +43,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     start,
     title,
     reservation,
-  } = state.currentEvent;
+  } = currentEvent;
 
   const projects = (state.resources[
     ResourceKey.Projects
@@ -120,7 +128,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               event.stopPropagation();
               dispatch({
                 type: CalendarAction.OpenReservationForm,
-                payload: { currentEvent: state.currentEvent },
+                payload: { currentEventId: state.currentEventId },
               });
             }}
           >

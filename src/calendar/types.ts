@@ -62,10 +62,10 @@ export interface CalendarState {
 
   // Resources
   resources: { [k in ResourceKey]: ResourceInstance[] };
-  currentEvent?: Event;
-  currentGroup?: UserGroup;
-  currentProject?: Project;
-  currentCourse?: { id: number; title: string };
+  currentEventId?: number;
+  currentGroupId?: number;
+  currentProjectId?: number;
+  currentCourseId?: number;
 }
 
 export type PartialCalendarState = Partial<Omit<CalendarState, "resources">> & {

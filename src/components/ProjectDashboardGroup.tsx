@@ -3,6 +3,7 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { Typography, Avatar, Button, LinearProgress } from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import UserGroup from "../resources/UserGroup";
+import Project from "../resources/Project";
 
 const availableHoursAsPercent = (maximum: number, used: number): number =>
   (100 * (maximum - used)) / maximum;
@@ -11,7 +12,10 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { currentProject, resources } = state;
+  const { resources } = state;
+  const currentProject = (
+    state.resources[ResourceKey.Projects] as Project[]
+  ).find((project) => project.id === state.currentProjectId);
   const currentGroup =
     (resources[ResourceKey.Groups] as UserGroup[]).find(
       (g) => g.projectId === currentProject?.id

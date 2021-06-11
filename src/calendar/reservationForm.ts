@@ -250,7 +250,7 @@ export const makeInitialValues = (
     (group) => group.projectId === project.id
   );
   return {
-    event: state.currentEvent?.id,
+    event: state.currentEventId,
     groupId: group?.id,
     phone: "",
     description: "",
