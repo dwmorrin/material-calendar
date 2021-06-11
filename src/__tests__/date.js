@@ -37,34 +37,26 @@ test("getFormattedDate", () => {
 
 test("getFormattedEventInterval same day, no time info", () => {
   expect(getFormattedEventInterval("2020-06-24", "2020-06-24")).toBe(
-    "Wednesday, June 24"
+    "Wed, Jun 24"
   );
 });
 
 test("getFormattedEventInterval different days, no time info", () => {
   expect(getFormattedEventInterval("2020-06-24", "2020-06-25")).toBe(
-    "Wednesday, June 24 - Thursday, June 25"
+    "Wed, Jun 24 - Thu, Jun 25"
   );
 });
 
 test("getFormattedEventInterval same day, with time", () => {
   expect(
-    getFormattedEventInterval(
-      "2020-06-24T13:00:00.000Z",
-      "2020-06-24T14:00:00.000Z"
-    )
-  ).toBe("Wednesday, June 24 \u00B7 1:00 PM - 2:00 PM");
+    getFormattedEventInterval("2020-06-24 13:00:00", "2020-06-24 14:00:00")
+  ).toBe("Wed, Jun 24 \u00B7 1:00 pm - 2:00 pm");
 });
 
 test("getFormattedEventInterval different days, with time", () => {
   expect(
-    getFormattedEventInterval(
-      "2020-06-24T20:00:00.000Z",
-      "2020-06-25T01:00:00.000Z"
-    )
-  ).toBe(
-    "Wednesday, June 24 \u00B7 8:00 PM - Thursday, June 25 \u00B7 1:00 AM"
-  );
+    getFormattedEventInterval("2020-06-24 20:00:00", "2020-06-25 01:00:00")
+  ).toBe("Wed, Jun 24 \u00B7 8:00 pm - Thu, Jun 25 \u00B7 1:00 am");
 });
 
 test("yyyymmdd", () => {

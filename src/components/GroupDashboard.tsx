@@ -85,8 +85,8 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
           <Typography variant="body2">
             {currentProject &&
               getFormattedEventInterval(
-                currentProject?.start as string | Date,
-                currentProject?.end as string | Date
+                currentProject?.start,
+                currentProject?.end
               )}
           </Typography>
         </section>

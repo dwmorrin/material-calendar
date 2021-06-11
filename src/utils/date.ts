@@ -1,5 +1,5 @@
 import { add, lightFormat } from "date-fns/fp";
-import { formatISO9075, parse, parseISO } from "date-fns";
+import { format, formatISO9075, parse, parseISO } from "date-fns";
 
 type DateInput = string | number | Date;
 
@@ -71,54 +71,21 @@ export function getFormattedDate(d: string | Date): string {
   return formatSlashed(d);
 }
 
-function isSameDay(a: Date, b: Date): boolean {
-  return (
-    a.getUTCFullYear() === b.getUTCFullYear() &&
-    a.getUTCMonth() === b.getUTCMonth() &&
-    a.getUTCDate() === b.getUTCDate()
-  );
-}
+export function getFormattedEventInterval(start: string, end: string): string {
+  [start, end] = [start, end].map((s) => s.replace("T", " "));
+  const hasNoTimeInfo = /^\d{4}-\d{2}-\d{2}$/.test(start);
+  const _start = hasNoTimeInfo ? parseSQLDate(start) : parseSQLDatetime(start);
+  const _end = hasNoTimeInfo ? parseSQLDate(end) : parseSQLDatetime(end);
 
-export function getFormattedEventInterval(
-  start: string | Date,
-  end: string | Date
-): string {
-  const _start = !isDate(start) ? new Date(start) : start;
-  const _end = !isDate(end) ? new Date(end) : end;
-  const hasNoTimeInfo =
-    typeof start === "string" && /^\d{4}-\d{2}-\d{2}$/.test(start);
-  const sameDay = isSameDay(_start, _end);
-
-  const dateFormat = {
-    weekday: "long" as "long" | "short" | "narrow" | undefined,
-    day: "numeric" as "numeric" | "2-digit" | undefined,
-    month: "long" as
-      | "numeric"
-      | "2-digit"
-      | "long"
-      | "short"
-      | "narrow"
-      | undefined,
-    timeZone: "UTC",
-  };
-  const timeFormat = {
-    hour12: true,
-    timeStyle: "short" as "long" | "short" | "full" | "medium" | undefined,
-    timeZone: "UTC",
-  };
   const timeDelimiter = " \u00B7 ";
   const intervalDelimiter = " - ";
-
-  const startDateString = _start.toLocaleDateString("en-US", dateFormat);
-  const startTimeString = hasNoTimeInfo
-    ? ""
-    : _start.toLocaleTimeString("en-US", timeFormat);
-  const endDateString = sameDay
-    ? ""
-    : _end.toLocaleDateString("en-US", dateFormat);
-  const endTimeString = hasNoTimeInfo
-    ? ""
-    : _end.toLocaleTimeString("en-US", timeFormat);
+  const dateFormat = "EE, MMM d";
+  const timeFormat = "h:mm aaa";
+  const startDateString = format(_start, dateFormat);
+  const startTimeString = hasNoTimeInfo ? "" : format(_start, timeFormat);
+  const endDateString = format(_end, dateFormat);
+  const endTimeString = hasNoTimeInfo ? "" : format(_end, timeFormat);
+  const sameDay = startDateString === endDateString;
 
   // hasNoTimeInfo && sameDay make for 4 possibilities:
   if (hasNoTimeInfo && sameDay) {
@@ -175,7 +142,7 @@ export function setDefaultDates<T, K extends keyof T>(
   dateKeys.forEach((key) => {
     if (!copy[key]) copy[key] = defaultDate as never;
     if (typeof copy[key] === "string")
-      copy[key] = ((copy[key] as unknown) as string).split(".")[0] as never;
+      copy[key] = (copy[key] as unknown as string).split(".")[0] as never;
   });
   return copy;
 }
