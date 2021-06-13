@@ -44,7 +44,7 @@ export const makeInitialValues = (
   state: CalendarState
 ): { [k: string]: unknown } => {
   return {
-    course: state.currentCourseId,
+    course: state.currentCourse?.id,
     title: "",
     description: "",
     instructions: "",

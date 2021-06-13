@@ -18,8 +18,6 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import { getFormattedEventInterval } from "../utils/date";
 import UserGroup from "../resources/UserGroup";
-import Project from "../resources/Project";
-import { ResourceKey } from "../resources/types";
 
 const transition = makeTransition("right");
 
@@ -27,19 +25,11 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   state,
   dispatch,
 }) => {
-  const { currentProjectId } = state;
-  const currentGroup = (
-    state.resources[ResourceKey.Projects] as Project[]
-  ).find((project) => project.id === state.currentGroupId);
-
+  const { currentGroup, currentProject } = state;
   const [groups, setGroups] = useState([] as UserGroup[]);
-  const currentProject = (
-    state.resources[ResourceKey.Projects] as Project[]
-  ).find((project) => project.id === state.currentProjectId);
-
   useEffect(() => {
-    if (!currentProjectId) return;
-    fetch(`/api/projects/${currentProjectId}/groups`)
+    if (!currentProject?.id) return;
+    fetch(`/api/projects/${currentProject.id}/groups`)
       .then((response) => response.json())
       .then(({ error, data, context }) => {
         if (error || !data) {
@@ -53,8 +43,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
           data.map((group: UserGroup) => new UserGroup(group)) as UserGroup[]
         );
       });
-  }, [currentProjectId, dispatch]);
-
+  }, [currentProject, dispatch]);
   return (
     <Dialog
       fullScreen

@@ -26,7 +26,6 @@ import {
 import { DatePicker } from "formik-material-ui-pickers";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
-import Project from "../resources/Project";
 
 const ProjectForm: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -34,9 +33,6 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const classes = useStyles();
-  const currentProject = (
-    state.resources[ResourceKey.Projects] as Project[]
-  ).find((project) => project.id === state.currentProjectId);
 
   function locationIsChecked(
     values: {
@@ -75,7 +71,8 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
         <MuiPickersUtilsProvider utils={DateFnUtils}>
           <Formik
             initialValues={
-              getValuesFromProject(currentProject) || makeInitialValues(state)
+              getValuesFromProject(state.currentProject) ||
+              makeInitialValues(state)
             }
             onSubmit={submitHandler}
             validationSchema={validationSchema}

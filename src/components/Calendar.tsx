@@ -24,7 +24,6 @@ import EventEditor from "./EventEditor";
 import ProjectForm from "./ProjectForm";
 import Snackbar from "./Snackbar";
 import ErrorPage from "./ErrorPage";
-import Event from "../resources/Event";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
@@ -58,9 +57,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         <EventEditor
           dispatch={dispatch}
           open={state.eventEditorIsOpen}
-          event={(state.resources[ResourceKey.Events] as Event[]).find(
-            (event) => event.id === state.currentEventId
-          )}
+          event={state.currentEvent}
         />
         <CalendarBar dispatch={dispatch} state={state} />
         {state.pickerShowing && (
