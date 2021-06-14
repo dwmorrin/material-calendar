@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import {
   Dialog,
   IconButton,
@@ -18,6 +18,7 @@ import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
 import ReservationForm from "./ReservationForm";
 import ListSubheader from "@material-ui/core/ListSubheader";
+import Event from "../resources/Event";
 
 const transition = makeTransition("left");
 
@@ -25,27 +26,73 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
+  // Update the event when the EventDetail is opened and when reservation form is closed
+  useEffect(() => {
+    if (!state.currentEvent?.id) return;
+    fetch(`/api/events/${state.currentEvent?.id}`)
+      .then(function (response) {
+        // If this response contained the 304 code it could save the comparison.
+        //console.log(response);
+        return response.json();
+      })
+      .then(({ error, data, context }) => {
+        if (error || !data) {
+          return dispatch({
+            type: CalendarAction.Error,
+            payload: { error },
+            meta: context,
+          });
+        }
+        //console.log({ error, data, context });
+        // Stringify the objects since even when cast as Events they do not compare
+        if (
+          data[0].id &&
+          JSON.stringify(data[0]) === JSON.stringify(state.currentEvent)
+        ) {
+          //console.log("event already up to date");
+        }
+        if (
+          data[0].id &&
+          JSON.stringify(data[0]) !== JSON.stringify(state.currentEvent)
+        ) {
+          //console.log("events out of date, updating");
+          fetch(`/api/events`)
+            .then(function (response) {
+              //console.log(response);
+              return response.json();
+            })
+            .then(({ error, data, context }) => {
+              if (error || !data) {
+                return dispatch({
+                  type: CalendarAction.Error,
+                  payload: { error },
+                  meta: context,
+                });
+              }
+              //console.log(data);
+              dispatch({
+                type: CalendarAction.UpdateEvents,
+                payload: { resources: { [ResourceKey.Events]: data } },
+                meta: ResourceKey.Events,
+              });
+            });
+        }
+      });
+  }, [state.detailIsOpen, state.reservationFormIsOpen]);
   if (!state.currentEvent || !state.currentEvent.location) {
     return null;
   }
-  const {
-    end,
-    location,
-    reservable,
-    start,
-    title,
-    reservation,
-  } = state.currentEvent;
+  const { end, location, reservable, start, title, reservation } =
+    state.currentEvent;
 
-  const projects = (state.resources[
-    ResourceKey.Projects
-  ] as Project[]).filter(({ allotments }) =>
-    allotments.some(
-      (a) =>
-        a.locationId === location.id &&
-        compareDateOrder(a.start, start) &&
-        compareDateOrder(end, a.end)
-    )
+  const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
+    ({ allotments }) =>
+      allotments.some(
+        (a) =>
+          a.locationId === location.id &&
+          compareDateOrder(a.start, start) &&
+          compareDateOrder(end, a.end)
+      )
   );
   const open = reservable && !reservation;
   const userOwns =

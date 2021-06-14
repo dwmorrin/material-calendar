@@ -3,6 +3,7 @@ import { ResourceKey } from "../resources/types";
 import UserGroup from "../resources/UserGroup";
 import { enqueue, dequeue } from "../utils/queue";
 import { ErrorType } from "../utils/error";
+import Event from "../resources/Event";
 
 type StateHandler = (state: CalendarState, action: Action) => CalendarState;
 
@@ -291,6 +292,55 @@ const receivedResource: StateHandler = (state, action) => {
   };
 };
 
+const updateEvents: StateHandler = (state, action) => {
+  const { payload, meta } = action;
+  const resources = payload?.resources;
+  if (!resources) {
+    return errorRedirect(
+      state,
+      action,
+      "no resources in payload",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  const resourceKey = meta as number;
+  if (resourceKey === undefined) {
+    return errorRedirect(
+      state,
+      action,
+      "no context given",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  const updatedCurrentEvent = resources[resourceKey].find(
+    (event) => event.id == state.currentEvent?.id
+  ) as Event;
+  return {
+    ...state,
+    currentEvent: updatedCurrentEvent,
+    resources: {
+      ...state.resources,
+      [resourceKey]: resources[resourceKey],
+    },
+  };
+};
+
+const selectedEvent: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload?.currentEvent) {
+    return errorRedirect(
+      state,
+      action,
+      "no event received for selecting Event",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  return {
+    ...state,
+    currentEvent: payload.currentEvent,
+  };
+};
+
 const selectedGroup: StateHandler = (state, action) => {
   const { payload } = action;
   if (!payload?.currentGroup) {
@@ -392,6 +442,8 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,
     [CalendarAction.ReceivedResource]: receivedResource,
+    [CalendarAction.UpdateEvents]: updateEvents,
+    [CalendarAction.SelectedEvent]: selectedEvent,
     [CalendarAction.SelectedGroup]: selectedGroup,
     [CalendarAction.SelectedLocation]: selectedLocation,
     [CalendarAction.SelectedProject]: selectedProject,

@@ -27,6 +27,8 @@ export enum CalendarAction {
   OpenProjectDashboard,
   ReceivedAllResources,
   ReceivedResource,
+  UpdateEvents,
+  SelectedEvent,
   SelectedGroup,
   SelectedLocation,
   SelectedProject,
