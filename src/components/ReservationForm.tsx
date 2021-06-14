@@ -201,7 +201,9 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
                 style={{ backgroundColor: "Green", color: "white" }}
                 disabled={isSubmitting}
               >
-                Confirm Reservation
+                {state.currentEvent?.reservation
+                  ? "Update Reservation"
+                  : "Confirm Reservation"}
               </Button>
               {values.hasEquipment === "yes" && state.currentEvent && (
                 <EquipmentForm
