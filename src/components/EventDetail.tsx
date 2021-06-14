@@ -202,6 +202,12 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                     }
                     // Stringify the objects since even when cast as Events they do not compare
                     else {
+                      dispatch({
+                        type: CalendarAction.DisplayMessage,
+                        payload: {
+                          message: "Your Reservation has been Canceled",
+                        },
+                      });
                       dispatch({ type: CalendarAction.CloseEventDetail });
                     }
                   });
