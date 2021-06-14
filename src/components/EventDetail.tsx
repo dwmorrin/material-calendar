@@ -180,6 +180,32 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 color: "white",
                 maxWidth: "400px",
               }}
+              onClick={(event): void => {
+                event.stopPropagation();
+                fetch(
+                  `/api/reservations/${state.currentEvent?.reservation?.id}`,
+                  {
+                    method: "DELETE",
+                    headers: {},
+                    body: null,
+                  }
+                )
+                  .then((response) => response.json())
+                  .then(({ error, data, context }) => {
+                    //console.log({ error, data, context });
+                    if (error || !data) {
+                      return dispatch({
+                        type: CalendarAction.Error,
+                        payload: { error },
+                        meta: context,
+                      });
+                    }
+                    // Stringify the objects since even when cast as Events they do not compare
+                    else {
+                      dispatch({ type: CalendarAction.CloseEventDetail });
+                    }
+                  });
+              }}
             >
               Cancel Reservation
             </Button>
