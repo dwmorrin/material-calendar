@@ -292,39 +292,6 @@ const receivedResource: StateHandler = (state, action) => {
   };
 };
 
-const updateEvents: StateHandler = (state, action) => {
-  const { payload, meta } = action;
-  const resources = payload?.resources;
-  if (!resources) {
-    return errorRedirect(
-      state,
-      action,
-      "no resources in payload",
-      ErrorType.MISSING_RESOURCE
-    );
-  }
-  const resourceKey = meta as number;
-  if (resourceKey === undefined) {
-    return errorRedirect(
-      state,
-      action,
-      "no context given",
-      ErrorType.MISSING_RESOURCE
-    );
-  }
-  const updatedCurrentEvent = resources[resourceKey].find(
-    (event) => event.id == state.currentEvent?.id
-  ) as Event;
-  return {
-    ...state,
-    currentEvent: updatedCurrentEvent,
-    resources: {
-      ...state.resources,
-      [resourceKey]: resources[resourceKey],
-    },
-  };
-};
-
 const selectedEvent: StateHandler = (state, action) => {
   const { payload } = action;
   if (!payload?.currentEvent) {
@@ -406,6 +373,39 @@ const togglePicker: StateHandler = (state) => ({
   pickerShowing: !state.pickerShowing,
 });
 
+const updateEvents: StateHandler = (state, action) => {
+  const { payload, meta } = action;
+  const resources = payload?.resources;
+  if (!resources) {
+    return errorRedirect(
+      state,
+      action,
+      "no resources in payload",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  const resourceKey = meta as number;
+  if (resourceKey === undefined) {
+    return errorRedirect(
+      state,
+      action,
+      "no context given",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  const updatedCurrentEvent = resources[resourceKey].find(
+    (event) => event.id == state.currentEvent?.id
+  ) as Event;
+  return {
+    ...state,
+    currentEvent: updatedCurrentEvent,
+    resources: {
+      ...state.resources,
+      [resourceKey]: resources[resourceKey],
+    },
+  };
+};
+
 const viewToday: StateHandler = (state, action) => {
   if (!state.ref?.current) {
     return errorRedirect(
@@ -442,13 +442,13 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,
     [CalendarAction.ReceivedResource]: receivedResource,
-    [CalendarAction.UpdateEvents]: updateEvents,
     [CalendarAction.SelectedEvent]: selectedEvent,
     [CalendarAction.SelectedGroup]: selectedGroup,
     [CalendarAction.SelectedLocation]: selectedLocation,
     [CalendarAction.SelectedProject]: selectedProject,
     [CalendarAction.ToggleDrawer]: toggleDrawer,
     [CalendarAction.TogglePicker]: togglePicker,
+    [CalendarAction.UpdateEvents]: updateEvents,
     [CalendarAction.ViewToday]: viewToday,
   }[action.type](state, action));
 
