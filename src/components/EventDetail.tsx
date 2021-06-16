@@ -67,8 +67,10 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const { end, location, reservable, start, title, reservation } =
     state.currentEvent;
 
+  // TODO constrain "Walk-in" to same day only
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
-    ({ allotments }) =>
+    ({ title, allotments }) =>
+      title === "Walk-in" ||
       allotments.some(
         (a) =>
           a.locationId === location.id &&
