@@ -21,7 +21,8 @@ import {
   EventEditorProps,
 } from "../calendar/eventEditor";
 import DateFnsUtils from "@date-io/date-fns";
-import { trimTZ } from "../utils/date";
+
+const trimTZ = (dateString: string): string => dateString.split(".")[0];
 
 const EventEditor: FunctionComponent<EventEditorProps> = ({
   dispatch,

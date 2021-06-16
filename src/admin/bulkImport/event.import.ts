@@ -1,6 +1,5 @@
 import { AdminAction, AdminState } from "../types";
 import Event from "../../resources/Event";
-import { formatForMySQL } from "../../utils/date";
 
 interface FlatEvent {
   location: string | number;
@@ -14,8 +13,6 @@ interface FlatEvent {
 const processEvent = (event: FlatEvent): FlatEvent => ({
   ...event,
   locationId: +event.location,
-  start: formatForMySQL(event.start),
-  end: formatForMySQL(event.end),
 });
 
 const bulkImport = (

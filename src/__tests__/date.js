@@ -5,8 +5,6 @@ import {
   getFormattedEventInterval,
   isDate,
   yyyymmdd,
-  unshiftTZ,
-  formatForMySQL,
 } from "../utils/date";
 
 test("isDate identifies Date objects", () => {
@@ -65,17 +63,4 @@ test("yyyymmdd", () => {
   expect(yyyymmdd.test("2020-49-03")).toBe(false);
   expect(yyyymmdd.test("2020-09-33")).toBe(false);
   expect(yyyymmdd.test("2020-00-00")).toBe(false);
-});
-
-const localDateString = "9/3/2020 9:00:00 AM";
-test("unshiftTZ", () => {
-  expect(unshiftTZ(new Date(localDateString)).toJSON()).toBe(
-    "2020-09-03T09:00:00.000Z"
-  );
-});
-
-test("format for MySQL", () => {
-  const expected = "2020-09-03 09:00:00";
-  expect(formatForMySQL(expected)).toBe(expected);
-  expect(formatForMySQL(localDateString)).toBe(expected);
 });

@@ -14,8 +14,13 @@ import DateFnUtils from "@date-io/date-fns";
 import { Field, Formik, Form } from "formik";
 import { DatePicker } from "formik-material-ui-pickers";
 import { AdminUIProps, AdminAction } from "../../admin/types";
-import { subtractOneDay } from "../../utils/date";
 import { makeOnSubmit } from "../../admin/virtualWeeksDialog";
+
+const subtractOneDay = (date: Date): Date => {
+  const copy = new Date(date);
+  copy.setUTCDate(copy.getUTCDate() - 1);
+  return copy;
+};
 
 const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const { locationHoursState, selectedSemester, schedulerLocationId } = state;

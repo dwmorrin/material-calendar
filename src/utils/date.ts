@@ -114,25 +114,6 @@ export function getFormattedEventInterval(start: string, end: string): string {
   );
 }
 
-const minutesToMilliseconds = (minutes: number): number => minutes * 6e4;
-
-/**
- * useful for shifting a local Date to a UTC date for the purpose of getting at
- * the .toISOString() or .toJSON() string formats with a local Date.
- * @param date
- */
-export const unshiftTZ = (date: Date): Date =>
-  new Date(date.getTime() - minutesToMilliseconds(date.getTimezoneOffset()));
-
-/**
- * formats a date string to "YYYY-mm-dd HH:MM:SS" format for MySQL storage
- * @param date a valid date string for Date.parse()
- */
-export const formatForMySQL = (date: string): string => {
-  if (yyyymmdd.test(date)) return date;
-  return unshiftTZ(new Date(date)).toJSON().replace("T", " ").split(".")[0];
-};
-
 export function setDefaultDates<T, K extends keyof T>(
   obj: T,
   ...dateKeys: K[]
@@ -187,11 +168,3 @@ export const eventGenerator = ({
     }
   },
 });
-
-export const subtractOneDay = (date: Date): Date => {
-  const copy = new Date(date);
-  copy.setUTCDate(copy.getUTCDate() - 1);
-  return copy;
-};
-
-export const trimTZ = (dateString: string): string => dateString.split(".")[0];

@@ -1,7 +1,7 @@
 import Category from "./Category";
 import Event from "./Event";
 import Tag from "./Tag";
-import { unshiftTZ } from "../utils/date";
+import { parseSQLDatetime } from "../utils/date";
 
 interface Equipment {
   [k: string]: unknown;
@@ -35,10 +35,13 @@ class Equipment implements Equipment {
       .filter(
         (reservation) =>
           (event.reservation?.id !== reservation.bookingId &&
-            unshiftTZ(new Date(reservation.start)) <= new Date(event.start) &&
-            unshiftTZ(new Date(reservation.end)) > new Date(event.start)) ||
-          (unshiftTZ(new Date(reservation.start)) < new Date(event.end) &&
-            unshiftTZ(new Date(reservation.start)) >= new Date(event.start))
+            parseSQLDatetime(reservation.start) <=
+              parseSQLDatetime(event.start) &&
+            parseSQLDatetime(reservation.end) >
+              parseSQLDatetime(event.start)) ||
+          (parseSQLDatetime(reservation.start) < parseSQLDatetime(event.end) &&
+            parseSQLDatetime(reservation.start) >=
+              parseSQLDatetime(event.start))
       )
       .map((reservation) => {
         // TODO: Remove this and figure out why the filter above is not working.
