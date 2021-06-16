@@ -20,6 +20,7 @@
     "@testing-library/user-event": "^7.2.1",
     "d3": "^5.16.0",
     "date-fns": "^2.15.0",
+    "fast-equals": "^2.0.3",
     "formik": "^2.1.4",
     "formik-material-ui": "^2.0.0-beta.1",
     "formik-material-ui-pickers": "0.0.8",
