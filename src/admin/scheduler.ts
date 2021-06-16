@@ -5,7 +5,6 @@ import Location from "../resources/Location";
 import { compareDateOrder, parseSQLDate } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";
-import { parseJSON } from "date-fns";
 import { areIntervalsOverlapping } from "date-fns/fp";
 import { deepEqual } from "fast-equals";
 
@@ -153,17 +152,17 @@ export const makeResources = (
   semester: Semester
 ): ProjectResource[] => {
   const overlapsSemester = areIntervalsOverlapping({
-    start: parseJSON(semester.start),
-    end: parseJSON(semester.end),
+    start: parseSQLDate(semester.start),
+    end: parseSQLDate(semester.end),
   });
   const getColor = scaleOrdinal(schemeCategory10);
   const projectsOfInterest = projects.filter(
     (project) =>
       overlapsSemester({
-        start: parseJSON(project.start),
-        end: parseJSON(project.end),
+        start: parseSQLDate(project.start),
+        end: parseSQLDate(project.end),
       }) &&
-      project.allotments.some(
+      project.allotments?.some(
         (allotment) => allotment.locationId === locationId
       )
   );
@@ -237,8 +236,8 @@ export const makeAllotments = (
   locationId: number
 ): SchedulerEventProps[] =>
   projects.reduce((allots, p) => {
-    const ofInterest = p.allotments.filter((a) => a.locationId === locationId);
-    if (!ofInterest.length) return allots;
+    const ofInterest = p.allotments?.filter((a) => a.locationId === locationId);
+    if (!ofInterest?.length) return allots;
     const [first, last, total] = ofInterest.reduce(
       getFirstLastAndTotalFromAllotments,
       [{}, {}, 0] as [Allotment, Allotment, number]
