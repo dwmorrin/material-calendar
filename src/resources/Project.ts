@@ -1,3 +1,5 @@
+import { formatSQLDate } from "../utils/date";
+
 export interface ProjectAllotment {
   locationId: number;
   start: string;
@@ -23,10 +25,10 @@ export interface Project {
 const defaultProject = {
   id: 0,
   title: "",
-  course: { title: "" },
-  start: "",
-  end: "",
-  reservationStart: "",
+  course: { title: "", id: -1 },
+  start: formatSQLDate(),
+  end: formatSQLDate(),
+  reservationStart: formatSQLDate(),
   allotments: [] as ProjectAllotment[],
   locationIds: [] as number[],
   open: false,

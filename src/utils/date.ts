@@ -114,20 +114,6 @@ export function getFormattedEventInterval(start: string, end: string): string {
   );
 }
 
-export function setDefaultDates<T, K extends keyof T>(
-  obj: T,
-  ...dateKeys: K[]
-): T {
-  const defaultDate = formatISO9075(new Date());
-  const copy = { ...obj };
-  dateKeys.forEach((key) => {
-    if (!copy[key]) copy[key] = defaultDate as never;
-    if (typeof copy[key] === "string")
-      copy[key] = (copy[key] as unknown as string).split(".")[0] as never;
-  });
-  return copy;
-}
-
 export const parseTime = (timeString: string): Time =>
   timeString.split(":").reduce(
     (time, str, index) => ({
