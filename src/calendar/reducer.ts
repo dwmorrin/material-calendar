@@ -103,6 +103,18 @@ const errorRedirect = (
 
 //--------- NORMAL ACTION HANDLERS ----------
 
+const canceledReservation: StateHandler = (state) => {
+  return displayMessage(
+    { ...state, detailIsOpen: false },
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: "Your Reservation has been Canceled",
+      },
+    }
+  );
+};
+
 const changedView: StateHandler = (state, action) => {
   const { payload } = action;
   if (!state.ref?.current || !payload?.currentView) {
@@ -421,6 +433,7 @@ const viewToday: StateHandler = (state, action) => {
 
 const calendarReducer: StateHandler = (state, action) =>
   ({
+    [CalendarAction.CanceledReservation]: canceledReservation,
     [CalendarAction.ChangedView]: changedView,
     [CalendarAction.CloseEquipmentForm]: closeEquipmentForm,
     [CalendarAction.CloseEventDetail]: closeEventDetail,

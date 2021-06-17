@@ -6,6 +6,7 @@ import { ResourceKey, ResourceInstance } from "../resources/types";
 import { SnackbarState } from "../components/Snackbar";
 
 export enum CalendarAction {
+  CanceledReservation,
   ChangedView,
   CloseEquipmentForm,
   CloseEventDetail,

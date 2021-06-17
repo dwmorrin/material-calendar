@@ -39,7 +39,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           });
         }
         // Compare the contents of the events
-        if (deepEqual(data[0], state.currentEvent)) {
+        if (!deepEqual(data[0], state.currentEvent)) {
           // events out of date, updating
           fetch(`/api/events`)
             .then((res) => res.json())
@@ -183,13 +183,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                         meta: context,
                       });
                     } else {
-                      dispatch({
-                        type: CalendarAction.DisplayMessage,
-                        payload: {
-                          message: "Your Reservation has been Canceled",
-                        },
-                      });
-                      dispatch({ type: CalendarAction.CloseEventDetail });
+                      dispatch({ type: CalendarAction.CanceledReservation });
                     }
                   });
               }}
