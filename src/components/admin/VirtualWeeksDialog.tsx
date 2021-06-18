@@ -15,23 +15,20 @@ import { Field, Formik, Form } from "formik";
 import { DatePicker } from "formik-material-ui-pickers";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { makeOnSubmit } from "../../admin/virtualWeeksDialog";
-
-const subtractOneDay = (date: Date): Date => {
-  const copy = new Date(date);
-  copy.setUTCDate(copy.getUTCDate() - 1);
-  return copy;
-};
+import { parseSQLDate } from "../../utils/date";
+import { subDays } from "date-fns";
 
 const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
-  const { locationHoursState, selectedSemester, schedulerLocationId } = state;
+  const { calendarSelectionState, selectedSemester, schedulerLocationId } =
+    state;
   if (
-    !locationHoursState ||
+    !calendarSelectionState ||
     !selectedSemester ||
     schedulerLocationId === undefined
   )
     return null;
 
-  const { location: currentLocation, select } = locationHoursState;
+  const { location: currentLocation, start, end } = calendarSelectionState;
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseVirtualWeeksDialog });
@@ -44,8 +41,8 @@ const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   );
 
   const initialValues = {
-    start: select.start,
-    end: subtractOneDay(select.end), // select has exclusive end
+    start: parseSQLDate(start),
+    end: subDays(parseSQLDate(end), 1), // select has exclusive end
   };
 
   return (
@@ -61,7 +58,7 @@ const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       <DialogContent>
         <MuiPickersUtilsProvider utils={DateFnUtils}>
           <Formik initialValues={initialValues} onSubmit={onSubmit}>
-            {({ handleSubmit }): unknown => (
+            {({ handleSubmit, values }): unknown => (
               <Form onSubmit={handleSubmit}>
                 <Box style={{ display: "flex", flexDirection: "column" }}>
                   <FormLabel>Apply to date range</FormLabel>
@@ -74,6 +71,7 @@ const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                     Submit
                   </Button>
                 </DialogActions>
+                <pre>{JSON.stringify(values, null, 2)}</pre>
               </Form>
             )}
           </Formik>

@@ -49,7 +49,7 @@ export interface AdminState {
   fileImportIsOpen: boolean;
   loading: boolean;
   locationHoursDialogIsOpen: boolean;
-  locationHoursState?: LocationHoursState;
+  calendarSelectionState?: CalendarSelectionState;
   recordPage: number;
   ref: React.RefObject<FullCalendar> | null;
   schedulerIsOpen: boolean;
@@ -84,9 +84,9 @@ export interface FormTemplateProps {
   state: AdminState;
 }
 
-export interface LocationHoursState {
-  select: { start: Date; end: Date };
-  time: { start: string; end: string };
+export interface CalendarSelectionState {
+  start: string;
+  end: string;
   location: Location;
 }
 

@@ -11,7 +11,6 @@ import {
   daysInInterval,
   eventClick,
   fetchDefaultLocation,
-  fetchVirtualWeeks,
   makeAllotments,
   makeDailyHours,
   makeResources,
@@ -31,7 +30,9 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const semesters = state.resources[ResourceKey.Semesters] as Semester[];
-  const [virtualWeeks, setVirtualWeeks] = useState([] as VirtualWeek[]);
+  const virtualWeeks = state.resources[
+    ResourceKey.VirtualWeeks
+  ] as VirtualWeek[];
   const [defaultLocationId, setDefaultLocationId] = useState(-1);
   const semester =
     selectedSemester ||
@@ -57,14 +58,6 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   useEffect(() => {
     if (!locationId) fetchDefaultLocation(dispatch, setDefaultLocationId);
   }, [dispatch, locationId]);
-
-  useEffect(() => {
-    fetchVirtualWeeks(
-      dispatch,
-      setVirtualWeeks,
-      locationId || defaultLocationId
-    );
-  }, [dispatch, defaultLocationId, locationId]);
 
   const selectedLocationId = locationId || defaultLocationId;
 

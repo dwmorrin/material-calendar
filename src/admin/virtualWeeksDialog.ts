@@ -6,13 +6,11 @@ import {
   AdminState,
   ApiResponse,
 } from "./types";
-import Location from "../resources/Location";
 import Semester from "../resources/Semester";
-import { formatSQLDate } from "../utils/date";
+import { formatSQLDate, parseSQLDate } from "../utils/date";
 import { ResourceKey } from "../resources/types";
 import VirtualWeek from "../resources/VirtualWeek";
 import { areIntervalsOverlapping } from "date-fns/fp";
-import { parseJSON } from "date-fns";
 
 export const makeOnSubmit =
   (
@@ -22,27 +20,51 @@ export const makeOnSubmit =
     locationId: number
   ) =>
   (values: FormValues, actions: FormikValues): void => {
-    const vws = state.resources[ResourceKey.VirtualWeeks] as VirtualWeek[];
+    const vws = (
+      state.resources[ResourceKey.VirtualWeeks] as VirtualWeek[]
+    ).filter(({ locationId: id }) => id === locationId);
     const start = values.start as Date;
     const end = values.end as Date;
     const overlapsInput = areIntervalsOverlapping({
-      start: parseJSON(start),
-      end: parseJSON(end),
+      start,
+      end,
     });
     if (
       vws.some((vw) =>
-        overlapsInput({ start: parseJSON(vw.start), end: parseJSON(vw.end) })
+        overlapsInput({
+          start: parseSQLDate(vw.start),
+          end: parseSQLDate(vw.end),
+        })
       )
     )
-      return console.log("overlap detected, submit aborted"); //TODO this is just temporary
+      //TODO this is just temporary; having trouble getting Formik validate to work with this
+      return console.log("overlap detected, submit aborted");
 
     const dispatchError = (error: Error): void =>
       dispatch({ type: AdminAction.Error, payload: { error } });
 
     const handleData = ({ error }: ApiResponse): void => {
       if (error) return dispatchError(error);
-      fetch(`${Location.url}`)
+      fetch(`${VirtualWeek.url}`)
         .then((response) => response.json())
+        .then(({ error, data }) =>
+          dispatch(
+            error || !data
+              ? { type: AdminAction.Error, payload: { error } }
+              : {
+                  type: AdminAction.ReceivedResource,
+                  meta: ResourceKey.VirtualWeeks,
+                  payload: {
+                    resources: {
+                      ...state.resources,
+                      [ResourceKey.VirtualWeeks]: (data as VirtualWeek[]).map(
+                        (vw) => new VirtualWeek(vw)
+                      ),
+                    },
+                  },
+                }
+          )
+        )
         .catch(dispatchError);
     };
 

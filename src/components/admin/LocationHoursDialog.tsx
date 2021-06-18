@@ -29,18 +29,19 @@ const useStyles = makeStyles({
 const dateLabelFormat = "yyyy-MM-dd [ccc]";
 
 const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
-  const { locationHoursState, selectedSemester, schedulerLocationId } = state;
+  const { calendarSelectionState, selectedSemester, schedulerLocationId } =
+    state;
 
   const classes = useStyles();
 
   if (
-    !locationHoursState ||
+    !calendarSelectionState ||
     !selectedSemester ||
     schedulerLocationId === undefined
   )
     return null;
 
-  const { location: currentLocation } = locationHoursState;
+  const { location: currentLocation } = calendarSelectionState;
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseLocationHoursDialog });
@@ -83,9 +84,11 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                     <div>
                       {(values as { days: { date: Date; hours: number }[] })
                         ?.days?.length
-                        ? (values as {
-                            days: { date: Date; hours: number }[];
-                          }).days.map((_, i) => (
+                        ? (
+                            values as {
+                              days: { date: Date; hours: number }[];
+                            }
+                          ).days.map((_, i) => (
                             <div
                               className={classes.locationHoursInput}
                               key={`hoursInput${i}`}

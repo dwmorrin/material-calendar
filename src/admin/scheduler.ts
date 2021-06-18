@@ -2,9 +2,10 @@ import { AdminAction, Action, AdminUIProps } from "./types";
 import VirtualWeek from "../resources/VirtualWeek";
 import Project from "../resources/Project";
 import Location from "../resources/Location";
-import { compareDateOrder, parseSQLDate } from "../utils/date";
+import { compareDateOrder, formatSQLDate, parseSQLDate } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";
+import { addDays } from "date-fns";
 import { areIntervalsOverlapping } from "date-fns/fp";
 import { deepEqual } from "fast-equals";
 
@@ -20,7 +21,8 @@ interface EventProps {
   event: {
     id: string;
     title: string;
-    start: Date | null;
+    startStr: string;
+    endStr: string;
     extendedProps: { [k: string]: unknown };
   };
 }
@@ -33,8 +35,8 @@ type ProjectResource = {
 };
 
 interface SelectProps {
-  start: Date;
-  end: Date;
+  startStr: string;
+  endStr: string;
   resource?: {
     id: string;
     title?: string;
@@ -60,9 +62,7 @@ const MILLISECONDS_PER_DAY = 8.64e7;
 //--- MODULE FUNCTIONS ---
 
 const addADay = (s: string): string => {
-  const d = new Date(s);
-  d.setUTCDate(d.getUTCDate() + 1);
-  return d.toJSON().split("T")[0];
+  return formatSQLDate(addDays(parseSQLDate(s), 1));
 };
 
 //--- EXPORTED FUNCTIONS ---
@@ -108,28 +108,6 @@ export const fetchDefaultLocation = (
         type: AdminAction.Error,
         payload: { error },
         meta: "DEFAULT_LOCATION_FETCH",
-      })
-    );
-};
-
-export const fetchVirtualWeeks = (
-  dispatch: (action: Action) => void,
-  setVirtualWeeks: (vws: VirtualWeek[]) => void,
-  locationId?: number
-): void => {
-  if (locationId === undefined || locationId < 1) return;
-  fetch(`${Location.url}/${locationId}/virtualweeks`)
-    .then((response) => response.json())
-    .then(({ error, data }) => {
-      if (error)
-        return dispatch({ type: AdminAction.Error, payload: { error } });
-      setVirtualWeeks(data.map((vw: VirtualWeek) => new VirtualWeek(vw)));
-    })
-    .catch((error) =>
-      dispatch({
-        type: AdminAction.Error,
-        payload: { error },
-        meta: "VIRTUAL_WEEKS_FETCH",
       })
     );
 };
@@ -248,8 +226,8 @@ export const makeAllotments = (
   }, [] as SchedulerEventProps[]);
 
 export const makeDailyHours = (location: Location): SchedulerEventProps[] =>
-  location.hours.map((dailyHours) => ({
-    id: `${Location.locationHoursId}-${dailyHours.id}`,
+  location.hours.map((dailyHours, index) => ({
+    id: `${Location.locationHoursId}-${index}`,
     start: dailyHours.date,
     allDay: true,
     title: "" + dailyHours.hours,
@@ -260,8 +238,8 @@ export const makeDailyHours = (location: Location): SchedulerEventProps[] =>
 export const processVirtualWeeks = (
   virtualWeeks: VirtualWeek[],
   locationId: number
-): SchedulerEventProps[] =>
-  virtualWeeks
+): SchedulerEventProps[] => {
+  return virtualWeeks
     .filter((vw) => vw.locationId === locationId)
     .map((vw) => ({
       ...vw,
@@ -271,6 +249,7 @@ export const processVirtualWeeks = (
       allDay: true,
       title: `${vw.locationHours}`,
     }));
+};
 
 export const processVirtualWeeksAsHoursRemaining = (
   virtualWeeks: VirtualWeek[],
@@ -314,23 +293,12 @@ export const resourceClickHandler =
     ) {
       switch (id) {
         case Location.locationHoursId: {
-          const start = parseSQLDate(semester.start);
           return dispatch({
             type: AdminAction.OpenLocationHoursDialog,
             payload: {
-              locationHoursState: {
-                select: {
-                  start,
-                  end: ((): Date => {
-                    const end = new Date(start.getTime());
-                    end.setDate(start.getDate() + 1);
-                    return end;
-                  })(),
-                },
-                time: {
-                  start: "09:00:00",
-                  end: "17:00:00",
-                },
+              calendarSelectionState: {
+                start: semester.start,
+                end: semester.end,
                 location,
               },
             },
@@ -344,8 +312,8 @@ export const resourceClickHandler =
 
 export const eventClick =
   (dispatch: (action: Action) => void, location: Location) =>
-  ({ event: { id, title, start, extendedProps } }: EventProps): void => {
-    if (!start)
+  ({ event: { id, title, startStr, endStr } }: EventProps): void => {
+    if (!startStr)
       return dispatch({
         type: AdminAction.Error,
         payload: {
@@ -356,39 +324,32 @@ export const eventClick =
       return dispatch({
         type: AdminAction.OpenLocationHoursDialog,
         payload: {
-          locationHoursState: {
-            select: {
-              start,
-              end: ((): Date => {
-                const end = new Date(start.getTime());
-                end.setDate(start.getDate() + 1);
-                return end;
-              })(),
-            },
-            time: {
-              start: (extendedProps.start as string) || "09:00:00",
-              end: (extendedProps.end as string) || "17:00:00",
-            },
+          calendarSelectionState: {
+            start: startStr,
+            end: endStr,
             location,
           },
         },
       });
     }
     console.group("Unhandled scheduler event click");
-    console.log({ id, title, start, extendedProps });
+    console.log({ id, title, startStr });
     console.groupEnd();
   };
 
 export const selectionHandler =
   (dispatch: (action: Action) => void, location: Location) =>
-  ({ start, end, resource = { id: "" } }: SelectProps): void => {
-    const locationHoursState = {
-      select: { start, end },
+  ({ startStr, endStr, resource = { id: "" } }: SelectProps): void => {
+    console.log({
+      in: "selectionHandler",
+      startStr,
+      endStr,
+      ext: resource.extendedProps,
+    });
+    const calendarSelectionState = {
+      start: startStr,
+      end: endStr,
       location,
-      time: {
-        start: (resource.extendedProps?.start as string) || "09:00:00",
-        end: (resource.extendedProps?.end as string) || "17:00:00",
-      },
     };
 
     switch (resource.id) {
@@ -396,19 +357,19 @@ export const selectionHandler =
         return dispatch({
           type: AdminAction.OpenLocationHoursDialog,
           payload: {
-            locationHoursState,
+            calendarSelectionState,
           },
         });
       case VirtualWeek.resourceId:
         return dispatch({
           type: AdminAction.OpenVirtualWeeksDialog,
           payload: {
-            locationHoursState,
+            calendarSelectionState,
           },
         });
       default:
         console.group("Unhandled Scheduler selection");
-        console.log({ start, end, resource });
+        console.log({ startStr, endStr, resource });
         console.groupEnd();
     }
   };
