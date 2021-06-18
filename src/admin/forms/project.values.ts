@@ -6,19 +6,22 @@ import { ResourceKey } from "../../resources/types";
 
 export const values = (state: AdminState): FormValues => {
   const project = state.resourceInstance as Project;
+  const locationHours = project.locationHours.map((lh) => ({
+    ...lh,
+    locationId: String(lh.locationId),
+  }));
   return {
     ...project,
     start: parseSQLDate(project.start),
     end: parseSQLDate(project.end),
     reservationStart: parseSQLDate(project.reservationStart),
-    locationIds: project.locationIds.map(String),
+    locationHours,
   };
 };
 
 export const update = (state: AdminState, values: FormValues): Project => {
   const project = new Project(state.resourceInstance as Project);
-  const locationIds = (values.locationIds as string[]).map(Number);
-  const { start, end, reservationStart, course } = values;
+  const { start, end, reservationStart, course, locationHours } = values;
   const courseTitle =
     typeof course === "object" ? (course as { title: string }).title : "";
   const courses = state.resources[ResourceKey.Courses] as Course[];
@@ -34,6 +37,8 @@ export const update = (state: AdminState, values: FormValues): Project => {
     start: formatSQLDate(start as Date),
     end: formatSQLDate(end as Date),
     reservationStart: formatSQLDate(reservationStart as Date),
-    locationIds,
+    locationHours: (
+      locationHours as { locationId: string; hours: number }[]
+    ).map((lh) => ({ ...lh, locationId: Number(lh.locationId) })),
   };
 };

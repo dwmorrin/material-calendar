@@ -7,6 +7,11 @@ export interface ProjectAllotment {
   hours: number;
 }
 
+export interface ProjectLocationHours {
+  locationId: number;
+  hours: number;
+}
+
 export interface Project {
   [k: string]: unknown;
   id: number;
@@ -16,7 +21,7 @@ export interface Project {
   end: string;
   reservationStart: string;
   allotments: ProjectAllotment[];
-  locationIds: number[];
+  locationHours: ProjectLocationHours[];
   open: boolean;
   groupSize: number;
   groupAllottedHours: number;
@@ -30,7 +35,7 @@ const defaultProject = {
   end: formatSQLDate(),
   reservationStart: formatSQLDate(),
   allotments: [] as ProjectAllotment[],
-  locationIds: [] as number[],
+  locationHours: [] as ProjectLocationHours[],
   open: false,
   groupSize: 0,
   groupAllottedHours: 0,

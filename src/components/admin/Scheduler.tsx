@@ -152,7 +152,7 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
               resourceKey: ResourceKey.Projects,
               resourceInstance: new Project({
                 ...defaultProject,
-                locationIds: [location.id],
+                locationHours: [{ locationId: location.id, hours: 0 }],
               }),
             },
           })
