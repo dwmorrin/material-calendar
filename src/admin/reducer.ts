@@ -272,7 +272,11 @@ const reducer: StateHandler = (state, action) =>
   }[action.type](state, action));
 
 // const logger: StateHandler = (state, action) => {
-//   console.log({ state, action });
+//   console.log({
+//     state,
+//     action: AdminAction[action.type],
+//     payload: action.payload,
+//   });
 //   return reducer(state, action);
 // };
 
