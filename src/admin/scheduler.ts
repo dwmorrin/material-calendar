@@ -340,12 +340,6 @@ export const eventClick =
 export const selectionHandler =
   (dispatch: (action: Action) => void, location: Location) =>
   ({ startStr, endStr, resource = { id: "" } }: SelectProps): void => {
-    console.log({
-      in: "selectionHandler",
-      startStr,
-      endStr,
-      ext: resource.extendedProps,
-    });
     const calendarSelectionState = {
       start: startStr,
       end: endStr,
