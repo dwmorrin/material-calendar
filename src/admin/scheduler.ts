@@ -140,9 +140,7 @@ export const makeResources = (
         start: parseSQLDate(project.start),
         end: parseSQLDate(project.end),
       }) &&
-      project.allotments?.some(
-        (allotment) => allotment.locationId === locationId
-      )
+      project.locationHours.some(({ locationId: id }) => id === locationId)
   );
   return [
     {

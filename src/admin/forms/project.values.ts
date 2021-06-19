@@ -38,7 +38,12 @@ export const update = (state: AdminState, values: FormValues): Project => {
     end: formatSQLDate(end as Date),
     reservationStart: formatSQLDate(reservationStart as Date),
     locationHours: (
-      locationHours as { locationId: string; hours: number }[]
-    ).map((lh) => ({ ...lh, locationId: Number(lh.locationId) })),
+      locationHours as { locationId: string | string[]; hours: string }[]
+    ).map((lh) => ({
+      locationId: Array.isArray(lh.locationId)
+        ? Number(lh.locationId[0])
+        : Number(lh.locationId),
+      hours: lh.hours ? Number(lh.hours) : 0,
+    })),
   };
 };

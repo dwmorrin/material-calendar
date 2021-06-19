@@ -50,9 +50,15 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({ state }) => {
         ))}
         <FormControlLabel label="None" value="" control={<Radio />} />
       </Field>
+      <Field
+        component={CheckboxWithLabel}
+        name="open"
+        Label={{ label: "Project is active" }}
+      />
+      <br />
       <FormLabel>Locations</FormLabel>
       <FieldArray
-        name="locationIds"
+        name="locationHours"
         render={(): JSX.Element => (
           <>
             {Object.entries(locationValues).map(([label, value], index) => (
@@ -60,9 +66,14 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({ state }) => {
                 <Field
                   type="checkbox"
                   component={CheckboxWithLabel}
-                  name={"locationIds"}
+                  name={`locationHours.${index}.locationId`}
                   Label={{ label }}
                   value={value}
+                />
+                <Field
+                  component={TextField}
+                  name={`locationHours.${index}.hours`}
+                  label="Hours"
                 />
               </div>
             ))}
