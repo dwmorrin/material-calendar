@@ -71,6 +71,13 @@ export function getFormattedDate(d: string | Date): string {
   return formatSlashed(d);
 }
 
+export function isSameDay(a: Date, b: Date): boolean {
+  const dateFormat = "EE, MMM d";
+  const aDateString = format(a, dateFormat);
+  const bDateString = format(b, dateFormat);
+  return aDateString === bDateString;
+}
+
 export function getFormattedEventInterval(start: string, end: string): string {
   [start, end] = [start, end].map((s) => s.replace("T", " "));
   const hasNoTimeInfo = /^\d{4}-\d{2}-\d{2}$/.test(start);

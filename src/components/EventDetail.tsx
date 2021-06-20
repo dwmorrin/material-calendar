@@ -11,7 +11,11 @@ import {
 } from "@material-ui/core";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import CloseIcon from "@material-ui/icons/Close";
-import { compareDateOrder, getFormattedEventInterval } from "../utils/date";
+import {
+  compareDateOrder,
+  getFormattedEventInterval,
+  isSameDay,
+} from "../utils/date";
 import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
@@ -19,6 +23,7 @@ import UserGroup from "../resources/UserGroup";
 import ReservationForm from "./ReservationForm";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import { deepEqual } from "fast-equals";
+import Event from "../resources/Event";
 
 const transition = makeTransition("left");
 
@@ -26,6 +31,26 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
+  const isAvailableForWalkin = (event?: Event): boolean => {
+    if (!event) {
+      return false;
+    }
+    const now = new Date();
+    const walkInStart = 8;
+    const walkInEnd = 20;
+    const eventInProgressCutoff = 15;
+    const eventStart = new Date(event.start);
+    const eventEnd = new Date(event.end);
+    const sameDay = isSameDay(now, eventStart);
+    const withinWalkInPeriod =
+      now.getHours() >= walkInStart && now.getHours() <= walkInEnd;
+    const eventWalkInAvailable = compareDateOrder(
+      now,
+      new Date(eventEnd.getTime() - eventInProgressCutoff * 60000)
+    );
+    return sameDay && withinWalkInPeriod && eventWalkInAvailable;
+  };
+
   // Update the event when the EventDetail is opened and when reservation form is closed
   useEffect(() => {
     fetch(`/api/events/${state.currentEvent?.id}`)
@@ -70,7 +95,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   // TODO constrain "Walk-in" to same day only
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
     ({ title, allotments }) =>
-      title === "Walk-in" ||
+      (title === "Walk-in" && isAvailableForWalkin(state.currentEvent)) ||
       allotments.some(
         (a) =>
           a.locationId === location.id &&
