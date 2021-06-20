@@ -81,6 +81,7 @@ interface Location {
   groupId: string; // for UI, to group by categories
   selected?: boolean;
   hours: LocationHours[];
+  restriction: number;
 }
 
 class Location implements Location {
@@ -92,6 +93,7 @@ class Location implements Location {
       title: "",
       groupId: "",
       hours: [] as LocationHours[],
+      restriction: 0,
     }
   ) {
     Object.assign(this, {

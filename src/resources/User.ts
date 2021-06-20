@@ -13,6 +13,7 @@ interface User {
     phone?: string[];
   };
   projects?: { id: number; title: string; groupId: number }[];
+  restriction: number;
 }
 
 class User implements User {

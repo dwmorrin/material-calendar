@@ -12,6 +12,7 @@ interface EquipmentStandardListProps {
       items?: { id: number; quantity: number }[];
     };
   };
+  userRestriction: number;
   setFieldValue: (
     field: string,
     value:
@@ -34,6 +35,7 @@ const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
   selectedEquipment,
   setFieldValue,
   reserveEquipment,
+  userRestriction,
 }) => {
   // Create list of single elements. may not work properly for singletons
   return (
@@ -57,6 +59,7 @@ const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
             }
             setFieldValue={setFieldValue}
             reserveEquipment={reserveEquipment}
+            userRestriction={userRestriction}
           />
         ))}
     </List>

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect, useContext } from "react";
 import {
   List,
   AppBar,
@@ -28,6 +28,7 @@ import EquipmentViewToggleMenu from "./EquipmentViewToggleMenu";
 import EquipmentCart from "./EquipmentCart";
 import EquipmentStandardList from "./EquipmentStandardList";
 import Equipment from "../resources/Equipment";
+import { AuthContext } from "./AuthContext";
 
 const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   open,
@@ -36,6 +37,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   setFieldValue,
   event,
 }) => {
+  const { user } = useContext(AuthContext);
   const [state, dispatch] = React.useReducer(reducer, {
     ...initialState,
     setFieldValue,
@@ -82,6 +84,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   };
 
   useEffect(() => fetchAllEquipmentResources(dispatch), []);
+  if (!user?.username) return null;
 
   const toggleFilterDrawer = (): void =>
     dispatch({ type: EquipmentActionTypes.ToggleFilterDrawer, payload: {} });
@@ -172,6 +175,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
               null
             )}
             selectedEquipment={selectedEquipment}
+            userRestriction={user.restriction}
           />
         )}
         {state.categoryDrawerView && state.selectedCategory && (
@@ -185,6 +189,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
               state.selectedCategory
             )}
             selectedEquipment={selectedEquipment}
+            userRestriction={user.restriction}
           />
         )}
       </div>

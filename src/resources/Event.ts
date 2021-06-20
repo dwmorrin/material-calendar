@@ -21,7 +21,7 @@ interface Event {
   id: number;
   start: string;
   end: string;
-  location: { id: number; title: string };
+  location: { id: number; title: string; restriction: number };
   title: string;
   reservable: boolean;
   reservation?: ReservationInfo;

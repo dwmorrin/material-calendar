@@ -23,6 +23,7 @@ interface Equipment {
     start: string;
     end: string;
   }[];
+  restriction: number;
 }
 
 class Equipment implements Equipment {

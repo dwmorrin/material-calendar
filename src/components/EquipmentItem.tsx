@@ -34,11 +34,13 @@ interface EquipmentItemProps {
         }
   ) => void;
   reserveEquipment: (id: number, quantity: number) => void;
+  userRestriction: number;
 }
 const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   item,
   values,
   setFieldValue,
+  userRestriction,
 }) => {
   const [errors, setErrors] = React.useState({} as { [k: string]: boolean });
   const itemName = getItemName(item);
@@ -56,6 +58,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
       quantity: newValue,
     });
   };
+  const userCanUseEquipment = userRestriction >= item.restriction;
 
   return (
     <div
@@ -66,43 +69,47 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
     >
       <ListItem>
         <ListItemText primary={itemName} />
-        <section
-          style={{
-            textAlign: "center",
-            flexDirection: "column",
-          }}
-        >
-          {values.quantity}
-          <br />
-          <ButtonGroup
-            variant="contained"
-            color="primary"
-            aria-label={itemName + "Quantity Buttons"}
-            size="small"
+        {userCanUseEquipment ? (
+          <section
+            style={{
+              textAlign: "center",
+              flexDirection: "column",
+            }}
           >
-            <Button
-              disabled={values.quantity - 1 < 0}
-              onClick={(): void => {
-                changeValue(values.quantity - 1);
-              }}
+            {values.quantity}
+            <br />
+            <ButtonGroup
+              variant="contained"
+              color="primary"
+              aria-label={itemName + "Quantity Buttons"}
+              size="small"
             >
-              -
-            </Button>
-            <Button
-              disabled={values.quantity + 1 > item.quantity}
-              onClick={(): void => {
-                changeValue(values.quantity + 1);
-              }}
-            >
-              +
-            </Button>
-          </ButtonGroup>
-          {errors[itemName] && (
-            <div>
-              <ErrorIcon />
-            </div>
-          )}
-        </section>
+              <Button
+                disabled={values.quantity - 1 < 0}
+                onClick={(): void => {
+                  changeValue(values.quantity - 1);
+                }}
+              >
+                -
+              </Button>
+              <Button
+                disabled={values.quantity + 1 > item.quantity}
+                onClick={(): void => {
+                  changeValue(values.quantity + 1);
+                }}
+              >
+                +
+              </Button>
+            </ButtonGroup>
+            {errors[itemName] && (
+              <div>
+                <ErrorIcon />
+              </div>
+            )}
+          </section>
+        ) : (
+          <p>You are not authorized to use this item</p>
+        )}
       </ListItem>
     </div>
   );

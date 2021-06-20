@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect, useContext } from "react";
 import {
   Dialog,
   IconButton,
@@ -16,6 +16,7 @@ import {
   getFormattedEventInterval,
   isSameDay,
 } from "../utils/date";
+import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
@@ -31,6 +32,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
+  const { user } = useContext(AuthContext);
   const isAvailableForWalkin = (event?: Event): boolean => {
     if (!event) {
       return false;
@@ -89,8 +91,10 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   if (!state.currentEvent || !state.currentEvent.location) {
     return null;
   }
+  if (!user?.username) return null;
   const { end, location, reservable, start, title, reservation } =
     state.currentEvent;
+  const userCanUseLocation = user?.restriction >= location.restriction;
 
   // TODO constrain "Walk-in" to same day only
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
@@ -103,12 +107,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           compareDateOrder(end, a.end)
       )
   );
-  const open = reservable && !reservation;
+  const open = reservable && !reservation && userCanUseLocation;
   const userOwns =
     reservation &&
     (state.resources[ResourceKey.Groups] as UserGroup[]).find(
       (group) => reservation.groupId === group.id
     );
+  // Should start be changed to end? or end-15 minutes?
   const future = new Date(start as string).getTime() > Date.now();
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
@@ -160,7 +165,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               ))}
             </List>
           )}
+          {!userCanUseLocation && (
+            <Typography component="h5">
+              You are not authorized to access this space
+            </Typography>
+          )}
         </section>
+
         {future && (userOwns || open) && !!projects.length && (
           <Button
             key="MakeBooking"

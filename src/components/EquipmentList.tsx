@@ -21,6 +21,7 @@ interface EquipmentListProps {
       items?: { id: number; quantity: number }[];
     };
   };
+  userRestriction: number;
 }
 const EquipmentList: FunctionComponent<EquipmentListProps> = ({
   state,
@@ -28,6 +29,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
   equipmentList,
   selectedEquipment,
   reserveEquipment,
+  userRestriction,
 }) => {
   const tree = Category.tree(state.categories, null);
   if (!state.equipment.length) return null;
@@ -98,6 +100,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                     selectedEquipment={selectedEquipment}
                     setFieldValue={state.setFieldValue}
                     reserveEquipment={reserveEquipment}
+                    userRestriction={userRestriction}
                   />
                 )}
               </List>
