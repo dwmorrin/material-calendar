@@ -234,7 +234,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           </section>
         )}
       </Paper>
-      <ReservationForm dispatch={dispatch} state={state} />
+      <ReservationForm dispatch={dispatch} state={state} projects={projects} />
     </Dialog>
   );
 };

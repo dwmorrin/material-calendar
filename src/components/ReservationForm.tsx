@@ -43,13 +43,17 @@ const RadioYesNo: FunctionComponent<{
   </section>
 );
 
-const ReservationForm: FunctionComponent<CalendarUIProps> = ({
+interface ReservationFormProps extends CalendarUIProps {
+  projects: Project[];
+}
+
+const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   dispatch,
   state,
+  projects,
 }) => {
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
-  const projects = state.resources[ResourceKey.Projects] as Project[];
   const findGroup = (id: number): UserGroup | undefined => {
     return groups.find((group) => group.projectId === id);
   };
@@ -86,7 +90,7 @@ const ReservationForm: FunctionComponent<CalendarUIProps> = ({
         <Formik
           initialValues={
             getValuesFromReservation(state.currentEvent) ||
-            makeInitialValues(state)
+            makeInitialValues(state, projects)
           }
           onSubmit={submitHandler(closeForm, displayMessage)}
           validationSchema={validationSchema}

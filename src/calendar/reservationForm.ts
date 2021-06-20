@@ -225,7 +225,8 @@ export const submitHandler =
   };
 
 export const makeInitialValues = (
-  state: CalendarState
+  state: CalendarState,
+  projects: Project[]
 ): {
   event: number | undefined;
   groupId: number | undefined;
@@ -244,8 +245,7 @@ export const makeInitialValues = (
   };
   hasEquipment: string;
 } => {
-  const project =
-    (state.resources[ResourceKey.Projects] as Project[])[0] || new Project();
+  const project = projects[0] || new Project();
   const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
     (group) => group.projectId === project.id
   );
