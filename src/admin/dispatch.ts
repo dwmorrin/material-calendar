@@ -56,7 +56,6 @@ export const dispatchOneResource =
         dispatch({
           type: AdminAction.ReceivedResource,
           payload: {
-            detailIsOpen: false,
             resourceInstance: deleting ? undefined : new resource(data),
             resources: {
               ...state.resources,
@@ -78,8 +77,6 @@ export const dispatchOneResource =
         })
       )
       .finally(() => {
-        // cancel any loading indicators, etc
         actions.setSubmitting(false);
-        dispatch({ type: AdminAction.SubmittingDocumentEnd });
       });
   };

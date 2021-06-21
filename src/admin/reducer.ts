@@ -178,7 +178,7 @@ const receivedResource: StateHandler = (state, action) => {
   }
   return {
     ...state,
-    detailIsOpen: !!payload?.resourceInstance,
+    detailIsOpen: false,
     resourceInstance: payload?.resourceInstance,
     resources: { ...state.resources, [resourceKey]: resources[resourceKey] },
     snackbarIsOpen: true,
@@ -235,8 +235,6 @@ const selectedSemester: StateHandler = (state, action) => {
 
 const submittingDocument: StateHandler = (state) => state;
 
-const submittingDocumentEnd: StateHandler = (state) => state;
-
 const toggleDrawer: StateHandler = (state) => ({
   ...state,
   drawerIsOpen: !state.drawerIsOpen,
@@ -267,7 +265,6 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.SelectedSchedulerLocation]: selectedSchedulerLocation,
     [AdminAction.SelectedSemester]: selectedSemester,
     [AdminAction.SubmittingDocument]: submittingDocument,
-    [AdminAction.SubmittingDocumentEnd]: submittingDocumentEnd,
     [AdminAction.ToggleDrawer]: toggleDrawer,
   }[action.type](state, action));
 

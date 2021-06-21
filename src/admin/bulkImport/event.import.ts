@@ -35,7 +35,6 @@ const bulkImport = (
     .then((response) => response.json())
     .then(({ data, error }) => {
       if (error || !data) return errorHandler(error);
-      dispatch({ type: AdminAction.SubmittingDocumentEnd });
     })
     .catch(errorHandler);
 };

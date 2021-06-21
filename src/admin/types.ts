@@ -35,7 +35,6 @@ export enum AdminAction {
   SelectedSchedulerLocation,
   SelectedSemester,
   SubmittingDocument,
-  SubmittingDocumentEnd,
   ToggleDrawer,
 }
 
