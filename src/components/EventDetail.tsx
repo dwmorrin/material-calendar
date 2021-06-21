@@ -15,6 +15,7 @@ import {
   compareDateOrder,
   getFormattedEventInterval,
   isSameDay,
+  parseSQLDatetime,
 } from "../utils/date";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
@@ -37,20 +38,26 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     if (!event) {
       return false;
     }
-    const now = new Date();
-    const walkInStart = 8;
-    const walkInEnd = 20;
-    const eventInProgressCutoff = 15;
-    const eventStart = new Date(event.start);
-    const eventEnd = new Date(event.end);
+    const now = new Date(
+      new Date().toLocaleString("en-US", {
+        timeZone: process.env.REACT_APP_TZ,
+      })
+    );
+    const walkInStart = Number(process.env.REACT_APP_WALK_IN_START);
+    const walkInEnd = Number(process.env.REACT_APP_WALK_IN_END);
+    const eventInProgressCutoff = Number(
+      process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF
+    );
+    const eventStart = parseSQLDatetime(event.start);
+    const eventEnd = parseSQLDatetime(event.end);
     const sameDay = isSameDay(now, eventStart);
     const withinWalkInPeriod =
       now.getHours() >= walkInStart && now.getHours() <= walkInEnd;
-    const eventWalkInAvailable = compareDateOrder(
+    const bookingCutoffHasNotPassed = compareDateOrder(
       now,
       new Date(eventEnd.getTime() - eventInProgressCutoff * 60000)
     );
-    return sameDay && withinWalkInPeriod && eventWalkInAvailable;
+    return sameDay && withinWalkInPeriod && bookingCutoffHasNotPassed;
   };
 
   // Update the event when the EventDetail is opened and when reservation form is closed

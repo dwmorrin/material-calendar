@@ -72,9 +72,8 @@ export function getFormattedDate(d: string | Date): string {
 }
 
 export function isSameDay(a: Date, b: Date): boolean {
-  const dateFormat = "EE, MMM d";
-  const aDateString = format(a, dateFormat);
-  const bDateString = format(b, dateFormat);
+  const aDateString = formatSQLDate(a);
+  const bDateString = formatSQLDate(b);
   return aDateString === bDateString;
 }
 
