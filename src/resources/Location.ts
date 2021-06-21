@@ -96,27 +96,7 @@ class Location implements Location {
       restriction: 0,
     }
   ) {
-    Object.assign(this, {
-      ...location,
-      hours: location.hours.map(Location.locationHoursAdapter),
-    });
-  }
-
-  /**
-   * legacy database only stores an integer amount of hours, but does not record
-   * how that number is derived, i.e. the start and end times.
-   * This applies a default start/end to legacy data.
-   */
-  static locationHoursAdapter(locationHours: LocationHours): LocationHours {
-    if (locationHours.start && locationHours.end) return locationHours;
-    const defaultStartHour = 9;
-    const makeDefaultTimeString = (hour = defaultStartHour): string =>
-      hour.toString().padStart(2, "0") + ":00:00";
-    return {
-      ...locationHours,
-      start: makeDefaultTimeString(),
-      end: makeDefaultTimeString(defaultStartHour + locationHours.hours),
-    };
+    Object.assign(this, location);
   }
 }
 
