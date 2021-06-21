@@ -7,19 +7,14 @@ import {
   ApiResponse,
 } from "./types";
 import Location, { LocationHours } from "../resources/Location";
-import Semester from "../resources/Semester";
-import { formatISO9075 } from "date-fns";
 import { ResourceKey } from "../resources/types";
+import { formatSQLDate } from "../utils/date";
+import VirtualWeek from "../resources/VirtualWeek";
 
 export type DailyHoursValue = { date: Date; hours: number };
 
 export const makeOnSubmit =
-  (
-    dispatch: (action: Action) => void,
-    state: AdminState,
-    semester: Semester,
-    locationId: number
-  ) =>
+  (dispatch: (action: Action) => void, state: AdminState, locationId: number) =>
   (values: FormValues, actions: FormikValues): void => {
     const { days } = values as { days: DailyHoursValue[] };
 
@@ -32,7 +27,7 @@ export const makeOnSubmit =
     });
 
     const dailyHours = days.map(({ date, hours }) =>
-      makeDailyHours(formatISO9075(date, { representation: "date" }), hours)
+      makeDailyHours(formatSQLDate(date), hours)
     );
 
     const dispatchError = (error: Error): void =>
@@ -52,11 +47,34 @@ export const makeOnSubmit =
       });
     };
 
+    const dispatchUpdatedVirtualWeeks = ({
+      error,
+      data,
+    }: ApiResponse): void => {
+      if (error) return dispatchError(error);
+      dispatch({
+        type: AdminAction.ReceivedResource,
+        payload: {
+          resources: {
+            ...state.resources,
+            [ResourceKey.VirtualWeeks]: data as VirtualWeek[],
+          },
+        },
+        meta: ResourceKey.VirtualWeeks,
+      });
+    };
+
     const handleData = ({ error }: ApiResponse): void => {
       if (error) return dispatchError(error);
       fetch(`${Location.url}`)
         .then((response) => response.json())
         .then(dispatchUpdatedLocations)
+        .then(() =>
+          fetch(VirtualWeek.url)
+            .then((response) => response.json())
+            .then(dispatchUpdatedVirtualWeeks)
+            .catch(dispatchError)
+        )
         .catch(dispatchError);
     };
 

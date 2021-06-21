@@ -46,12 +46,7 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const close = (): void =>
     dispatch({ type: AdminAction.CloseLocationHoursDialog });
 
-  const onSubmit = makeOnSubmit(
-    dispatch,
-    state,
-    selectedSemester,
-    schedulerLocationId
-  );
+  const onSubmit = makeOnSubmit(dispatch, state, schedulerLocationId);
 
   const days = eachDayOfInterval({
     start: parseSQLDate(selectedSemester.start),
