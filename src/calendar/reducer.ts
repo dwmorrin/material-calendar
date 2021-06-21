@@ -170,6 +170,41 @@ const closeSnackbar: StateHandler = (state) => {
   return { ...state, snackbarQueue };
 };
 
+const joinedGroup: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload?.currentGroup) {
+    return errorRedirect(
+      state,
+      action,
+      "no group joined",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  return displayMessage(
+    // This should probably not close the groupDashboard
+    { ...state, currentGroup: payload.currentGroup },
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: "You have joined the group",
+      },
+    }
+  );
+};
+
+const leftGroup: StateHandler = (state, action) => {
+  return displayMessage(
+    // This should probably not close the groupDashboard
+    { ...state },
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: "You have left the group",
+      },
+    }
+  );
+};
+
 const loading: StateHandler = (state) => ({
   ...state,
   loading: true,
@@ -445,6 +480,8 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CloseSnackbar]: closeSnackbar,
     [CalendarAction.DisplayMessage]: displayMessage,
     [CalendarAction.Error]: errorHandler,
+    [CalendarAction.JoinedGroup]: joinedGroup,
+    [CalendarAction.LeftGroup]: leftGroup,
     [CalendarAction.Loading]: loading,
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.OpenReservationForm]: openReservationForm,

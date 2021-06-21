@@ -18,6 +18,8 @@ export enum CalendarAction {
   CloseSnackbar,
   Error,
   DisplayMessage,
+  JoinedGroup,
+  LeftGroup,
   Loading,
   PickedDate,
   OpenReservationForm,

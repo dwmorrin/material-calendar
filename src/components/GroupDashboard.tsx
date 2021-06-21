@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useState, useEffect } from "react";
+import React, {
+  FunctionComponent,
+  useState,
+  useEffect,
+  useContext,
+} from "react";
 import {
   Dialog,
   Toolbar,
@@ -18,6 +23,7 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import { getFormattedEventInterval } from "../utils/date";
 import UserGroup from "../resources/UserGroup";
+import { AuthContext } from "./AuthContext";
 
 const transition = makeTransition("right");
 
@@ -43,7 +49,9 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
           data.map((group: UserGroup) => new UserGroup(group)) as UserGroup[]
         );
       });
-  }, [currentProject, dispatch]);
+  }, [currentProject, dispatch, state.currentGroup]);
+  const { user } = useContext(AuthContext);
+  if (!user) return null;
   return (
     <Dialog
       fullScreen
@@ -90,16 +98,35 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
           }}
         >
           {currentGroup?.title}
-          <Button
-            size="small"
-            variant="contained"
-            color="inherit"
-            onClick={(): void =>
-              console.error("you didn't implement 'leave group'")
-            }
-          >
-            Leave
-          </Button>
+          {currentGroup?.id && (
+            <Button
+              size="small"
+              variant="contained"
+              color="inherit"
+              onClick={(event): void => {
+                event.stopPropagation();
+                fetch(`/api/users/${user.id}/groups/${currentGroup.id}`, {
+                  method: "DELETE",
+                  headers: {},
+                  body: null,
+                })
+                  .then((response) => response.json())
+                  .then(({ error, data, context }) => {
+                    if (error || !data) {
+                      return dispatch({
+                        type: CalendarAction.Error,
+                        payload: { error },
+                        meta: context,
+                      });
+                    } else {
+                      dispatch({ type: CalendarAction.LeftGroup });
+                    }
+                  });
+              }}
+            >
+              Leave
+            </Button>
+          )}
         </Box>
         <List>
           <Accordion defaultExpanded>
@@ -114,16 +141,93 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                   style={{ justifyContent: "space-between" }}
                 >
                   {group.title}
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="inherit"
-                    onClick={(): void =>
-                      console.error("you didn't implement 'join group'")
-                    }
-                  >
-                    Join
-                  </Button>
+                  {currentGroup?.id && (
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="inherit"
+                      onClick={(event): void => {
+                        event.stopPropagation();
+                        currentGroup?.id
+                          ? fetch(
+                              `/api/users/${user.id}/groups/${currentGroup.id}`,
+                              {
+                                method: "DELETE",
+                                headers: {},
+                                body: null,
+                              }
+                            )
+                              .then((response) => response.json())
+                              .then(({ error, data, context }) => {
+                                if (error || !data) {
+                                  return dispatch({
+                                    type: CalendarAction.Error,
+                                    payload: { error },
+                                    meta: context,
+                                  });
+                                } else {
+                                  fetch(
+                                    `/api/users/${user.id}/groups/${group.id}`,
+                                    {
+                                      method: "POST",
+                                    }
+                                  )
+                                    .then((response) => response.json())
+                                    .then(({ error, data, context }) => {
+                                      if (error || !data) {
+                                        return dispatch({
+                                          type: CalendarAction.Error,
+                                          payload: { error },
+                                          meta: context,
+                                        });
+                                      } else {
+                                        fetch(`/api/users/groups/${group.id}`)
+                                          .then((response) => response.json())
+                                          .then(({ error, data, context }) => {
+                                            if (error || !data) {
+                                              return dispatch({
+                                                type: CalendarAction.Error,
+                                                payload: { error },
+                                                meta: context,
+                                              });
+                                            } else {
+                                              dispatch({
+                                                type: CalendarAction.JoinedGroup,
+                                                payload: {
+                                                  currentGroup: new UserGroup(
+                                                    data[0]
+                                                  ),
+                                                },
+                                              });
+                                            }
+                                          });
+                                      }
+                                    });
+                                }
+                              })
+                          : fetch(`/api/users/${user.id}/groups/${group.id}`, {
+                              method: "POST",
+                            })
+                              .then((response) => response.json())
+                              .then(({ error, data, context }) => {
+                                if (error || !data) {
+                                  return dispatch({
+                                    type: CalendarAction.Error,
+                                    payload: { error },
+                                    meta: context,
+                                  });
+                                } else {
+                                  dispatch({
+                                    type: CalendarAction.JoinedGroup,
+                                    payload: { currentGroup: group },
+                                  });
+                                }
+                              });
+                      }}
+                    >
+                      Join
+                    </Button>
+                  )}
                 </ListItem>
               ))}
           </Accordion>
