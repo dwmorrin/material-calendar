@@ -26,6 +26,7 @@ import { Fab, Snackbar } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 
 const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
+  const [snackbarDismissed, setSnackbarDismissed] = useState(false);
   const { schedulerLocationId: locationId, selectedSemester, ref } = state;
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
@@ -84,9 +85,10 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   return (
     <>
       <Snackbar
-        open={!dailyHours.length}
+        open={!dailyHours.length && !snackbarDismissed}
         message="Start by creating the daily hours for this location."
         anchorOrigin={{ horizontal: "left", vertical: "top" }}
+        onClick={(): void => setSnackbarDismissed(true)}
       />
       <FullCalendar
         // RESOURCES
