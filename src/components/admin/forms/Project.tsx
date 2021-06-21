@@ -8,14 +8,20 @@ import { ResourceKey } from "../../../resources/types";
 import Course from "../../../resources/Course";
 import Location from "../../../resources/Location";
 
-const FormTemplate: FunctionComponent<FormTemplateProps> = ({ state }) => {
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({
+  state,
+  values,
+}) => {
   const courses = state.resources[ResourceKey.Courses] as Course[];
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const locationValues = locations.reduce(
     (dict, { id, title }) => ({ ...dict, [title]: String(id) }),
     {} as { [k: string]: string }
   );
-  return (
+  //! Hard coded project title should be set in .env or similar config file
+  return values.title === "Walk-in" ? (
+    <div>You cannot edit the Walk-in project</div>
+  ) : (
     <List>
       <Field fullWidth component={TextField} name="title" label="Title" />
       <Field fullWidth component={DatePicker} name="start" label="Start" />
