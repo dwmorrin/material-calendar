@@ -3,10 +3,19 @@ import { Field, FieldArray } from "formik";
 import { TextField, RadioGroup, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker } from "formik-material-ui-pickers";
 import { FormTemplateProps } from "../../../admin/types";
-import { FormControlLabel, FormLabel, List, Radio } from "@material-ui/core";
+import {
+  Button,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
+  List,
+  Radio,
+} from "@material-ui/core";
 import { ResourceKey } from "../../../resources/types";
 import Course from "../../../resources/Course";
 import Location from "../../../resources/Location";
+import DeleteIcon from "@material-ui/icons/Delete";
+import { ListItem } from "@material-ui/core";
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = ({
   state,
@@ -14,10 +23,6 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
 }) => {
   const courses = state.resources[ResourceKey.Courses] as Course[];
   const locations = state.resources[ResourceKey.Locations] as Location[];
-  const locationValues = locations.reduce(
-    (dict, { id, title }) => ({ ...dict, [title]: String(id) }),
-    {} as { [k: string]: string }
-  );
   //! Hard coded project title should be set in .env or similar config file
   return values.title === "Walk-in" ? (
     <div>You cannot edit the Walk-in project</div>
@@ -57,35 +62,49 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
         <FormControlLabel label="None" value="" control={<Radio />} />
       </Field>
       <Field
+        type="checkbox"
         component={CheckboxWithLabel}
         name="open"
+        checked={values.open}
         Label={{ label: "Project is active" }}
       />
       <br />
       <FormLabel>Locations</FormLabel>
       <FieldArray
         name="locationHours"
-        render={(): JSX.Element => (
+        render={({ remove, push }): JSX.Element => (
           <>
-            {Object.entries(locationValues).map(([label, value], index) => (
+            {(values.locationHours as []).map((_, index) => (
               <div key={index}>
                 <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
+                  component={TextField}
                   name={`locationHours.${index}.locationId`}
-                  Label={{ label }}
-                  value={value}
+                  label="Location ID"
                 />
                 <Field
                   component={TextField}
                   name={`locationHours.${index}.hours`}
                   label="Hours"
                 />
+                <IconButton
+                  aria-label="delete"
+                  onClick={(): void => remove(index)}
+                >
+                  <DeleteIcon />
+                </IconButton>
               </div>
             ))}
+            <Button onClick={(): void => push({ locationId: "?", hours: 0 })}>
+              Add location to project
+            </Button>
           </>
         )}
       />
+      {locations.map(({ id, title }, index) => (
+        <ListItem key={`locationLookupList${index}`}>
+          ID {id}: {title}
+        </ListItem>
+      ))}
     </List>
   );
 };
