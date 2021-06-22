@@ -50,7 +50,14 @@ test("makeResources", () =>
 test("makeAllotmentSummaryEvent", () =>
   expect(
     makeAllotmentSummaryEvent(
-      { id: 0, title: "PROJECT TITLE", start: "2020-06-18", end: "2020-06-18" },
+      {
+        id: 0,
+        title: "PROJECT TITLE",
+        start: "2020-06-18",
+        end: "2020-06-18",
+        locationHours: [{ locationId: 1, hours: 10 }],
+      },
+      1,
       0
     )
   ).toEqual({
@@ -59,7 +66,7 @@ test("makeAllotmentSummaryEvent", () =>
     start: "2020-06-18",
     end: "2020-06-19",
     resourceId: "0",
-    title: "PROJECT TITLE - Total Hours: 0",
+    title: "PROJECT TITLE - Allotted: 0 - Max: 10",
   }));
 
 test("makeAllotmentEventMap", () =>
@@ -94,6 +101,7 @@ test("makeAllotments", () =>
           allotments: [
             { start: "2020-06-18", end: "2020-06-18", locationId: 0, hours: 0 },
           ],
+          locationHours: [{ locationId: 0, hours: 10 }],
         },
       ],
       0
@@ -105,7 +113,7 @@ test("makeAllotments", () =>
       id: "allotmentTotal0",
       resourceId: "0",
       start: "2020-06-18",
-      title: "PROJECT TITLE - Total Hours: 0",
+      title: "PROJECT TITLE - Allotted: 0 - Max: 10",
     },
     {
       allDay: true,

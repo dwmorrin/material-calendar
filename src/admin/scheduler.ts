@@ -172,6 +172,7 @@ export const makeResources = (
 
 export const makeAllotmentSummaryEvent = (
   p: Project,
+  locationId: number,
   total: number
 ): SchedulerEventProps => ({
   id: `allotmentTotal${p.id}`,
@@ -179,7 +180,9 @@ export const makeAllotmentSummaryEvent = (
   end: addADay(p.end),
   resourceId: String(p.id),
   allDay: true,
-  title: `${p.title} - Total Hours: ${total}`,
+  title: `${p.title} - Allotted: ${total} - Max: ${
+    p.locationHours.find(({ locationId: id }) => id === locationId)?.hours
+  }`,
 });
 
 export const makeAllotmentEventMap =
@@ -212,13 +215,13 @@ export const makeAllotments = (
   projects.reduce((allots, p) => {
     const ofInterest = p.allotments?.filter((a) => a.locationId === locationId);
     if (!ofInterest?.length)
-      return [...allots, makeAllotmentSummaryEvent(p, 0)];
+      return [...allots, makeAllotmentSummaryEvent(p, locationId, 0)];
     const [, , total] = ofInterest.reduce(getFirstLastAndTotalFromAllotments, [
       {},
       {},
       0,
     ] as [Allotment, Allotment, number]);
-    allots.push(makeAllotmentSummaryEvent(p, total));
+    allots.push(makeAllotmentSummaryEvent(p, locationId, total));
     allots.push(...ofInterest.map(makeAllotmentEventMap(p)));
     return allots;
   }, [] as SchedulerEventProps[]);
