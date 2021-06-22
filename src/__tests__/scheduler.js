@@ -62,6 +62,9 @@ test("makeAllotmentSummaryEvent", () =>
     )
   ).toEqual({
     allDay: true,
+    extendedProps: {
+      projectId: 0,
+    },
     id: "allotmentTotal0",
     start: "2020-06-18",
     end: "2020-06-19",
@@ -74,6 +77,9 @@ test("makeAllotmentEventMap", () =>
     makeAllotmentEventMap({ id: 0 })({ end: "2020-06-18", hours: 0 }, 0)
   ).toEqual({
     end: "2020-06-19",
+    extendedProps: {
+      projectId: 0,
+    },
     hours: 0,
     id: "allotment0-0",
     resourceId: "Allotments0",
@@ -110,6 +116,9 @@ test("makeAllotments", () =>
     {
       allDay: true,
       end: "2020-06-19",
+      extendedProps: {
+        projectId: 0,
+      },
       id: "allotmentTotal0",
       resourceId: "0",
       start: "2020-06-18",
@@ -118,6 +127,9 @@ test("makeAllotments", () =>
     {
       allDay: true,
       end: "2020-06-19",
+      extendedProps: {
+        projectId: 0,
+      },
       hours: 0,
       id: "allotment0-0",
       locationId: 0,

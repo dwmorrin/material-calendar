@@ -12,6 +12,7 @@ export const resources = {
 
 const initialState: AdminState = {
   // UI state
+  allotmentSummaryIsOpen: false,
   appIsBroken: false,
   backupsIsOpen: false,
   detailIsOpen: false,

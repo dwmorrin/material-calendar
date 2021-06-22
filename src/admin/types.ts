@@ -12,6 +12,7 @@ export interface Action {
 }
 
 export enum AdminAction {
+  CloseAllotmentSummaryDialog,
   CloseBackups,
   CloseDetail,
   CloseFileImport,
@@ -21,6 +22,7 @@ export enum AdminAction {
   CloseVirtualWeeksDialog,
   Error,
   OpenBackups,
+  OpenAllotmentSummaryDialog,
   OpenLocationHoursDialog,
   OpenDetail,
   OpenScheduler,
@@ -40,6 +42,7 @@ export enum AdminAction {
 
 export interface AdminState {
   // UI state
+  allotmentSummaryIsOpen: boolean;
   appIsBroken: boolean;
   backupsIsOpen: boolean;
   detailIsOpen: boolean;
@@ -48,6 +51,7 @@ export interface AdminState {
   fileImportIsOpen: boolean;
   loading: boolean;
   locationHoursDialogIsOpen: boolean;
+  calendarEventClickState?: CalendarEventClickState;
   calendarSelectionState?: CalendarSelectionState;
   recordPage: number;
   ref: React.RefObject<FullCalendar> | null;
@@ -87,6 +91,13 @@ export interface CalendarSelectionState {
   start: string;
   end: string;
   location: Location;
+}
+
+export interface CalendarEventClickState {
+  title: string;
+  startStr: string;
+  endStr: string;
+  extendedProps: Record<string, unknown>;
 }
 
 export interface ApiResponse {

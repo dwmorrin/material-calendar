@@ -85,6 +85,11 @@ const errorRedirect = (
 
 //--------- NORMAL ACTION HANDLERS ----------
 
+const closeAllotmentSummaryDialog: StateHandler = (state) => ({
+  ...state,
+  allotmentSummaryIsOpen: false,
+});
+
 const closeBackups: StateHandler = (state) => ({
   ...state,
   backupsIsOpen: false,
@@ -120,6 +125,12 @@ const closeSemesterDialog: StateHandler = (state) => ({
 const closeVirtualWeeksDialog: StateHandler = (state) => ({
   ...state,
   virtualWeeksDialogIsOpen: false,
+});
+
+const openAllotmentSummaryDialog: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+  allotmentSummaryIsOpen: true,
 });
 
 const openBackups: StateHandler = (state) => ({
@@ -242,6 +253,7 @@ const toggleDrawer: StateHandler = (state) => ({
 
 const reducer: StateHandler = (state, action) =>
   ({
+    [AdminAction.CloseAllotmentSummaryDialog]: closeAllotmentSummaryDialog,
     [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
     [AdminAction.CloseFileImport]: closeFileImport,
@@ -250,6 +262,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseSnackbar]: closeSnackbar,
     [AdminAction.CloseVirtualWeeksDialog]: closeVirtualWeeksDialog,
     [AdminAction.Error]: errorHandler,
+    [AdminAction.OpenAllotmentSummaryDialog]: openAllotmentSummaryDialog,
     [AdminAction.OpenBackups]: openBackups,
     [AdminAction.OpenDetail]: openDetail,
     [AdminAction.OpenLocationHoursDialog]: openLocationHoursDialog,

@@ -185,6 +185,9 @@ export const makeAllotmentSummaryEvent = (
   title: `${p.title} - Allotted: ${total} - Max: ${
     p.locationHours.find(({ locationId: id }) => id === locationId)?.hours
   }`,
+  extendedProps: {
+    projectId: p.id,
+  },
 });
 
 export const makeAllotmentEventMap =
@@ -196,6 +199,9 @@ export const makeAllotmentEventMap =
     resourceId: `Allotments${p.id}`,
     allDay: true,
     title: "" + a.hours,
+    extendedProps: {
+      projectId: p.id,
+    },
   });
 
 export const getFirstLastAndTotalFromAllotments = (
@@ -315,7 +321,9 @@ export const resourceClickHandler =
 
 export const eventClick =
   (dispatch: (action: Action) => void, location: Location) =>
-  ({ event: { id, title, startStr, endStr } }: EventProps): void => {
+  ({
+    event: { id, title, startStr, endStr, extendedProps },
+  }: EventProps): void => {
     if (!startStr)
       return dispatch({
         type: AdminAction.Error,
@@ -335,8 +343,21 @@ export const eventClick =
         },
       });
     }
+    if (id.startsWith("allotmentTotal")) {
+      return dispatch({
+        type: AdminAction.OpenAllotmentSummaryDialog,
+        payload: {
+          calendarEventClickState: {
+            title,
+            startStr,
+            endStr,
+            extendedProps,
+          },
+        },
+      });
+    }
     console.group("Unhandled scheduler event click");
-    console.log({ id, title, startStr });
+    console.log({ id, title, startStr, extendedProps });
     console.groupEnd();
   };
 
