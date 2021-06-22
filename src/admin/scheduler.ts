@@ -6,7 +6,7 @@ import { compareDateOrder, formatSQLDate, parseSQLDate } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";
 import { addDays } from "date-fns";
-import { areIntervalsOverlapping } from "date-fns/fp";
+import { areIntervalsOverlappingWithOptions } from "date-fns/fp";
 import { deepEqual } from "fast-equals";
 
 //--- TYPES ---
@@ -129,7 +129,9 @@ export const makeResources = (
   locationId: number,
   semester: Semester
 ): ProjectResource[] => {
-  const overlapsSemester = areIntervalsOverlapping({
+  const overlapsSemester = areIntervalsOverlappingWithOptions({
+    inclusive: true,
+  })({
     start: parseSQLDate(semester.start),
     end: parseSQLDate(semester.end),
   });
