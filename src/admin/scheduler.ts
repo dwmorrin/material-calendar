@@ -1,4 +1,4 @@
-import { AdminAction, Action, AdminUIProps } from "./types";
+import { AdminAction, Action, AdminUIProps, AdminState } from "./types";
 import VirtualWeek from "../resources/VirtualWeek";
 import Project from "../resources/Project";
 import Location from "../resources/Location";
@@ -8,6 +8,7 @@ import Semester from "../resources/Semester";
 import { addDays } from "date-fns";
 import { areIntervalsOverlappingWithOptions } from "date-fns/fp";
 import { deepEqual } from "fast-equals";
+import { ResourceKey } from "../resources/types";
 
 //--- TYPES ---
 
@@ -287,12 +288,14 @@ export const resourceClickHandler =
     dispatch,
     location,
     semester,
+    state,
   }: {
     id: string;
     title: string;
     dispatch: (a: Action) => void;
     location: Location;
     semester: Semester;
+    state: AdminState;
   }): ((this: GlobalEventHandlers, ev: MouseEvent) => unknown) | null =>
   (event): void => {
     if (
@@ -301,6 +304,10 @@ export const resourceClickHandler =
       )
     ) {
       switch (id) {
+        case VirtualWeek.resourceId:
+          return console.log("TODO: virtual week dialog");
+        case VirtualWeek.hoursRemainingId:
+          return console.log("TODO: hours remaining dialog");
         case Location.locationHoursId: {
           return dispatch({
             type: AdminAction.OpenLocationHoursDialog,
@@ -313,8 +320,21 @@ export const resourceClickHandler =
             },
           });
         }
-        default:
-          console.log(`no handler for ID: ${id}, TITLE: ${title}`);
+        default: {
+          // assume ID is a project ID
+          const project = state.resources[ResourceKey.Projects].find(
+            (p) => p.id === Number(id)
+          );
+          if (!project)
+            return console.log(`no handler for ID: ${id}, TITLE: ${title}`);
+          return dispatch({
+            type: AdminAction.OpenDetailWithResourceInstance,
+            payload: {
+              resourceKey: ResourceKey.Projects,
+              resourceInstance: project,
+            },
+          });
+        }
       }
     }
   };

@@ -25,6 +25,7 @@ export enum AdminAction {
   OpenAllotmentSummaryDialog,
   OpenLocationHoursDialog,
   OpenDetail,
+  OpenDetailWithResourceInstance,
   OpenScheduler,
   OpenSemesterDialog,
   OpenVirtualWeeksDialog,

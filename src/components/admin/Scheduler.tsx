@@ -110,6 +110,7 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
             dispatch,
             location,
             semester,
+            state,
           });
         }}
         // EVENTS

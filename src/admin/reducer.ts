@@ -143,6 +143,12 @@ const openDetail: StateHandler = (state) => ({
   detailIsOpen: true,
 });
 
+const openDetailWithResourceInstance: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+  detailIsOpen: true,
+});
+
 const openLocationHoursDialog: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
@@ -265,6 +271,8 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.OpenAllotmentSummaryDialog]: openAllotmentSummaryDialog,
     [AdminAction.OpenBackups]: openBackups,
     [AdminAction.OpenDetail]: openDetail,
+    [AdminAction.OpenDetailWithResourceInstance]:
+      openDetailWithResourceInstance,
     [AdminAction.OpenLocationHoursDialog]: openLocationHoursDialog,
     [AdminAction.OpenScheduler]: openScheduler,
     [AdminAction.OpenSemesterDialog]: openSemesterDialog,
