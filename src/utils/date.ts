@@ -1,5 +1,5 @@
 import { add, lightFormat } from "date-fns/fp";
-import { format, formatISO9075, parse, parseISO } from "date-fns";
+import { compareAsc, format, formatISO9075, parse, parseISO } from "date-fns";
 
 type DateInput = string | number | Date;
 
@@ -160,3 +160,11 @@ export const eventGenerator = ({
     }
   },
 });
+
+export const isValidDateInterval = ({
+  start,
+  end,
+}: {
+  start: Date;
+  end: Date;
+}): boolean => compareAsc(start, end) < 1;
