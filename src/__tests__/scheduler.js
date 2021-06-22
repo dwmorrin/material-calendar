@@ -50,9 +50,7 @@ test("makeResources", () =>
 test("makeAllotmentSummaryEvent", () =>
   expect(
     makeAllotmentSummaryEvent(
-      { id: 0, title: "PROJECT TITLE" },
-      { start: "2020-06-18" },
-      { end: "2020-06-18" },
+      { id: 0, title: "PROJECT TITLE", start: "2020-06-18", end: "2020-06-18" },
       0
     )
   ).toEqual({
@@ -77,9 +75,9 @@ test("makeAllotmentEventMap", () =>
   }));
 
 test("getFirstLastAndTotalFromAllotments initial", () =>
-  expect(
-    getFirstLastAndTotalFromAllotments([{}, {}, 0], { hours: 0 })
-  ).toEqual([{ hours: 0 }, { hours: 0 }, 0]));
+  expect(getFirstLastAndTotalFromAllotments([{}, {}, 0], { hours: 0 })).toEqual(
+    [{ hours: 0 }, { hours: 0 }, 0]
+  ));
 
 test("makeAllotments with [] returns []", () =>
   expect(makeAllotments([], 0)).toEqual([]));
