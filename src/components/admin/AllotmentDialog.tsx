@@ -9,13 +9,18 @@ import {
   FormLabel,
   makeStyles,
 } from "@material-ui/core";
+import { TextField } from "formik-material-ui";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import { DatePicker } from "formik-material-ui-pickers";
 import DateFnUtils from "@date-io/date-fns";
 import DraggablePaper from "../DraggablePaper";
 import { Formik, Form, Field, FormikValues } from "formik";
 import { AdminUIProps, AdminAction, FormValues } from "../../admin/types";
-import { isValidDateInterval, parseSQLDate } from "../../utils/date";
+import {
+  formatSQLDate,
+  isValidDateInterval,
+  parseSQLDate,
+} from "../../utils/date";
 import { subDays } from "date-fns";
 import { ResourceKey } from "../../resources/types";
 import { isWithinInterval } from "date-fns/fp";
@@ -62,14 +67,55 @@ const AllotmentDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
     });
   };
 
-  const onSubmit = (_: FormValues, actions: FormikValues): void => {
-    setFormErrors(initialErrors);
-    actions.setSubmitting(false);
+  const onSubmit = (values: FormValues, actions: FormikValues): void => {
+    const dispatchError = (error: Error): void =>
+      dispatch({ type: AdminAction.Error, payload: { error } });
+    fetch(`${Project.url}/${project.id}/allotments`, {
+      method: "PUT",
+      body: JSON.stringify({
+        projectId: project.id,
+        locationId: location.id,
+        start: formatSQLDate(values.start as Date),
+        end: formatSQLDate(values.end as Date),
+        hours: Number(values.hours as string),
+      }),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then(({ error }) => {
+        if (error) return dispatchError(error);
+        fetch(Project.url)
+          .then((response) => response.json())
+          .then(({ error, data }) =>
+            dispatch(
+              error
+                ? { type: AdminAction.Error, payload: { error } }
+                : {
+                    type: AdminAction.ReceivedResource,
+                    payload: {
+                      resources: {
+                        ...state.resources,
+                        [ResourceKey.Projects]: data as Project[],
+                      },
+                    },
+                    meta: ResourceKey.Projects,
+                  }
+            )
+          )
+          .catch(dispatchError);
+      })
+      .catch(dispatchError)
+      .finally(() => {
+        setFormErrors(initialErrors);
+        actions.setSubmitting(false);
+        dispatch({ type: AdminAction.CloseAllotmentDialog });
+      });
   };
 
   const initialValues = {
     start: parseSQLDate(start),
     end: subDays(parseSQLDate(end), 1),
+    hours: 0,
   };
 
   return (
@@ -104,6 +150,7 @@ const AllotmentDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                     </FormLabel>
                   )}
                   <Field component={DatePicker} name="end" label="End" />
+                  <Field component={TextField} name="hours" label="Hours" />
                 </Box>
                 <DialogActions>
                   <Button onClick={close}>Cancel</Button>
