@@ -1,4 +1,10 @@
-import { AdminAction, Action, AdminUIProps, AdminState } from "./types";
+import {
+  AdminAction,
+  Action,
+  AdminUIProps,
+  AdminState,
+  CalendarSelectionState,
+} from "./types";
 import VirtualWeek from "../resources/VirtualWeek";
 import Project from "../resources/Project";
 import Location from "../resources/Location";
@@ -24,7 +30,7 @@ interface EventProps {
     title: string;
     startStr: string;
     endStr: string;
-    extendedProps: { [k: string]: unknown };
+    extendedProps: Record<string, unknown>;
   };
 }
 
@@ -41,7 +47,7 @@ interface SelectProps {
   resource?: {
     id: string;
     title?: string;
-    extendedProps?: { [k: string]: unknown };
+    extendedProps?: Record<string, unknown>;
   };
 }
 
@@ -52,7 +58,7 @@ type SchedulerEventProps = {
   resourceId: string;
   allDay: boolean;
   title: string;
-  extendedProps?: { [k: string]: unknown };
+  extendedProps?: Record<string, unknown>;
 };
 
 //--- MODULE CONSTANTS ---
@@ -158,12 +164,14 @@ export const makeResources = (
       id: "" + project.id,
       title: project.title,
       eventBackgroundColor: getColor("" + project.id),
+      extendedProps: { projectId: project.id },
     })),
     ...projectsOfInterest.map((project) => ({
       id: `Allotments${project.id}`,
       title: "Allotments",
       parentId: project.id,
       eventBackgroundColor: getColor("" + project.id),
+      extendedProps: { projectId: project.id },
     })),
     {
       id: VirtualWeek.hoursRemainingId,
@@ -316,6 +324,7 @@ export const resourceClickHandler =
                 start: semester.start,
                 end: semester.end,
                 location,
+                resource: { extendedProps: {} },
               },
             },
           });
@@ -359,6 +368,7 @@ export const eventClick =
             start: startStr,
             end: endStr,
             location,
+            resource: { extendedProps: {} },
           },
         },
       });
@@ -383,31 +393,37 @@ export const eventClick =
 
 export const selectionHandler =
   (dispatch: (action: Action) => void, location: Location) =>
-  ({ startStr, endStr, resource = { id: "" } }: SelectProps): void => {
-    const calendarSelectionState = {
+  ({ startStr, endStr, resource }: SelectProps): void => {
+    const calendarSelectionState: CalendarSelectionState = {
       start: startStr,
       end: endStr,
       location,
+      resource: { extendedProps: resource?.extendedProps || {} },
     };
+    const payload = { calendarSelectionState };
 
-    switch (resource.id) {
+    switch (resource?.id) {
       case Location.locationHoursId:
         return dispatch({
           type: AdminAction.OpenLocationHoursDialog,
-          payload: {
-            calendarSelectionState,
-          },
+          payload,
         });
       case VirtualWeek.resourceId:
         return dispatch({
           type: AdminAction.OpenVirtualWeeksDialog,
-          payload: {
-            calendarSelectionState,
-          },
+          payload,
         });
-      default:
+      default: {
+        // selecting on allotment summary row or allotment row
+        const projectId = resource?.extendedProps?.projectId;
+        if (typeof projectId === "number" && projectId > 0)
+          return dispatch({
+            type: AdminAction.OpenAllotmentDialog,
+            payload,
+          });
         console.group("Unhandled Scheduler selection");
         console.log({ startStr, endStr, resource });
         console.groupEnd();
+      }
     }
   };

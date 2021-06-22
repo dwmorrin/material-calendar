@@ -29,7 +29,7 @@ const AllotmentSummaryDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
 
   return (
     <Dialog
-      open={state.allotmentSummaryIsOpen}
+      open={state.allotmentSummaryDialogIsOpen}
       onClose={close}
       PaperComponent={DraggablePaper}
       aria-labelledby="draggable-dialog-tite"

@@ -101,7 +101,7 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
           );
         }}
         resourceOrder="id" // TODO user preference; create an order prop
-        resourcesInitiallyExpanded={false} // TODO user preference
+        resourcesInitiallyExpanded={true} // TODO user preference
         resourceLabelDidMount={({ resource: { id, title }, el }): void => {
           el.style.cursor = "default"; //! TODO move to CSS
           el.onclick = resourceClickHandler({

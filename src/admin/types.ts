@@ -13,6 +13,7 @@ export interface Action {
 
 export enum AdminAction {
   CloseAllotmentSummaryDialog,
+  CloseAllotmentDialog,
   CloseBackups,
   CloseDetail,
   CloseFileImport,
@@ -23,6 +24,7 @@ export enum AdminAction {
   Error,
   OpenBackups,
   OpenAllotmentSummaryDialog,
+  OpenAllotmentDialog,
   OpenLocationHoursDialog,
   OpenDetail,
   OpenDetailWithResourceInstance,
@@ -43,7 +45,8 @@ export enum AdminAction {
 
 export interface AdminState {
   // UI state
-  allotmentSummaryIsOpen: boolean;
+  allotmentDialogIsOpen: boolean;
+  allotmentSummaryDialogIsOpen: boolean;
   appIsBroken: boolean;
   backupsIsOpen: boolean;
   detailIsOpen: boolean;
@@ -92,6 +95,7 @@ export interface CalendarSelectionState {
   start: string;
   end: string;
   location: Location;
+  resource: { extendedProps: Record<string, unknown> };
 }
 
 export interface CalendarEventClickState {

@@ -12,7 +12,8 @@ export const resources = {
 
 const initialState: AdminState = {
   // UI state
-  allotmentSummaryIsOpen: false,
+  allotmentDialogIsOpen: false,
+  allotmentSummaryDialogIsOpen: false,
   appIsBroken: false,
   backupsIsOpen: false,
   detailIsOpen: false,
