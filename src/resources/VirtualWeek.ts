@@ -1,3 +1,5 @@
+import { formatSQLDate } from "../utils/date";
+
 interface VirtualWeek {
   [k: string]: unknown;
   id: number;
@@ -15,8 +17,8 @@ class VirtualWeek implements VirtualWeek {
   constructor(
     virtualWeek = {
       id: -1,
-      start: "",
-      end: "",
+      start: formatSQLDate(),
+      end: formatSQLDate(),
       locationId: -1,
       locationHours: 0,
       projectHours: 0,
