@@ -9,7 +9,7 @@ import {
   formatISO9075,
   parse,
   parseISO,
-  setHours,
+  set,
 } from "date-fns";
 
 export {
@@ -190,7 +190,12 @@ export const nowInServerTimezone = (): Date =>
   );
 
 export const todayInServerTimezoneAtHour = (hours: number): Date =>
-  setHours(nowInServerTimezone(), hours);
+  set(nowInServerTimezone(), {
+    hours,
+    minutes: 0,
+    seconds: 0,
+    milliseconds: 0,
+  });
 
 export const compareAscSQLDate = ({
   start,
