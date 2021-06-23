@@ -10,15 +10,11 @@ import DateFnUtils from "@date-io/date-fns";
 import formRouter from "../../admin/forms/router";
 import { dispatchOneResource } from "../../admin/dispatch";
 
-const AdminDetailsForm: FunctionComponent<AdminUIProps> = ({
-  dispatch,
-  state,
-}) => {
+const DetailsForm: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
+  if (!state.resourceInstance || !state.detailIsOpen) return null;
+
   const { template, valuator, updater } = formRouter(state.resourceKey);
 
-  if (!state.resourceInstance) {
-    return <div style={{ display: "none" }}></div>;
-  }
   return (
     <Dialog fullScreen={true} open={state.detailIsOpen}>
       <Toolbar>
@@ -50,4 +46,4 @@ const AdminDetailsForm: FunctionComponent<AdminUIProps> = ({
   );
 };
 
-export default AdminDetailsForm;
+export default DetailsForm;
