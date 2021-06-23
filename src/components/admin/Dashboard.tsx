@@ -10,10 +10,10 @@ import { AdminAction } from "../../admin/types";
 import { Resources } from "../../resources/Resources";
 import reducer from "../../admin/reducer";
 import initialState from "../../admin/initialState";
-import AdminBar from "./Bar";
-import AdminNavigationDrawer from "./NavigationDrawer";
-import AdminDocumentBrowser from "./DocumentBrowser";
-import AdminDetailsForm from "./DetailsForm";
+import Bar from "./Bar";
+import NavigationDrawer from "./NavigationDrawer";
+import DocumentBrowser from "./DocumentBrowser";
+import DetailsForm from "./DetailsForm";
 import FileImport from "./FileImport";
 import fetchAllResources from "../../utils/fetchAllResources";
 import Scheduler from "./Scheduler";
@@ -56,14 +56,14 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   if (state.loading) return <CircularProgress />;
   return (
     <div>
-      <AdminBar dispatch={dispatch} state={state} />
-      <AdminNavigationDrawer dispatch={dispatch} state={state} />
+      <Bar dispatch={dispatch} state={state} />
+      <NavigationDrawer dispatch={dispatch} state={state} />
       {state.schedulerIsOpen ? (
         <Scheduler dispatch={dispatch} state={state} />
       ) : (
-        <AdminDocumentBrowser dispatch={dispatch} state={state} />
+        <DocumentBrowser dispatch={dispatch} state={state} />
       )}
-      <AdminDetailsForm dispatch={dispatch} state={state} />
+      <DetailsForm dispatch={dispatch} state={state} />
       <FileImport dispatch={dispatch} state={state} />
       <Backups dispatch={dispatch} state={state} />
       <SemesterDialog dispatch={dispatch} state={state} />

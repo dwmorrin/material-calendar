@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps } from "../calendar/types";
+import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
 import {
   Accordion,
   AccordionSummary,
@@ -9,26 +9,27 @@ import {
   Checkbox,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ResourceListItem from "./ResourceListItem";
+import LocationListItem from "./LocationListItem";
 import Location from "../resources/Location";
 import { ResourceKey } from "../resources/types";
-import { dispatchSelectedLocation } from "../calendar/dispatch";
 
-interface ResourceAccordionListProps extends CalendarUIProps {
+interface LocationAccordionListProps extends CalendarUIProps {
   groupId: string;
 }
-const ResourceAccordionList: FunctionComponent<ResourceAccordionListProps> = ({
-  dispatch,
-  state,
-  groupId,
-}) => {
+
+const LocationAccordionList: FunctionComponent<
+  LocationAccordionListProps & CalendarUISelectionProps
+> = ({ state, groupId, selections, setSelections }) => {
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const groupLocations = locations.filter(
     (location) => location.groupId === groupId
   );
-  const checked = groupLocations.every((location) => location.selected);
+  const checked = groupLocations.every(({ id }) =>
+    selections.locationIds.includes(id)
+  );
   const indeterminate =
-    !checked && groupLocations.some((location) => location.selected);
+    !checked &&
+    groupLocations.some(({ id }) => selections.locationIds.includes(id));
   return (
     <Accordion>
       <AccordionSummary
@@ -47,7 +48,18 @@ const ResourceAccordionList: FunctionComponent<ResourceAccordionListProps> = ({
           onClick={(event): void => event.stopPropagation()}
           onChange={(event: React.ChangeEvent<unknown>, checked): void => {
             event.stopPropagation();
-            dispatchSelectedLocation(state, dispatch, groupId, checked);
+            setSelections({
+              ...selections,
+              locationIds: locations.reduce((newIds, location) => {
+                // see if this location is a member of the group
+                if (location.groupId === groupId)
+                  return checked ? [...newIds, location.id] : newIds;
+                // not a member of the group. copy existing locationIds
+                return selections.locationIds.includes(location.id)
+                  ? [...newIds, location.id]
+                  : newIds;
+              }, [] as number[]),
+            });
           }}
         />
       </AccordionSummary>
@@ -56,11 +68,11 @@ const ResourceAccordionList: FunctionComponent<ResourceAccordionListProps> = ({
           {locations
             .filter((location) => location.groupId === groupId)
             .map((location) => (
-              <ResourceListItem
+              <LocationListItem
                 key={location.id}
-                dispatch={dispatch}
-                state={state}
                 location={location}
+                selections={selections}
+                setSelections={setSelections}
               />
             ))}
         </List>
@@ -69,4 +81,4 @@ const ResourceAccordionList: FunctionComponent<ResourceAccordionListProps> = ({
   );
 };
 
-export default ResourceAccordionList;
+export default LocationAccordionList;

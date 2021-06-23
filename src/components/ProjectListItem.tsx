@@ -1,5 +1,9 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import {
+  CalendarAction,
+  CalendarUIProps,
+  CalendarUISelectionProps,
+} from "../calendar/types";
 import {
   Checkbox,
   IconButton,
@@ -10,17 +14,14 @@ import {
 } from "@material-ui/core";
 import InfoIcon from "@material-ui/icons/Info";
 import Project from "../resources/Project";
-import { dispatchSelectedProject } from "../calendar/dispatch";
 
 interface ProjectListItemProps extends CalendarUIProps {
   project: Project;
 }
 
-const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
-  dispatch,
-  state,
-  project,
-}) => {
+const ProjectListItem: FunctionComponent<
+  ProjectListItemProps & CalendarUISelectionProps
+> = ({ dispatch, state, project, selections, setSelections }) => {
   return (
     <ListItem
       button
@@ -28,14 +29,25 @@ const ProjectListItem: FunctionComponent<ProjectListItemProps> = ({
       onClick={(event): void => event.stopPropagation()}
     >
       <FormControlLabel
-        //TODO state should track selected Projects (removed project.selected)
-        checked={false}
+        checked={selections.projectIds.includes(project.id)}
         control={<Checkbox />}
         label={<ListItemText primary={project.title} />}
         onClick={(event): void => event.stopPropagation()}
         onChange={(event: React.ChangeEvent<unknown>, checked): void => {
           event.stopPropagation();
-          dispatchSelectedProject(state, dispatch, project.id, checked);
+          let { projectIds } = selections;
+          // checked and not in selections - add
+          if (checked && !projectIds.includes(project.id))
+            projectIds = [...projectIds, project.id];
+          // checked and in selections - do nothing
+          // not checked and not in selections - do nothing
+          // not checked and in selections - remove
+          else if (!checked && projectIds.includes(project.id))
+            projectIds = projectIds.filter((id) => id !== project.id);
+          setSelections({
+            ...selections,
+            projectIds,
+          });
         }}
       />
       <Divider orientation="vertical" flexItem />

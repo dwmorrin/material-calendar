@@ -252,7 +252,6 @@ export const makeDailyHours = (location: Location): SchedulerEventProps[] =>
     allDay: true,
     title: "" + dailyHours.hours,
     resourceId: Location.locationHoursId,
-    extendedProps: { start: dailyHours.start, end: dailyHours.end },
   }));
 
 export const processVirtualWeeks = (

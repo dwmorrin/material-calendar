@@ -5,10 +5,14 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import {
+  CalendarUIProps,
+  CalendarAction,
+  CalendarUISelectionProps,
+} from "../calendar/types";
 import { ResourceKey } from "../resources/types";
 import Event from "../resources/Event";
-import Location, { makeSelectedLocationDict } from "../resources/Location";
+import Location from "../resources/Location";
 import Project from "../resources/Project";
 import {
   addResourceId,
@@ -26,20 +30,21 @@ const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
 }));
 
-const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
-  dispatch,
-  state,
-}) => {
+const FullCalendarBox: FunctionComponent<
+  CalendarUIProps & CalendarUISelectionProps
+> = ({ dispatch, state, selections }) => {
   const { user } = useContext(AuthContext);
   const isAdmin = process.env.NODE_ENV === "development" || User.isAdmin(user);
   const projects = state.resources[ResourceKey.Projects] as Project[];
-  const projectLocations = makeSelectedLocationIdSet(projects);
+  const projectLocations = makeSelectedLocationIdSet(
+    projects,
+    selections.projectIds
+  );
   const events = state.resources[ResourceKey.Events] as Event[];
-  const locations = state.resources[ResourceKey.Locations] as Location[];
   const byLocationId = getEventsByLocationId(
     events,
     projectLocations,
-    makeSelectedLocationDict(locations)
+    selections.locationIds
   );
   const classes = useStyles();
 
@@ -51,7 +56,8 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
         // RESOURCES
         resources={makeResources(
           state.resources[ResourceKey.Locations] as Location[],
-          projectLocations
+          projectLocations,
+          selections.locationIds
         )}
         // EVENTS
         events={(_, successCallback): void => {

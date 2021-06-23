@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps } from "../calendar/types";
+import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
 import {
   Accordion,
   AccordionSummary,
@@ -12,25 +12,28 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ProjectListItem from "./ProjectListItem";
 import Project from "../resources/Project";
-import { dispatchSelectedProjectsByCourse } from "../calendar/dispatch";
+import { ResourceKey } from "../resources/types";
 
 interface ProjectAccordionListProps extends CalendarUIProps {
   course: { id: number; title: string };
-  projects: Project[];
 }
 
-const ProjectAccordionList: FunctionComponent<ProjectAccordionListProps> = ({
-  dispatch,
-  state,
-  course,
-  projects,
-}) => {
-  const checked = projects.every((project) => project.selected);
+const ProjectAccordionList: FunctionComponent<
+  ProjectAccordionListProps & CalendarUISelectionProps
+> = ({ dispatch, state, course, selections, setSelections }) => {
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const courseProjects = projects.filter(
+    (p) => p.course.title === course.title
+  );
+  const checked = courseProjects.every(({ id }) =>
+    selections.projectIds.includes(id)
+  );
   const indeterminate =
-    !checked && projects.some((project) => project.selected);
+    !checked &&
+    courseProjects.some(({ id }) => selections.projectIds.includes(id));
 
   return (
-    <Accordion defaultExpanded={projects.length === 1}>
+    <Accordion defaultExpanded={courseProjects.length === 1}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-label="Expand"
@@ -47,23 +50,36 @@ const ProjectAccordionList: FunctionComponent<ProjectAccordionListProps> = ({
           onClick={(event): void => event.stopPropagation()}
           onChange={(event: React.ChangeEvent<unknown>, checked): void => {
             event.stopPropagation();
-            dispatchSelectedProjectsByCourse(
-              state,
-              dispatch,
-              course.title as string,
-              checked
-            );
+            let { projectIds } = selections;
+            // checked: make sure all course projects are in selections
+            if (checked) {
+              courseProjects.forEach((p) => {
+                if (!projectIds.includes(p.id))
+                  projectIds = [...projectIds, p.id];
+              });
+            }
+            // not checked: filter out all course projects
+            if (!checked)
+              projectIds = projectIds.filter(
+                (id) => !courseProjects.find((p) => id === p.id)
+              );
+            setSelections({
+              ...selections,
+              projectIds,
+            });
           }}
         />
       </AccordionSummary>
       <AccordionDetails>
         <List>
-          {projects.map((project) => (
+          {courseProjects.map((project) => (
             <ProjectListItem
               key={project.id}
               dispatch={dispatch}
               state={state}
               project={project}
+              selections={selections}
+              setSelections={setSelections}
             />
           ))}
         </List>

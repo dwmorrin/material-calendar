@@ -1,13 +1,16 @@
 import React, { FunctionComponent } from "react";
 import { SwipeableDrawer, Typography } from "@material-ui/core";
-import { CalendarAction, CalendarUIProps } from "../calendar/types";
-import ResourceList from "./ResourceList";
+import {
+  CalendarAction,
+  CalendarUIProps,
+  CalendarUISelectionProps,
+} from "../calendar/types";
+import LocationList from "./LocationList";
 import ProjectList from "./ProjectList";
 
-const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
-  dispatch,
-  state,
-}) => {
+const CalendarDrawer: FunctionComponent<
+  CalendarUIProps & CalendarUISelectionProps
+> = ({ dispatch, state, selections, setSelections }) => {
   const onClose = (): void => {
     // TODO clean up after drawer closes
   };
@@ -40,12 +43,22 @@ const TemporaryDrawer: FunctionComponent<CalendarUIProps> = ({
         <Typography variant="h5">
           {process.env.REACT_APP_DRAWER_TITLE}
         </Typography>
-        <ProjectList dispatch={dispatch} state={state} />
+        <ProjectList
+          dispatch={dispatch}
+          state={state}
+          selections={selections}
+          setSelections={setSelections}
+        />
         <Typography variant="body1">Rooms</Typography>
-        <ResourceList dispatch={dispatch} state={state} />
+        <LocationList
+          dispatch={dispatch}
+          state={state}
+          selections={selections}
+          setSelections={setSelections}
+        />
       </div>
     </SwipeableDrawer>
   );
 };
 
-export default TemporaryDrawer;
+export default CalendarDrawer;

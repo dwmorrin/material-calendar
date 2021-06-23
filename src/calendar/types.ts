@@ -95,3 +95,13 @@ export type ApiResponse = {
   data?: unknown;
   context?: unknown;
 };
+
+export type CalendarSelections = {
+  locationIds: number[];
+  projectIds: number[];
+};
+
+export type CalendarUISelectionProps = {
+  selections: CalendarSelections;
+  setSelections: (s: CalendarSelections) => void;
+};

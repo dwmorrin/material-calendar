@@ -1,15 +1,14 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps } from "../calendar/types";
+import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
 import ProjectAccordionList from "./ProjectAccordionList";
 import { Typography } from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import Course from "../resources/Course";
 
-const ProjectList: FunctionComponent<CalendarUIProps> = ({
-  dispatch,
-  state,
-}) => {
+const ProjectList: FunctionComponent<
+  CalendarUIProps & CalendarUISelectionProps
+> = ({ dispatch, state, selections, setSelections }) => {
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const courses = state.resources[ResourceKey.Courses] as Course[];
   return (
@@ -22,9 +21,8 @@ const ProjectList: FunctionComponent<CalendarUIProps> = ({
             dispatch={dispatch}
             state={state}
             course={course}
-            projects={projects.filter(
-              (project) => project.course.title === course.title
-            )}
+            selections={selections}
+            setSelections={setSelections}
           />
         ))}
     </div>

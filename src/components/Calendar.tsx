@@ -5,8 +5,9 @@ import React, {
   useReducer,
   useRef,
 } from "react";
+import useLocalStorage from "../calendar/useLocalStorage";
 import { RouteComponentProps, Redirect } from "@reach/router";
-import TemporaryDrawer from "./TemporaryDrawer";
+import CalendarDrawer from "./CalendarDrawer";
 import CalendarBar from "./CalendarBar";
 import StaticDatePicker from "./DatePicker";
 import FullCalendar from "@fullcalendar/react";
@@ -18,7 +19,7 @@ import initialState from "../calendar/initialState";
 import ProjectDashboard from "./ProjectDashboard";
 import { ResourceKey } from "../resources/types";
 import fetchAllResources from "../utils/fetchAllResources";
-import { CalendarAction } from "../calendar/types";
+import { CalendarAction, CalendarSelections } from "../calendar/types";
 import { Box } from "@material-ui/core";
 import EventEditor from "./EventEditor";
 import ProjectForm from "./ProjectForm";
@@ -32,6 +33,10 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     ...initialState,
     ref: calendarRef,
   });
+  const [selections, setSelections] = useLocalStorage("calendar-selections", {
+    locationIds: [],
+    projectIds: [],
+  } as CalendarSelections);
 
   useEffect(() => {
     if (!user?.username) return;
@@ -46,12 +51,18 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `/api/users/${user.username}/projects?context=${ResourceKey.Projects}`
     );
   }, [user]);
+
   return (
     (user?.username && (
       <Box>
         <ErrorPage open={state.appIsBroken} error={state.error} />
         <ProjectDashboard dispatch={dispatch} state={state} />
-        <TemporaryDrawer dispatch={dispatch} state={state} />
+        <CalendarDrawer
+          dispatch={dispatch}
+          state={state}
+          selections={selections}
+          setSelections={setSelections}
+        />
         <EventDetail dispatch={dispatch} state={state} />
         <ProjectForm dispatch={dispatch} state={state} />
         <EventEditor
@@ -63,7 +74,12 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         {state.pickerShowing && (
           <StaticDatePicker dispatch={dispatch} state={state} />
         )}
-        <FullCalendarBox dispatch={dispatch} state={state} />
+        <FullCalendarBox
+          dispatch={dispatch}
+          state={state}
+          selections={selections}
+          setSelections={setSelections}
+        />
         <Snackbar
           dispatch={dispatch}
           state={state}
