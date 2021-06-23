@@ -10,8 +10,12 @@ import {
 } from "@material-ui/core";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
-import { eachDayOfInterval, format } from "date-fns";
-import { formatSQLDate, parseSQLDate } from "../../utils/date";
+import {
+  eachDayOfInterval,
+  format,
+  formatSQLDate,
+  parseSQLDate,
+} from "../../utils/date";
 import DraggablePaper from "../../components/DraggablePaper";
 import { Field, Formik, Form, FieldArray } from "formik";
 import { TextField } from "formik-material-ui";

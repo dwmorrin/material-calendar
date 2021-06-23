@@ -12,7 +12,7 @@ import AddIcon from "@material-ui/icons/Add";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import Semester from "../../resources/Semester";
-import { getFormattedEventInterval } from "../../utils/date";
+import { parseAndFormatSQLDateInterval } from "../../utils/date";
 
 const useStyles = makeStyles({
   semesterListItem: {
@@ -26,8 +26,10 @@ const descendingByStart = (
   { start: b }: Semester
 ): number => new Date(b).valueOf() - new Date(a).valueOf();
 
-const byId = (id: number) => (semester: Semester): boolean =>
-  semester.id === id;
+const byId =
+  (id: number) =>
+  (semester: Semester): boolean =>
+    semester.id === id;
 
 const SemesterDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const classes = useStyles();
@@ -65,10 +67,7 @@ const SemesterDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
             <ButtonBase onClick={setSemester(id)}>
               <Typography variant="h6">{title}</Typography>
               <Typography variant="subtitle1" style={{ marginLeft: 20 }}>
-                {getFormattedEventInterval(
-                  start.split("T")[0],
-                  end.split("T")[0]
-                )}
+                {parseAndFormatSQLDateInterval({ start, end })}
               </Typography>
             </ButtonBase>
             <Button onClick={editSemester(id)}>Edit</Button>

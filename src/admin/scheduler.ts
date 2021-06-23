@@ -8,11 +8,15 @@ import {
 import VirtualWeek from "../resources/VirtualWeek";
 import Project from "../resources/Project";
 import Location from "../resources/Location";
-import { compareDateOrder, formatSQLDate, parseSQLDate } from "../utils/date";
+import {
+  addDays,
+  compareAscSQLDate,
+  formatSQLDate,
+  parseSQLDate,
+  areIntervalsOverlappingInclusive,
+} from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";
-import { addDays } from "date-fns";
-import { areIntervalsOverlappingWithOptions } from "date-fns/fp";
 import { deepEqual } from "fast-equals";
 import { ResourceKey } from "../resources/types";
 
@@ -136,9 +140,7 @@ export const makeResources = (
   locationId: number,
   semester: Semester
 ): ProjectResource[] => {
-  const overlapsSemester = areIntervalsOverlappingWithOptions({
-    inclusive: true,
-  })({
+  const overlapsSemester = areIntervalsOverlappingInclusive({
     start: parseSQLDate(semester.start),
     end: parseSQLDate(semester.end),
   });
@@ -219,8 +221,8 @@ export const getFirstLastAndTotalFromAllotments = (
 ): [Allotment, Allotment, number] => {
   if (!first.start || !last.start) return [allot, allot, allot.hours];
   return [
-    compareDateOrder(allot.start, first.start) ? allot : first,
-    compareDateOrder(last.start, allot.start) ? allot : last,
+    compareAscSQLDate({ start: allot.start, end: first.start }) ? allot : first,
+    compareAscSQLDate({ start: last.start, end: allot.start }) ? allot : last,
     total + allot.hours,
   ];
 };

@@ -7,10 +7,13 @@ import {
   ApiResponse,
 } from "./types";
 import Semester from "../resources/Semester";
-import { formatSQLDate, parseSQLDate } from "../utils/date";
+import {
+  areIntervalsOverlapping,
+  formatSQLDate,
+  parseSQLDate,
+} from "../utils/date";
 import { ResourceKey } from "../resources/types";
 import VirtualWeek from "../resources/VirtualWeek";
-import { areIntervalsOverlapping } from "date-fns/fp";
 
 export const makeOnSubmit =
   (

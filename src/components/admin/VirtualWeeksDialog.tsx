@@ -15,8 +15,7 @@ import { Field, Formik, Form } from "formik";
 import { DatePicker } from "formik-material-ui-pickers";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { makeOnSubmit } from "../../admin/virtualWeeksDialog";
-import { parseSQLDate } from "../../utils/date";
-import { subDays } from "date-fns";
+import { parseSQLDate, subDays } from "../../utils/date";
 
 const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const { calendarSelectionState, selectedSemester, schedulerLocationId } =

@@ -12,10 +12,17 @@ import {
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import CloseIcon from "@material-ui/icons/Close";
 import {
-  compareDateOrder,
-  getFormattedEventInterval,
+  castSQLDateToSQLDatetime,
+  compareAscSQLDatetime,
+  parseAndFormatSQLDatetimeInterval,
+  isBefore,
   isSameDay,
+  isValidDateInterval,
+  isWithinInterval,
+  nowInServerTimezone,
   parseSQLDatetime,
+  subMinutes,
+  todayInServerTimezoneAtHour,
 } from "../utils/date";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
@@ -35,28 +42,24 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const isAvailableForWalkin = (event?: Event): boolean => {
-    if (!event) {
-      return false;
-    }
-    const now = new Date(
-      new Date().toLocaleString("en-US", {
-        timeZone: process.env.REACT_APP_TZ,
-      })
-    );
-    const walkInStart = Number(process.env.REACT_APP_WALK_IN_START);
-    const walkInEnd = Number(process.env.REACT_APP_WALK_IN_END);
-    const eventInProgressCutoff = Number(
-      process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF
-    );
-    const eventStart = parseSQLDatetime(event.start);
-    const eventEnd = parseSQLDatetime(event.end);
-    const sameDay = isSameDay(now, eventStart);
-    const withinWalkInPeriod =
-      now.getHours() >= walkInStart && now.getHours() <= walkInEnd;
-    const bookingCutoffHasNotPassed = compareDateOrder(
-      now,
-      new Date(eventEnd.getTime() - eventInProgressCutoff * 60000)
-    );
+    if (!event) return false;
+    const now = nowInServerTimezone();
+    const sameDay = isSameDay(now, parseSQLDatetime(event.start));
+    const withinWalkInPeriod = isWithinInterval(now, {
+      start: todayInServerTimezoneAtHour(
+        Number(process.env.REACT_APP_WALK_IN_START_HOUR)
+      ),
+      end: todayInServerTimezoneAtHour(
+        Number(process.env.REACT_APP_WALK_IN_END_HOUR)
+      ),
+    });
+    const bookingCutoffHasNotPassed = isValidDateInterval({
+      start: now,
+      end: subMinutes(
+        parseSQLDatetime(event.end),
+        Number(process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF_MINUTES)
+      ),
+    });
     return sameDay && withinWalkInPeriod && bookingCutoffHasNotPassed;
   };
 
@@ -95,23 +98,29 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         }
       });
   }, [dispatch, state.detailIsOpen, state.reservationFormIsOpen]);
-  if (!state.currentEvent || !state.currentEvent.location) {
+
+  if (!state.currentEvent || !state.currentEvent.location || !user?.username) {
     return null;
   }
-  if (!user?.username) return null;
+
   const { end, location, reservable, start, title, reservation } =
     state.currentEvent;
   const userCanUseLocation = user?.restriction >= location.restriction;
 
-  // TODO constrain "Walk-in" to same day only
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
     ({ title, allotments }) =>
       (title === "Walk-in" && isAvailableForWalkin(state.currentEvent)) ||
       allotments.some(
         (a) =>
           a.locationId === location.id &&
-          compareDateOrder(a.start, start) &&
-          compareDateOrder(end, a.end)
+          compareAscSQLDatetime({
+            start: castSQLDateToSQLDatetime(a.start),
+            end: start,
+          }) &&
+          compareAscSQLDatetime({
+            start: end,
+            end: castSQLDateToSQLDatetime(a.end),
+          })
       )
   );
   const open = reservable && !reservation && userCanUseLocation;
@@ -121,7 +130,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       (group) => reservation.groupId === group.id
     );
   // Should start be changed to end? or end-15 minutes?
-  const future = new Date(start as string).getTime() > Date.now();
+  const future = isBefore(nowInServerTimezone(), parseSQLDatetime(start));
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
     : null;
@@ -156,7 +165,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           <Typography variant="h6">{location.title}</Typography>
           <Typography variant="h5">{title}</Typography>
           <Typography variant="body2">
-            {getFormattedEventInterval(start, end)}
+            {parseAndFormatSQLDatetimeInterval({ start, end })}
           </Typography>
 
           {equipmentList && (

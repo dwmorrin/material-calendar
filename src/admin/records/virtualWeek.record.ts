@@ -1,12 +1,12 @@
 import VirtualWeek from "../../resources/VirtualWeek";
-import { getFormattedDate } from "../../utils/date";
+import { formatSlashed, parseSQLDate } from "../../utils/date";
 
 const template = (virtualWeek: unknown): string[][] =>
   virtualWeek instanceof VirtualWeek
     ? [
         ["ID", virtualWeek.id.toString()],
-        ["Start", getFormattedDate(virtualWeek.start)],
-        ["End", getFormattedDate(virtualWeek.end)],
+        ["Start", formatSlashed(parseSQLDate(virtualWeek.start))],
+        ["End", formatSlashed(parseSQLDate(virtualWeek.end))],
         ["Location ID", virtualWeek.locationId.toString()],
         ["Location hours", virtualWeek.locationHours.toString()],
         ["Project hours", virtualWeek.projectHours.toString()],

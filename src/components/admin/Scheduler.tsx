@@ -138,7 +138,7 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
           { day: "numeric" },
         ]}
         // ETC
-        timeZone={process.env.REACT_APP_TZ}
+        timeZone={process.env.REACT_APP_SERVER_TIMEZONE}
         nowIndicator={true}
         height="auto"
         plugins={[resourceTimelinePlugin, interactionPlugin]}

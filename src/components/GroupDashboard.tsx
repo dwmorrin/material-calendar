@@ -21,7 +21,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
-import { getFormattedEventInterval } from "../utils/date";
+import { parseAndFormatSQLDateInterval } from "../utils/date";
 import UserGroup from "../resources/UserGroup";
 import { AuthContext } from "./AuthContext";
 
@@ -80,11 +80,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
       >
         <section>
           <Typography variant="body2">
-            {currentProject &&
-              getFormattedEventInterval(
-                currentProject?.start,
-                currentProject?.end
-              )}
+            {currentProject && parseAndFormatSQLDateInterval(currentProject)}
           </Typography>
         </section>
         <Typography variant="body1" style={{ marginLeft: 20, marginTop: 20 }}>

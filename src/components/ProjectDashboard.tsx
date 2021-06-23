@@ -15,7 +15,10 @@ import {
 import { AuthContext } from "./AuthContext";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { getFormattedEventInterval } from "../utils/date";
+import {
+  parseAndFormatSQLDateInterval,
+  parseAndFormatSQLDatetimeInterval,
+} from "../utils/date";
 import ProjectLocationHours from "./ProjectLocationHours";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
 import GroupDashboard from "./GroupDashboard";
@@ -87,7 +90,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         }}
       >
         <Typography variant="body2">
-          {getFormattedEventInterval(currentProject.start, currentProject.end)}
+          {parseAndFormatSQLDateInterval(currentProject)}
         </Typography>
         <Accordion defaultExpanded={locations.length === 1}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -131,9 +134,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             }
           >
             <ListItem>{event.title}</ListItem>
-            <ListItem>
-              {getFormattedEventInterval(event.start, event.end)}
-            </ListItem>
+            <ListItem>{parseAndFormatSQLDatetimeInterval(event)}</ListItem>
           </List>
         ))}
         <Typography>Previous Sessions</Typography>
@@ -148,9 +149,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
             }
           >
             <ListItem>{event.title}</ListItem>
-            <ListItem>
-              {getFormattedEventInterval(event.start, event.end)}
-            </ListItem>
+            <ListItem>{parseAndFormatSQLDatetimeInterval(event)}</ListItem>
           </List>
         ))}
       </Paper>

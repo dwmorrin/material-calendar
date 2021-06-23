@@ -20,6 +20,7 @@ import {
 } from "../calendar/calendar";
 import { AuthContext } from "./AuthContext";
 import User from "../resources/User";
+import { formatFCString } from "../utils/date";
 
 const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
@@ -79,14 +80,18 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
         headerToolbar={false}
         // INTERACTIONS
         selectable={isAdmin}
-        select={({ start, end, resource = { id: -1, title: "" } }): void =>
+        select={({
+          resource = { id: -1, title: "" },
+          startStr,
+          endStr,
+        }): void =>
           dispatch({
             type: CalendarAction.OpenEventEditor,
             payload: {
               currentEvent: new Event({
                 id: -1,
-                start: start.toJSON().split(".")[0], // removes timezone info
-                end: end.toJSON().split(".")[0], // removes timezone info
+                start: formatFCString(startStr),
+                end: formatFCString(endStr),
                 location: { id: +resource.id, title: resource.title },
                 title: "",
                 reservable: false,
@@ -95,7 +100,7 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
           })
         }
         // ETC
-        timeZone={process.env.REACT_APP_TZ}
+        timeZone={process.env.REACT_APP_SERVER_TIMEZONE}
         height="93vh"
         ref={state.ref}
         allDaySlot={false}

@@ -1,3 +1,5 @@
+import { formatSQLDatetime } from "../utils/date";
+
 export interface ReservationInfo {
   id: number;
   projectId: number;
@@ -32,8 +34,8 @@ class Event implements Event {
   constructor(
     event = {
       id: 0,
-      start: "",
-      end: "",
+      start: formatSQLDatetime(),
+      end: formatSQLDatetime(),
       location: { id: 0, title: "" },
       title: "",
       reservable: false,

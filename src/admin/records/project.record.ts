@@ -1,5 +1,9 @@
 import Project from "../../resources/Project";
-import { getFormattedDate, getFormattedEventInterval } from "../../utils/date";
+import {
+  parseSQLDate,
+  formatSlashed,
+  parseAndFormatSQLDateInterval,
+} from "../../utils/date";
 
 const template = (project: unknown): string[][] =>
   project instanceof Project
@@ -7,8 +11,11 @@ const template = (project: unknown): string[][] =>
         ["ID", project.id.toString()],
         ["Title", project.title],
         ["Course", project.course.title || "none"],
-        ["Duration", getFormattedEventInterval(project.start, project.end)],
-        ["Reservations start", getFormattedDate(project.reservationStart)],
+        ["Duration", parseAndFormatSQLDateInterval(project)],
+        [
+          "Reservations start",
+          formatSlashed(parseSQLDate(project.reservationStart)),
+        ],
         ["Group size", project.groupSize.toString()],
         ["Allotments", project.allotments.length.toString()],
       ]

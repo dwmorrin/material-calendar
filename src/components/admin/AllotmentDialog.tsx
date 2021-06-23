@@ -20,10 +20,10 @@ import {
   formatSQLDate,
   isValidDateInterval,
   parseSQLDate,
+  subDays,
+  isWithinIntervalFP,
 } from "../../utils/date";
-import { subDays } from "date-fns";
 import { ResourceKey } from "../../resources/types";
-import { isWithinInterval } from "date-fns/fp";
 import Project from "../../resources/Project";
 
 const useStyles = makeStyles({
@@ -51,7 +51,7 @@ const AllotmentDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   };
 
   const validate = (values: FormValues): void => {
-    const isWithinProject = isWithinInterval({
+    const isWithinProject = isWithinIntervalFP({
       start: parseSQLDate(project.start),
       end: parseSQLDate(project.end),
     });

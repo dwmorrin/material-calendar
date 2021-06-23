@@ -2,6 +2,7 @@ import { CalendarUIProps } from "../calendar/types";
 import Event from "../resources/Event";
 import Location, { LocationDictionary } from "../resources/Location";
 import Project from "../resources/Project";
+import { deepEqual } from "fast-equals";
 
 export const addResourceId = (event: Event): Omit<Event, "id"> => ({
   ...event,
@@ -19,13 +20,11 @@ export const compareCalendarStates = (
 ): boolean => {
   const prevState = prevProps.state;
   const nextState = nextProps.state;
-  const compareDeep = (a: unknown, b: unknown): boolean =>
-    JSON.stringify(a) === JSON.stringify(b);
   return (
     prevState.ref === nextState.ref &&
     prevState.currentStart === nextState.currentStart &&
     prevState.loading === nextState.loading &&
-    compareDeep(prevState.resources, nextState.resources)
+    deepEqual(prevState.resources, nextState.resources)
   );
 };
 

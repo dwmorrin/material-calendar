@@ -1,17 +1,35 @@
-import { add, lightFormat } from "date-fns/fp";
-import { compareAsc, format, formatISO9075, parse, parseISO } from "date-fns";
+import {
+  add,
+  areIntervalsOverlappingWithOptions,
+  lightFormat,
+} from "date-fns/fp";
+import {
+  compareAsc,
+  format,
+  formatISO9075,
+  parse,
+  parseISO,
+  setHours,
+} from "date-fns";
 
-type DateInput = string | number | Date;
+export {
+  addDays,
+  eachDayOfInterval,
+  format,
+  isBefore,
+  isWithinInterval,
+  subDays,
+  subMinutes,
+} from "date-fns";
+export {
+  areIntervalsOverlapping,
+  isWithinInterval as isWithinIntervalFP,
+} from "date-fns/fp";
 
-interface Time {
-  hours: number;
-  minutes: number;
-  seconds: number;
+interface DateStringInterval {
+  start: string;
+  end: string;
 }
-
-export const yyyymmdd = /\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\d|3[01])/;
-
-const add1Day = add({ days: 1 });
 
 const sqlFormat = {
   date: "yyyy-MM-dd",
@@ -19,11 +37,20 @@ const sqlFormat = {
   datetime: "yyyy-MM-dd HH:mm:ss",
 };
 
-export const formatJSON = lightFormat("yyyy-MM-dd'T'HH:mm:ss");
+export const areIntervalsOverlappingInclusive =
+  areIntervalsOverlappingWithOptions({ inclusive: true });
+
 export const formatSlashed = lightFormat("MM/dd/yyyy");
 
 export const formatSQLDate = (date = new Date()): string =>
   formatISO9075(date, { representation: "date" });
+
+/**
+ * alias for formatISO9075 for consistency with other date lib names
+ * and adds default new Date()
+ */
+export const formatSQLDatetime = (date = new Date()): string =>
+  formatISO9075(date);
 
 export const parseSQLDate = (dateStr: string): Date =>
   parse(dateStr, sqlFormat.date, new Date());
@@ -38,60 +65,31 @@ export const parseFCString = (fcStr: string): Date => parseISO(fcStr);
 export const formatFCString = (fcStr: string): string =>
   formatISO9075(parseFCString(fcStr));
 
-export function isDate(date?: DateInput): date is Date {
-  return (
-    !!date &&
-    typeof date !== "string" &&
-    typeof date !== "number" &&
-    !Array.isArray(date) &&
-    date.getTime !== undefined
-  );
-}
-
-export function dateInputToNumber(dateInput?: DateInput): number {
-  if (typeof dateInput === "string") return +new Date(dateInput);
-  if (isDate(dateInput)) return +dateInput;
-  if (typeof dateInput === "number") return dateInput;
-  throw new Error(`could not convert date input {${dateInput}} to a number`);
-}
-
-export function compareDateOrder(
-  earlier?: DateInput,
-  later?: DateInput
-): boolean {
-  return dateInputToNumber(earlier) <= dateInputToNumber(later);
-}
-
-export function getFormattedDate(d: string | Date): string {
-  if (typeof d === "string") {
-    d = parseSQLDate(d);
-    if (isNaN(d.valueOf()))
-      throw new Error(`unknown date string format: "${d}"`);
-  }
-  return formatSlashed(d);
-}
-
 export function isSameDay(a: Date, b: Date): boolean {
-  const aDateString = formatSQLDate(a);
-  const bDateString = formatSQLDate(b);
-  return aDateString === bDateString;
+  return formatSQLDate(a) === formatSQLDate(b);
 }
 
-export function getFormattedEventInterval(start: string, end: string): string {
-  [start, end] = [start, end].map((s) => s.replace("T", " "));
-  const hasNoTimeInfo = /^\d{4}-\d{2}-\d{2}$/.test(start);
-  const _start = hasNoTimeInfo ? parseSQLDate(start) : parseSQLDatetime(start);
-  const _end = hasNoTimeInfo ? parseSQLDate(end) : parseSQLDatetime(end);
-
+/** @private */
+function formatInterval({
+  hasNoTimeInfo,
+  start,
+  end,
+}: {
+  hasNoTimeInfo: boolean;
+  start: Date;
+  end: Date;
+}): string {
+  // formatting constants: potentially admin configurable options
   const timeDelimiter = " \u00B7 ";
   const intervalDelimiter = " - ";
   const dateFormat = "EE, MMM d";
   const timeFormat = "h:mm aaa";
-  const startDateString = format(_start, dateFormat);
-  const startTimeString = hasNoTimeInfo ? "" : format(_start, timeFormat);
-  const endDateString = format(_end, dateFormat);
-  const endTimeString = hasNoTimeInfo ? "" : format(_end, timeFormat);
-  const sameDay = startDateString === endDateString;
+
+  const startDateString = format(start, dateFormat);
+  const startTimeString = hasNoTimeInfo ? "" : format(start, timeFormat);
+  const endDateString = format(end, dateFormat);
+  const endTimeString = hasNoTimeInfo ? "" : format(end, timeFormat);
+  const sameDay = isSameDay(start, end);
 
   // hasNoTimeInfo && sameDay make for 4 possibilities:
   if (hasNoTimeInfo && sameDay) {
@@ -120,16 +118,29 @@ export function getFormattedEventInterval(start: string, end: string): string {
   );
 }
 
-export const parseTime = (timeString: string): Time =>
-  timeString.split(":").reduce(
-    (time, str, index) => ({
-      ...time,
-      [index === 0 ? "hours" : index === 1 ? "minutes" : "seconds"]: +str,
-    }),
-    {} as Time
-  );
+export function parseAndFormatSQLDateInterval({
+  start,
+  end,
+}: DateStringInterval): string {
+  return formatInterval({
+    hasNoTimeInfo: true,
+    start: parseSQLDate(start),
+    end: parseSQLDate(end),
+  });
+}
 
-export interface EventDuration {
+export function parseAndFormatSQLDatetimeInterval({
+  start,
+  end,
+}: DateStringInterval): string {
+  return formatInterval({
+    hasNoTimeInfo: false,
+    start: parseSQLDatetime(start),
+    end: parseSQLDatetime(end),
+  });
+}
+
+interface EventDuration {
   start: Date;
   end: Date;
 }
@@ -147,6 +158,8 @@ export const eventGenerator = ({
   [Symbol.iterator](): Generator<{ start: string; end: string }>;
 } => ({
   *[Symbol.iterator](): Generator<{ start: string; end: string }> {
+    const formatJSON = lightFormat("yyyy-MM-dd'T'HH:mm:ss");
+    const add1Day = add({ days: 1 });
     const untilValue = until.valueOf();
     while (untilValue >= start.valueOf()) {
       if (!days.length || days.includes(start.getUTCDay())) {
@@ -168,3 +181,40 @@ export const isValidDateInterval = ({
   start: Date;
   end: Date;
 }): boolean => compareAsc(start, end) < 1;
+
+export const nowInServerTimezone = (): Date =>
+  new Date(
+    new Date().toLocaleString("en-US", {
+      timeZone: process.env.REACT_APP_SERVER_TIMEZONE,
+    })
+  );
+
+export const todayInServerTimezoneAtHour = (hours: number): Date =>
+  setHours(nowInServerTimezone(), hours);
+
+export const compareAscSQLDate = ({
+  start,
+  end,
+}: {
+  start: string;
+  end: string;
+}): boolean =>
+  isValidDateInterval({
+    start: parseSQLDate(start),
+    end: parseSQLDate(end),
+  });
+
+export const compareAscSQLDatetime = ({
+  start,
+  end,
+}: {
+  start: string;
+  end: string;
+}): boolean =>
+  isValidDateInterval({
+    start: parseSQLDatetime(start),
+    end: parseSQLDatetime(end),
+  });
+
+export const castSQLDateToSQLDatetime = (date: string): string =>
+  `${date} 00:00:00`;
