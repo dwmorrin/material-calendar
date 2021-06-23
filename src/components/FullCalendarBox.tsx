@@ -20,7 +20,7 @@ import {
 } from "../calendar/calendar";
 import { AuthContext } from "./AuthContext";
 import User from "../resources/User";
-import { formatFCString } from "../utils/date";
+import { parseAndFormatFCString } from "../utils/date";
 
 const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
@@ -90,8 +90,8 @@ const FullCalendarBox: FunctionComponent<CalendarUIProps> = ({
             payload: {
               currentEvent: new Event({
                 id: -1,
-                start: formatFCString(startStr),
-                end: formatFCString(endStr),
+                start: parseAndFormatFCString(startStr),
+                end: parseAndFormatFCString(endStr),
                 location: { id: +resource.id, title: resource.title },
                 title: "",
                 reservable: false,

@@ -62,7 +62,7 @@ export const parseSQLDatetime = (dateStr: string): Date =>
 export const parseFCString = (fcStr: string): Date => parseISO(fcStr);
 
 // Formats a FullCalendar (FC) event "dateStr" into a SQL format string
-export const formatFCString = (fcStr: string): string =>
+export const parseAndFormatFCString = (fcStr: string): string =>
   formatISO9075(parseFCString(fcStr));
 
 export function isSameDay(a: Date, b: Date): boolean {
