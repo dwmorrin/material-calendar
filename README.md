@@ -11,19 +11,9 @@ uses Express & MySQL to serve and store the calendar data.
 
 ## config
 
-`npm start` to serve this repo from localhost:3000.
+Copy the `.env` config as `.env.local` and enter your local overrides.
 
-Uses a `.env.local` file to fill in any variables on `process.env`.
+`npm start` to serve this repo from localhost:3000.
 
 Needs a backend API to function.
 [See this repo.](https://github.com/dwmorrin/material-calendar-api)
-
-## notes
-
-This is _not_ a general purpose calendar client (yet).
-Curently it is an upgrade module for an existing bespoke calendar app.
-The current goal of the project is to adapt to the legacy app where needed, thus
-some bits of the repo may be completely irrelevant for a general calendar app.
-
-The long term goal is to generalize the client app and provide enough admin
-controls in the web app to let end users tailor the app to their needs.
