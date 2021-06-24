@@ -1,11 +1,14 @@
 import React, { FC } from "react";
 import { Dialog, DialogTitle, DialogContent, Button } from "@material-ui/core";
-import DraggablePaper from "../../components/DraggablePaper";
+import DraggablePaper from "../DraggablePaper";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 
-const AllotmentSummaryDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
+const ProjectLocationHoursSummaryDialog: FC<AdminUIProps> = ({
+  dispatch,
+  state,
+}) => {
   if (!state.calendarEventClickState) return null;
 
   const projectId = Number(
@@ -61,4 +64,4 @@ const AllotmentSummaryDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   );
 };
 
-export default AllotmentSummaryDialog;
+export default ProjectLocationHoursSummaryDialog;

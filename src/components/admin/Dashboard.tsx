@@ -22,8 +22,8 @@ import { AuthContext } from "../AuthContext";
 import { Redirect } from "@reach/router";
 import User from "../../resources/User";
 import SemesterDialog from "./SemesterDialog";
-import AllotmentDialog from "./AllotmentDialog";
-import AllotmentSummaryDialog from "./AllotmentSummaryDialog";
+import ProjectLocationHoursDialog from "./ProjectLocationHoursDialog";
+import ProjectLocationHoursSummaryDialog from "./ProjectLocationHoursSummaryDialog";
 import LocationHoursDialog from "./LocationHoursDialog";
 import VirtualWeeksDialog from "./VirtualWeeksDialog";
 import Snackbar from "../Snackbar";
@@ -67,8 +67,8 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       <FileImport dispatch={dispatch} state={state} />
       <Backups dispatch={dispatch} state={state} />
       <SemesterDialog dispatch={dispatch} state={state} />
-      <AllotmentDialog dispatch={dispatch} state={state} />
-      <AllotmentSummaryDialog dispatch={dispatch} state={state} />
+      <ProjectLocationHoursDialog dispatch={dispatch} state={state} />
+      <ProjectLocationHoursSummaryDialog dispatch={dispatch} state={state} />
       <LocationHoursDialog dispatch={dispatch} state={state} />
       <VirtualWeeksDialog dispatch={dispatch} state={state} />
       <ErrorPage open={state.appIsBroken} error={state.error} />

@@ -26,7 +26,7 @@ import { Radio } from "@material-ui/core";
 
 const initialErrors = { hours: "" };
 
-const AllotmentDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
+const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const [formErrors, setFormErrors] = useState(initialErrors);
   if (!state.calendarSelectionState || !state.schedulerLocationId) return null;
   const { location, resource } = state.calendarSelectionState;
@@ -177,7 +177,7 @@ const AllotmentDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       aria-labelledby="draggable-dialog-title"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-        Allot hours for {project.title} in {location.title}
+        Set hours for {project.title} in {location.title}
       </DialogTitle>
       <DialogContent>
         <Formik
@@ -217,4 +217,4 @@ const AllotmentDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   );
 };
 
-export default AllotmentDialog;
+export default ProjectLocationHoursDialog;
