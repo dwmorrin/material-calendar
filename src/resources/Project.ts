@@ -2,6 +2,7 @@ import { formatSQLDate } from "../utils/date";
 
 export interface ProjectAllotment {
   locationId: number;
+  virtualWeekId: number;
   start: string;
   end: string;
   hours: number;

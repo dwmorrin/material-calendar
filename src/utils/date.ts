@@ -7,6 +7,7 @@ import {
   compareAsc,
   format,
   formatISO9075,
+  isWithinInterval,
   parse,
   parseISO,
   set,
@@ -140,11 +141,11 @@ export function parseAndFormatSQLDatetimeInterval({
   });
 }
 
-interface EventDuration {
+interface DateInterval {
   start: Date;
   end: Date;
 }
-interface EventGeneratorProps extends EventDuration {
+interface EventGeneratorProps extends DateInterval {
   until: Date;
   days: number[];
 }
@@ -223,3 +224,8 @@ export const compareAscSQLDatetime = ({
 
 export const castSQLDateToSQLDatetime = (date: string): string =>
   `${date} 00:00:00`;
+
+export const isIntervalWithinInterval =
+  (inner: DateInterval) =>
+  (outer: DateInterval): boolean =>
+    isWithinInterval(inner.start, outer) && isWithinInterval(inner.end, outer);
