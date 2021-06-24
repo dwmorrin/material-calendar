@@ -132,6 +132,11 @@ const closeVirtualWeeksDialog: StateHandler = (state) => ({
   virtualWeeksDialogIsOpen: false,
 });
 
+const closeVirtualWeekSplitDialog: StateHandler = (state) => ({
+  ...state,
+  virtualWeekSplitDialogIsOpen: false,
+});
+
 const openAllotmentDialog: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
@@ -180,6 +185,12 @@ const openVirtualWeeksDialog: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
   virtualWeeksDialogIsOpen: true,
+});
+
+const openVirtualWeekSplitDialog: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+  virtualWeekSplitDialogIsOpen: true,
 });
 
 const openedFile: StateHandler = (state, { payload }) => ({
@@ -307,6 +318,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseSemesterDialog]: closeSemesterDialog,
     [AdminAction.CloseSnackbar]: closeSnackbar,
     [AdminAction.CloseVirtualWeeksDialog]: closeVirtualWeeksDialog,
+    [AdminAction.CloseVirtualWeekSplitDialog]: closeVirtualWeekSplitDialog,
     [AdminAction.Error]: errorHandler,
     [AdminAction.OpenAllotmentDialog]: openAllotmentDialog,
     [AdminAction.OpenAllotmentSummaryDialog]: openAllotmentSummaryDialog,
@@ -318,6 +330,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.OpenScheduler]: openScheduler,
     [AdminAction.OpenSemesterDialog]: openSemesterDialog,
     [AdminAction.OpenVirtualWeeksDialog]: openVirtualWeeksDialog,
+    [AdminAction.OpenVirtualWeekSplitDialog]: openVirtualWeekSplitDialog,
     [AdminAction.OpenedFile]: openedFile,
     [AdminAction.ReceivedAllResources]: receivedAllResources,
     [AdminAction.ReceivedResource]: receivedResource,

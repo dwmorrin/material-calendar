@@ -21,6 +21,7 @@ export enum AdminAction {
   CloseSemesterDialog,
   CloseSnackbar,
   CloseVirtualWeeksDialog,
+  CloseVirtualWeekSplitDialog,
   Error,
   OpenBackups,
   OpenAllotmentSummaryDialog,
@@ -31,6 +32,7 @@ export enum AdminAction {
   OpenScheduler,
   OpenSemesterDialog,
   OpenVirtualWeeksDialog,
+  OpenVirtualWeekSplitDialog,
   OpenedFile,
   ReceivedAllResources,
   ReceivedResource,
@@ -66,6 +68,7 @@ export interface AdminState {
   semesterDialogIsOpen: boolean;
   snackbarQueue: SnackbarState[];
   virtualWeeksDialogIsOpen: boolean;
+  virtualWeekSplitDialogIsOpen: boolean;
 
   // resources
   selectedSemester?: Semester;

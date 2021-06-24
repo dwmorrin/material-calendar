@@ -27,6 +27,7 @@ const initialState: AdminState = {
   semesterDialogIsOpen: false,
   snackbarQueue: [],
   virtualWeeksDialogIsOpen: false,
+  virtualWeekSplitDialogIsOpen: false,
 
   // resources
   resourceKey: ResourceKey.Users,

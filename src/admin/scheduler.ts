@@ -263,7 +263,7 @@ export const processVirtualWeeks = (
     .map((vw) => ({
       ...vw,
       end: addADay(vw.end),
-      id: `vw${vw.id}`,
+      id: `${VirtualWeek.eventPrefix}${vw.id}`,
       resourceId: VirtualWeek.resourceId,
       allDay: true,
       title: `${vw.locationHours}`,
@@ -361,7 +361,21 @@ export const eventClick =
           error: new Error(`Event with id ${id} is missing start info`),
         },
       });
-    if (id.startsWith(Location.locationHoursId)) {
+    if (id.startsWith(VirtualWeek.eventPrefix)) {
+      return dispatch({
+        type: AdminAction.OpenVirtualWeekSplitDialog,
+        payload: {
+          calendarEventClickState: {
+            title,
+            startStr,
+            endStr,
+            extendedProps: {
+              id: Number(id.replace(VirtualWeek.eventPrefix, "")),
+            },
+          },
+        },
+      });
+    } else if (id.startsWith(Location.locationHoursId)) {
       return dispatch({
         type: AdminAction.OpenLocationHoursDialog,
         payload: {
@@ -373,8 +387,7 @@ export const eventClick =
           },
         },
       });
-    }
-    if (id.startsWith("allotmentTotal")) {
+    } else if (id.startsWith("allotmentTotal")) {
       return dispatch({
         type: AdminAction.OpenAllotmentSummaryDialog,
         payload: {

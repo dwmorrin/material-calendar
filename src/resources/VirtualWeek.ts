@@ -14,6 +14,7 @@ class VirtualWeek implements VirtualWeek {
   static url = "/api/virtualweeks";
   static resourceId = "001";
   static hoursRemainingId = "ZZZ";
+  static eventPrefix = "vw-";
   constructor(
     virtualWeek = {
       id: -1,
