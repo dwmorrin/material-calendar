@@ -49,7 +49,7 @@ const AllotmentSummaryDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       open={state.allotmentSummaryDialogIsOpen}
       onClose={close}
       PaperComponent={DraggablePaper}
-      aria-labelledby="draggable-dialog-tite"
+      aria-labelledby="draggable-dialog-title"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
         {title}

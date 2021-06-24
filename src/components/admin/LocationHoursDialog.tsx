@@ -67,7 +67,7 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       open={state.locationHoursDialogIsOpen}
       onClose={close}
       PaperComponent={DraggablePaper}
-      aria-labelledby="draggable-dialog-tite"
+      aria-labelledby="draggable-dialog-title"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
         Daily Hours for {currentLocation.title}

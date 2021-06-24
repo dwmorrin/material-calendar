@@ -49,7 +49,7 @@ const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       open={state.virtualWeeksDialogIsOpen}
       onClose={close}
       PaperComponent={DraggablePaper}
-      aria-labelledby="draggable-dialog-tite"
+      aria-labelledby="draggable-dialog-title"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
         {currentLocation.title} Virtual Week
