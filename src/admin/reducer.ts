@@ -218,6 +218,20 @@ const receivedResource: StateHandler = (state, action) => {
   };
 };
 
+const receivedResourcesAfterAllotmentUpdate: StateHandler = (
+  state,
+  { payload }
+) => ({
+  ...state,
+  resources: { ...state.resources, ...payload?.resources },
+  snackbarIsOpen: true,
+  snackbarQueue: enqueue(state.snackbarQueue, {
+    type: "success",
+    message: "Allotments updated",
+    autoHideDuration: 6000,
+  }),
+});
+
 const selectedDocument: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
@@ -293,6 +307,8 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.OpenedFile]: openedFile,
     [AdminAction.ReceivedAllResources]: receivedAllResources,
     [AdminAction.ReceivedResource]: receivedResource,
+    [AdminAction.ReceivedResourcesAfterAllotmentUpdate]:
+      receivedResourcesAfterAllotmentUpdate,
     [AdminAction.SelectedDocument]: selectedDocument,
     [AdminAction.SelectedRecordPage]: selectedRecordPage,
     [AdminAction.SelectedResource]: selectedResource,

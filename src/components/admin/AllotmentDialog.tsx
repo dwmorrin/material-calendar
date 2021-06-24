@@ -25,6 +25,7 @@ import {
 } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
+import VirtualWeek from "../../resources/VirtualWeek";
 
 const useStyles = makeStyles({
   error: {
@@ -67,6 +68,11 @@ const AllotmentDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
     });
   };
 
+  /**
+   * Updates or creates project time allotments in a particular location.
+   * On success, we need to update projects and virtual weeks so those are fetched
+   * from the server. This should update the "hours remaining" section of the calendar.
+   */
   const onSubmit = (values: FormValues, actions: FormikValues): void => {
     const dispatchError = (error: Error): void =>
       dispatch({ type: AdminAction.Error, payload: { error } });
@@ -84,23 +90,44 @@ const AllotmentDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       .then((response) => response.json())
       .then(({ error }) => {
         if (error) return dispatchError(error);
-        fetch(Project.url)
-          .then((response) => response.json())
-          .then(({ error, data }) =>
-            dispatch(
-              error
-                ? { type: AdminAction.Error, payload: { error } }
-                : {
-                    type: AdminAction.ReceivedResource,
-                    payload: {
-                      resources: {
-                        ...state.resources,
-                        [ResourceKey.Projects]: data as Project[],
-                      },
+        Promise.all([
+          fetch(`${Project.url}?context=${ResourceKey.Projects}`),
+          fetch(`${VirtualWeek.url}?context=${ResourceKey.VirtualWeeks}`),
+        ])
+          .then((responses) =>
+            Promise.all(responses.map((response) => response.json()))
+              .then((dataArray) => {
+                if (dataArray.some(({ error }) => !!error))
+                  // returning the first error only; better if we could return all
+                  return dispatchError(
+                    dataArray.find(({ error }) => !!error).error
+                  );
+                const projects = dataArray.find(
+                  ({ context }) => Number(context) === ResourceKey.Projects
+                );
+                if (!projects || !Array.isArray(projects.data))
+                  return dispatchError(
+                    new Error("no projects returned in allotment update")
+                  );
+                const virtualWeeks = dataArray.find(
+                  ({ context }) => Number(context) === ResourceKey.VirtualWeeks
+                );
+                if (!virtualWeeks || !Array.isArray(virtualWeeks.data))
+                  return dispatchError(
+                    new Error("no virtual weeks returned in allotment update")
+                  );
+                dispatch({
+                  type: AdminAction.ReceivedResourcesAfterAllotmentUpdate,
+                  payload: {
+                    resources: {
+                      ...state.resources,
+                      [ResourceKey.Projects]: projects.data,
+                      [ResourceKey.VirtualWeeks]: virtualWeeks.data,
                     },
-                    meta: ResourceKey.Projects,
-                  }
-            )
+                  },
+                });
+              })
+              .catch(dispatchError)
           )
           .catch(dispatchError);
       })

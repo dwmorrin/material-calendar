@@ -34,6 +34,7 @@ export enum AdminAction {
   OpenedFile,
   ReceivedAllResources,
   ReceivedResource,
+  ReceivedResourcesAfterAllotmentUpdate,
   SelectedDocument,
   SelectedRecordPage,
   SelectedResource,
