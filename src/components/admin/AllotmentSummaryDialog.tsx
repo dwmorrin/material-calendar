@@ -3,6 +3,7 @@ import { Dialog, DialogTitle, DialogContent, Button } from "@material-ui/core";
 import DraggablePaper from "../../components/DraggablePaper";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
+import Project from "../../resources/Project";
 
 const AllotmentSummaryDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   if (!state.calendarEventClickState) return null;
@@ -10,8 +11,24 @@ const AllotmentSummaryDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const projectId = Number(
     state.calendarEventClickState.extendedProps.projectId
   );
+  if (projectId < 0 || !state.schedulerLocationId) return null;
 
-  if (projectId < 0) return null;
+  const project = (state.resources[ResourceKey.Projects] as Project[]).find(
+    ({ id }) => id === projectId
+  );
+  if (!project) return null;
+
+  const locationHours = project.locationHours.find(
+    ({ locationId }) => locationId === state.schedulerLocationId
+  );
+  if (!locationHours) return null;
+
+  const allottedHours = project.allotments.reduce(
+    (sum, { hours }) => sum + hours,
+    0
+  );
+
+  const title = `${project.title} - Allotted: ${allottedHours} - Max: ${locationHours.hours}`;
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseAllotmentSummaryDialog });
@@ -35,7 +52,7 @@ const AllotmentSummaryDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       aria-labelledby="draggable-dialog-tite"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-        {state.calendarEventClickState.title}
+        {title}
       </DialogTitle>
       <DialogContent>
         <Button onClick={(): void => openProject()}>Open project</Button>
