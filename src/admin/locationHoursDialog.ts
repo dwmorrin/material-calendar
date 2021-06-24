@@ -33,46 +33,45 @@ export const makeOnSubmit =
     const dispatchError = (error: Error): void =>
       dispatch({ type: AdminAction.Error, payload: { error } });
 
-    const dispatchUpdatedLocations = ({ error, data }: ApiResponse): void => {
-      if (error) return dispatchError(error);
-      dispatch({
-        type: AdminAction.ReceivedResource,
-        payload: {
-          resources: {
-            ...state.resources,
-            [ResourceKey.Locations]: data as Location[],
-          },
-        },
-        meta: ResourceKey.Locations,
-      });
-    };
-
-    const dispatchUpdatedVirtualWeeks = ({
-      error,
-      data,
-    }: ApiResponse): void => {
-      if (error) return dispatchError(error);
-      dispatch({
-        type: AdminAction.ReceivedResource,
-        payload: {
-          resources: {
-            ...state.resources,
-            [ResourceKey.VirtualWeeks]: data as VirtualWeek[],
-          },
-        },
-        meta: ResourceKey.VirtualWeeks,
-      });
-    };
-
     const handleData = ({ error }: ApiResponse): void => {
       if (error) return dispatchError(error);
-      fetch(`${Location.url}`)
-        .then((response) => response.json())
-        .then(dispatchUpdatedLocations)
-        .then(() =>
-          fetch(VirtualWeek.url)
-            .then((response) => response.json())
-            .then(dispatchUpdatedVirtualWeeks)
+      Promise.all([
+        fetch(`${Location.url}?context=${ResourceKey.Locations}`),
+        fetch(`${VirtualWeek.url}?context=${ResourceKey.VirtualWeeks}`),
+      ])
+        .then((responses) =>
+          Promise.all(responses.map((response) => response.json()))
+            .then((dataArray) => {
+              if (dataArray.some(({ error }) => !!error))
+                // returning the first error only; better if we could return all
+                return dispatchError(
+                  dataArray.find(({ error }) => !!error).error
+                );
+              const locations = dataArray.find(
+                ({ context }) => Number(context) === ResourceKey.Locations
+              );
+              if (!locations || !Array.isArray(locations.data))
+                return dispatchError(
+                  new Error("no locations returned in allotment update")
+                );
+              const virtualWeeks = dataArray.find(
+                ({ context }) => Number(context) === ResourceKey.VirtualWeeks
+              );
+              if (!virtualWeeks || !Array.isArray(virtualWeeks.data))
+                return dispatchError(
+                  new Error("no virtual weeks returned in allotment update")
+                );
+              dispatch({
+                type: AdminAction.ReceivedResourcesAfterLocationHoursUpdate,
+                payload: {
+                  resources: {
+                    ...state.resources,
+                    [ResourceKey.Locations]: locations.data,
+                    [ResourceKey.VirtualWeeks]: virtualWeeks.data,
+                  },
+                },
+              });
+            })
             .catch(dispatchError)
         )
         .catch(dispatchError);

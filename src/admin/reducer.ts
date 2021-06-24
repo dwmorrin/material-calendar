@@ -232,6 +232,20 @@ const receivedResourcesAfterAllotmentUpdate: StateHandler = (
   }),
 });
 
+const receivedResourcesAfterLocationHoursUpdate: StateHandler = (
+  state,
+  { payload }
+) => ({
+  ...state,
+  resources: { ...state.resources, ...payload?.resources },
+  snackbarIsOpen: true,
+  snackbarQueue: enqueue(state.snackbarQueue, {
+    type: "success",
+    message: "Location hours updated",
+    autoHideDuration: 6000,
+  }),
+});
+
 const selectedDocument: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
@@ -309,6 +323,8 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.ReceivedResource]: receivedResource,
     [AdminAction.ReceivedResourcesAfterAllotmentUpdate]:
       receivedResourcesAfterAllotmentUpdate,
+    [AdminAction.ReceivedResourcesAfterLocationHoursUpdate]:
+      receivedResourcesAfterLocationHoursUpdate,
     [AdminAction.SelectedDocument]: selectedDocument,
     [AdminAction.SelectedRecordPage]: selectedRecordPage,
     [AdminAction.SelectedResource]: selectedResource,

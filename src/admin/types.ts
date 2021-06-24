@@ -35,6 +35,7 @@ export enum AdminAction {
   ReceivedAllResources,
   ReceivedResource,
   ReceivedResourcesAfterAllotmentUpdate,
+  ReceivedResourcesAfterLocationHoursUpdate,
   SelectedDocument,
   SelectedRecordPage,
   SelectedResource,
