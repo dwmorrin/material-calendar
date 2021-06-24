@@ -165,7 +165,6 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   };
 
   const initialValues = {
-    virtualWeekId: selectedWeek.id,
     hours: existing?.hours || 0,
   };
 
@@ -180,6 +179,7 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
         Set hours for {project.title} in {location.title}
       </DialogTitle>
       <DialogContent>
+        <p>{parseAndFormatSQLDateInterval(selectedWeek)}</p>
         <Formik
           initialValues={initialValues}
           onSubmit={onSubmit}
@@ -187,17 +187,6 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
         >
           {({ handleSubmit }): unknown => (
             <Form onSubmit={handleSubmit}>
-              <Field component={RadioGroup} name="virtualWeekId">
-                <FormLabel>Select a virtual week for these hours</FormLabel>
-                {virtualWeeks.map((vw) => (
-                  <FormControlLabel
-                    key={`${vw.id}-${vw.locationId}-${vw.start}`}
-                    label={parseAndFormatSQLDateInterval(vw)}
-                    value={vw.id}
-                    control={<Radio />}
-                  />
-                ))}
-              </Field>
               <Field component={TextField} name="hours" label="Hours" />
               <DialogActions>
                 <Button onClick={close}>Cancel</Button>
