@@ -118,7 +118,7 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
         eventClick={eventClick(dispatch, location)}
         // SELECTIONS
         selectable={true}
-        select={selectionHandler(dispatch, location)}
+        select={selectionHandler(dispatch, state, location)}
         // VISIBLE DATE RANGE
         initialDate={semester.start}
         initialView="resourceTimelineSemester"

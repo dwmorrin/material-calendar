@@ -46,7 +46,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   if (!week) return null;
 
   const close = (): void =>
-    dispatch({ type: AdminAction.CloseVirtualWeekSplitDialog });
+    dispatch({ type: AdminAction.CloseVirtualWeekModifyDialog });
 
   const onSubmit = (): void => console.log("not implemented yet");
 
@@ -59,7 +59,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
 
   return (
     <Dialog
-      open={state.virtualWeekSplitDialogIsOpen}
+      open={state.virtualWeekModifyDialogIsOpen}
       onClose={close}
       PaperComponent={DraggablePaper}
       aria-labelledby="draggable-dialog-title"

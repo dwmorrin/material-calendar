@@ -14,6 +14,8 @@ import {
   formatSQLDate,
   parseSQLDate,
   areIntervalsOverlappingInclusive,
+  subDays,
+  isWithinInterval,
 } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";
@@ -363,7 +365,7 @@ export const eventClick =
       });
     if (id.startsWith(VirtualWeek.eventPrefix)) {
       return dispatch({
-        type: AdminAction.OpenVirtualWeekSplitDialog,
+        type: AdminAction.OpenVirtualWeekModifyDialog,
         payload: {
           calendarEventClickState: {
             title,
@@ -418,7 +420,7 @@ export const eventClick =
   };
 
 export const selectionHandler =
-  (dispatch: (action: Action) => void, location: Location) =>
+  (dispatch: (action: Action) => void, state: AdminState, location: Location) =>
   ({ startStr, endStr, resource }: SelectProps): void => {
     const calendarSelectionState: CalendarSelectionState = {
       start: startStr,
@@ -434,11 +436,40 @@ export const selectionHandler =
           type: AdminAction.OpenLocationHoursDialog,
           payload,
         });
-      case VirtualWeek.resourceId:
+      case VirtualWeek.resourceId: {
+        // check for existing week inside selection
+        const start = parseSQLDate(startStr);
+        const end = subDays(parseSQLDate(endStr), 1);
+        const overlaps = areIntervalsOverlappingInclusive({ start, end });
+        const virtualWeeks = (
+          state.resources[ResourceKey.VirtualWeeks] as VirtualWeek[]
+        ).filter(
+          (vw) =>
+            vw.locationId === location.id &&
+            overlaps({
+              start: parseSQLDate(vw.start),
+              end: parseSQLDate(vw.end),
+            })
+        );
+        if (virtualWeeks && virtualWeeks[0]) {
+          return dispatch({
+            type: AdminAction.OpenVirtualWeekModifyDialog,
+            payload: {
+              calendarEventClickState: {
+                title: "",
+                startStr,
+                endStr,
+                extendedProps: { id: virtualWeeks[0].id },
+              },
+            },
+          });
+        }
+        // if not existing, create a virtual week
         return dispatch({
           type: AdminAction.OpenVirtualWeeksDialog,
           payload,
         });
+      }
       default: {
         // selecting on allotment summary row or allotment row
         const projectId = resource?.extendedProps?.projectId;
