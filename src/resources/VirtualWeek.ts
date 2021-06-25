@@ -6,6 +6,7 @@ interface VirtualWeek {
   start: string;
   end: string;
   locationId: number;
+  semesterId: number;
   locationHours: number; //! -1 indicates hours calculation was omitted
   projectHours: number; //! -1 indicates hours calculation was omitted
 }
@@ -18,6 +19,7 @@ class VirtualWeek implements VirtualWeek {
   constructor(
     virtualWeek = {
       id: -1,
+      semesterId: -1,
       start: formatSQLDate(),
       end: formatSQLDate(),
       locationId: -1,

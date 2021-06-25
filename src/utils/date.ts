@@ -17,6 +17,7 @@ export {
   addDays,
   eachDayOfInterval,
   format,
+  isAfter,
   isBefore,
   isWithinInterval,
   subDays,

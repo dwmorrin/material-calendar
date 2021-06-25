@@ -17,16 +17,19 @@ import { Field, Formik, Form } from "formik";
 import { DatePicker } from "formik-material-ui-pickers";
 import { AdminUIProps, AdminAction, FormValues } from "../../admin/types";
 import {
+  addDays,
   areIntervalsOverlappingInclusive,
   formatSQLDate,
+  isAfter,
+  isBefore,
   isWithinIntervalFP,
   parseSQLDate,
+  subDays,
 } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 import VirtualWeek from "../../resources/VirtualWeek";
 import fetchProjectsAndVirtualWeeks from "../../admin/fetchProjectsAndVirtualWeeks";
 import ErrorFormLabel from "../ErrorFormLabel";
-import Semester from "../../resources/Semester";
 
 enum VirtualWeekModifier {
   resize = "resize",
@@ -54,6 +57,8 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   ).filter(({ locationId }) => locationId === schedulerLocationId);
   const week = virtualWeeks.find(({ id }) => id === selectedId);
   if (!week) return null;
+
+  const isSingleDay = week.start === week.end;
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseVirtualWeekModifyDialog });
@@ -84,15 +89,47 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
           })
           .catch(dispatchError);
         break;
-      case VirtualWeekModifier.split:
-        // TODO define split actions
-        // TODO dispatch update
-        fetch(`${url}/split`, { method: "PUT", body: JSON.stringify([week]) });
+      case VirtualWeekModifier.split: {
+        // body: [resizedWeek, newWeek]
+        const resizedWeek = {
+          ...week,
+          end: formatSQLDate(subDays(values.split as Date, 1)),
+        };
+        const newWeek = {
+          locationId: week.locationId,
+          semesterId: week.semesterId,
+          start: formatSQLDate(values.split as Date),
+          end: week.end,
+        };
+        fetch(`${url}/split`, {
+          method: "PUT",
+          body: JSON.stringify([resizedWeek, newWeek]),
+          headers: { "Content-Type": "application/json" },
+        })
+          .then((res) => res.json())
+          .then(({ error }) => {
+            if (error) dispatch(error);
+            fetchProjectsAndVirtualWeeks({
+              dispatch,
+              state,
+              type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
+            });
+          })
+          .catch(dispatchError);
         break;
+      }
       case VirtualWeekModifier.delete:
-        // TODO check if all project location hours are deleted
-        // TODO dispatch update
-        fetch(url, { method: "DELETE" });
+        fetch(url, { method: "DELETE" })
+          .then((res) => res.json())
+          .then(({ error }) => {
+            if (error) dispatch(error);
+            fetchProjectsAndVirtualWeeks({
+              dispatch,
+              state,
+              type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
+            });
+          })
+          .catch(dispatchError);
         break;
     }
   };
@@ -126,6 +163,20 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
     const endNotWithin = withinSemester(values.end as Date)
       ? ""
       : "End outside semester";
+    // split must be 1 day after start and on or before end
+    const splitAfterStart = isAfter(
+      values.split as Date,
+      parseSQLDate(week.start)
+    )
+      ? ""
+      : "Split must be after current start";
+    const splitBeforeEnd = isBefore(
+      values.split as Date,
+      addDays(parseSQLDate(week.end), 1)
+    )
+      ? ""
+      : "Split must be on or before current end";
+
     setErrors({
       start:
         startNotWithin ||
@@ -133,7 +184,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       end:
         endNotWithin ||
         (overlapError ? "overlaps with another virtual week" : ""),
-      split: "",
+      split: splitAfterStart || splitBeforeEnd || "",
     });
   };
 
@@ -163,9 +214,13 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                     control={<Radio />}
                   />
                   <FormControlLabel
-                    label="Split"
+                    label={
+                      "Split" +
+                      (isSingleDay ? " (cannot split single day)" : "")
+                    }
                     value={VirtualWeekModifier.split}
                     control={<Radio />}
+                    disabled={isSingleDay}
                   />
                   <FormControlLabel
                     label="Delete"
@@ -175,11 +230,16 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                 </Field>
                 <Box style={{ display: "flex", flexDirection: "column" }}>
                   {values.mode === VirtualWeekModifier.split && (
-                    <Field
-                      component={DatePicker}
-                      name="split"
-                      label="Select 2nd start date"
-                    />
+                    <>
+                      {!!errors.split && (
+                        <ErrorFormLabel>{errors.split}</ErrorFormLabel>
+                      )}
+                      <Field
+                        component={DatePicker}
+                        name="split"
+                        label="Select 2nd start date"
+                      />
+                    </>
                   )}
                   {values.mode === VirtualWeekModifier.resize && (
                     <>
