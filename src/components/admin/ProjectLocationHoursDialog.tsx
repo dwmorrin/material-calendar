@@ -104,7 +104,7 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       method: "PUT",
       body: JSON.stringify({
         projectId: project.id,
-        virtualWeekId: Number(values.virtualWeekId),
+        virtualWeekId: selectedWeek.id,
         hours: Number(values.hours),
       }),
       headers: { "Content-Type": "application/json" },
