@@ -52,7 +52,7 @@ const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       aria-labelledby="draggable-dialog-title"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-        {currentLocation.title} Virtual Week
+        Create Virtual Week
       </DialogTitle>
       <DialogContent>
         <MuiPickersUtilsProvider utils={DateFnUtils}>
@@ -60,7 +60,6 @@ const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
             {({ handleSubmit, values }): unknown => (
               <Form onSubmit={handleSubmit}>
                 <Box style={{ display: "flex", flexDirection: "column" }}>
-                  <FormLabel>Apply to date range</FormLabel>
                   <Field component={DatePicker} name="start" label="Start" />
                   <Field component={DatePicker} name="end" label="End" />
                 </Box>
