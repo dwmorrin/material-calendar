@@ -1,12 +1,15 @@
 import React, { FC } from "react";
 import {
+  Box,
   Button,
   Dialog,
-  DialogTitle,
   DialogActions,
   DialogContent,
-  Box,
+  DialogTitle,
+  FormControlLabel,
+  Radio,
 } from "@material-ui/core";
+import { RadioGroup } from "formik-material-ui";
 import DraggablePaper from "../../components/DraggablePaper";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
@@ -16,6 +19,12 @@ import { AdminUIProps, AdminAction } from "../../admin/types";
 import { parseSQLDate } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 import VirtualWeek from "../../resources/VirtualWeek";
+
+enum VirtualWeekModifier {
+  resize = "resize",
+  split = "split",
+  delete = "delete",
+}
 
 const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const { calendarEventClickState, selectedSemester, schedulerLocationId } =
@@ -42,7 +51,10 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const onSubmit = (): void => console.log("not implemented yet");
 
   const initialValues = {
-    start: parseSQLDate(week.end),
+    start: parseSQLDate(week.start),
+    end: parseSQLDate(week.end),
+    split: parseSQLDate(week.end),
+    mode: VirtualWeekModifier.resize,
   };
 
   return (
@@ -53,20 +65,55 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       aria-labelledby="draggable-dialog-title"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-        Split Virtual Week
+        Modify Virtual Week
       </DialogTitle>
       <DialogContent>
         <MuiPickersUtilsProvider utils={DateFnUtils}>
           <Formik initialValues={initialValues} onSubmit={onSubmit}>
             {({ handleSubmit, values }): unknown => (
               <Form onSubmit={handleSubmit}>
-                <Box style={{ display: "flex", flexDirection: "column" }}>
-                  <Field
-                    component={DatePicker}
-                    name="start"
-                    label="Select 2nd start date"
+                <Field component={RadioGroup} name="mode">
+                  <FormControlLabel
+                    label="Resize"
+                    value={VirtualWeekModifier.resize}
+                    control={<Radio />}
                   />
+                  <FormControlLabel
+                    label="Split"
+                    value={VirtualWeekModifier.split}
+                    control={<Radio />}
+                  />
+                  <FormControlLabel
+                    label="Delete"
+                    value={VirtualWeekModifier.delete}
+                    control={<Radio />}
+                  />
+                </Field>
+                <Box style={{ display: "flex", flexDirection: "column" }}>
+                  {values.mode === VirtualWeekModifier.split && (
+                    <Field
+                      component={DatePicker}
+                      name="split"
+                      label="Select 2nd start date"
+                    />
+                  )}
+                  {values.mode === VirtualWeekModifier.resize && (
+                    <Field
+                      component={DatePicker}
+                      name="start"
+                      label="Start date"
+                    />
+                  )}
+                  {values.mode === VirtualWeekModifier.resize && (
+                    <Field component={DatePicker} name="end" label="End date" />
+                  )}
                 </Box>
+                {values.mode === VirtualWeekModifier.delete && (
+                  <p>
+                    This will also delete all the project allotments within this
+                    virtual week.
+                  </p>
+                )}
                 <DialogActions>
                   <Button onClick={close}>Cancel</Button>
                   <Button variant="contained" type="submit">
