@@ -15,10 +15,11 @@ import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
 import { Field, Formik, Form } from "formik";
 import { DatePicker } from "formik-material-ui-pickers";
-import { AdminUIProps, AdminAction } from "../../admin/types";
-import { parseSQLDate } from "../../utils/date";
+import { AdminUIProps, AdminAction, FormValues } from "../../admin/types";
+import { formatSQLDate, parseSQLDate } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 import VirtualWeek from "../../resources/VirtualWeek";
+import fetchProjectsAndVirtualWeeks from "../../admin/fetchProjectsAndVirtualWeeks";
 
 enum VirtualWeekModifier {
   resize = "resize",
@@ -47,8 +48,46 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseVirtualWeekModifyDialog });
+  const dispatchError = (error: Error): void =>
+    dispatch({ type: AdminAction.Error, payload: { error } });
 
-  const onSubmit = (): void => console.log("not implemented yet");
+  const onSubmit = (values: FormValues): void => {
+    const url = `${VirtualWeek.url}/${week.id}`;
+    switch (values.mode as VirtualWeekModifier) {
+      case VirtualWeekModifier.resize:
+        fetch(url, {
+          method: "PUT",
+          body: JSON.stringify({
+            ...week,
+            start: formatSQLDate(values.start as Date),
+            end: formatSQLDate(values.end as Date),
+          }),
+          headers: { "Content-Type": "application/json" },
+        })
+          .then((res) => res.json())
+          .then(({ error }) => {
+            if (error) dispatch(error);
+            fetchProjectsAndVirtualWeeks({
+              dispatch,
+              state,
+              type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
+            });
+          })
+          .catch(dispatchError);
+        break;
+      case VirtualWeekModifier.split:
+        // TODO define split actions
+        fetch(`${url}/split`, { method: "PUT", body: JSON.stringify([week]) });
+        break;
+      case VirtualWeekModifier.delete:
+        fetch(url, {
+          method: "DELETE",
+          body: JSON.stringify(week),
+          headers: { "Content-Type": "application/json" },
+        });
+        break;
+    }
+  };
 
   const initialValues = {
     start: parseSQLDate(week.start),

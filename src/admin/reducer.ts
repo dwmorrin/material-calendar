@@ -229,7 +229,7 @@ const receivedResource: StateHandler = (state, action) => {
   };
 };
 
-const receivedResourcesAfterAllotmentUpdate: StateHandler = (
+const receivedResourcesAfterProjectLocationHoursUpdate: StateHandler = (
   state,
   { payload }
 ) => ({
@@ -253,6 +253,21 @@ const receivedResourcesAfterLocationHoursUpdate: StateHandler = (
   snackbarQueue: enqueue(state.snackbarQueue, {
     type: "success",
     message: "Location hours updated",
+    autoHideDuration: 6000,
+  }),
+});
+
+const receivedResourcesAfterVirtualWeekUpdate: StateHandler = (
+  state,
+  { payload }
+) => ({
+  ...state,
+  ...payload,
+  virtualWeekModifyDialogIsOpen: false,
+  snackbarIsOpen: true,
+  snackbarQueue: enqueue(state.snackbarQueue, {
+    type: "success",
+    message: "Virtual week updated",
     autoHideDuration: 6000,
   }),
 });
@@ -334,10 +349,12 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.OpenedFile]: openedFile,
     [AdminAction.ReceivedAllResources]: receivedAllResources,
     [AdminAction.ReceivedResource]: receivedResource,
-    [AdminAction.ReceivedResourcesAfterAllotmentUpdate]:
-      receivedResourcesAfterAllotmentUpdate,
     [AdminAction.ReceivedResourcesAfterLocationHoursUpdate]:
       receivedResourcesAfterLocationHoursUpdate,
+    [AdminAction.ReceivedResourcesAfterProjectLocationHoursUpdate]:
+      receivedResourcesAfterProjectLocationHoursUpdate,
+    [AdminAction.ReceivedResourcesAfterVirtualWeekUpdate]:
+      receivedResourcesAfterVirtualWeekUpdate,
     [AdminAction.SelectedDocument]: selectedDocument,
     [AdminAction.SelectedRecordPage]: selectedRecordPage,
     [AdminAction.SelectedResource]: selectedResource,

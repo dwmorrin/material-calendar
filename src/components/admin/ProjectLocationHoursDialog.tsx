@@ -20,6 +20,7 @@ import {
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import VirtualWeek from "../../resources/VirtualWeek";
+import fetchProjectsAndVirtualWeeks from "../../admin/fetchProjectsAndVirtualWeeks";
 
 const initialErrors = { hours: "" };
 
@@ -112,46 +113,11 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       .then((response) => response.json())
       .then(({ error }) => {
         if (error) return dispatchError(error);
-        Promise.all([
-          fetch(`${Project.url}?context=${ResourceKey.Projects}`),
-          fetch(`${VirtualWeek.url}?context=${ResourceKey.VirtualWeeks}`),
-        ])
-          .then((responses) =>
-            Promise.all(responses.map((response) => response.json()))
-              .then((dataArray) => {
-                if (dataArray.some(({ error }) => !!error))
-                  // returning the first error only; better if we could return all
-                  return dispatchError(
-                    dataArray.find(({ error }) => !!error).error
-                  );
-                const projects = dataArray.find(
-                  ({ context }) => Number(context) === ResourceKey.Projects
-                );
-                if (!projects || !Array.isArray(projects.data))
-                  return dispatchError(
-                    new Error("no projects returned in allotment update")
-                  );
-                const virtualWeeks = dataArray.find(
-                  ({ context }) => Number(context) === ResourceKey.VirtualWeeks
-                );
-                if (!virtualWeeks || !Array.isArray(virtualWeeks.data))
-                  return dispatchError(
-                    new Error("no virtual weeks returned in allotment update")
-                  );
-                dispatch({
-                  type: AdminAction.ReceivedResourcesAfterAllotmentUpdate,
-                  payload: {
-                    resources: {
-                      ...state.resources,
-                      [ResourceKey.Projects]: projects.data,
-                      [ResourceKey.VirtualWeeks]: virtualWeeks.data,
-                    },
-                  },
-                });
-              })
-              .catch(dispatchError)
-          )
-          .catch(dispatchError);
+        fetchProjectsAndVirtualWeeks({
+          dispatch,
+          state,
+          type: AdminAction.ReceivedResourcesAfterProjectLocationHoursUpdate,
+        });
       })
       .catch(dispatchError)
       .finally(() => {
