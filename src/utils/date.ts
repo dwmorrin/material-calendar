@@ -175,13 +175,8 @@ export const eventGenerator = ({
   },
 });
 
-export const isValidDateInterval = ({
-  start,
-  end,
-}: {
-  start: Date;
-  end: Date;
-}): boolean => compareAsc(start, end) < 1;
+export const isValidDateInterval = ({ start, end }: DateInterval): boolean =>
+  compareAsc(start, end) < 1;
 
 export const nowInServerTimezone = (): Date =>
   new Date(
