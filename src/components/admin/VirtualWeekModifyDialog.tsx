@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import {
   Box,
   Button,
@@ -16,10 +16,17 @@ import DateFnUtils from "@date-io/date-fns";
 import { Field, Formik, Form } from "formik";
 import { DatePicker } from "formik-material-ui-pickers";
 import { AdminUIProps, AdminAction, FormValues } from "../../admin/types";
-import { formatSQLDate, parseSQLDate } from "../../utils/date";
+import {
+  areIntervalsOverlappingInclusive,
+  formatSQLDate,
+  isWithinIntervalFP,
+  parseSQLDate,
+} from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 import VirtualWeek from "../../resources/VirtualWeek";
 import fetchProjectsAndVirtualWeeks from "../../admin/fetchProjectsAndVirtualWeeks";
+import ErrorFormLabel from "../ErrorFormLabel";
+import Semester from "../../resources/Semester";
 
 enum VirtualWeekModifier {
   resize = "resize",
@@ -28,6 +35,7 @@ enum VirtualWeekModifier {
 }
 
 const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
+  const [errors, setErrors] = useState({ start: "", end: "", split: "" });
   const { calendarEventClickState, selectedSemester, schedulerLocationId } =
     state;
   if (
@@ -41,9 +49,10 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const selectedId = extendedProps.id as number;
   if (typeof selectedId !== "number" || selectedId < 1) return null;
 
-  const week = (
+  const virtualWeeks = (
     state.resources[ResourceKey.VirtualWeeks] as VirtualWeek[]
-  ).find(({ id }) => id === selectedId);
+  ).filter(({ locationId }) => locationId === schedulerLocationId);
+  const week = virtualWeeks.find(({ id }) => id === selectedId);
   if (!week) return null;
 
   const close = (): void =>
@@ -77,14 +86,13 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
         break;
       case VirtualWeekModifier.split:
         // TODO define split actions
+        // TODO dispatch update
         fetch(`${url}/split`, { method: "PUT", body: JSON.stringify([week]) });
         break;
       case VirtualWeekModifier.delete:
-        fetch(url, {
-          method: "DELETE",
-          body: JSON.stringify(week),
-          headers: { "Content-Type": "application/json" },
-        });
+        // TODO check if all project location hours are deleted
+        // TODO dispatch update
+        fetch(url, { method: "DELETE" });
         break;
     }
   };
@@ -94,6 +102,39 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
     end: parseSQLDate(week.end),
     split: parseSQLDate(week.end),
     mode: VirtualWeekModifier.resize,
+  };
+
+  const validate = (values: FormValues): void => {
+    // disallow virtual week overlap
+    const overlaps = areIntervalsOverlappingInclusive({
+      start: values.start as Date,
+      end: values.end as Date,
+    });
+    const overlapError = virtualWeeks.some(
+      ({ id, start, end }) =>
+        id !== week.id &&
+        overlaps({ start: parseSQLDate(start), end: parseSQLDate(end) })
+    );
+    // disallow extending beyond semester
+    const withinSemester = isWithinIntervalFP({
+      start: parseSQLDate(selectedSemester.start),
+      end: parseSQLDate(selectedSemester.end),
+    });
+    const startNotWithin = withinSemester(values.start as Date)
+      ? ""
+      : "Start outside semester";
+    const endNotWithin = withinSemester(values.end as Date)
+      ? ""
+      : "End outside semester";
+    setErrors({
+      start:
+        startNotWithin ||
+        (overlapError ? "overlaps with another virtual week" : ""),
+      end:
+        endNotWithin ||
+        (overlapError ? "overlaps with another virtual week" : ""),
+      split: "",
+    });
   };
 
   return (
@@ -108,7 +149,11 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       </DialogTitle>
       <DialogContent>
         <MuiPickersUtilsProvider utils={DateFnUtils}>
-          <Formik initialValues={initialValues} onSubmit={onSubmit}>
+          <Formik
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            validate={validate}
+          >
             {({ handleSubmit, values }): unknown => (
               <Form onSubmit={handleSubmit}>
                 <Field component={RadioGroup} name="mode">
@@ -137,14 +182,24 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                     />
                   )}
                   {values.mode === VirtualWeekModifier.resize && (
-                    <Field
-                      component={DatePicker}
-                      name="start"
-                      label="Start date"
-                    />
-                  )}
-                  {values.mode === VirtualWeekModifier.resize && (
-                    <Field component={DatePicker} name="end" label="End date" />
+                    <>
+                      {!!errors.start && (
+                        <ErrorFormLabel>{errors.start}</ErrorFormLabel>
+                      )}
+                      <Field
+                        component={DatePicker}
+                        name="start"
+                        label="Start date"
+                      />
+                      {!!errors.end && (
+                        <ErrorFormLabel>{errors.end}</ErrorFormLabel>
+                      )}
+                      <Field
+                        component={DatePicker}
+                        name="end"
+                        label="End date"
+                      />
+                    </>
                   )}
                 </Box>
                 {values.mode === VirtualWeekModifier.delete && (
@@ -155,7 +210,16 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                 )}
                 <DialogActions>
                   <Button onClick={close}>Cancel</Button>
-                  <Button variant="contained" type="submit">
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    disabled={
+                      (values.mode === VirtualWeekModifier.resize &&
+                        (!!errors.start || !!errors.end)) ||
+                      (values.mode === VirtualWeekModifier.split &&
+                        !!errors.split)
+                    }
+                  >
                     Submit
                   </Button>
                 </DialogActions>
