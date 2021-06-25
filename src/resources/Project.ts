@@ -45,6 +45,7 @@ const defaultProject = {
 export class Project implements Project {
   static url = "/api/projects";
   static collectionKey = "projects";
+  static allotmentPrefix = "allotment-";
   constructor(project = defaultProject) {
     Object.assign(this, project);
   }

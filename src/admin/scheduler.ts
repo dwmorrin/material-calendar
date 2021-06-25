@@ -206,7 +206,7 @@ export const makeAllotmentEventMap =
   (a: Allotment, index: number): SchedulerEventProps => ({
     ...a,
     end: addADay(a.end),
-    id: `allotment${p.id}-${index}`,
+    id: `${Project.allotmentPrefix}${p.id}-${index}`,
     resourceId: `Allotments${p.id}`,
     allDay: true,
     title: "" + a.hours,
