@@ -12,8 +12,8 @@ export const resources = {
 
 const initialState: AdminState = {
   // UI state
-  allotmentDialogIsOpen: false,
-  allotmentSummaryDialogIsOpen: false,
+  projectLocationHoursDialogIsOpen: false,
+  projectLocationHoursSummaryDialogIsOpen: false,
   appIsBroken: false,
   backupsIsOpen: false,
   detailIsOpen: false,

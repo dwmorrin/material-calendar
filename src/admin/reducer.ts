@@ -85,14 +85,14 @@ const errorRedirect = (
 
 //--------- NORMAL ACTION HANDLERS ----------
 
-const closeAllotmentDialog: StateHandler = (state) => ({
+const closeProjectLocationHoursDialog: StateHandler = (state) => ({
   ...state,
-  allotmentDialogIsOpen: false,
+  projectLocationHoursDialogIsOpen: false,
 });
 
-const closeAllotmentSummaryDialog: StateHandler = (state) => ({
+const closeProjectLocationHoursSummaryDialog: StateHandler = (state) => ({
   ...state,
-  allotmentSummaryDialogIsOpen: false,
+  projectLocationHoursSummaryDialogIsOpen: false,
 });
 
 const closeBackups: StateHandler = (state) => ({
@@ -137,16 +137,19 @@ const closeVirtualWeekSplitDialog: StateHandler = (state) => ({
   virtualWeekModifyDialogIsOpen: false,
 });
 
-const openAllotmentDialog: StateHandler = (state, { payload }) => ({
+const openProjectLocationHoursDialog: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
-  allotmentDialogIsOpen: true,
+  projectLocationHoursDialogIsOpen: true,
 });
 
-const openAllotmentSummaryDialog: StateHandler = (state, { payload }) => ({
+const openProjectLocationHoursSummaryDialog: StateHandler = (
+  state,
+  { payload }
+) => ({
   ...state,
   ...payload,
-  allotmentSummaryDialogIsOpen: true,
+  projectLocationHoursSummaryDialogIsOpen: true,
 });
 
 const openBackups: StateHandler = (state) => ({
@@ -324,24 +327,28 @@ const toggleDrawer: StateHandler = (state) => ({
 
 const reducer: StateHandler = (state, action) =>
   ({
-    [AdminAction.CloseAllotmentDialog]: closeAllotmentDialog,
-    [AdminAction.CloseAllotmentSummaryDialog]: closeAllotmentSummaryDialog,
     [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
     [AdminAction.CloseFileImport]: closeFileImport,
     [AdminAction.CloseLocationHoursDialog]: closeLocationHoursDialog,
+    [AdminAction.CloseProjectLocationHoursDialog]:
+      closeProjectLocationHoursDialog,
+    [AdminAction.CloseProjectLocationHoursSummaryDialog]:
+      closeProjectLocationHoursSummaryDialog,
     [AdminAction.CloseSemesterDialog]: closeSemesterDialog,
     [AdminAction.CloseSnackbar]: closeSnackbar,
     [AdminAction.CloseVirtualWeeksDialog]: closeVirtualWeeksDialog,
     [AdminAction.CloseVirtualWeekModifyDialog]: closeVirtualWeekSplitDialog,
     [AdminAction.Error]: errorHandler,
-    [AdminAction.OpenAllotmentDialog]: openAllotmentDialog,
-    [AdminAction.OpenAllotmentSummaryDialog]: openAllotmentSummaryDialog,
+    [AdminAction.OpenProjectLocationHoursSummaryDialog]:
+      openProjectLocationHoursSummaryDialog,
     [AdminAction.OpenBackups]: openBackups,
     [AdminAction.OpenDetail]: openDetail,
     [AdminAction.OpenDetailWithResourceInstance]:
       openDetailWithResourceInstance,
     [AdminAction.OpenLocationHoursDialog]: openLocationHoursDialog,
+    [AdminAction.OpenProjectLocationHoursDialog]:
+      openProjectLocationHoursDialog,
     [AdminAction.OpenScheduler]: openScheduler,
     [AdminAction.OpenSemesterDialog]: openSemesterDialog,
     [AdminAction.OpenVirtualWeeksDialog]: openVirtualWeeksDialog,

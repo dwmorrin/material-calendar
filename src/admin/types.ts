@@ -12,27 +12,27 @@ export interface Action {
 }
 
 export enum AdminAction {
-  CloseAllotmentSummaryDialog,
-  CloseAllotmentDialog,
   CloseBackups,
   CloseDetail,
   CloseFileImport,
   CloseLocationHoursDialog,
+  CloseProjectLocationHoursDialog,
+  CloseProjectLocationHoursSummaryDialog,
   CloseSemesterDialog,
   CloseSnackbar,
-  CloseVirtualWeeksDialog,
   CloseVirtualWeekModifyDialog,
+  CloseVirtualWeeksDialog,
   Error,
   OpenBackups,
-  OpenAllotmentSummaryDialog,
-  OpenAllotmentDialog,
-  OpenLocationHoursDialog,
   OpenDetail,
   OpenDetailWithResourceInstance,
+  OpenLocationHoursDialog,
+  OpenProjectLocationHoursDialog,
+  OpenProjectLocationHoursSummaryDialog,
   OpenScheduler,
   OpenSemesterDialog,
-  OpenVirtualWeeksDialog,
   OpenVirtualWeekModifyDialog,
+  OpenVirtualWeeksDialog,
   OpenedFile,
   ReceivedAllResources,
   ReceivedResource,
@@ -50,26 +50,26 @@ export enum AdminAction {
 
 export interface AdminState {
   // UI state
-  allotmentDialogIsOpen: boolean;
-  allotmentSummaryDialogIsOpen: boolean;
   appIsBroken: boolean;
   backupsIsOpen: boolean;
+  calendarEventClickState?: CalendarEventClickState;
+  calendarSelectionState?: CalendarSelectionState;
   detailIsOpen: boolean;
   drawerIsOpen: boolean;
   error?: Error;
   fileImportIsOpen: boolean;
   loading: boolean;
   locationHoursDialogIsOpen: boolean;
-  calendarEventClickState?: CalendarEventClickState;
-  calendarSelectionState?: CalendarSelectionState;
+  projectLocationHoursDialogIsOpen: boolean;
+  projectLocationHoursSummaryDialogIsOpen: boolean;
   recordPage: number;
   ref: React.RefObject<FullCalendar> | null;
   schedulerIsOpen: boolean;
   schedulerLocationId?: number;
   semesterDialogIsOpen: boolean;
   snackbarQueue: SnackbarState[];
-  virtualWeeksDialogIsOpen: boolean;
   virtualWeekModifyDialogIsOpen: boolean;
+  virtualWeeksDialogIsOpen: boolean;
 
   // resources
   selectedSemester?: Semester;

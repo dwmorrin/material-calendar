@@ -391,7 +391,7 @@ export const eventClick =
       });
     } else if (id.startsWith("allotmentTotal")) {
       return dispatch({
-        type: AdminAction.OpenAllotmentSummaryDialog,
+        type: AdminAction.OpenProjectLocationHoursSummaryDialog,
         payload: {
           calendarEventClickState: {
             title,
@@ -403,7 +403,7 @@ export const eventClick =
       });
     } else if (id.startsWith(Project.allotmentPrefix)) {
       return dispatch({
-        type: AdminAction.OpenAllotmentDialog,
+        type: AdminAction.OpenProjectLocationHoursDialog,
         payload: {
           calendarSelectionState: {
             start: startStr,
@@ -475,7 +475,7 @@ export const selectionHandler =
         const projectId = resource?.extendedProps?.projectId;
         if (typeof projectId === "number" && projectId > 0)
           return dispatch({
-            type: AdminAction.OpenAllotmentDialog,
+            type: AdminAction.OpenProjectLocationHoursDialog,
             payload,
           });
         console.group("Unhandled Scheduler selection");

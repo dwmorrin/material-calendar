@@ -52,14 +52,14 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
 
   const close = (): void => {
     setFormErrors(initialErrors);
-    dispatch({ type: AdminAction.CloseAllotmentDialog });
+    dispatch({ type: AdminAction.CloseProjectLocationHoursDialog });
   };
 
   // allotments must be matched to a virtual week
   if (!virtualWeeks.length)
     return (
       <Dialog
-        open={state.allotmentDialogIsOpen}
+        open={state.projectLocationHoursDialogIsOpen}
         onClose={close}
         PaperComponent={DraggablePaper}
         aria-labelledby="draggable-dialog-title"
@@ -123,7 +123,7 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       .finally(() => {
         setFormErrors(initialErrors);
         actions.setSubmitting(false);
-        dispatch({ type: AdminAction.CloseAllotmentDialog });
+        dispatch({ type: AdminAction.CloseProjectLocationHoursDialog });
       });
   };
 
@@ -133,7 +133,7 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
 
   return (
     <Dialog
-      open={state.allotmentDialogIsOpen}
+      open={state.projectLocationHoursDialogIsOpen}
       onClose={close}
       PaperComponent={DraggablePaper}
       aria-labelledby="draggable-dialog-title"

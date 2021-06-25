@@ -34,7 +34,7 @@ const ProjectLocationHoursSummaryDialog: FC<AdminUIProps> = ({
   const title = `${project.title} - Allotted: ${allottedHours} - Max: ${locationHours.hours}`;
 
   const close = (): void =>
-    dispatch({ type: AdminAction.CloseAllotmentSummaryDialog });
+    dispatch({ type: AdminAction.CloseProjectLocationHoursSummaryDialog });
 
   const openProject = (): void =>
     dispatch({
@@ -49,7 +49,7 @@ const ProjectLocationHoursSummaryDialog: FC<AdminUIProps> = ({
 
   return (
     <Dialog
-      open={state.allotmentSummaryDialogIsOpen}
+      open={state.projectLocationHoursSummaryDialogIsOpen}
       onClose={close}
       PaperComponent={DraggablePaper}
       aria-labelledby="draggable-dialog-title"
