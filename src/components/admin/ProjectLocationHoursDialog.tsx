@@ -5,10 +5,8 @@ import {
   DialogTitle,
   DialogActions,
   DialogContent,
-  FormControlLabel,
-  FormLabel,
 } from "@material-ui/core";
-import { TextField, RadioGroup } from "formik-material-ui";
+import { TextField } from "formik-material-ui";
 import DraggablePaper from "../DraggablePaper";
 import { Formik, Form, Field, FormikValues } from "formik";
 import { AdminUIProps, AdminAction, FormValues } from "../../admin/types";
@@ -22,7 +20,6 @@ import {
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import VirtualWeek from "../../resources/VirtualWeek";
-import { Radio } from "@material-ui/core";
 
 const initialErrors = { hours: "" };
 
