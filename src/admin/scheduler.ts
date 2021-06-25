@@ -399,6 +399,18 @@ export const eventClick =
           },
         },
       });
+    } else if (id.startsWith(Project.allotmentPrefix)) {
+      return dispatch({
+        type: AdminAction.OpenAllotmentDialog,
+        payload: {
+          calendarSelectionState: {
+            start: startStr,
+            end: endStr,
+            location,
+            resource: { extendedProps },
+          },
+        },
+      });
     }
     console.group("Unhandled scheduler event click");
     console.log({ id, title, startStr, extendedProps });
