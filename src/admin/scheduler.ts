@@ -15,7 +15,6 @@ import {
   parseSQLDate,
   areIntervalsOverlappingInclusive,
   subDays,
-  isWithinInterval,
 } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";

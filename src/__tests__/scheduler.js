@@ -12,6 +12,7 @@ import {
 } from "../admin/scheduler";
 import VirtualWeek from "../resources/VirtualWeek";
 import Location from "../resources/Location";
+import Project from "../resources/Project";
 
 test("there are 1e3 * 60 * 60 * 24 ms in a day", () =>
   expect(millisecondsToDays(1e3 * 60 * 60 * 24)).toEqual(1));
@@ -81,7 +82,7 @@ test("makeAllotmentEventMap", () =>
       projectId: 0,
     },
     hours: 0,
-    id: "allotment0-0",
+    id: Project.allotmentPrefix + "0-0",
     resourceId: "Allotments0",
     allDay: true,
     title: "0",
@@ -131,7 +132,7 @@ test("makeAllotments", () =>
         projectId: 0,
       },
       hours: 0,
-      id: "allotment0-0",
+      id: Project.allotmentPrefix + "0-0",
       locationId: 0,
       resourceId: "Allotments0",
       start: "2020-06-18",
@@ -183,7 +184,7 @@ test("processVirtualWeeks adds a day", () =>
       end: "2021-01-01",
       locationId: 0,
       locationHours: 0,
-      id: "vw0",
+      id: VirtualWeek.eventPrefix + "0",
       resourceId: VirtualWeek.resourceId,
       allDay: true,
       title: "0",
