@@ -24,6 +24,21 @@ import fetchProjectsAndVirtualWeeks from "../../admin/fetchProjectsAndVirtualWee
 
 const initialErrors = { hours: "" };
 
+const DialogWrapper: FC<AdminUIProps & { onClose: () => void }> = ({
+  state,
+  children,
+  onClose,
+}) => (
+  <Dialog
+    open={state.projectLocationHoursDialogIsOpen}
+    onClose={onClose}
+    PaperComponent={DraggablePaper}
+    aria-labelledby="draggable-dialog-title"
+  >
+    {children}
+  </Dialog>
+);
+
 const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const [formErrors, setFormErrors] = useState(initialErrors);
   if (!state.calendarSelectionState || !state.schedulerLocationId) return null;
@@ -58,14 +73,10 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   // allotments must be matched to a virtual week
   if (!virtualWeeks.length)
     return (
-      <Dialog
-        open={state.projectLocationHoursDialogIsOpen}
-        onClose={close}
-        PaperComponent={DraggablePaper}
-        aria-labelledby="draggable-dialog-title"
-      >
+      <DialogWrapper dispatch={dispatch} state={state} onClose={close}>
+        {" "}
         Please create virtual weeks first.
-      </Dialog>
+      </DialogWrapper>
     );
 
   const isWithinSelection = isIntervalWithinInterval({ start, end });
@@ -76,15 +87,21 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   );
 
   // find closest virtual week to the selection
-  const selectedWeek =
-    virtualWeeks.find(({ start, end, id }) =>
-      existing
-        ? existing.virtualWeekId === id
-        : isWithinSelection({
-            start: parseSQLDate(start),
-            end: parseSQLDate(end),
-          })
-    ) || virtualWeeks[0];
+  const selectedWeek = virtualWeeks.find(({ start, end, id }) =>
+    existing
+      ? existing.virtualWeekId === id
+      : isWithinSelection({
+          start: parseSQLDate(start),
+          end: parseSQLDate(end),
+        })
+  );
+
+  if (!selectedWeek)
+    return (
+      <DialogWrapper dispatch={dispatch} state={state} onClose={close}>
+        Allotments cannot be created outside of a virtual week.
+      </DialogWrapper>
+    );
 
   const validate = (values: FormValues): void => {
     const hours = Number(values.hours);
@@ -132,12 +149,7 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   };
 
   return (
-    <Dialog
-      open={state.projectLocationHoursDialogIsOpen}
-      onClose={close}
-      PaperComponent={DraggablePaper}
-      aria-labelledby="draggable-dialog-title"
-    >
+    <DialogWrapper state={state} dispatch={dispatch} onClose={close}>
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
         Set hours for {project.title} in {location.title}
       </DialogTitle>
@@ -165,7 +177,7 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
           )}
         </Formik>
       </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   );
 };
 
