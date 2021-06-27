@@ -109,7 +109,11 @@ export const makeOnSubmit = (dispatch: (action: Action) => void) => (
         if (error) return dispatchError(error);
         dispatch({
           type: CalendarAction.ReceivedResource,
-          payload: { resources: { [ResourceKey.Events]: data } },
+            payload: {
+              resources: {
+                [ResourceKey.Events]: data.map((e: Event) => new Event(e)),
+              },
+            },
           meta: ResourceKey.Events,
         });
         dispatch({ type: CalendarAction.CloseEventEditor });

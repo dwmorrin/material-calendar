@@ -90,7 +90,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                     }
                   : {
                       type: CalendarAction.UpdateEvents,
-                      payload: { resources: { [ResourceKey.Events]: data } },
+                      payload: {
+                        resources: {
+                          [ResourceKey.Events]: data.map(
+                            (e: Event) => new Event(e)
+                          ),
+                        },
+                      },
                       meta: ResourceKey.Events,
                     }
               )

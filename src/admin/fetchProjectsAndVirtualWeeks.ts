@@ -43,8 +43,12 @@ export default function fetchProjectsAndVirtualWeeks({
             payload: {
               resources: {
                 ...state.resources,
-                [ResourceKey.Projects]: projects.data,
-                [ResourceKey.VirtualWeeks]: virtualWeeks.data,
+                [ResourceKey.Projects]: projects.data.map(
+                  (p: Project) => new Project(p)
+                ),
+                [ResourceKey.VirtualWeeks]: virtualWeeks.data.map(
+                  (v: VirtualWeek) => new VirtualWeek(v)
+                ),
               },
             },
           });

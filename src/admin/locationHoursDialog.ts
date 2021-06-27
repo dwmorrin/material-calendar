@@ -66,8 +66,12 @@ export const makeOnSubmit =
                 payload: {
                   resources: {
                     ...state.resources,
-                    [ResourceKey.Locations]: locations.data,
-                    [ResourceKey.VirtualWeeks]: virtualWeeks.data,
+                    [ResourceKey.Locations]: locations.data.map(
+                      (l: Location) => new Location(l)
+                    ),
+                    [ResourceKey.VirtualWeeks]: virtualWeeks.data.map(
+                      (v: VirtualWeek) => new VirtualWeek(v)
+                    ),
                   },
                 },
               });

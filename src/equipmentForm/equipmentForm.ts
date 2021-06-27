@@ -40,16 +40,14 @@ export const fetchAllEquipmentResources = (
             switch (+context) {
               case ResourceKey.Equipment:
                 payload.equipment = data.map(
-                  (d: unknown) => new Equipment(d as never)
+                  (e: Equipment) => new Equipment(e)
                 );
                 break;
               case ResourceKey.Categories:
-                payload.categories = data.map(
-                  (d: unknown) => new Category(d as never)
-                );
+                payload.categories = data.map((c: Category) => new Category(c));
                 break;
               case ResourceKey.Tags:
-                payload.tags = data.map((d: unknown) => new Tag(d as never));
+                payload.tags = data.map((t: Tag) => new Tag(t));
                 payload.selectedTags = payload.tags?.reduce(
                   (filters, tag) => ({
                     ...filters,
@@ -82,19 +80,21 @@ export const makeValidTags = (
     .map((tag) => tag.title)
     .filter((v, i, a) => a.indexOf(v) === i);
 
-export const makeToggleFilterDrawer = (
-  currentState: boolean,
-  setFilterDrawerIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-) => (event?: React.KeyboardEvent | React.MouseEvent): void => {
-  if (
-    event?.type === "keydown" &&
-    ((event as React.KeyboardEvent).key === "Tab" ||
-      (event as React.KeyboardEvent).key === "Shift")
-  ) {
-    return;
-  }
-  setFilterDrawerIsOpen(!currentState);
-};
+export const makeToggleFilterDrawer =
+  (
+    currentState: boolean,
+    setFilterDrawerIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  ) =>
+  (event?: React.KeyboardEvent | React.MouseEvent): void => {
+    if (
+      event?.type === "keydown" &&
+      ((event as React.KeyboardEvent).key === "Tab" ||
+        (event as React.KeyboardEvent).key === "Shift")
+    ) {
+      return;
+    }
+    setFilterDrawerIsOpen(!currentState);
+  };
 
 export function queryEquipment(
   equipment: Equipment[],
