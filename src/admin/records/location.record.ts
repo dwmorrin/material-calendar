@@ -6,6 +6,7 @@ const template = (location: unknown): string[][] =>
         ["ID", location.id.toString()],
         ["Title", location.title],
         ["Group", location.groupId],
+        ["Restriction", location.restriction.toString()],
       ]
     : [["", JSON.stringify(location)]];
 export default template;
