@@ -35,16 +35,6 @@ export const validationSchema = object().shape({
   }),
 });
 
-export function getCurrentEquipment(): Equipment[] | null {
-  const values: Equipment[] = [];
-  fetch(`/api/equipment`)
-    .then((response) => response.json())
-    .then((data) => {
-      data.data.map((item: Equipment) => values.push(new Equipment(item)));
-    });
-  return values;
-}
-
 export function getEquipmentIds(
   requests: {
     [k: string]: {
