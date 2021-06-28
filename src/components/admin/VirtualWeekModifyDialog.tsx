@@ -34,6 +34,7 @@ import ErrorFormLabel from "../ErrorFormLabel";
 enum VirtualWeekModifier {
   resize = "resize",
   split = "split",
+  join = "join",
   delete = "delete",
 }
 
@@ -48,7 +49,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   )
     return null;
 
-  const { extendedProps } = calendarEventClickState;
+  const { startStr, extendedProps } = calendarEventClickState;
   const selectedId = extendedProps.id as number;
   if (typeof selectedId !== "number" || selectedId < 1) return null;
 
@@ -59,6 +60,11 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   if (!week) return null;
 
   const isSingleDay = week.start === week.end;
+  // RULE: only allow joins to adjacent week.
+  // RULE: selected week is before the week to be joined.
+  const joinableWeek = virtualWeeks.find(
+    ({ start }) => formatSQLDate(addDays(parseSQLDate(week.end), 1)) === start
+  );
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseVirtualWeekModifyDialog });
@@ -80,7 +86,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
         })
           .then((res) => res.json())
           .then(({ error }) => {
-            if (error) dispatch(error);
+            if (error) dispatchError(error);
             fetchProjectsAndVirtualWeeks({
               dispatch,
               state,
@@ -108,7 +114,29 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
         })
           .then((res) => res.json())
           .then(({ error }) => {
-            if (error) dispatch(error);
+            if (error) dispatchError(error);
+            fetchProjectsAndVirtualWeeks({
+              dispatch,
+              state,
+              type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
+            });
+          })
+          .catch(dispatchError);
+        break;
+      }
+      case VirtualWeekModifier.join: {
+        // resize left, delete right
+        fetch(`${url}/join`, {
+          method: "PUT",
+          body: JSON.stringify([
+            { ...week, end: joinableWeek?.end },
+            joinableWeek,
+          ]),
+          headers: { "Content-Type": "application/json" },
+        })
+          .then((res) => res.json())
+          .then(({ error }) => {
+            if (error) dispatchError(error);
             fetchProjectsAndVirtualWeeks({
               dispatch,
               state,
@@ -137,7 +165,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const initialValues = {
     start: parseSQLDate(week.start),
     end: parseSQLDate(week.end),
-    split: parseSQLDate(week.end),
+    split: parseSQLDate(startStr),
     mode: VirtualWeekModifier.resize,
   };
 
@@ -223,6 +251,17 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                     disabled={isSingleDay}
                   />
                   <FormControlLabel
+                    label={
+                      "Join" +
+                      (joinableWeek
+                        ? ""
+                        : " (join requires an adjacent week after the selected week)")
+                    }
+                    value={VirtualWeekModifier.join}
+                    control={<Radio />}
+                    disabled={!joinableWeek}
+                  />
+                  <FormControlLabel
                     label="Delete"
                     value={VirtualWeekModifier.delete}
                     control={<Radio />}
@@ -266,6 +305,13 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                   <p>
                     This will also delete all the project allotments within this
                     virtual week.
+                  </p>
+                )}
+                {values.mode === VirtualWeekModifier.join && (
+                  <p>
+                    Warning: the project allotments on the right will be deleted
+                    and the allotted hours will be ignored. This action does not
+                    automatically add the allotment hours.
                   </p>
                 )}
                 <DialogActions>
