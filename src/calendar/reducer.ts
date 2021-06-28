@@ -195,7 +195,7 @@ const joinedGroup: StateHandler = (state, action) => {
 const leftGroup: StateHandler = (state, action) => {
   return displayMessage(
     // This should probably not close the groupDashboard
-    { ...state },
+    { ...state, currentGroup: undefined },
     {
       type: CalendarAction.DisplayMessage,
       payload: {
