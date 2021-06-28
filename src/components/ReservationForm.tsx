@@ -62,12 +62,6 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   const closeForm = (): void =>
     dispatch({ type: CalendarAction.CloseReservationForm });
 
-  const displayMessage = (message: string): void =>
-    dispatch({
-      type: CalendarAction.DisplayMessage,
-      payload: { message: message },
-    });
-
   return (
     <Dialog
       fullScreen
@@ -92,7 +86,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
             getValuesFromReservation(state.currentEvent) ||
             makeInitialValues(state, projects)
           }
-          onSubmit={submitHandler(closeForm, displayMessage)}
+          onSubmit={submitHandler(closeForm, dispatch)}
           validationSchema={validationSchema}
         >
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (

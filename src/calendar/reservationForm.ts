@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core";
 import { makeTransition } from "../components/Transition";
 import { object, string } from "yup";
 import { FormikValues } from "formik";
-import { CalendarState } from "./types";
+import { CalendarAction, CalendarState, Action } from "./types";
 import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
 import Equipment from "../resources/Equipment";
@@ -118,33 +118,22 @@ export function getEquipmentIds(
   return newList;
 }
 
-export const updater = (values: {
-  [k: string]: unknown;
-}): {
-  [k: string]: unknown;
-} => {
-  const newVal = {
-    allotment_id: values.event,
-    group_id: values.groupId,
-    project_id: values.project,
-    purpose: values.description,
-    guests: values.hasGuests ? values.guests : null,
-    living_room: values.liveRoom === "yes" ? 1 : 0,
-    contact_phone: values.phone,
-    notes: values.hasNotes === "yes" && values.notes ? values.notes : null,
-    //gear: values.equipment,
+const updater = (values: Record<string, unknown>): Record<string, unknown> => {
+  const updated = {
+    allotmentId: values.event,
+    groupId: values.groupId,
+    projectId: values.project,
+    description: values.description,
+    guests: values.hasGuests ? values.guests : "",
+    liveRoom: values.liveRoom === "yes" ? 1 : 0,
+    phone: values.phone,
+    notes: values.hasNotes === "yes" && values.notes ? values.notes : "",
   };
-  if (values.id) {
-    return { ...newVal, id: values.id };
-  } else {
-    return newVal;
-  }
+  return values.id ? { ...updated, id: values.id } : updated;
 };
 
 export const makeEquipmentRequests = (
-  equipment: {
-    [k: string]: any;
-  },
+  equipment: Record<string, unknown>,
   bookingId: number
 ): { id: string; bookingId: number; quantity: number }[] => {
   return Object.entries(equipment).map(([key, value]) => {
@@ -157,7 +146,7 @@ export const makeEquipmentRequests = (
 };
 
 export const submitHandler =
-  (closeForm: () => void, displayMessage: (message: string) => void) =>
+  (closeForm: () => void, dispatch: (action: Action) => void) =>
   (values: { [k: string]: unknown }, actions: FormikValues): void => {
     values = {
       ...values,
@@ -172,19 +161,18 @@ export const submitHandler =
       ),
     };
     actions.setSubmitting(true);
-    console.log(JSON.stringify(updater(values)));
+    const dispatchError = (error: Error): void =>
+      dispatch({ type: CalendarAction.Error, payload: { error } });
     fetch(`/api/reservations${values.id ? `/${values.id}` : ""}`, {
       method: values.id ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updater(values)),
     })
       .then((response) => response.json())
-      .then(({ error, data, context }) => {
-        console.log({ error, data, context });
-        console.log(data);
+      .then(({ error, data }) => {
+        if (error) return dispatchError(error);
         if (
-          Object.entries(values.equipment as Record<string, unknown>).length !==
-          0
+          Object.entries(values.equipment as Record<string, unknown>).length
         ) {
           fetch(`/api/reservations/equipment/${data.id || values.id}`, {
             method: values.id ? "PUT" : "POST",
@@ -197,19 +185,23 @@ export const submitHandler =
             ),
           })
             .then((response) => response.json())
-            .then(({ error, data, context }) => {
-              console.log({ error, data, context });
-            });
+            .then(({ error }) => {
+              if (error) dispatchError(error);
+            })
+            .catch(dispatchError);
         }
       })
-      .catch(console.error)
+      .catch(dispatchError)
       .finally(() => {
         actions.setSubmitting(false);
-        displayMessage(
-          values.id
-            ? "Your Reservation has been updated!"
-            : "Your Reservation has been made!"
-        );
+        dispatch({
+          type: CalendarAction.DisplayMessage,
+          payload: {
+            message: values.id
+              ? "Your Reservation has been updated!"
+              : "Your Reservation has been made!",
+          },
+        });
         closeForm();
       });
   };
