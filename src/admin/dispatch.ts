@@ -39,6 +39,8 @@ export const dispatchOneResource =
   (values: FormValues, actions: FormikValues): void => {
     const deleting = values.__delete__;
     const id = state.resourceInstance?.id || "";
+    if (deleting && Number(id) < 1)
+      return dispatch({ type: AdminAction.CloseDetail });
     const resources = state.resources[state.resourceKey];
     const resource = Resources[state.resourceKey];
 
