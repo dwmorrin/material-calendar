@@ -16,7 +16,7 @@ const DetailsForm: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const { template, valuator, updater } = formRouter(state.resourceKey);
 
   return (
-    <Dialog fullScreen={true} open={state.detailIsOpen}>
+    <Dialog open={state.detailIsOpen}>
       <Toolbar>
         <IconButton
           edge="start"
