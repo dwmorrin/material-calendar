@@ -20,7 +20,6 @@ export enum CalendarAction {
   DisplayMessage,
   JoinedGroup,
   LeftGroup,
-  Loading,
   PickedDate,
   OpenReservationForm,
   OpenProjectForm,
@@ -57,7 +56,7 @@ export interface CalendarState {
   error?: Error;
   message: string;
   groupDashboardIsOpen: boolean;
-  loading: boolean;
+  initialResourcesPending: boolean;
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
   reservationFormIsOpen: boolean;

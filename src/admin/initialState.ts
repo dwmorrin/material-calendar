@@ -19,7 +19,7 @@ const initialState: AdminState = {
   detailIsOpen: false,
   drawerIsOpen: false,
   fileImportIsOpen: false,
-  loading: true,
+  initialResourcesPending: true,
   locationHoursDialogIsOpen: false,
   recordPage: 0,
   ref: null,

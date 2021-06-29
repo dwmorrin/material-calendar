@@ -58,7 +58,7 @@ export interface AdminState {
   drawerIsOpen: boolean;
   error?: Error;
   fileImportIsOpen: boolean;
-  loading: boolean;
+  initialResourcesPending: boolean;
   locationHoursDialogIsOpen: boolean;
   projectLocationHoursDialogIsOpen: boolean;
   projectLocationHoursSummaryDialogIsOpen: boolean;

@@ -205,7 +205,7 @@ const openedFile: StateHandler = (state, { payload }) => ({
 const receivedAllResources: StateHandler = (state, { payload }) => ({
   ...state,
   resources: { ...state.resources, ...payload?.resources },
-  loading: false,
+  initialResourcesPending: false,
 });
 
 const receivedResource: StateHandler = (state, action) => {

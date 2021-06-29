@@ -48,7 +48,8 @@ const FullCalendarBox: FunctionComponent<
   );
   const classes = useStyles();
 
-  if (state.loading) return <CircularProgress size="90%" thickness={1} />;
+  if (state.initialResourcesPending)
+    return <CircularProgress size="90%" thickness={1} />;
   return (
     <Box>
       <Box className={classes.toolbarSpacer} />

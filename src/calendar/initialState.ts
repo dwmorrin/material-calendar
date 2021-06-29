@@ -6,9 +6,9 @@ import { ResourceKey, ResourceInstance } from "../resources/types";
  * coerce the ResourceKey enum into a dictionary to hold all our resources
  * enum => [0,1,...] => {0: [], 1: [], ...}
  */
-const resources = ({
+const resources = {
   ...enumKeys(ResourceKey).map(() => [] as ResourceInstance[]),
-} as unknown) as { [k in ResourceKey]: ResourceInstance[] };
+} as unknown as { [k in ResourceKey]: ResourceInstance[] };
 
 export const initialCalendarState: CalendarState = {
   appIsBroken: false,
@@ -21,7 +21,7 @@ export const initialCalendarState: CalendarState = {
   groupDashboardIsOpen: false,
   reservationFormIsOpen: false,
   projectFormIsOpen: false,
-  loading: true,
+  initialResourcesPending: true,
   pickerShowing: false,
   projectDashboardIsOpen: false,
   resources,

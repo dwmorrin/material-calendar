@@ -54,7 +54,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   if (process.env.NODE_ENV !== "development" && !User.isAdmin(user)) {
     return <Redirect to="/" replace={true} noThrow={true} />;
   }
-  if (state.loading) return <CircularProgress />;
+  if (state.initialResourcesPending) return <CircularProgress />;
   return (
     <div>
       <Bar dispatch={dispatch} state={state} />

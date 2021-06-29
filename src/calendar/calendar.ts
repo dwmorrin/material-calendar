@@ -25,7 +25,7 @@ export const compareCalendarStates = (
   return (
     prevState.ref === nextState.ref &&
     prevState.currentStart === nextState.currentStart &&
-    prevState.loading === nextState.loading &&
+    prevState.initialResourcesPending === nextState.initialResourcesPending &&
     deepEqual(prevState.resources, nextState.resources) &&
     deepEqual(prevSelections, nextSelections)
   );

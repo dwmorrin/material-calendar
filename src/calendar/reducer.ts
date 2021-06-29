@@ -205,11 +205,6 @@ const leftGroup: StateHandler = (state, action) => {
   );
 };
 
-const loading: StateHandler = (state) => ({
-  ...state,
-  loading: true,
-});
-
 const pickedDate: StateHandler = (state, action) => {
   const { payload } = action;
   if (!payload?.currentStart) {
@@ -307,7 +302,7 @@ const openReservationForm: StateHandler = (state) => ({
 const receivedAllResources: StateHandler = (state, { payload }) => ({
   ...state,
   resources: { ...state.resources, ...payload?.resources },
-  loading: false,
+  initialResourcesPending: false,
 });
 
 const receivedResource: StateHandler = (state, action) => {
@@ -482,7 +477,6 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.Error]: errorHandler,
     [CalendarAction.JoinedGroup]: joinedGroup,
     [CalendarAction.LeftGroup]: leftGroup,
-    [CalendarAction.Loading]: loading,
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.OpenReservationForm]: openReservationForm,
     [CalendarAction.OpenProjectForm]: openProjectForm,
