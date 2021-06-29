@@ -25,6 +25,9 @@ import EventEditor from "./EventEditor";
 import ProjectForm from "./ProjectForm";
 import Snackbar from "./Snackbar";
 import ErrorPage from "./ErrorPage";
+import User from "../resources/User";
+import Event from "../resources/Event";
+import Location from "../resources/Location";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
@@ -44,11 +47,11 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       dispatch,
       CalendarAction.ReceivedAllResources,
       CalendarAction.Error,
-      `/api/events?context=${ResourceKey.Events}`,
-      `/api/locations?context=${ResourceKey.Locations}`,
-      `/api/users/${user.username}/courses?context=${ResourceKey.Courses}`,
-      `/api/users/${user.username}/groups?context=${ResourceKey.Groups}`,
-      `/api/users/${user.username}/projects?context=${ResourceKey.Projects}`
+      `${Event.url}?context=${ResourceKey.Events}`,
+      `${Location.url}?context=${ResourceKey.Locations}`,
+      `${User.url}/${user.id}/courses?context=${ResourceKey.Courses}`,
+      `${User.url}/${user.id}/groups?context=${ResourceKey.Groups}`,
+      `${User.url}/${user.id}/projects?context=${ResourceKey.Projects}`
     );
   }, [user]);
 
