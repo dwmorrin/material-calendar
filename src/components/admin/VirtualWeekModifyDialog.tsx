@@ -329,7 +329,6 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
                     Submit
                   </Button>
                 </DialogActions>
-                <pre>{JSON.stringify(values, null, 2)}</pre>
               </Form>
             )}
           </Formik>
