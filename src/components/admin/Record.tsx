@@ -1,22 +1,20 @@
 import React, { FunctionComponent } from "react";
 import {
   Card,
+  CardContent,
   List,
   ListItem,
-  CardContent,
-  CardActions,
-  IconButton,
   makeStyles,
 } from "@material-ui/core";
 import { AdminAction, AdminUIProps } from "../../admin/types";
 import { ResourceInstance } from "../../resources/types";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 
 const useStyles = makeStyles({
   record: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    cursor: "pointer",
   },
 });
 
@@ -29,7 +27,15 @@ const Record: FunctionComponent<
 > = ({ dispatch, document, template }) => {
   const classes = useStyles();
   return (
-    <Card className={classes.record}>
+    <Card
+      className={classes.record}
+      onClick={(): void =>
+        dispatch({
+          type: AdminAction.SelectedDocument,
+          payload: { resourceInstance: document },
+        })
+      }
+    >
       <CardContent>
         <List>
           {template.map(([key, value], index) => (
@@ -39,18 +45,6 @@ const Record: FunctionComponent<
           ))}
         </List>
       </CardContent>
-      <CardActions>
-        <IconButton
-          onClick={(): void =>
-            dispatch({
-              type: AdminAction.SelectedDocument,
-              payload: { resourceInstance: document },
-            })
-          }
-        >
-          <ArrowForwardIcon />
-        </IconButton>
-      </CardActions>
     </Card>
   );
 };
