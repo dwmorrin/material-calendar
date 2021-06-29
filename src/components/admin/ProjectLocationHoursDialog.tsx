@@ -5,6 +5,11 @@ import {
   DialogTitle,
   DialogActions,
   DialogContent,
+  Paper,
+  Table,
+  TableCell,
+  TableContainer,
+  TableRow,
 } from "@material-ui/core";
 import { TextField } from "formik-material-ui";
 import DraggablePaper from "../DraggablePaper";
@@ -151,10 +156,41 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   return (
     <DialogWrapper state={state} dispatch={dispatch} onClose={close}>
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-        Set hours for {project.title} in {location.title}
+        Allot project hours
       </DialogTitle>
       <DialogContent>
-        <p>{parseAndFormatSQLDateInterval(selectedWeek)}</p>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableRow>
+              <TableCell>Location</TableCell>
+              <TableCell>{location.title}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Project</TableCell>
+              <TableCell>{project.title}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Virtual week</TableCell>
+              <TableCell>
+                {parseAndFormatSQLDateInterval(selectedWeek)}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Location hours</TableCell>
+              <TableCell>{selectedWeek.locationHours}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Project hours</TableCell>
+              <TableCell>{selectedWeek.projectHours}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Hours remaining</TableCell>
+              <TableCell>
+                {selectedWeek.locationHours - selectedWeek.projectHours}
+              </TableCell>
+            </TableRow>
+          </Table>
+        </TableContainer>
         <Formik
           initialValues={initialValues}
           onSubmit={onSubmit}

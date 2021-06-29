@@ -1,9 +1,21 @@
 import React, { FC } from "react";
-import { Dialog, DialogTitle, DialogContent, Button } from "@material-ui/core";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Paper,
+  Table,
+  TableCell,
+  TableContainer,
+  TableRow,
+} from "@material-ui/core";
 import DraggablePaper from "../DraggablePaper";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
+import { formatSlashed, parseSQLDate } from "../../utils/date";
 
 const ProjectLocationHoursSummaryDialog: FC<AdminUIProps> = ({
   dispatch,
@@ -31,8 +43,6 @@ const ProjectLocationHoursSummaryDialog: FC<AdminUIProps> = ({
     0
   );
 
-  const title = `${project.title} - Allotted: ${allottedHours} - Max: ${locationHours.hours}`;
-
   const close = (): void =>
     dispatch({ type: AdminAction.CloseProjectLocationHoursSummaryDialog });
 
@@ -55,11 +65,40 @@ const ProjectLocationHoursSummaryDialog: FC<AdminUIProps> = ({
       aria-labelledby="draggable-dialog-title"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-        {title}
+        {project.title}
       </DialogTitle>
       <DialogContent>
-        <Button onClick={(): void => openProject()}>Open project</Button>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableRow>
+              <TableCell>Reservations start</TableCell>
+              <TableCell>
+                {formatSlashed(parseSQLDate(project.reservationStart))}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Alloted hours</TableCell>
+              <TableCell>{allottedHours}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Maximum hours</TableCell>
+              <TableCell>{locationHours.hours}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Group hours</TableCell>
+              <TableCell>{project.groupAllottedHours}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Group size</TableCell>
+              <TableCell>{project.groupSize}</TableCell>
+            </TableRow>
+          </Table>
+        </TableContainer>
       </DialogContent>
+      <DialogActions>
+        <Button onClick={(): void => openProject()}>Open project</Button>
+        <Button onClick={close}>Close</Button>
+      </DialogActions>
     </Dialog>
   );
 };
