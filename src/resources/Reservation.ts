@@ -16,7 +16,7 @@ interface Reservation {
     requested: ActionDetails;
     approved: ActionDetails;
     rejected: ActionDetails;
-  };
+  } | null;
 }
 
 class Reservation implements Reservation {
