@@ -17,7 +17,7 @@ class Semester implements Semester {
       title: "",
       start: formatSQLDate(),
       end: formatSQLDate(),
-      active: true,
+      active: false,
     }
   ) {
     Object.assign(this, semester);
