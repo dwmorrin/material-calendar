@@ -315,16 +315,25 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       invitation.invitor.name.last +
                       " wants to form a group with " +
                       invitation.invitees
-                        .filter((invitee) => invitee.id !== user.id)
+                        .filter(function (invitee) {
+                          if (
+                            invitee.id !==
+                            user.id /* && invitee.accepted == 1 */
+                          )
+                            return true;
+                        })
                         .map(
                           (invitee) =>
                             invitee.name.first + " " + invitee.name.last
                         )
-                        .join(",") +
-                      (invitation.invitees.filter(
-                        (invitee) => invitee.id !== user.id
-                      ).length
-                        ? " and"
+                        .join(", ") +
+                      (invitation.invitees.filter(function (invitee) {
+                        if (
+                          invitee.id !== user.id /* && invitee.accepted == 1 */
+                        )
+                          return true;
+                      }).length
+                        ? ", and"
                         : "") +
                       " you"}
                     <ButtonGroup
