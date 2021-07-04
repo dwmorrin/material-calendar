@@ -153,6 +153,7 @@ const closeProjectDashboard: StateHandler = (state) => ({
   ...state,
   projectDashboardIsOpen: false,
   currentProject: undefined,
+  currentGroup: undefined,
 });
 
 const closeProjectForm: StateHandler = (state) => ({
