@@ -70,7 +70,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
           });
         }
         setUsers(data.map((user: User) => new User(user)) as User[]);
-        fetch(`/api/projects/${currentProject.id}/invitations/${user?.id}`)
+        fetch(`/api/invitations/user/${user?.id}/project/${currentProject.id}`)
           .then((response) => response.json())
           .then(({ error, data, context }) => {
             if (error || !data) {
@@ -146,7 +146,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
               onClick={(event): void => {
                 event.stopPropagation();
                 // remove user from group
-                fetch(`/api/users/${user.id}/groups/${currentGroup.id}`, {
+                fetch(`/api/groups/${currentGroup.id}/user/${user.id}`, {
                   method: "DELETE",
                   headers: {},
                   body: null,
@@ -165,7 +165,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       );
                       //Mark group Invitation Rejected so it doesn't show up again
                       if (invitation !== undefined) {
-                        fetch(`/api/projects/invitations/${invitation.id}`, {
+                        fetch(`/api/invitations/${invitation.id}`, {
                           method: "PUT",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({
@@ -186,7 +186,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       }
                       //If user was the last member of the group, delete the group
                       if (currentGroup.members.length <= 1) {
-                        fetch(`/api/users/groups/${currentGroup.id}`, {
+                        fetch(`/api/groups/${currentGroup.id}`, {
                           method: "DELETE",
                           headers: {},
                           body: null,
@@ -251,7 +251,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                           event.stopPropagation();
                           // Delete invitation which will delete
                           // entries on invitee table via CASCADE
-                          fetch(`/api/projects/invitations/${invitation.id}`, {
+                          fetch(`/api/invitations/${invitation.id}`, {
                             method: "DELETE",
                             headers: {},
                             body: null,
@@ -265,13 +265,17 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                   meta: context,
                                 });
                               } else {
-                                // Remove invitation from state
-                                setInvitations(
-                                  invitations.splice(
-                                    invitations.indexOf(invitation),
-                                    1
-                                  )
+                                const invites = invitations;
+                                invites.splice(
+                                  invites
+                                    .map(function (x) {
+                                      return x.id;
+                                    })
+                                    .indexOf(invitation.id),
+                                  1
                                 );
+                                // Remove invitation from state
+                                setInvitations(invites);
                                 dispatch({
                                   type: CalendarAction.DisplayMessage,
                                   payload: {
@@ -332,7 +336,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                         style={{ backgroundColor: "Green", color: "white" }}
                         onClick={(): void => {
                           // Accept Invitation
-                          fetch(`/api/projects/invitations/${invitation.id}`, {
+                          fetch(`/api/invitations/${invitation.id}`, {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
@@ -353,7 +357,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                 invitation.group_id
                                   ? // Join Group
                                     fetch(
-                                      `/api/users/groups/${invitation.group_id}/invitation/${invitation.id}`,
+                                      `/api/groups/${invitation.group_id}/invitation/${invitation.id}`,
                                       {
                                         method: "POST",
                                         headers: {
@@ -373,7 +377,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                         } else {
                                           // Get new group info and set state.currentGroup to it
                                           fetch(
-                                            `/api/users/groups/${invitation.group_id}`
+                                            `/api/groups/${invitation.group_id}`
                                           )
                                             .then((response) => response.json())
                                             .then(
@@ -399,7 +403,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                       })
                                   : // Create group based on invitation id
                                     fetch(
-                                      `/api/users/groups/${invitation.id}`,
+                                      `/api/groups/invitation/${invitation.id}`,
                                       {
                                         method: "POST",
                                         headers: {
@@ -420,7 +424,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                           const insertId = data.id;
                                           // Join Group
                                           fetch(
-                                            `/api/users/groups/${insertId}/invitation/${invitation.id}`,
+                                            `/api/groups/${insertId}/invitation/${invitation.id}`,
                                             {
                                               method: "POST",
                                               headers: {
@@ -442,7 +446,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                                 } else {
                                                   // Get new group info and set state.currentGroup to it
                                                   fetch(
-                                                    `/api/users/groups/${insertId}`
+                                                    `/api/groups/${insertId}`
                                                   )
                                                     .then((response) =>
                                                       response.json()
@@ -487,7 +491,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                         style={{ backgroundColor: "Red", color: "white" }}
                         onClick={(): void => {
                           // set invitation to rejected for invitee
-                          fetch(`/api/projects/invitations/${invitation.id}`, {
+                          fetch(`/api/invitations/${invitation.id}`, {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
@@ -504,13 +508,17 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                   meta: context,
                                 });
                               } else {
-                                // Remove invitation from state to not display it
-                                setInvitations(
-                                  invitations.splice(
-                                    invitations.indexOf(invitation),
-                                    1
-                                  )
+                                const invites = invitations;
+                                invites.splice(
+                                  invites
+                                    .map(function (x) {
+                                      return x.id;
+                                    })
+                                    .indexOf(invitation.id),
+                                  1
                                 );
+                                // Remove invitation from state
+                                setInvitations(invites);
                                 dispatch({
                                   type: CalendarAction.DisplayMessage,
                                   payload: {
@@ -546,12 +554,13 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                   if (requestedUsers.length > 0) {
                     event.stopPropagation();
                     // Create Invitation
-                    fetch(`/api/projects/${currentProject?.id}/invitations/`, {
+                    fetch(`/api/invitations/`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
-                        invitor: user.id,
+                        invitorId: user.id,
                         invitees: requestedUsers,
+                        projectId: currentProject?.id,
                       }),
                     })
                       .then((response) => response.json())
@@ -565,7 +574,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                         } else {
                           // Get list of invitations again (to get the new one)
                           fetch(
-                            `/api/projects/${currentProject?.id}/invitations/${user?.id}`
+                            `/api/invitations/user/${user?.id}/project/${currentProject?.id}`
                           )
                             .then((response) => response.json())
                             .then(({ error, data, context }) => {

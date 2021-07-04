@@ -26,7 +26,7 @@ class UserGroup implements UserGroup {
     }
     return lastNames.slice(0, -1).join(", ") + ", and " + lastNames.slice(-1);
   }
-  static url = "/api/users/groups";
+  static url = "/api/groups";
   constructor(
     group = {
       id: 0,

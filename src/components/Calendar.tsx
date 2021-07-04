@@ -28,6 +28,7 @@ import ErrorPage from "./ErrorPage";
 import User from "../resources/User";
 import Event from "../resources/Event";
 import Location from "../resources/Location";
+import UserGroup from "../resources/UserGroup";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
@@ -50,7 +51,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `${Event.url}?context=${ResourceKey.Events}`,
       `${Location.url}?context=${ResourceKey.Locations}`,
       `${User.url}/${user.id}/courses?context=${ResourceKey.Courses}`,
-      `${User.url}/${user.id}/groups?context=${ResourceKey.Groups}`,
+      `${UserGroup.url}/user/${user.id}/?context=${ResourceKey.Groups}`,
       `${User.url}/${user.id}/projects?context=${ResourceKey.Projects}`
     );
   }, [user]);
