@@ -43,15 +43,16 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    fetchAllResources(
-      dispatch,
-      AdminAction.ReceivedAllResources,
-      AdminAction.Error,
-      ...makeUrlsForAllResources()
-    );
-  }, []);
+    if (User.isAdmin(user))
+      fetchAllResources(
+        dispatch,
+        AdminAction.ReceivedAllResources,
+        AdminAction.Error,
+        ...makeUrlsForAllResources()
+      );
+  }, [user]);
 
-  if (process.env.NODE_ENV !== "development" && !User.isAdmin(user)) {
+  if (!User.isAdmin(user)) {
     return <Redirect to="/" replace={true} noThrow={true} />;
   }
   if (state.initialResourcesPending) return <CircularProgress />;

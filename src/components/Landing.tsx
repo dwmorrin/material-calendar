@@ -2,6 +2,7 @@ import React, { FC, useContext, useEffect } from "react";
 import { RouteComponentProps, navigate } from "@reach/router";
 import { AuthContext } from "./AuthContext";
 import User from "../resources/User";
+import { useState } from "react";
 
 /**
  * This landing page assumes the app is protected behind a server handling authentication.
@@ -10,12 +11,16 @@ import User from "../resources/User";
  * and magically all the user details will be returned to the app.
  *
  * This page should just display animation and/or a "loading" message and then get redirected
- * to a working app page or an error page.
+ * to a working app page.
+ * If the API does not respond with success, the component assumes that the
+ * user is authenticated but not registered to use the app (user does not exist in the app database).
  *
  * @returns Landing page component
  */
 const Landing: FC<RouteComponentProps> = () => {
   const { user, setUser } = useContext(AuthContext);
+  const [unauthorized, setUnauthorized] = useState(false);
+
   useEffect(() => {
     if (!user || !setUser) throw new Error("no method to login user available");
     if (user.username) navigate("/calendar");
@@ -23,9 +28,7 @@ const Landing: FC<RouteComponentProps> = () => {
       fetch("/login")
         .then((response) => response.json())
         .then(({ data, error }) => {
-          if (!data) {
-            throw new Error(error);
-          }
+          if (error || !data) return setUnauthorized(true);
           setUser(new User(data));
           navigate("/calendar");
         })
@@ -33,7 +36,16 @@ const Landing: FC<RouteComponentProps> = () => {
           throw new Error(error); // TODO handle 500 & 401 responses
         });
   }, [user, setUser]);
-  return <div>Loading...</div>;
+
+  return unauthorized ? (
+    <>
+      <h1>Are you registered?</h1>
+      <p>We were unable to find you in our system.</p>
+      <a href={process.env.REACT_APP_HELP_URL}>Click here to contact us.</a>
+    </>
+  ) : (
+    <>Loading...</>
+  );
 };
 
 export default Landing;
