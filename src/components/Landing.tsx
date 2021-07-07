@@ -3,6 +3,7 @@ import { RouteComponentProps, navigate } from "@reach/router";
 import { AuthContext } from "./AuthContext";
 import User from "../resources/User";
 import { useState } from "react";
+import LoggedOut from "./LoggedOut";
 
 /**
  * This landing page assumes the app is protected behind a server handling authentication.
@@ -18,13 +19,13 @@ import { useState } from "react";
  * @returns Landing page component
  */
 const Landing: FC<RouteComponentProps> = () => {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser, loggedOut } = useContext(AuthContext);
   const [unauthorized, setUnauthorized] = useState(false);
 
   useEffect(() => {
     if (!user || !setUser) throw new Error("no method to login user available");
     if (user.username) navigate("/calendar");
-    else
+    else if (!loggedOut)
       fetch("/login")
         .then((response) => response.json())
         .then(({ data, error }) => {
@@ -35,7 +36,7 @@ const Landing: FC<RouteComponentProps> = () => {
         .catch((error) => {
           throw new Error(error); // TODO handle 500 & 401 responses
         });
-  }, [user, setUser]);
+  }, [user, setUser, loggedOut]);
 
   return unauthorized ? (
     <>
@@ -43,6 +44,8 @@ const Landing: FC<RouteComponentProps> = () => {
       <p>We were unable to find you in our system.</p>
       <a href={process.env.REACT_APP_HELP_URL}>Click here to contact us.</a>
     </>
+  ) : loggedOut ? (
+    <LoggedOut />
   ) : (
     <>Loading...</>
   );

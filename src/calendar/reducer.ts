@@ -374,10 +374,6 @@ const selectedLocation: StateHandler = (state, action) => {
       ErrorType.MISSING_RESOURCE
     );
   }
-  sessionStorage.setItem(
-    "locations",
-    JSON.stringify(!payload.resources[ResourceKey.Locations])
-  );
   return {
     ...state,
     resources: {

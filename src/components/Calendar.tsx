@@ -31,7 +31,7 @@ import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
-  const { user } = useContext(AuthContext);
+  const { user, loggedOut } = useContext(AuthContext);
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
@@ -43,7 +43,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   } as CalendarSelections);
 
   useEffect(() => {
-    if (!user?.username) return;
+    if (loggedOut || !user.username) return;
     fetchAllResources(
       dispatch,
       CalendarAction.ReceivedAllResources,
@@ -54,10 +54,10 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `${UserGroup.url}/user/${user.id}/?context=${ResourceKey.Groups}`,
       `${User.url}/${user.id}/projects?context=${ResourceKey.Projects}`
     );
-  }, [user]);
+  }, [user, loggedOut]);
 
   return (
-    (user?.username && (
+    (!loggedOut && !!user.username && (
       <Box>
         <ErrorPage open={state.appIsBroken} error={state.error} />
         <ProjectDashboard dispatch={dispatch} state={state} />

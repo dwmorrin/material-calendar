@@ -13,7 +13,7 @@ import User from "../resources/User";
 const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   inAdminApp,
 }) => {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser, setLoggedOut } = useContext(AuthContext);
   const isAdmin = process.env.NODE_ENV === "development" || User.isAdmin(user);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = !!anchorEl;
@@ -24,16 +24,10 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   const handleClose = (): void => setAnchorEl(null);
 
   const logout = (): void => {
-    if (!user || !setUser) {
-      throw new Error("no method to logout user");
-    }
-    fetch("/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    sessionStorage.clear();
+    // if server-side cleanup needed, uncomment below
+    // fetch("/logout", { method: "POST" });
+    setLoggedOut(true);
     setUser(new User());
-    navigate("/");
   };
 
   return (
