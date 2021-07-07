@@ -65,44 +65,45 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   // Update the event when the EventDetail is opened and when reservation form is closed
   useEffect(() => {
-    fetch(`/api/events/${state.currentEvent?.id}`)
-      .then((res) => res.json())
-      .then(({ error, data, context }) => {
-        if (error || !data) {
-          return dispatch({
-            type: CalendarAction.Error,
-            payload: { error },
-            meta: context,
-          });
-        }
-        // Compare the contents of the events
-        if (!deepEqual(data[0], state.currentEvent)) {
-          // events out of date, updating
-          fetch(`/api/events`)
-            .then((res) => res.json())
-            .then(({ error, data, context }) =>
-              dispatch(
-                error || !data
-                  ? {
-                      type: CalendarAction.Error,
-                      payload: { error },
-                      meta: context,
-                    }
-                  : {
-                      type: CalendarAction.UpdateEvents,
-                      payload: {
-                        resources: {
-                          [ResourceKey.Events]: data.map(
-                            (e: Event) => new Event(e)
-                          ),
+    if (state.currentEvent?.id)
+      fetch(`${Event.url}/${state.currentEvent.id}`)
+        .then((res) => res.json())
+        .then(({ error, data, context }) => {
+          if (error || !data) {
+            return dispatch({
+              type: CalendarAction.Error,
+              payload: { error },
+              meta: context,
+            });
+          }
+          // Compare the contents of the events
+          if (!deepEqual(data[0], state.currentEvent)) {
+            // events out of date, updating
+            fetch(Event.url)
+              .then((res) => res.json())
+              .then(({ error, data, context }) =>
+                dispatch(
+                  error || !data
+                    ? {
+                        type: CalendarAction.Error,
+                        payload: { error },
+                        meta: context,
+                      }
+                    : {
+                        type: CalendarAction.UpdateEvents,
+                        payload: {
+                          resources: {
+                            [ResourceKey.Events]: data.map(
+                              (e: Event) => new Event(e)
+                            ),
+                          },
                         },
-                      },
-                      meta: ResourceKey.Events,
-                    }
-              )
-            );
-        }
-      });
+                        meta: ResourceKey.Events,
+                      }
+                )
+              );
+          }
+        });
   }, [dispatch, state.detailIsOpen, state.reservationFormIsOpen]);
 
   if (!state.currentEvent || !state.currentEvent.location || !user?.username) {
