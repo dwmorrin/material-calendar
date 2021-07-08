@@ -39,25 +39,15 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { currentGroup, currentProject } = state;
   const [users, setUsers] = useState([] as User[]);
-  const [invitations, setInvitations] = useState(
-    [] as {
-      id: number;
-      confirmed: number;
-      project: number;
-      invitor: { id: number; name: { last: string; first: string } };
-      invitees: {
-        id: number;
-        accepted: number;
-        rejected: number;
-        name: { last: string; first: string };
-      }[];
-      group_id: number;
-    }[]
-  );
-  const [requestedUsers, setRequestedUsers] = useState([] as number[]);
+  const [selectedUsers, setSelectedUsers] = useState([] as number[]);
   const { user } = useContext(AuthContext);
+  const invitations =
+    state.invitations?.filter(
+      (invitation) => invitation.project === currentProject?.id
+    ) || [];
+  const isNotCurrentUser = ({ id }: { id: number }): boolean => id !== user.id;
   useEffect(() => {
-    setRequestedUsers([]);
+    setSelectedUsers([]);
     if (!currentProject?.id) return;
     fetch(`/api/projects/${currentProject.id}/users`)
       .then((response) => response.json())
@@ -70,7 +60,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
           });
         }
         setUsers(data.map((user: User) => new User(user)) as User[]);
-        fetch(`/api/invitations/user/${user?.id}/project/${currentProject.id}`)
+        fetch(`/api/invitations/user/${user?.id}`)
           .then((response) => response.json())
           .then(({ error, data, context }) => {
             if (error || !data) {
@@ -80,20 +70,25 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                 meta: context,
               });
             }
-            setInvitations(data);
+            dispatch({
+              type: CalendarAction.ReceivedInvitations,
+              payload: {
+                invitations: data,
+              },
+            });
           });
       });
   }, [currentProject, dispatch, state.currentGroup, user]);
 
   const selectUser = (userId: number): void => {
-    const newList: number[] = requestedUsers;
+    const newList: number[] = selectedUsers;
     const valueExisting = newList.indexOf(userId);
     if (valueExisting !== -1) {
       newList.splice(valueExisting, 1);
     } else {
       newList.push(userId);
     }
-    setRequestedUsers(newList);
+    setSelectedUsers(newList);
   };
   if (!user) return null;
   return (
@@ -234,7 +229,9 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       }}
                     >
                       {invitation.invitees.map((invitee) => (
-                        <ListItem key={`invitee${invitee.id}`}>
+                        <ListItem
+                          key={`invitation-${invitation.id}-invitee-${invitee.id}`}
+                        >
                           {invitee.name.first + " " + invitee.name.last + "  "}
                           {invitee.accepted ? (
                             <ThumbUpIcon />
@@ -265,17 +262,24 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                   meta: context,
                                 });
                               } else {
-                                const invites = invitations;
-                                invites.splice(
-                                  invites
-                                    .map(function (x) {
-                                      return x.id;
-                                    })
-                                    .indexOf(invitation.id),
-                                  1
-                                );
-                                // Remove invitation from state
-                                setInvitations(invites);
+                                //Get updated invitations
+                                fetch(`/api/invitations/user/${user?.id}`)
+                                  .then((response) => response.json())
+                                  .then(({ error, data, context }) => {
+                                    if (error || !data) {
+                                      return dispatch({
+                                        type: CalendarAction.Error,
+                                        payload: { error },
+                                        meta: context,
+                                      });
+                                    }
+                                    dispatch({
+                                      type: CalendarAction.ReceivedInvitations,
+                                      payload: {
+                                        invitations: data,
+                                      },
+                                    });
+                                  });
                                 dispatch({
                                   type: CalendarAction.DisplayMessage,
                                   payload: {
@@ -315,24 +319,13 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       invitation.invitor.name.last +
                       " wants to form a group with " +
                       invitation.invitees
-                        .filter(function (invitee) {
-                          if (
-                            invitee.id !==
-                            user.id /* && invitee.accepted == 1 */
-                          )
-                            return true;
-                        })
+                        .filter(isNotCurrentUser)
                         .map(
                           (invitee) =>
                             invitee.name.first + " " + invitee.name.last
                         )
                         .join(", ") +
-                      (invitation.invitees.filter(function (invitee) {
-                        if (
-                          invitee.id !== user.id /* && invitee.accepted == 1 */
-                        )
-                          return true;
-                      }).length
+                      (invitation.invitees.some(isNotCurrentUser)
                         ? ", and"
                         : "") +
                       " you"}
@@ -517,17 +510,23 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                   meta: context,
                                 });
                               } else {
-                                const invites = invitations;
-                                invites.splice(
-                                  invites
-                                    .map(function (x) {
-                                      return x.id;
-                                    })
-                                    .indexOf(invitation.id),
-                                  1
-                                );
-                                // Remove invitation from state
-                                setInvitations(invites);
+                                fetch(`/api/invitations/user/${user?.id}`)
+                                  .then((response) => response.json())
+                                  .then(({ error, data, context }) => {
+                                    if (error || !data) {
+                                      return dispatch({
+                                        type: CalendarAction.Error,
+                                        payload: { error },
+                                        meta: context,
+                                      });
+                                    }
+                                    dispatch({
+                                      type: CalendarAction.ReceivedInvitations,
+                                      payload: {
+                                        invitations: data,
+                                      },
+                                    });
+                                  });
                                 dispatch({
                                   type: CalendarAction.DisplayMessage,
                                   payload: {
@@ -553,14 +552,14 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
             </AccordionSummary>
             <List>
               <Button
-                // setting disabled={requestedUsers.length == 0} does not
+                // setting disabled={selectedUsers.length == 0} does not
                 // seem to work, due to local state?
                 size="small"
                 variant="contained"
                 color="inherit"
                 onClick={(event): void => {
                   // Because button disable does not work, prevent empty invitations here
-                  if (requestedUsers.length > 0) {
+                  if (selectedUsers.length > 0) {
                     event.stopPropagation();
                     // Create Invitation
                     fetch(`/api/invitations/`, {
@@ -568,7 +567,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
                         invitorId: user.id,
-                        invitees: requestedUsers,
+                        invitees: selectedUsers,
                         projectId: currentProject?.id,
                       }),
                     })
@@ -582,9 +581,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                           });
                         } else {
                           // Get list of invitations again (to get the new one)
-                          fetch(
-                            `/api/invitations/user/${user?.id}/project/${currentProject?.id}`
-                          )
+                          fetch(`/api/invitations/user/${user?.id}`)
                             .then((response) => response.json())
                             .then(({ error, data, context }) => {
                               if (error || !data) {
@@ -594,14 +591,19 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                   meta: context,
                                 });
                               }
-                              setInvitations(data);
                               dispatch({
-                                type: CalendarAction.DisplayMessage,
+                                type: CalendarAction.ReceivedInvitations,
                                 payload: {
-                                  message: "Invitation Sent",
+                                  invitations: data,
                                 },
                               });
                             });
+                          dispatch({
+                            type: CalendarAction.DisplayMessage,
+                            payload: {
+                              message: "Invitation Sent",
+                            },
+                          });
                         }
                       });
                   } else {

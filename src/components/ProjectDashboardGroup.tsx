@@ -1,8 +1,15 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useContext } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
-import { Typography, Avatar, Button, LinearProgress } from "@material-ui/core";
+import {
+  Typography,
+  Avatar,
+  Button,
+  LinearProgress,
+  Badge,
+} from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import UserGroup from "../resources/UserGroup";
+import { AuthContext } from "./AuthContext";
 
 const availableHoursAsPercent = (maximum: number, used: number): number =>
   (100 * (maximum - used)) / maximum;
@@ -17,7 +24,16 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
       (g) => g.projectId === currentProject?.id
     ) || new UserGroup();
 
+  const { user } = useContext(AuthContext);
   if (!currentProject || isNaN(currentProject.groupAllottedHours)) return null;
+
+  const unansweredInvitations =
+    state.invitations?.filter(function (invitation) {
+      // Get Invitations where user has yet to respond
+      const u = invitation.invitees.find((invitee) => invitee.id === user.id);
+      if (u?.accepted == 0 && u.rejected === 0) return true;
+      else return false;
+    }) || [];
 
   return (
     <section>
@@ -47,16 +63,25 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
           </Avatar>
         ))}
       </div>
-      <Button
-        size="small"
-        variant="contained"
-        color="inherit"
-        onClick={(): void =>
-          dispatch({ type: CalendarAction.OpenGroupDashboard })
+      <Badge
+        color="secondary"
+        badgeContent={
+          unansweredInvitations.filter(
+            (invitation) => currentProject.id === invitation.project
+          ).length
         }
       >
-        Manage group
-      </Button>
+        <Button
+          size="small"
+          variant="contained"
+          color="inherit"
+          onClick={(): void =>
+            dispatch({ type: CalendarAction.OpenGroupDashboard })
+          }
+        >
+          Manage group
+        </Button>
+      </Badge>
     </section>
   );
 };

@@ -2,6 +2,7 @@ import React, {
   FunctionComponent,
   useContext,
   useEffect,
+  useState,
   useReducer,
   useRef,
 } from "react";
@@ -55,6 +56,23 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `${UserGroup.url}/user/${user.id}/?context=${ResourceKey.Groups}`,
       `${User.url}/${user.id}/projects?context=${ResourceKey.Projects}`
     );
+    fetch(`/api/invitations/user/${user?.id}/`)
+      .then((response) => response.json())
+      .then(({ error, data, context }) => {
+        if (error || !data) {
+          return dispatch({
+            type: CalendarAction.Error,
+            payload: { error },
+            meta: context,
+          });
+        }
+        dispatch({
+          type: CalendarAction.ReceivedInvitations,
+          payload: {
+            invitations: data,
+          },
+        });
+      });
   }, [user, loggedOut]);
 
   return (

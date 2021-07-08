@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useContext } from "react";
 import {
   CalendarAction,
   CalendarUIProps,
@@ -11,12 +11,14 @@ import {
   Typography,
   Button,
   makeStyles,
+  Badge,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import TodayIcon from "@material-ui/icons/Today";
 import ViewMenu from "./ViewMenu";
 import MoreMenu from "./MoreMenu";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { AuthContext } from "./AuthContext";
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -31,7 +33,15 @@ const useStyles = makeStyles(() => ({
 const CalendarBar: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
 > = ({ dispatch, state, selections, setSelections }) => {
+  const { user } = useContext(AuthContext);
   const classes = useStyles();
+  const unansweredInvitations =
+    state.invitations?.filter(function (invitation) {
+      // Get Invitations where user has yet to respond
+      const u = invitation.invitees.find((invitee) => invitee.id === user.id);
+      if (u?.accepted == 0 && u.rejected === 0) return true;
+      else return false;
+    }) || [];
   return (
     <AppBar>
       <Toolbar className={classes.toolbar}>
@@ -41,7 +51,16 @@ const CalendarBar: FunctionComponent<
           aria-label="menu"
           onClick={(): void => dispatch({ type: CalendarAction.ToggleDrawer })}
         >
-          <MenuIcon />
+          <Badge
+            color="secondary"
+            badgeContent={
+              unansweredInvitations.filter(
+                (invitation) => invitation.invitor.id !== user?.id
+              ).length
+            }
+          >
+            <MenuIcon />
+          </Badge>
         </IconButton>
         <Button
           endIcon={<ExpandMoreIcon />}

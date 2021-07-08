@@ -161,17 +161,32 @@ function closeEventEditor(state: CalendarState): CalendarState {
   };
 }
 
-const closeGroupDashboard: StateHandler = (state) => ({
-  ...state,
-  groupDashboardIsOpen: false,
-});
-
 const closeProjectDashboard: StateHandler = (state) => ({
   ...state,
   projectDashboardIsOpen: false,
   currentProject: undefined,
   currentGroup: undefined,
 });
+
+const closeGroupDashboard: StateHandler = (state, action) => {
+  if (state.currentGroup == undefined) {
+    return closeProjectDashboard(
+      {
+        ...state,
+        groupDashboardIsOpen: false,
+        projectDashboardIsOpen: false,
+        currentProject: undefined,
+        currentGroup: undefined,
+      },
+      action
+    );
+  } else {
+    return {
+      ...state,
+      groupDashboardIsOpen: false,
+    };
+  }
+};
 
 const closeProjectForm: StateHandler = (state) => ({
   ...state,
@@ -300,6 +315,18 @@ const openProjectDashboard: StateHandler = (state, action) => {
   const group =
     currentGroup ||
     groups.find((group) => group.projectId === currentProject.id);
+  if (!group) {
+    return openGroupDashboard(
+      {
+        ...state,
+        currentGroup: group,
+        currentProject: currentProject,
+        projectDashboardIsOpen: true,
+        groupDashboardIsOpen: true,
+      },
+      action
+    );
+  }
   return {
     ...state,
     currentGroup: group,
@@ -326,6 +353,19 @@ const receivedAllResources: StateHandler = (state, { payload }) => ({
   resources: { ...state.resources, ...payload?.resources },
   initialResourcesPending: false,
 });
+
+const receivedInvitations: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload?.invitations) {
+    return errorRedirect(
+      state,
+      action,
+      "no invitations in received",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  return { ...state, invitations: payload.invitations };
+};
 
 const selectedEvent: StateHandler = (state, action) => {
   const { payload } = action;
@@ -485,6 +525,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.OpenReservationForm]: openReservationForm,
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,
+    [CalendarAction.ReceivedInvitations]: receivedInvitations,
     [CalendarAction.ReceivedResource]: receivedResource,
     [CalendarAction.SelectedEvent]: selectedEvent,
     [CalendarAction.SelectedGroup]: selectedGroup,
