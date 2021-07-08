@@ -40,6 +40,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const [selections, setSelections] = useLocalStorage("calendar-selections", {
     locationIds: [],
     projectIds: [],
+    calendarView: "resourceTimeGridWeek",
   } as CalendarSelections);
 
   useEffect(() => {
@@ -74,7 +75,12 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
           open={state.eventEditorIsOpen}
           event={state.currentEvent}
         />
-        <CalendarBar dispatch={dispatch} state={state} />
+        <CalendarBar
+          dispatch={dispatch}
+          state={state}
+          selections={selections}
+          setSelections={setSelections}
+        />
         {state.pickerShowing && (
           <StaticDatePicker dispatch={dispatch} state={state} />
         )}

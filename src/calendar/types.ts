@@ -7,7 +7,6 @@ import { SnackbarState } from "../components/Snackbar";
 
 export enum CalendarAction {
   CanceledReservation,
-  ChangedView,
   CloseEquipmentForm,
   CloseEventDetail,
   CloseEventEditor,
@@ -49,7 +48,6 @@ export interface CalendarState {
   // UI state
   appIsBroken: boolean;
   currentStart: Date;
-  currentView: string;
   detailIsOpen: boolean;
   drawerIsOpen: boolean;
   eventEditorIsOpen: boolean;
@@ -98,6 +96,7 @@ export type ApiResponse = {
 export type CalendarSelections = {
   locationIds: number[];
   projectIds: number[];
+  calendarView: CalendarView;
 };
 
 export type CalendarUISelectionProps = {

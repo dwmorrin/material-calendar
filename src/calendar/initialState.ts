@@ -13,7 +13,6 @@ const resources = {
 export const initialCalendarState: CalendarState = {
   appIsBroken: false,
   currentStart: new Date(),
-  currentView: "resourceTimeGridDay",
   detailIsOpen: false,
   drawerIsOpen: false,
   message: "",

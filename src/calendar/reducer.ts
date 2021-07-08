@@ -115,20 +115,6 @@ const canceledReservation: StateHandler = (state) => {
   );
 };
 
-const changedView: StateHandler = (state, action) => {
-  const { payload } = action;
-  if (!state.ref?.current || !payload?.currentView) {
-    return errorRedirect(
-      state,
-      action,
-      "no calendar ref or no view received in view change request",
-      ErrorType.IMPOSSIBLE_STATE
-    );
-  }
-  state.ref.current.getApi().changeView(payload.currentView);
-  return { ...state, currentView: payload.currentView };
-};
-
 const closeEquipmentForm: StateHandler = (state) => ({
   ...state,
   equipmentFormIsOpen: false,
@@ -193,7 +179,7 @@ const joinedGroup: StateHandler = (state, action) => {
   );
 };
 
-const leftGroup: StateHandler = (state, action) => {
+const leftGroup: StateHandler = (state) => {
   return displayMessage(
     // This should probably not close the groupDashboard
     { ...state, currentGroup: undefined },
@@ -461,7 +447,6 @@ const viewToday: StateHandler = (state, action) => {
 const calendarReducer: StateHandler = (state, action) =>
   ({
     [CalendarAction.CanceledReservation]: canceledReservation,
-    [CalendarAction.ChangedView]: changedView,
     [CalendarAction.CloseEquipmentForm]: closeEquipmentForm,
     [CalendarAction.CloseEventDetail]: closeEventDetail,
     [CalendarAction.CloseEventEditor]: closeEventEditor,

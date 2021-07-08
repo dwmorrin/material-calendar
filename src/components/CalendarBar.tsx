@@ -1,5 +1,9 @@
 import React, { FunctionComponent } from "react";
-import { CalendarAction, CalendarUIProps } from "../calendar/types";
+import {
+  CalendarAction,
+  CalendarUIProps,
+  CalendarUISelectionProps,
+} from "../calendar/types";
 import {
   AppBar,
   IconButton,
@@ -24,10 +28,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const CalendarBar: FunctionComponent<CalendarUIProps> = ({
-  dispatch,
-  state,
-}) => {
+const CalendarBar: FunctionComponent<
+  CalendarUIProps & CalendarUISelectionProps
+> = ({ dispatch, state, selections, setSelections }) => {
   const classes = useStyles();
   return (
     <AppBar>
@@ -63,7 +66,12 @@ const CalendarBar: FunctionComponent<CalendarUIProps> = ({
         >
           <TodayIcon />
         </IconButton>
-        <ViewMenu dispatch={dispatch} state={state} />
+        <ViewMenu
+          dispatch={dispatch}
+          state={state}
+          selections={selections}
+          setSelections={setSelections}
+        />
         <MoreMenu />
       </Toolbar>
     </AppBar>

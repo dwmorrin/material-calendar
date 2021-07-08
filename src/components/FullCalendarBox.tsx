@@ -86,7 +86,7 @@ const FullCalendarBox: FunctionComponent<
         // EVENTS
         events={(_, successCallback): void => {
           // https://fullcalendar.io/docs/events-function
-          if (stringStartsWithResource(state.currentView)) {
+          if (stringStartsWithResource(selections.calendarView)) {
             // FullCalendar's resource system handles locations automatically
             // so long as we provide a .resourceId prop
             successCallback(events.map(addResourceId));
@@ -105,7 +105,7 @@ const FullCalendarBox: FunctionComponent<
         }
         // VISIBLE DATE RANGE
         initialDate={state.currentStart}
-        initialView={state.currentView}
+        initialView={selections.calendarView}
         // HEADER CONFIG
         headerToolbar={false}
         // INTERACTIONS
