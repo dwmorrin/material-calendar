@@ -263,9 +263,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                 });
                               } else {
                                 //Get updated invitations
-                                fetch(
-                                  `/api/invitations/user/${user?.id}/project/${currentProject?.id}`
-                                )
+                                fetch(`/api/invitations/user/${user?.id}`)
                                   .then((response) => response.json())
                                   .then(({ error, data, context }) => {
                                     if (error || !data) {
@@ -512,9 +510,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                   meta: context,
                                 });
                               } else {
-                                fetch(
-                                  `/api/invitations/user/${user?.id}/project/${currentProject?.id}`
-                                )
+                                fetch(`/api/invitations/user/${user?.id}`)
                                   .then((response) => response.json())
                                   .then(({ error, data, context }) => {
                                     if (error || !data) {
