@@ -30,15 +30,14 @@ const useStyles = makeStyles({
 });
 
 const hasTabs = (s: string): boolean =>
-  !!s
-    .split("\n")
-    .find((line) => line.length)
-    ?.includes("\t");
+  !!s.split("\n").find(String)?.includes("\t");
+
+const blankLine = /^\s*$/;
 
 const removeBlankLines = (s: string): string =>
   s
     .split("\n")
-    .filter((line) => line.length)
+    .filter((l) => !blankLine.test(l))
     .join("\n");
 
 const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
