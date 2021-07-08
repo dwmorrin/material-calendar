@@ -32,7 +32,7 @@ const CalendarDrawer: FunctionComponent<
 
   return (
     <SwipeableDrawer
-      open={state.drawerIsOpen}
+      open={!selections.locationIds.length || state.drawerIsOpen}
       anchor="left"
       onClose={onClose}
       onOpen={toggleDrawer}

@@ -1,5 +1,11 @@
 import React, { FunctionComponent, memo, useContext } from "react";
-import { CircularProgress, makeStyles, Box } from "@material-ui/core";
+import {
+  CircularProgress,
+  makeStyles,
+  Box,
+  Grid,
+  Typography,
+} from "@material-ui/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
@@ -28,7 +34,23 @@ import { parseAndFormatFCString } from "../utils/date";
 
 const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
+  fullHeight: { minHeight: "100vh" },
 }));
+
+const SelectALocationMessage: FunctionComponent = () => {
+  const classes = useStyles();
+  return (
+    <Grid
+      container
+      direction="column"
+      justify="center"
+      alignItems="center"
+      className={classes.fullHeight}
+    >
+      <Typography variant="h3">Select a location to view a calendar</Typography>
+    </Grid>
+  );
+};
 
 const FullCalendarBox: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
@@ -50,6 +72,7 @@ const FullCalendarBox: FunctionComponent<
 
   if (state.initialResourcesPending)
     return <CircularProgress size="90%" thickness={1} />;
+  if (!selections.locationIds.length) return <SelectALocationMessage />;
   return (
     <Box>
       <Box className={classes.toolbarSpacer} />
