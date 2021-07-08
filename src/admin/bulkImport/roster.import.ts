@@ -7,6 +7,19 @@ import { tsv } from "../../utils/csv";
 import { AdminAction } from "../types";
 import User from "../../resources/User";
 
+export const headings = [
+  "Course",
+  "Catalog",
+  "Section",
+  "Instructor",
+  "Student",
+  "NetID",
+  "Restriction",
+  "Project",
+];
+
+// TODO use headings below to parse submission correctly
+
 const lineIsBlank = (line: string[]): boolean =>
   line.length === 1 && line[0] === "";
 const lineIsNotBlank = (line: string[]): boolean => !lineIsBlank(line);

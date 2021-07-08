@@ -45,16 +45,18 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const [text, setText] = useState("");
   const [parsed, setParsed] = useState(csvParse(""));
   const classes = useStyles();
-  const onSubmit = importRouter(state.resourceKey);
+  const [headings, onSubmit] = importRouter(state.resourceKey);
 
   useEffect(() => {
     if (typeof state.resourceFile !== "string") return;
     const file = removeBlankLines(state.resourceFile);
     const foundTabs = hasTabs(file);
+    const IFS = foundTabs ? "\t" : ",";
     setText(file);
     setDelimiter(foundTabs ? "tab" : ",");
-    setParsed(foundTabs ? tsvParse(file) : csvParse(file));
-  }, [state.resourceFile]);
+    const withHeaders = headings.join(IFS) + "\n" + file;
+    setParsed(foundTabs ? tsvParse(withHeaders) : csvParse(withHeaders));
+  }, [state.resourceFile, headings]);
 
   return (
     <Dialog fullScreen={true} open={state.fileImportIsOpen}>
