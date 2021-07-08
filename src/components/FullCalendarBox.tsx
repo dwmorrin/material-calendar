@@ -130,6 +130,7 @@ const FullCalendarBox: FunctionComponent<
           })
         }
         // ETC
+        firstDay={Number(process.env.REACT_APP_FIRST_DAY)}
         timeZone={process.env.REACT_APP_SERVER_TIMEZONE}
         height="93vh"
         ref={state.ref}
