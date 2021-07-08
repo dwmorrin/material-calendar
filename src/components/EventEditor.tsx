@@ -21,8 +21,7 @@ import {
   EventEditorProps,
 } from "../calendar/eventEditor";
 import DateFnsUtils from "@date-io/date-fns";
-
-const trimTZ = (dateString: string): string => dateString.split(".")[0];
+import { parseSQLDatetime } from "../utils/date";
 
 const EventEditor: FunctionComponent<EventEditorProps> = ({
   dispatch,
@@ -32,8 +31,8 @@ const EventEditor: FunctionComponent<EventEditorProps> = ({
   const classes = useStyles();
   const initialValues = {
     ...event,
-    start: new Date(trimTZ(event.start)),
-    end: new Date(trimTZ(event.end)),
+    start: parseSQLDatetime(event.start),
+    end: parseSQLDatetime(event.end),
     __options__: initialEventOptions,
   };
   const onSubmit = makeOnSubmit(dispatch);
@@ -81,12 +80,14 @@ const EventEditor: FunctionComponent<EventEditorProps> = ({
                 type="checkbox"
                 name="reservable"
               />
-              <Field
-                component={CheckboxWithLabel}
-                type="checkbox"
-                Label={{ label: "Repeats" }}
-                name="__options__.repeats"
-              />
+              {event.id < 1 && (
+                <Field
+                  component={CheckboxWithLabel}
+                  type="checkbox"
+                  Label={{ label: "Repeats" }}
+                  name="__options__.repeats"
+                />
+              )}
               {values.__options__.repeats && (
                 <Fragment>
                   <FormLabel>Repeats on these days:</FormLabel>
@@ -142,6 +143,9 @@ const EventEditor: FunctionComponent<EventEditorProps> = ({
               <Button type="submit">
                 {event.id < 1 ? "Create event" : "Edit event"}
               </Button>
+              {process.env.NODE_ENV === "development" && (
+                <pre>{JSON.stringify(values, null, 2)}</pre>
+              )}
             </Form>
           )}
         </Formik>

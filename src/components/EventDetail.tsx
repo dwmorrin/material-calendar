@@ -267,6 +267,18 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             </List>
           </section>
         )}
+        {user.roles.includes("admin") && (
+          <Button
+            onClick={(): void =>
+              dispatch({
+                type: CalendarAction.OpenEventEditor,
+                payload: state,
+              })
+            }
+          >
+            Edit this event
+          </Button>
+        )}
       </Paper>
       <ReservationForm dispatch={dispatch} state={state} projects={projects} />
     </Dialog>

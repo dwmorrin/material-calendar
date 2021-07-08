@@ -101,6 +101,35 @@ const errorRedirect = (
     },
   });
 
+function receivedResource(state: CalendarState, action: Action): CalendarState {
+  const { payload, meta } = action;
+  const resources = payload?.resources;
+  if (!resources) {
+    return errorRedirect(
+      state,
+      action,
+      "no resources in payload",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  const resourceKey = meta as number;
+  if (resourceKey === undefined) {
+    return errorRedirect(
+      state,
+      action,
+      "no context given",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  return {
+    ...state,
+    resources: {
+      ...state.resources,
+      [resourceKey]: resources[resourceKey],
+    },
+  };
+}
+
 //--------- NORMAL ACTION HANDLERS ----------
 
 const canceledReservation: StateHandler = (state) => {
@@ -125,10 +154,12 @@ const closeEventDetail: StateHandler = (state) => ({
   detailIsOpen: false,
 });
 
-const closeEventEditor: StateHandler = (state) => ({
-  ...state,
-  eventEditorIsOpen: false,
-});
+function closeEventEditor(state: CalendarState): CalendarState {
+  return {
+    ...state,
+    eventEditorIsOpen: false,
+  };
+}
 
 const closeGroupDashboard: StateHandler = (state) => ({
   ...state,
@@ -155,6 +186,10 @@ const closeReservationForm: StateHandler = (state) => ({
 const closeSnackbar: StateHandler = (state) => {
   const [snackbarQueue] = dequeue(state.snackbarQueue);
   return { ...state, snackbarQueue };
+};
+
+const createdEventsReceived: StateHandler = (state, action) => {
+  return closeEventEditor(receivedResource(state, action));
 };
 
 const joinedGroup: StateHandler = (state, action) => {
@@ -292,35 +327,6 @@ const receivedAllResources: StateHandler = (state, { payload }) => ({
   initialResourcesPending: false,
 });
 
-const receivedResource: StateHandler = (state, action) => {
-  const { payload, meta } = action;
-  const resources = payload?.resources;
-  if (!resources) {
-    return errorRedirect(
-      state,
-      action,
-      "no resources in payload",
-      ErrorType.MISSING_RESOURCE
-    );
-  }
-  const resourceKey = meta as number;
-  if (resourceKey === undefined) {
-    return errorRedirect(
-      state,
-      action,
-      "no context given",
-      ErrorType.MISSING_RESOURCE
-    );
-  }
-  return {
-    ...state,
-    resources: {
-      ...state.resources,
-      [resourceKey]: resources[resourceKey],
-    },
-  };
-};
-
 const selectedEvent: StateHandler = (state, action) => {
   const { payload } = action;
   if (!payload?.currentEvent) {
@@ -431,6 +437,17 @@ const updateEvents: StateHandler = (state, action) => {
   };
 };
 
+const UpdatedEventReceived: StateHandler = (state, action) =>
+  closeEventEditor(
+    selectedEvent(
+      {
+        ...receivedResource(state, action),
+        currentEvent: action.payload?.currentEvent,
+      },
+      action
+    )
+  );
+
 const viewToday: StateHandler = (state, action) => {
   if (!state.ref?.current) {
     return errorRedirect(
@@ -455,17 +472,18 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CloseProjectForm]: closeProjectForm,
     [CalendarAction.CloseReservationForm]: closeReservationForm,
     [CalendarAction.CloseSnackbar]: closeSnackbar,
+    [CalendarAction.CreatedEventsReceived]: createdEventsReceived,
     [CalendarAction.DisplayMessage]: displayMessage,
     [CalendarAction.Error]: errorHandler,
     [CalendarAction.JoinedGroup]: joinedGroup,
     [CalendarAction.LeftGroup]: leftGroup,
-    [CalendarAction.PickedDate]: pickedDate,
-    [CalendarAction.OpenReservationForm]: openReservationForm,
-    [CalendarAction.OpenProjectForm]: openProjectForm,
     [CalendarAction.OpenEventDetail]: openEventDetail,
     [CalendarAction.OpenEventEditor]: openEventEditor,
     [CalendarAction.OpenGroupDashboard]: openGroupDashboard,
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,
+    [CalendarAction.OpenProjectForm]: openProjectForm,
+    [CalendarAction.OpenReservationForm]: openReservationForm,
+    [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,
     [CalendarAction.ReceivedResource]: receivedResource,
     [CalendarAction.SelectedEvent]: selectedEvent,
@@ -475,6 +493,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.ToggleDrawer]: toggleDrawer,
     [CalendarAction.TogglePicker]: togglePicker,
     [CalendarAction.UpdateEvents]: updateEvents,
+    [CalendarAction.UpdatedEventReceived]: UpdatedEventReceived,
     [CalendarAction.ViewToday]: viewToday,
   }[action.type](state, action));
 
