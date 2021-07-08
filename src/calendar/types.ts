@@ -28,6 +28,7 @@ export enum CalendarAction {
   OpenGroupDashboard,
   OpenProjectDashboard,
   ReceivedAllResources,
+  ReceivedInvitations,
   ReceivedResource,
   SelectedEvent,
   SelectedGroup,
@@ -70,6 +71,19 @@ export interface CalendarState {
   currentGroup?: UserGroup;
   currentProject?: Project;
   currentCourse?: { id: number; title: string };
+  invitations?: {
+    id: number;
+    confirmed: number;
+    project: number;
+    invitor: { id: number; name: { last: string; first: string } };
+    invitees: {
+      id: number;
+      accepted: number;
+      rejected: number;
+      name: { last: string; first: string };
+    }[];
+    group_id: number;
+  }[];
 }
 
 export type PartialCalendarState = Partial<Omit<CalendarState, "resources">> & {

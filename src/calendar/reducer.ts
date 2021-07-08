@@ -306,6 +306,19 @@ const receivedAllResources: StateHandler = (state, { payload }) => ({
   initialResourcesPending: false,
 });
 
+const receivedInvitations: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload?.invitations) {
+    return errorRedirect(
+      state,
+      action,
+      "no invitations in received",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  return { ...state, invitations: payload.invitations };
+};
+
 const receivedResource: StateHandler = (state, action) => {
   const { payload, meta } = action;
   const resources = payload?.resources;
@@ -482,6 +495,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.OpenGroupDashboard]: openGroupDashboard,
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,
+    [CalendarAction.ReceivedInvitations]: receivedInvitations,
     [CalendarAction.ReceivedResource]: receivedResource,
     [CalendarAction.SelectedEvent]: selectedEvent,
     [CalendarAction.SelectedGroup]: selectedGroup,

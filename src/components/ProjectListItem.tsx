@@ -11,17 +11,19 @@ import {
   ListItemText,
   Divider,
   FormControlLabel,
+  Badge,
 } from "@material-ui/core";
 import InfoIcon from "@material-ui/icons/Info";
 import Project from "../resources/Project";
 
 interface ProjectListItemProps extends CalendarUIProps {
   project: Project;
+  invitations: number;
 }
 
 const ProjectListItem: FunctionComponent<
   ProjectListItemProps & CalendarUISelectionProps
-> = ({ dispatch, state, project, selections, setSelections }) => {
+> = ({ dispatch, state, project, selections, setSelections, invitations }) => {
   return (
     <ListItem
       button
@@ -61,7 +63,9 @@ const ProjectListItem: FunctionComponent<
           });
         }}
       >
-        <InfoIcon />
+        <Badge color="secondary" badgeContent={invitations}>
+          <InfoIcon />
+        </Badge>
       </IconButton>
     </ListItem>
   );
