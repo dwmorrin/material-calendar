@@ -68,18 +68,20 @@ const FullCalendarBox: FunctionComponent<
     projectLocations,
     selections.locationIds
   );
+  const locations = state.resources[ResourceKey.Locations] as Location[];
   const classes = useStyles();
 
   if (state.initialResourcesPending)
     return <CircularProgress size="90%" thickness={1} />;
-  if (!selections.locationIds.length) return <SelectALocationMessage />;
+  if (!selections.locationIds.some((id) => locations.find((l) => l.id === id)))
+    return <SelectALocationMessage />;
   return (
     <Box>
       <Box className={classes.toolbarSpacer} />
       <FullCalendar
         // RESOURCES
         resources={makeResources(
-          state.resources[ResourceKey.Locations] as Location[],
+          locations,
           projectLocations,
           selections.locationIds
         )}

@@ -8,6 +8,8 @@ import {
 import LocationList from "./LocationList";
 import ProjectList from "./ProjectList";
 import { AuthContext } from "./AuthContext";
+import Location from "../resources/Location";
+import { ResourceKey } from "../resources/types";
 
 const CalendarDrawer: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
@@ -38,9 +40,16 @@ const CalendarDrawer: FunctionComponent<
       if (u?.accepted == 0 && u.rejected === 0) return true;
       else return false;
     }) || [];
+
+  const locations = state.resources[ResourceKey.Locations] as Location[];
+
   return (
     <SwipeableDrawer
-      open={!selections.locationIds.length || state.drawerIsOpen}
+      open={
+        !selections.locationIds.some((id) =>
+          locations.find((l) => l.id === id)
+        ) || state.drawerIsOpen
+      }
       anchor="left"
       onClose={onClose}
       onOpen={toggleDrawer}
