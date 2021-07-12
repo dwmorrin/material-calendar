@@ -80,6 +80,7 @@ const FullCalendarBox: FunctionComponent<
       <Box className={classes.toolbarSpacer} />
       <FullCalendar
         // RESOURCES
+        resourceOrder="title"
         resources={makeResources(
           locations,
           projectLocations,
