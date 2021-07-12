@@ -4,6 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import UserGroup from "../resources/UserGroup";
 import { ResourceKey, ResourceInstance } from "../resources/types";
 import { SnackbarState } from "../components/Snackbar";
+import { Invitation } from "../resources/Invitation";
 
 export enum CalendarAction {
   CanceledReservation,
@@ -58,6 +59,7 @@ export interface CalendarState {
   message: string;
   groupDashboardIsOpen: boolean;
   initialResourcesPending: boolean;
+  invitations: Invitation[];
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
   reservationFormIsOpen: boolean;
@@ -71,19 +73,6 @@ export interface CalendarState {
   currentGroup?: UserGroup;
   currentProject?: Project;
   currentCourse?: { id: number; title: string };
-  invitations?: {
-    id: number;
-    confirmed: number;
-    project: number;
-    invitor: { id: number; name: { last: string; first: string } };
-    invitees: {
-      id: number;
-      accepted: number;
-      rejected: number;
-      name: { last: string; first: string };
-    }[];
-    group_id: number;
-  }[];
 }
 
 export type PartialCalendarState = Partial<Omit<CalendarState, "resources">> & {

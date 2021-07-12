@@ -19,6 +19,7 @@ import ViewMenu from "./ViewMenu";
 import MoreMenu from "./MoreMenu";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AuthContext } from "./AuthContext";
+import { getUnansweredInvitations } from "../resources/Invitation";
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -35,13 +36,10 @@ const CalendarBar: FunctionComponent<
 > = ({ dispatch, state, selections, setSelections }) => {
   const { user } = useContext(AuthContext);
   const classes = useStyles();
-  const unansweredInvitations =
-    state.invitations?.filter(function (invitation) {
-      // Get Invitations where user has yet to respond
-      const u = invitation.invitees.find((invitee) => invitee.id === user.id);
-      if (u?.accepted == 0 && u.rejected === 0) return true;
-      else return false;
-    }) || [];
+  const unansweredInvitations = getUnansweredInvitations(
+    user,
+    state.invitations
+  );
   return (
     <AppBar>
       <Toolbar className={classes.toolbar}>

@@ -41,10 +41,9 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   const [users, setUsers] = useState([] as User[]);
   const [selectedUsers, setSelectedUsers] = useState([] as number[]);
   const { user } = useContext(AuthContext);
-  const invitations =
-    state.invitations?.filter(
-      (invitation) => invitation.project === currentProject?.id
-    ) || [];
+  const invitations = state.invitations.filter(
+    (invitation) => invitation.project === currentProject?.id
+  );
   const isNotCurrentUser = ({ id }: { id: number }): boolean => id !== user.id;
   useEffect(() => {
     setSelectedUsers([]);

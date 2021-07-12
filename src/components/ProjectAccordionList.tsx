@@ -15,6 +15,7 @@ import ProjectListItem from "./ProjectListItem";
 import Project from "../resources/Project";
 import { ResourceKey } from "../resources/types";
 import { AuthContext } from "./AuthContext";
+import { getUnansweredInvitations } from "../resources/Invitation";
 
 interface ProjectAccordionListProps extends CalendarUIProps {
   course: { id: number; title: string };
@@ -35,13 +36,10 @@ const ProjectAccordionList: FunctionComponent<
     courseProjects.some(({ id }) => selections.projectIds.includes(id));
 
   const { user } = useContext(AuthContext);
-  const unansweredInvitations =
-    state.invitations?.filter(function (invitation) {
-      // Get Invitations where user has yet to respond
-      const u = invitation.invitees.find((invitee) => invitee.id === user.id);
-      if (u?.accepted == 0 && u.rejected === 0) return true;
-      else return false;
-    }) || [];
+  const unansweredInvitations = getUnansweredInvitations(
+    user,
+    state.invitations
+  );
 
   return (
     <Accordion defaultExpanded={courseProjects.length === 1}>

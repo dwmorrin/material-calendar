@@ -10,6 +10,7 @@ import ProjectList from "./ProjectList";
 import { AuthContext } from "./AuthContext";
 import Location from "../resources/Location";
 import { ResourceKey } from "../resources/types";
+import { getUnansweredInvitations } from "../resources/Invitation";
 
 const CalendarDrawer: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
@@ -33,14 +34,10 @@ const CalendarDrawer: FunctionComponent<
     dispatch({ type: CalendarAction.ToggleDrawer });
   };
   const { user } = useContext(AuthContext);
-  const unansweredInvitations =
-    state.invitations?.filter(function (invitation) {
-      // Get Invitations where user has yet to respond
-      const u = invitation.invitees.find((invitee) => invitee.id === user.id);
-      if (u?.accepted == 0 && u.rejected === 0) return true;
-      else return false;
-    }) || [];
-
+  const unansweredInvitations = getUnansweredInvitations(
+    user,
+    state.invitations
+  );
   const locations = state.resources[ResourceKey.Locations] as Location[];
 
   return (
