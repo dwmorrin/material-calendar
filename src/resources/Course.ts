@@ -2,6 +2,8 @@ export interface Course {
   [k: string]: unknown;
   id: number;
   title: string;
+  catalogId: string;
+  section: string;
   instructor: string;
 }
 
@@ -11,6 +13,8 @@ export class Course implements Course {
     course = {
       id: 0,
       title: "",
+      catalogId: "",
+      section: "",
       instructor: "",
     }
   ) {
