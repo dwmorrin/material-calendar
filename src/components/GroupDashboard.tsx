@@ -39,7 +39,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { currentGroup, currentProject } = state;
   const [users, setUsers] = useState([] as User[]);
-  const [selectedUsers, setSelectedUsers] = useState([] as number[]);
+  const [selectedUsers, setSelectedUsers] = useState([] as User[]);
   const { user } = useContext(AuthContext);
   const invitations = state.invitations.filter(
     (invitation) => invitation.project === currentProject?.id
@@ -79,13 +79,14 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
       });
   }, [currentProject, dispatch, state.currentGroup, user]);
 
-  const selectUser = (userId: number): void => {
-    const newList: number[] = selectedUsers;
-    const valueExisting = newList.indexOf(userId);
+  const selectUser = (newUser: User): void => {
+    const newList: User[] = selectedUsers;
+    const valueExisting = newList.map((u: User) => u.id).indexOf(newUser.id);
+    console.log(valueExisting);
     if (valueExisting !== -1) {
       newList.splice(valueExisting, 1);
     } else {
-      newList.push(userId);
+      newList.push(newUser);
     }
     setSelectedUsers(newList);
   };
@@ -101,9 +102,9 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
           edge="start"
           color="inherit"
           aria-label="close"
-          onClick={(): void =>
-            dispatch({ type: CalendarAction.CloseGroupDashboard })
-          }
+          onClick={(): void => {
+            dispatch({ type: CalendarAction.CloseGroupDashboard });
+          }}
         >
           <CloseIcon />
         </IconButton>
@@ -566,7 +567,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
                         invitorId: user.id,
-                        invitees: selectedUsers,
+                        invitees: selectedUsers.map((u) => u.id),
                         projectId: currentProject?.id,
                       }),
                     })
@@ -579,6 +580,58 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                             meta: context,
                           });
                         } else {
+                          selectedUsers.forEach((u: User) => {
+                            console.log(
+                              "emailing" + u.name?.first + " " + u.name?.last
+                            );
+                            if (u.contact.email !== undefined) {
+                              console.log(
+                                "emailing" +
+                                  u.name?.first +
+                                  " " +
+                                  u.name?.last +
+                                  " at " +
+                                  u.contact.email[0]
+                              );
+                              fetch(`/api/mail`, {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                  to: u.contact.email[0],
+                                  subject: "You have been invited to a group",
+                                  text:
+                                    "Hello " +
+                                    u.name?.first +
+                                    ", " +
+                                    user.name?.first +
+                                    " " +
+                                    user.name?.last +
+                                    " has invited you to join their group for " +
+                                    currentProject?.title,
+                                }),
+                              })
+                                .then((response) => response.json())
+                                .then(({ error, data, context }) => {
+                                  if (error || !data) {
+                                    return dispatch({
+                                      type: CalendarAction.Error,
+                                      payload: { error },
+                                      meta: context,
+                                    });
+                                  }
+                                  console.log("emailed!");
+                                });
+                            } else
+                              console.log(
+                                "user" +
+                                  u.name?.first +
+                                  " " +
+                                  u.name?.last +
+                                  " has no email!! "
+                              );
+                          });
                           // Get list of invitations again (to get the new one)
                           fetch(`/api/invitations/user/${user?.id}`)
                             .then((response) => response.json())
@@ -627,7 +680,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                   >
                     {individual.name?.first + " " + individual.name?.last}
                     <Checkbox
-                      onChange={(): void => selectUser(individual.id)}
+                      onChange={(): void => selectUser(individual)}
                       size="small"
                       inputProps={{
                         "aria-label": individual.username + " Checkbox",
