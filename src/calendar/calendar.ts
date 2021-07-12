@@ -77,6 +77,3 @@ export const getEventsByLocationId = (
   }
   return result;
 };
-
-export const stringStartsWithResource = (s: string): boolean =>
-  s.indexOf("resource") === 0;

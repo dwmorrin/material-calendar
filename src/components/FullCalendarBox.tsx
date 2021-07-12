@@ -15,6 +15,7 @@ import {
   CalendarUIProps,
   CalendarAction,
   CalendarUISelectionProps,
+  CalendarView,
 } from "../calendar/types";
 import { ResourceKey } from "../resources/types";
 import Event from "../resources/Event";
@@ -26,7 +27,6 @@ import {
   makeResources,
   makeSelectedLocationIdSet,
   getEventsByLocationId,
-  stringStartsWithResource,
 } from "../calendar/calendar";
 import { AuthContext } from "./AuthContext";
 import User from "../resources/User";
@@ -86,7 +86,11 @@ const FullCalendarBox: FunctionComponent<
         // EVENTS
         events={(_, successCallback): void => {
           // https://fullcalendar.io/docs/events-function
-          if (stringStartsWithResource(selections.calendarView)) {
+          if (
+            (
+              ["resourceTimeGridDay", "resourceTimeGridWeek"] as CalendarView[]
+            ).includes(selections.calendarView)
+          ) {
             // FullCalendar's resource system handles locations automatically
             // so long as we provide a .resourceId prop
             successCallback(events.map(addResourceId));
