@@ -122,7 +122,11 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
           onChange={(event): void => {
             const { value } = event.target;
             setText(value);
-            setParsed(delimiter === "," ? csvParse(value) : tsvParse(value));
+            const withHeaders =
+              headings.join(delimiter === "," ? "," : "\t") + "\n" + value;
+            setParsed(
+              delimiter === "," ? csvParse(withHeaders) : tsvParse(withHeaders)
+            );
           }}
         />
       </Container>
