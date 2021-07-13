@@ -79,10 +79,12 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
       });
   }, [currentProject, dispatch, state.currentGroup, user]);
 
+  const dispatchError = (error: Error, meta?: unknown): void =>
+    dispatch({ type: CalendarAction.Error, payload: { error }, meta });
+
   const selectUser = (newUser: User): void => {
     const newList: User[] = selectedUsers;
     const valueExisting = newList.map((u: User) => u.id).indexOf(newUser.id);
-    console.log(valueExisting);
     if (valueExisting !== -1) {
       newList.splice(valueExisting, 1);
     } else {
@@ -149,11 +151,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                   .then((response) => response.json())
                   .then(({ error, data, context }) => {
                     if (error || !data) {
-                      return dispatch({
-                        type: CalendarAction.Error,
-                        payload: { error },
-                        meta: context,
-                      });
+                      return dispatchError(error, context);
                     } else {
                       const invitation = invitations.find(
                         (invitation) => invitation.group_id === currentGroup.id
@@ -169,15 +167,10 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                           }),
                         })
                           .then((response) => response.json())
-                          .then(({ error, data, context }) => {
-                            if (error || !data) {
-                              return dispatch({
-                                type: CalendarAction.Error,
-                                payload: { error },
-                                meta: context,
-                              });
-                            }
-                          });
+                          .then(({ error, data }) => {
+                            if (error || !data) return dispatchError(error);
+                          })
+                          .catch(dispatchError);
                       }
                       //If user was the last member of the group, delete the group
                       if (currentGroup.members.length <= 1) {
@@ -187,15 +180,12 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                           body: null,
                         })
                           .then((response) => response.json())
-                          .then(({ error, data, context }) => {
+                          .then(({ error, data }) => {
                             if (error || !data) {
-                              return dispatch({
-                                type: CalendarAction.Error,
-                                payload: { error },
-                                meta: context,
-                              });
+                              return dispatchError(error);
                             }
-                          });
+                          })
+                          .catch(dispatchError);
                       }
                       dispatch({ type: CalendarAction.LeftGroup });
                     }
@@ -581,68 +571,47 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                           });
                         } else {
                           selectedUsers.forEach((u: User) => {
-                            console.log(
-                              "emailing" + u.name?.first + " " + u.name?.last
-                            );
-                            if (u.contact.email !== undefined) {
-                              console.log(
-                                "emailing" +
-                                  u.name?.first +
-                                  " " +
-                                  u.name?.last +
-                                  " at " +
-                                  u.contact.email[0]
+                            if (!u.email)
+                              return dispatchError(
+                                new Error(
+                                  `${u.name.first} ${u.name.last} has no email`
+                                )
                               );
-                              fetch(`/api/mail`, {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                  to: u.contact.email[0],
-                                  subject: "You have been invited to a group",
-                                  text:
-                                    "Hello " +
-                                    u.name?.first +
-                                    ", " +
-                                    user.name?.first +
-                                    " " +
-                                    user.name?.last +
-                                    " has invited you to join their group for " +
-                                    currentProject?.title,
-                                }),
+                            fetch(`/api/mail`, {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                              },
+                              body: JSON.stringify({
+                                to: u.email,
+                                subject: "You have been invited to a group",
+                                text:
+                                  "Hello " +
+                                  u.name?.first +
+                                  ", " +
+                                  user.name?.first +
+                                  " " +
+                                  user.name?.last +
+                                  " has invited you to join their group for " +
+                                  currentProject?.title,
+                              }),
+                            })
+                              .then((response) => response.json())
+                              .then(({ error, data }) => {
+                                if (error || !data) return dispatchError(error);
+                                dispatchError(
+                                  new Error(
+                                    "Email success, but no success handler written!"
+                                  )
+                                );
                               })
-                                .then((response) => response.json())
-                                .then(({ error, data, context }) => {
-                                  if (error || !data) {
-                                    return dispatch({
-                                      type: CalendarAction.Error,
-                                      payload: { error },
-                                      meta: context,
-                                    });
-                                  }
-                                  console.log("emailed!");
-                                });
-                            } else
-                              console.log(
-                                "user" +
-                                  u.name?.first +
-                                  " " +
-                                  u.name?.last +
-                                  " has no email!! "
-                              );
+                              .catch(dispatchError);
                           });
                           // Get list of invitations again (to get the new one)
                           fetch(`/api/invitations/user/${user?.id}`)
                             .then((response) => response.json())
-                            .then(({ error, data, context }) => {
-                              if (error || !data) {
-                                return dispatch({
-                                  type: CalendarAction.Error,
-                                  payload: { error },
-                                  meta: context,
-                                });
-                              }
+                            .then(({ error, data }) => {
+                              if (error || !data) return dispatchError(error);
                               dispatch({
                                 type: CalendarAction.ReceivedInvitations,
                                 payload: {
