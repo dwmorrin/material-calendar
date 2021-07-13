@@ -8,8 +8,12 @@ const template = (rosterRecord: unknown): string[][] => {
   return [
     ["Course", `${course.title} (${course.catalogId}-${course.section})`],
     ["Instructor", course.instructor],
-    ["Project", course.project.title],
-    ["Student", `${student.name.first} ${student.name.last} ${student.id}`],
+    [
+      "Student",
+      `${[student.name.first, student.name.middle, student.name.last].join(
+        " "
+      )}`,
+    ],
   ];
 };
 

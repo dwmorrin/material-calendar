@@ -15,18 +15,14 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
     (dict, { title, id }) => ({ ...dict, [title]: String(id) }),
     {} as { [k: string]: string }
   );
-  const { email, phone } = (values as FormValues).contact as {
-    email: string[];
-    phone: string[];
-  };
   return (
     <List>
       <Field component={TextField} name="name.first" label="First" />
       <Field component={TextField} name="name.middle" label="Middle" />
       <Field component={TextField} name="name.last" label="Last" />
       <Field fullWidth component={TextField} name="username" label="Username" />
-      <FieldList name="contact.email" values={email} />
-      <FieldList name="contact.phone" values={phone} />
+      <Field component={TextField} name="email" label="Email" />
+      <Field component={TextField} name="phone" label="Phone" />
       <FieldList name="roles" values={values.roles as string[]} />
       <FieldArray
         name="projects"

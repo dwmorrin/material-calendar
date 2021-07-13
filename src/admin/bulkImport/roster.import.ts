@@ -1,11 +1,9 @@
-import RosterRecord, {
-  Student,
-  Course as RosterCourse,
-} from "../../resources/RosterRecord";
 import Course from "../../resources/Course";
-import { tsv } from "../../utils/csv";
-import { AdminAction } from "../types";
+import { AdminAction, AdminState } from "../types";
 import User from "../../resources/User";
+import Project, { defaultProject } from "../../resources/Project";
+import { ResourceKey } from "../../resources/types";
+import RosterRecord from "../../resources/RosterRecord";
 
 export const headings = [
   "Course",
@@ -20,59 +18,12 @@ export const headings = [
 
 // TODO use headings below to parse submission correctly
 
-const lineIsBlank = (line: string[]): boolean =>
-  line.length === 1 && line[0] === "";
-const lineIsNotBlank = (line: string[]): boolean => !lineIsBlank(line);
-
-/**
- * Produces 4 lists: users, courses, projects, roster records, and errors
- * @param rosterString tab separated values, newline separated records
- */
-export const parseRoster = (
-  rosterString: string
-): {
-  users: { [k: string]: Student };
-  courses: { [k: string]: RosterCourse };
-  roster: RosterRecord[];
-  errors: Error[];
-} => {
-  try {
-    const rawParse = tsv(rosterString);
-    return rawParse.filter(lineIsNotBlank).reduce(
-      (lists, line, index) => {
-        try {
-          const record = RosterRecord.read(new RosterRecord(), line);
-          lists.roster.push(record);
-          if (!(record.student.id in lists.users))
-            lists.users[record.student.id] = record.student;
-          if (!(record.course.title in lists.courses))
-            lists.courses[record.course.title] = record.course;
-        } catch (error) {
-          lists.errors.push(
-            new Error(
-              `In roster import, line ${
-                index + 1
-              } rejected. Line contents: ${JSON.stringify(line)}`
-            )
-          );
-        }
-        return lists;
-      },
-      {
-        users: {} as { [k: string]: Student },
-        courses: {} as { [k: string]: RosterCourse },
-        roster: [] as RosterRecord[],
-        errors: [] as Error[],
-      }
-    );
-  } catch (error) {
-    return {
-      users: {},
-      courses: {},
-      roster: [],
-      errors: [error],
-    };
-  }
+const defaultUserInfo = {
+  id: 0,
+  roles: [],
+  email: "",
+  phone: "",
+  projects: [],
 };
 
 const bulkImport = (
@@ -80,40 +31,122 @@ const bulkImport = (
     type: AdminAction;
     payload: Record<string, unknown>;
   }) => void,
-  rosterString: unknown
+  records: unknown,
+  state: AdminState
 ): void => {
-  if (typeof rosterString !== "string") return;
-  const { users, courses, roster, errors } = parseRoster(rosterString);
-  if (errors) {
-    return dispatch({ type: AdminAction.Error, payload: { error: errors } });
-  }
-  const requests = [
-    { url: `${User.url}/bulk`, body: JSON.stringify(Object.values(users)) },
-    { url: `${Course.url}/bulk`, body: JSON.stringify(Object.values(courses)) },
-    { url: `${RosterRecord.url}/bulk`, body: JSON.stringify(roster) },
-  ];
+  const dispatchError = (error: Error): void =>
+    dispatch({ type: AdminAction.Error, payload: { error } });
+  if (!Array.isArray(records))
+    return dispatchError(
+      new Error(
+        "Roster import failed: could not parse roster (records not an array)"
+      )
+    );
+  // get courses
+  const courses = state.resources[ResourceKey.Courses] as Course[];
+  const newCourses = records.reduce((dict, r) => {
+    if (courses.find(({ title }) => r.Course === title)) return dict;
+    const key = r.Course + r.Section;
+    if (!dict[key])
+      dict[key] = new Course({
+        id: -1,
+        title: r.Course,
+        catalogId: r.Catalog,
+        section: r.Section,
+        instructor: r.Instructor,
+      });
+    return dict;
+  }, {});
+  const mergedCoures = [...courses, ...Object.values(newCourses)] as Project[];
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const semester = state.selectedSemester;
+  if (!semester)
+    return dispatchError(
+      new Error("Roster import failed: no semester selected.")
+    );
+  const newProjects = records.reduce((dict, r) => {
+    if (projects.find(({ title }) => title === r.Project)) return dict;
+    const key = r.Project;
+    if (!dict[key]) {
+      const course =
+        mergedCoures.find(({ title }) => title === r.Course) ||
+        new Course({
+          id: -1,
+          title: r.Course,
+          catalogId: r.Catalog,
+          section: r.Section,
+          instructor: r.Instructor,
+        });
+      dict[key] = new Project({
+        ...defaultProject,
+        title: key,
+        course,
+        start: semester.start,
+        end: semester.end,
+        reservationStart: semester.start,
+      });
+    }
+    return dict;
+  }, {});
 
-  Promise.all(
-    requests.map(({ url, body }) => fetch(url, { method: "POST", body }))
-  ).then((responses) =>
-    Promise.all(responses.map((response) => response.json()))
-      .then((dataArray) =>
-        dispatch({
-          type: AdminAction.Error,
-          payload: {
-            error: "TODO: implement the bulk import success handler",
-          },
-        })
-      )
-      .catch((error) =>
-        dispatch({
-          type: AdminAction.Error,
-          payload: {
-            error: "TODO: implmenet the bulk import error handler",
-          },
-        })
-      )
+  const users = state.resources[ResourceKey.Users] as User[];
+  const [newUsers, modifiedUsers] = records.reduce(
+    ([newUsers, modifiedUsers], r) => {
+      const [last = "", first = ""] = r.Student.split(/\s*,\s*/);
+      const existing = users.find(({ username }) => username === r.NetID);
+      if (existing) {
+        if (last === existing.name?.last && first === existing.name?.first) {
+          // nothing to do
+          return [newUsers, modifiedUsers];
+        } else {
+          // add to modified users
+          return [
+            newUsers,
+            {
+              ...modifiedUsers,
+              [r.NetID]: new User({
+                ...existing,
+                name: { first, last, middle: "" },
+                restriction: Number(r.Restriction) || 0,
+              }),
+            },
+          ];
+        }
+      }
+      if (r.NetId in newUsers) return [newUsers, modifiedUsers];
+      // add to new users
+      return [
+        {
+          ...newUsers,
+          [r.NetID]: new User({
+            ...defaultUserInfo,
+            username: r.NetID,
+            name: { first, last, middle: "" },
+            restriction: Number(r.Restriction) || 0,
+          }),
+        },
+        modifiedUsers,
+      ];
+    },
+    [{}, {}]
   );
+
+  fetch(`${RosterRecord.url}/bulk`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      courses: Object.values(newCourses),
+      projects: Object.values(newProjects),
+      users: Object.values(newUsers),
+      modifiedUsers: Object.values(modifiedUsers),
+    }),
+  })
+    .then((res) => res.json())
+    .then(({ error, data }) => {
+      if (error) return dispatchError(error);
+      console.log({ data });
+      dispatchError(new Error("post OK, but success handler not written"));
+    });
 };
 
 export default bulkImport;

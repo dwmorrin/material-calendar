@@ -6,10 +6,7 @@ const template = (user: unknown): string[][] =>
         ["Username", user.username],
         ["Name", user.name ? [user.name.first, user.name.last].join(" ") : ""],
         ["Roles", user.roles.join(", ")],
-        [
-          "Email",
-          user.contact.email?.length ? user.contact.email.join(", ") : "none",
-        ],
+        ["Email", user.email],
         [
           "Projects",
           user.projects?.length ? user.projects.length.toString() : "0",

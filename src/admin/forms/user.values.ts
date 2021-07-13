@@ -21,22 +21,8 @@ const getSelectedProjectIds = (
 
 export const values = (state: AdminState): FormValues => {
   const user = state.resourceInstance as User;
-  const name = user.name
-    ? {
-        first: user.name.first || "",
-        middle: user.name.middle || "",
-        last: user.name.last || "",
-      }
-    : { first: "", middle: "", last: "" };
-  const contact = {
-    email: user.contact.email || [],
-    phone: user.contact.phone || [],
-  };
-
   return {
     ...user,
-    name,
-    contact,
   };
 };
 

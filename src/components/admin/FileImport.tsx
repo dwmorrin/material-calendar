@@ -59,7 +59,7 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   }, [state.resourceFile, headings]);
 
   return (
-    <Dialog fullScreen={true} open={state.fileImportIsOpen}>
+    <Dialog fullScreen open={state.fileImportIsOpen}>
       <Toolbar>
         <IconButton
           edge="start"
@@ -94,7 +94,7 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
       </FormLabel>
       <Button
         variant="contained"
-        onClick={(): void => onSubmit(dispatch, parsed)}
+        onClick={(): void => onSubmit(dispatch, parsed, state)}
       >
         Submit
       </Button>

@@ -13,12 +13,12 @@ export interface Course {
   catalogId: string;
   section: string;
   instructor: string;
-  project: { title: string };
 }
 
 export interface Student {
   name: {
     first: string;
+    middle: string;
     last: string;
   };
   id: string;
@@ -38,29 +38,14 @@ export class RosterRecord implements RosterRecord {
     rosterRecord = {
       course: {
         title: "",
+        catalogId: "",
+        section: "",
         instructor: "",
       },
-      student: { name: { first: "", last: "" }, id: "" },
+      student: { name: { first: "", middle: "", last: "" }, id: "" },
     }
   ) {
     Object.assign(this, rosterRecord);
-  }
-
-  static read(record: RosterRecord, fields: string[], id = -1): RosterRecord {
-    record.id = id;
-    const [last, first] = fields[RosterFields.STUDENT_NAME].split(", ");
-    record.course = {
-      title: fields[RosterFields.COURSE_TITLE],
-      catalogId: fields[RosterFields.COURSE_CATALOG_ID],
-      section: fields[RosterFields.COURSE_SECTION],
-      instructor: fields[RosterFields.COURSE_INSTRUCTOR],
-      project: { title: fields[RosterFields.PROJECT_TITLE] },
-    };
-    record.student = {
-      name: { first, last },
-      id: fields[RosterFields.STUDENT_ID],
-    };
-    return record;
   }
 }
 
