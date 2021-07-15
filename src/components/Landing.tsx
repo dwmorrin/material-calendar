@@ -24,7 +24,7 @@ const Landing: FC<RouteComponentProps> = () => {
 
   useEffect(() => {
     if (!user || !setUser) throw new Error("no method to login user available");
-    if (user.username) navigate("/calendar");
+    if (user.username) navigate(User.isAdmin(user) ? "/admin" : "/calendar");
     else if (!loggedOut)
       fetch("/login")
         .then((response) => response.json())
