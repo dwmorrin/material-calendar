@@ -5,7 +5,6 @@ import {
   DialogTitle,
   DialogActions,
   DialogContent,
-  FormLabel,
   Box,
 } from "@material-ui/core";
 import DraggablePaper from "../../components/DraggablePaper";
@@ -27,7 +26,7 @@ const VirtualWeeksDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   )
     return null;
 
-  const { location: currentLocation, start, end } = calendarSelectionState;
+  const { start, end } = calendarSelectionState;
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseVirtualWeeksDialog });
