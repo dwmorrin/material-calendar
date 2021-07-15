@@ -50,23 +50,21 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
     if (!currentProject?.id) return;
     fetch(`/api/projects/${currentProject.id}/users`)
       .then((response) => response.json())
-      .then(({ error, data, context }) => {
+      .then(({ error, data }) => {
         if (error || !data) {
           return dispatch({
             type: CalendarAction.Error,
             payload: { error },
-            meta: context,
           });
         }
         setUsers(data.map((user: User) => new User(user)) as User[]);
         fetch(`/api/invitations/user/${user?.id}`)
           .then((response) => response.json())
-          .then(({ error, data, context }) => {
+          .then(({ error, data }) => {
             if (error || !data) {
               return dispatch({
                 type: CalendarAction.Error,
                 payload: { error },
-                meta: context,
               });
             }
             dispatch({
@@ -149,9 +147,9 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                   body: null,
                 })
                   .then((response) => response.json())
-                  .then(({ error, data, context }) => {
+                  .then(({ error, data }) => {
                     if (error || !data) {
-                      return dispatchError(error, context);
+                      return dispatchError(error);
                     } else {
                       const invitation = invitations.find(
                         (invitation) => invitation.group_id === currentGroup.id
@@ -244,23 +242,21 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                             body: null,
                           })
                             .then((response) => response.json())
-                            .then(({ error, data, context }) => {
+                            .then(({ error, data }) => {
                               if (error || !data) {
                                 return dispatch({
                                   type: CalendarAction.Error,
                                   payload: { error },
-                                  meta: context,
                                 });
                               } else {
                                 //Get updated invitations
                                 fetch(`/api/invitations/user/${user?.id}`)
                                   .then((response) => response.json())
-                                  .then(({ error, data, context }) => {
+                                  .then(({ error, data }) => {
                                     if (error || !data) {
                                       return dispatch({
                                         type: CalendarAction.Error,
                                         payload: { error },
-                                        meta: context,
                                       });
                                     }
                                     dispatch({
@@ -337,12 +333,11 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                             }),
                           })
                             .then((response) => response.json())
-                            .then(({ error, data, context }) => {
+                            .then(({ error, data }) => {
                               if (error || !data) {
                                 return dispatch({
                                   type: CalendarAction.Error,
                                   payload: { error },
-                                  meta: context,
                                 });
                               } else {
                                 // If the group already exists, add user to it, otherwise form group with invitor and user
@@ -359,12 +354,11 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                       }
                                     )
                                       .then((response) => response.json())
-                                      .then(({ error, data, context }) => {
+                                      .then(({ error, data }) => {
                                         if (error || !data) {
                                           return dispatch({
                                             type: CalendarAction.Error,
                                             payload: { error },
-                                            meta: context,
                                           });
                                         } else {
                                           // Get new group info and set state.currentGroup to it
@@ -372,25 +366,23 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                             `/api/groups/${invitation.group_id}`
                                           )
                                             .then((response) => response.json())
-                                            .then(
-                                              ({ error, data, context }) => {
-                                                if (error || !data) {
-                                                  return dispatch({
-                                                    type: CalendarAction.Error,
-                                                    payload: { error },
-                                                    meta: context,
-                                                  });
-                                                } else {
-                                                  dispatch({
-                                                    type: CalendarAction.JoinedGroup,
-                                                    payload: {
-                                                      currentGroup:
-                                                        new UserGroup(data[0]),
-                                                    },
-                                                  });
-                                                }
+                                            .then(({ error, data }) => {
+                                              if (error || !data) {
+                                                return dispatch({
+                                                  type: CalendarAction.Error,
+                                                  payload: { error },
+                                                });
+                                              } else {
+                                                dispatch({
+                                                  type: CalendarAction.JoinedGroup,
+                                                  payload: {
+                                                    currentGroup: new UserGroup(
+                                                      data[0]
+                                                    ),
+                                                  },
+                                                });
                                               }
-                                            );
+                                            });
                                         }
                                       })
                                   : // Create group based on invitation id
@@ -405,12 +397,11 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                       }
                                     )
                                       .then((response) => response.json())
-                                      .then(({ error, data, context }) => {
+                                      .then(({ error, data }) => {
                                         if (error || !data) {
                                           return dispatch({
                                             type: CalendarAction.Error,
                                             payload: { error },
-                                            meta: context,
                                           });
                                         } else {
                                           const insertId = data.id;
@@ -427,50 +418,38 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                             }
                                           )
                                             .then((response) => response.json())
-                                            .then(
-                                              ({ error, data, context }) => {
-                                                if (error || !data) {
-                                                  return dispatch({
-                                                    type: CalendarAction.Error,
-                                                    payload: { error },
-                                                    meta: context,
-                                                  });
-                                                } else {
-                                                  // Get new group info and set state.currentGroup to it
-                                                  fetch(
-                                                    `/api/groups/${insertId}`
+                                            .then(({ error, data }) => {
+                                              if (error || !data) {
+                                                return dispatch({
+                                                  type: CalendarAction.Error,
+                                                  payload: { error },
+                                                });
+                                              } else {
+                                                // Get new group info and set state.currentGroup to it
+                                                fetch(`/api/groups/${insertId}`)
+                                                  .then((response) =>
+                                                    response.json()
                                                   )
-                                                    .then((response) =>
-                                                      response.json()
-                                                    )
-                                                    .then(
-                                                      ({
-                                                        error,
-                                                        data,
-                                                        context,
-                                                      }) => {
-                                                        if (error || !data) {
-                                                          return dispatch({
-                                                            type: CalendarAction.Error,
-                                                            payload: { error },
-                                                            meta: context,
-                                                          });
-                                                        } else {
-                                                          dispatch({
-                                                            type: CalendarAction.JoinedGroup,
-                                                            payload: {
-                                                              currentGroup:
-                                                                new UserGroup(
-                                                                  data[0]
-                                                                ),
-                                                            },
-                                                          });
-                                                        }
-                                                      }
-                                                    );
-                                                }
+                                                  .then(({ error, data }) => {
+                                                    if (error || !data) {
+                                                      return dispatch({
+                                                        type: CalendarAction.Error,
+                                                        payload: { error },
+                                                      });
+                                                    } else {
+                                                      dispatch({
+                                                        type: CalendarAction.JoinedGroup,
+                                                        payload: {
+                                                          currentGroup:
+                                                            new UserGroup(
+                                                              data[0]
+                                                            ),
+                                                        },
+                                                      });
+                                                    }
+                                                  });
                                               }
-                                            );
+                                            });
                                         }
                                       });
                               }
@@ -492,22 +471,20 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                             }),
                           })
                             .then((response) => response.json())
-                            .then(({ error, data, context }) => {
+                            .then(({ error, data }) => {
                               if (error || !data) {
                                 return dispatch({
                                   type: CalendarAction.Error,
                                   payload: { error },
-                                  meta: context,
                                 });
                               } else {
                                 fetch(`/api/invitations/user/${user?.id}`)
                                   .then((response) => response.json())
-                                  .then(({ error, data, context }) => {
+                                  .then(({ error, data }) => {
                                     if (error || !data) {
                                       return dispatch({
                                         type: CalendarAction.Error,
                                         payload: { error },
-                                        meta: context,
                                       });
                                     }
                                     dispatch({
@@ -562,12 +539,11 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       }),
                     })
                       .then((response) => response.json())
-                      .then(({ error, data, context }) => {
+                      .then(({ error, data }) => {
                         if (error || !data) {
                           return dispatch({
                             type: CalendarAction.Error,
                             payload: { error },
-                            meta: context,
                           });
                         } else {
                           selectedUsers.forEach((u: User) => {
