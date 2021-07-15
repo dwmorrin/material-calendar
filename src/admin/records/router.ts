@@ -4,7 +4,7 @@ import equipmentRecord from "./equipment.record";
 import eventRecord from "./event.record";
 import locationRecord from "./location.record";
 import projectRecord from "./project.record";
-import courseRecord from "./courseRecord";
+import courseRecord from "./course.record";
 import reservationRecord from "./reservation.record";
 import rosterRecord from "./roster.record";
 import semesterRecord from "./semester.record";
