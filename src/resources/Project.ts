@@ -46,6 +46,7 @@ export class Project implements Project {
   static url = "/api/projects";
   static collectionKey = "projects";
   static allotmentPrefix = "allotment-";
+  static walkInTitle = "Walk-in";
   constructor(project = defaultProject) {
     Object.assign(this, project);
   }

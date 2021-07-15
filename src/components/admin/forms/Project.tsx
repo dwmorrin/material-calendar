@@ -13,6 +13,7 @@ import {
 } from "@material-ui/core";
 import { ResourceKey } from "../../../resources/types";
 import Course from "../../../resources/Course";
+import Project from "../../../resources/Project";
 import Location from "../../../resources/Location";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { ListItem } from "@material-ui/core";
@@ -23,9 +24,8 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
 }) => {
   const courses = state.resources[ResourceKey.Courses] as Course[];
   const locations = state.resources[ResourceKey.Locations] as Location[];
-  //! Hard coded project title should be set in .env or similar config file
-  return values.title === "Walk-in" ? (
-    <div>You cannot edit the Walk-in project</div>
+  return values.title === Project.walkInTitle ? (
+    <div>You cannot edit the {values.title} project</div>
   ) : (
     <List>
       <Field fullWidth component={TextField} name="title" label="Title" />

@@ -116,7 +116,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
     ({ title, allotments }) =>
-      (title === "Walk-in" && isAvailableForWalkin(state.currentEvent)) ||
+      (title === Project.walkInTitle &&
+        isAvailableForWalkin(state.currentEvent)) ||
       allotments.some(
         (a) =>
           a.locationId === location.id &&
