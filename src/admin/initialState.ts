@@ -12,6 +12,7 @@ export const resources = {
 
 const initialState: AdminState = {
   // UI state
+  addProjectToLocationIsOpen: false,
   projectLocationHoursDialogIsOpen: false,
   projectLocationHoursSummaryDialogIsOpen: false,
   appIsBroken: false,

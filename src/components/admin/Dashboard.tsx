@@ -22,6 +22,7 @@ import { AuthContext } from "../AuthContext";
 import { Redirect } from "@reach/router";
 import User from "../../resources/User";
 import SemesterDialog from "./SemesterDialog";
+import AddProjectToLocationDialog from "./AddProjectToLocationDialog";
 import ProjectLocationHoursDialog from "./ProjectLocationHoursDialog";
 import ProjectLocationHoursSummaryDialog from "./ProjectLocationHoursSummaryDialog";
 import LocationHoursDialog from "./LocationHoursDialog";
@@ -69,6 +70,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       <FileImport dispatch={dispatch} state={state} />
       <Backups dispatch={dispatch} state={state} />
       <SemesterDialog dispatch={dispatch} state={state} />
+      <AddProjectToLocationDialog dispatch={dispatch} state={state} />
       <ProjectLocationHoursDialog dispatch={dispatch} state={state} />
       <ProjectLocationHoursSummaryDialog dispatch={dispatch} state={state} />
       <LocationHoursDialog dispatch={dispatch} state={state} />

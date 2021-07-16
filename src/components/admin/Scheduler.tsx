@@ -148,9 +148,9 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
       <Fab
         variant="extended"
         onClick={(): void =>
-          //! consider adding action "jump to document"
           dispatch({
-            type: AdminAction.SelectedDocument,
+            type: AdminAction.OpenAddProjectToLocation,
+            // not needed right now, but hold onto this idea
             payload: {
               resourceKey: ResourceKey.Projects,
               resourceInstance: new Project({

@@ -12,6 +12,7 @@ export interface Action {
 }
 
 export enum AdminAction {
+  CloseAddProjectToLocation,
   CloseBackups,
   CloseDetail,
   CloseFileImport,
@@ -23,6 +24,7 @@ export enum AdminAction {
   CloseVirtualWeekModifyDialog,
   CloseVirtualWeeksDialog,
   Error,
+  OpenAddProjectToLocation,
   OpenBackups,
   OpenDetail,
   OpenDetailWithResourceInstance,
@@ -50,6 +52,7 @@ export enum AdminAction {
 
 export interface AdminState {
   // UI state
+  addProjectToLocationIsOpen: boolean;
   appIsBroken: boolean;
   backupsIsOpen: boolean;
   calendarEventClickState?: CalendarEventClickState;

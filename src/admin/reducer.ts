@@ -84,6 +84,10 @@ const errorRedirect = (
   });
 
 //--------- NORMAL ACTION HANDLERS ----------
+const closeAddProjectToLocation: StateHandler = (state) => ({
+  ...state,
+  addProjectToLocationIsOpen: false,
+});
 
 const closeProjectLocationHoursDialog: StateHandler = (state) => ({
   ...state,
@@ -135,6 +139,11 @@ const closeVirtualWeeksDialog: StateHandler = (state) => ({
 const closeVirtualWeekSplitDialog: StateHandler = (state) => ({
   ...state,
   virtualWeekModifyDialogIsOpen: false,
+});
+
+const openAddProjectToLocation: StateHandler = (state) => ({
+  ...state,
+  addProjectToLocationIsOpen: true,
 });
 
 const openProjectLocationHoursDialog: StateHandler = (state, { payload }) => ({
@@ -327,6 +336,7 @@ const toggleDrawer: StateHandler = (state) => ({
 
 const reducer: StateHandler = (state, action) =>
   ({
+    [AdminAction.CloseAddProjectToLocation]: closeAddProjectToLocation,
     [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
     [AdminAction.CloseFileImport]: closeFileImport,
@@ -340,6 +350,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseVirtualWeeksDialog]: closeVirtualWeeksDialog,
     [AdminAction.CloseVirtualWeekModifyDialog]: closeVirtualWeekSplitDialog,
     [AdminAction.Error]: errorHandler,
+    [AdminAction.OpenAddProjectToLocation]: openAddProjectToLocation,
     [AdminAction.OpenProjectLocationHoursSummaryDialog]:
       openProjectLocationHoursSummaryDialog,
     [AdminAction.OpenBackups]: openBackups,
