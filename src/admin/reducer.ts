@@ -141,6 +141,18 @@ const closeVirtualWeekSplitDialog: StateHandler = (state) => ({
   virtualWeekModifyDialogIsOpen: false,
 });
 
+const fileImportSuccess: StateHandler = (state, { payload }) => ({
+  ...state,
+  fileImportIsOpen: false,
+  resources: { ...state.resources, ...payload?.resources },
+  snackbarIsOpen: true,
+  snackbarQueue: enqueue(state.snackbarQueue, {
+    type: "success",
+    message: "File imported",
+    autoHideDuration: 6000,
+  }),
+});
+
 const openAddProjectToLocation: StateHandler = (state) => ({
   ...state,
   addProjectToLocationIsOpen: true,
@@ -378,6 +390,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseVirtualWeeksDialog]: closeVirtualWeeksDialog,
     [AdminAction.CloseVirtualWeekModifyDialog]: closeVirtualWeekSplitDialog,
     [AdminAction.Error]: errorHandler,
+    [AdminAction.FileImportSuccess]: fileImportSuccess,
     [AdminAction.OpenAddProjectToLocation]: openAddProjectToLocation,
     [AdminAction.OpenProjectLocationHoursSummaryDialog]:
       openProjectLocationHoursSummaryDialog,

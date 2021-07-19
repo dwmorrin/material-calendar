@@ -5,13 +5,7 @@ import { BulkImporter } from "./router";
 
 export const headings = ["Title", "Group", "Restriction"];
 
-const bulkImport = (
-  dispatch: (action: {
-    type: AdminAction;
-    payload: Record<string, unknown>;
-  }) => void,
-  records: unknown
-): void => {
+const bulkImport: BulkImporter = (dispatch, records): void => {
   const dispatchError = (error: Error): void =>
     dispatch({ type: AdminAction.Error, payload: { error } });
 

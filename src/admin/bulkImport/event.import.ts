@@ -1,39 +1,45 @@
 import { AdminAction } from "../types";
 import Event from "../../resources/Event";
 import { BulkImporter } from "./router";
-
-interface FlatEvent {
-  location: string | number;
-  locationId: number;
-  title: string;
-  start: string;
-  end: string;
-  reservable: boolean;
-}
-
-const processEvent = (event: FlatEvent): FlatEvent => ({
-  ...event,
-  locationId: +event.location,
-});
+import { ResourceKey } from "../../resources/types";
 
 const headings = ["Title", "Location", "Start", "End", "Reservable"];
 
 const bulkImport: BulkImporter = (dispatch, events) => {
-  const errorHandler = (error: Error): void =>
+  const dispatchError = (error: Error): void =>
     dispatch({ type: AdminAction.Error, payload: { error } });
-  const body = JSON.stringify((events as FlatEvent[]).map(processEvent));
-  fetch(`${Event.url}/bulk`, {
+  if (!Array.isArray(events))
+    return dispatchError(
+      new Error(
+        "Event import failed: could not parse file (records not an array)"
+      )
+    );
+  fetch(`${Event.url}/import`, {
     method: "POST",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(
+      events.map(({ Title, Location, Start, End, Reservable }) => ({
+        title: Title,
+        locationId: Location,
+        start: Start,
+        end: End,
+        reservable: Number(Reservable),
+      }))
+    ),
   })
     .then((response) => response.json())
     .then(({ data, error }) => {
-      if (error || !data) return errorHandler(error);
+      if (error) return dispatchError(error);
+      dispatch({
+        type: AdminAction.FileImportSuccess,
+        payload: {
+          resources: {
+            [ResourceKey.Events]: (data as Event[]).map((e) => new Event(e)),
+          },
+        },
+      });
     })
-    .catch(errorHandler);
+    .catch(dispatchError);
 };
 
 export default [headings, bulkImport] as [string[], BulkImporter];

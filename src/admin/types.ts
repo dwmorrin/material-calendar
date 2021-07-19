@@ -24,6 +24,7 @@ export enum AdminAction {
   CloseVirtualWeekModifyDialog,
   CloseVirtualWeeksDialog,
   Error,
+  FileImportSuccess,
   OpenAddProjectToLocation,
   OpenBackups,
   OpenDetail,
