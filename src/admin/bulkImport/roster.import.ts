@@ -4,8 +4,9 @@ import RosterRecord from "../../resources/RosterRecord";
 import Course from "../../resources/Course";
 import Project from "../../resources/Project";
 import User from "../../resources/User";
+import { BulkImporter } from "./router";
 
-export const headings = [
+const headings = [
   "Course",
   "Catalog",
   "Section",
@@ -16,13 +17,7 @@ export const headings = [
   "Project",
 ];
 
-const bulkImport = (
-  dispatch: (action: {
-    type: AdminAction;
-    payload: Record<string, unknown>;
-  }) => void,
-  records: unknown
-): void => {
+const bulkImport: BulkImporter = (dispatch, records) => {
   const dispatchError = (error: Error): void =>
     dispatch({ type: AdminAction.Error, payload: { error } });
 
@@ -41,7 +36,6 @@ const bulkImport = (
     .then((res) => res.json())
     .then(({ error, data }) => {
       if (error) return dispatchError(error);
-      console.log({ data });
       dispatch({
         type: AdminAction.ReceivedResourcesAfterRosterImport,
         payload: {
@@ -65,4 +59,4 @@ const bulkImport = (
     .catch(dispatchError);
 };
 
-export default bulkImport;
+export default [headings, bulkImport] as [string[], BulkImporter];

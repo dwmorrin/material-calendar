@@ -1,5 +1,6 @@
-import { AdminAction, AdminState } from "../types";
+import { AdminAction } from "../types";
 import Event from "../../resources/Event";
+import { BulkImporter } from "./router";
 
 interface FlatEvent {
   location: string | number;
@@ -15,13 +16,9 @@ const processEvent = (event: FlatEvent): FlatEvent => ({
   locationId: +event.location,
 });
 
-const bulkImport = (
-  dispatch: (action: {
-    type: AdminAction;
-    payload?: Partial<AdminState>;
-  }) => void,
-  events: unknown
-): void => {
+const headings = ["Title", "Location", "Start", "End", "Reservable"];
+
+const bulkImport: BulkImporter = (dispatch, events) => {
   const errorHandler = (error: Error): void =>
     dispatch({ type: AdminAction.Error, payload: { error } });
   const body = JSON.stringify((events as FlatEvent[]).map(processEvent));
@@ -39,4 +36,4 @@ const bulkImport = (
     .catch(errorHandler);
 };
 
-export default bulkImport;
+export default [headings, bulkImport] as [string[], BulkImporter];

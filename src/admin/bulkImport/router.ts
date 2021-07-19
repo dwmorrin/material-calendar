@@ -1,53 +1,40 @@
 import { ResourceKey } from "../../resources/types";
 import { AdminAction, AdminState } from "../types";
 import eventImport from "./event.import";
-import rosterImport, { headings } from "./roster.import";
+import locationImport from "./location.import";
+import rosterImport from "./roster.import";
 
-function defaultImporter(
+export type BulkImporter = (
   dispatch: (action: {
     type: AdminAction;
-    payload?: Partial<AdminState>;
-  }) => void
-): void {
+    payload: Record<string, unknown>;
+  }) => void,
+  data: unknown,
+  state?: AdminState
+) => void;
+
+const defaultImporter: BulkImporter = (dispatch) =>
   dispatch({
     type: AdminAction.Error,
     payload: { error: new Error("resource has no bulk importer defined") },
   });
-}
 
-const defaultHeadings = ["Error: no headers defined"];
-
-type HeadingsAndDispatch = [
-  string[],
-  (
-    dispatch: (action: {
-      type: AdminAction;
-      payload?: Partial<AdminState>;
-    }) => void,
-    data: unknown,
-    state?: AdminState
-  ) => void
-];
-
-const defaultHeadingsAndDispatch: HeadingsAndDispatch = [
-  defaultHeadings,
+const defaultHeadingsAndDispatch: [string[], BulkImporter] = [
+  ["Error: no headers defined"],
   defaultImporter,
 ];
 
-const router = (key: ResourceKey): HeadingsAndDispatch =>
+const router = (key: ResourceKey): [string[], BulkImporter] =>
   ({
     [ResourceKey.Categories]: defaultHeadingsAndDispatch,
     [ResourceKey.Courses]: defaultHeadingsAndDispatch,
     [ResourceKey.Equipment]: defaultHeadingsAndDispatch,
-    [ResourceKey.Events]: [defaultHeadings, eventImport] as HeadingsAndDispatch,
+    [ResourceKey.Events]: eventImport,
     [ResourceKey.Groups]: defaultHeadingsAndDispatch,
-    [ResourceKey.Locations]: defaultHeadingsAndDispatch,
+    [ResourceKey.Locations]: locationImport,
     [ResourceKey.Projects]: defaultHeadingsAndDispatch,
     [ResourceKey.Reservations]: defaultHeadingsAndDispatch,
-    [ResourceKey.RosterRecords]: [
-      headings,
-      rosterImport,
-    ] as HeadingsAndDispatch,
+    [ResourceKey.RosterRecords]: rosterImport,
     [ResourceKey.Semesters]: defaultHeadingsAndDispatch,
     [ResourceKey.Tags]: defaultHeadingsAndDispatch,
     [ResourceKey.Users]: defaultHeadingsAndDispatch,
