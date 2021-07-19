@@ -23,13 +23,14 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import { parseAndFormatSQLDateInterval } from "../utils/date";
-import UserGroup from "../resources/UserGroup";
+import UserGroup, { GroupMember } from "../resources/UserGroup";
 import { AuthContext } from "./AuthContext";
 import User from "../resources/User";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import ThumbsUpDownIcon from "@material-ui/icons/ThumbsUpDown";
+import { sendMail } from "../utils/mail";
 
 const transition = makeTransition("right");
 
@@ -373,11 +374,12 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                                   payload: { error },
                                                 });
                                               } else {
+                                                console.log(data);
                                                 dispatch({
                                                   type: CalendarAction.JoinedGroup,
                                                   payload: {
                                                     currentGroup: new UserGroup(
-                                                      data[0]
+                                                      data
                                                     ),
                                                   },
                                                 });
@@ -437,13 +439,46 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                                         payload: { error },
                                                       });
                                                     } else {
+                                                      const newGroup =
+                                                        new UserGroup(data);
+                                                      newGroup.members
+                                                        .filter(
+                                                          (u: GroupMember) =>
+                                                            u.username !==
+                                                            user.username
+                                                        )
+                                                        .forEach(
+                                                          (u: GroupMember) => {
+                                                            if (!u.email)
+                                                              return dispatchError(
+                                                                new Error(
+                                                                  `${u.name.first} ${u.name.last} has no email`
+                                                                )
+                                                              );
+                                                            sendMail(
+                                                              u.email,
+                                                              user.name.first +
+                                                                " " +
+                                                                user.name.last +
+                                                                " has joined your group",
+                                                              "Hello " +
+                                                                u.name?.first +
+                                                                ", " +
+                                                                user.name
+                                                                  .first +
+                                                                " " +
+                                                                user.name.last +
+                                                                " has joined your group for " +
+                                                                currentProject?.title,
+                                                              dispatch
+                                                            );
+                                                          }
+                                                        );
                                                       dispatch({
                                                         type: CalendarAction.JoinedGroup,
                                                         payload: {
                                                           currentGroup:
-                                                            new UserGroup(
-                                                              data[0]
-                                                            ),
+                                                            newGroup,
                                                         },
                                                       });
                                                     }
@@ -494,6 +529,22 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                       },
                                     });
                                   });
+                                sendMail(
+                                  invitation.invitor.email,
+                                  user.name.first +
+                                    " " +
+                                    user.name.last +
+                                    " has rejected upir group invitation",
+                                  "Hello " +
+                                    invitation.invitor.name.first +
+                                    ", " +
+                                    user.name.first +
+                                    " " +
+                                    user.name.last +
+                                    " has rejected your group invitation for " +
+                                    currentProject?.title,
+                                  dispatch
+                                );
                                 dispatch({
                                   type: CalendarAction.DisplayMessage,
                                   payload: {
@@ -553,35 +604,19 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                   `${u.name.first} ${u.name.last} has no email`
                                 )
                               );
-                            fetch(`/api/mail`, {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json",
-                              },
-                              body: JSON.stringify({
-                                to: u.email,
-                                subject: "You have been invited to a group",
-                                text:
-                                  "Hello " +
-                                  u.name?.first +
-                                  ", " +
-                                  user.name?.first +
-                                  " " +
-                                  user.name?.last +
-                                  " has invited you to join their group for " +
-                                  currentProject?.title,
-                              }),
-                            })
-                              .then((response) => response.json())
-                              .then(({ error, data }) => {
-                                if (error || !data) return dispatchError(error);
-                                dispatchError(
-                                  new Error(
-                                    "Email success, but no success handler written!"
-                                  )
-                                );
-                              })
-                              .catch(dispatchError);
+                            sendMail(
+                              u.email,
+                              "You have been invited to a group",
+                              "Hello " +
+                                u.name?.first +
+                                ", " +
+                                user.name?.first +
+                                " " +
+                                user.name?.last +
+                                " has invited you to join their group for " +
+                                currentProject?.title,
+                              dispatch
+                            );
                           });
                           // Get list of invitations again (to get the new one)
                           fetch(`/api/invitations/user/${user?.id}`)

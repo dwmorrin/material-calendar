@@ -33,6 +33,7 @@ import ReservationForm from "./ReservationForm";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import { deepEqual } from "fast-equals";
 import Event from "../resources/Event";
+import { sendMail } from "../utils/mail";
 
 const transition = makeTransition("left");
 
@@ -62,7 +63,6 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     });
     return sameDay && withinWalkInPeriod && bookingCutoffHasNotPassed;
   };
-
   // Update the event when the EventDetail is opened and when reservation form is closed
   useEffect(() => {
     if (state.currentEvent?.id)
@@ -196,7 +196,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           )}
         </section>
 
-        {future && (userOwns || open) && !!projects.length && (
+        {(userOwns || open) && !!projects.length && (
           <Button
             key="MakeBooking"
             style={{
@@ -243,6 +243,53 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                         meta: context,
                       });
                     } else {
+                      const group = (
+                        state.resources[ResourceKey.Groups] as UserGroup[]
+                      ).find(
+                        (group) =>
+                          group.id === state.currentEvent?.reservation?.groupId
+                      );
+                      const project = (
+                        state.resources[ResourceKey.Projects] as Project[]
+                      ).find((project) => project.id === group?.projectId);
+                      if (group) {
+                        const subject = "canceled a reservation for your group";
+                        const body =
+                          subject +
+                          " for " +
+                          project?.title +
+                          " on " +
+                          state.currentEvent?.start +
+                          " in " +
+                          state.currentEvent?.location.title;
+                        group.members
+                          .filter((member) => member.username !== user.username)
+                          .forEach((member) =>
+                            sendMail(
+                              member.email,
+                              user.name.first +
+                                " " +
+                                user.name.last +
+                                " has " +
+                                subject,
+                              "Hello " +
+                                member.name.first +
+                                ", " +
+                                user.name.first +
+                                " " +
+                                user.name.last +
+                                " has " +
+                                body,
+                              dispatch
+                            )
+                          );
+                        sendMail(
+                          user.email,
+                          "You have " + subject,
+                          "Hello " + user.name.first + ",  You have " + body,
+                          dispatch
+                        );
+                      }
                       dispatch({ type: CalendarAction.CanceledReservation });
                     }
                   });

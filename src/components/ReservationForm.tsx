@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useContext, useState } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   Button,
@@ -28,6 +28,7 @@ import {
   transition,
   getValuesFromReservation,
 } from "../calendar/reservationForm";
+import { AuthContext } from "./AuthContext";
 
 const RadioYesNo: FunctionComponent<{
   label: string;
@@ -61,6 +62,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   const classes = useStyles();
   const closeForm = (): void =>
     dispatch({ type: CalendarAction.CloseReservationForm });
+  const { user } = useContext(AuthContext);
 
   return (
     <Dialog
@@ -86,7 +88,14 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
             getValuesFromReservation(state.currentEvent) ||
             makeInitialValues(state, projects)
           }
-          onSubmit={submitHandler(closeForm, dispatch)}
+          onSubmit={submitHandler(
+            closeForm,
+            dispatch,
+            user,
+            state.currentEvent,
+            state.resources[ResourceKey.Groups] as UserGroup[],
+            state.resources[ResourceKey.Projects] as Project[]
+          )}
           validationSchema={validationSchema}
         >
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (

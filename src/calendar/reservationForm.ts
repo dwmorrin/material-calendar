@@ -8,6 +8,8 @@ import UserGroup from "../resources/UserGroup";
 import Equipment from "../resources/Equipment";
 import Event from "../resources/Event";
 import { ResourceKey } from "../resources/types";
+import { sendMail } from "../utils/mail";
+import User from "../resources/User";
 
 export const useStyles = makeStyles({
   list: {
@@ -146,7 +148,14 @@ export const makeEquipmentRequests = (
 };
 
 export const submitHandler =
-  (closeForm: () => void, dispatch: (action: Action) => void) =>
+  (
+    closeForm: () => void,
+    dispatch: (action: Action) => void,
+    user: User,
+    event: Event | undefined,
+    groups: UserGroup[],
+    projects: Project[]
+  ) =>
   (values: { [k: string]: unknown }, actions: FormikValues): void => {
     values = {
       ...values,
@@ -194,6 +203,48 @@ export const submitHandler =
       .catch(dispatchError)
       .finally(() => {
         actions.setSubmitting(false);
+        if (event) {
+          const group = groups.find((group) => group.id === values.groupId);
+          const project = projects.find(
+            (project) => project.id === values.project
+          );
+          const subject =
+            (values.id ? "modified" : "created") +
+            " a reservation for your group";
+          const body =
+            subject +
+            " for " +
+            project?.title +
+            " on " +
+            event.start +
+            " in " +
+            event.location.title;
+          if (group) {
+            group.members
+              .filter((member) => member.username !== user.username)
+              .forEach((member) =>
+                sendMail(
+                  member.email,
+                  user.name.first + " " + user.name.last + " has " + subject,
+                  "Hello " +
+                    member.name.first +
+                    ", " +
+                    user.name.first +
+                    " " +
+                    user.name.last +
+                    " has " +
+                    body,
+                  dispatch
+                )
+              );
+          }
+          sendMail(
+            user.email,
+            "You have " + subject,
+            "Hello " + user.name.first + ",  You have " + body,
+            dispatch
+          );
+        }
         dispatch({
           type: CalendarAction.DisplayMessage,
           payload: {
