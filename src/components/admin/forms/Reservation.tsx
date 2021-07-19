@@ -5,13 +5,19 @@ import { FormTemplateProps } from "../../../admin/types";
 import { List, FormLabel } from "@material-ui/core";
 import Event from "../../../resources/Event";
 import Project from "../../../resources/Project";
-import { deleteKeys } from "../../../utils/deleteKeys";
 import { ResourceKey } from "../../../resources/types";
 
 const getEventById = (events: Event[], id: number): Event =>
   events.find((e) => e.id === id) || new Event();
+
+const deleteKey = (obj: Project, key: string): Project => {
+  const copy = { ...obj };
+  delete copy[key];
+  return copy;
+};
+
 const getProjectById = (projects: Project[], id: number): Project =>
-  deleteKeys(
+  deleteKey(
     projects.find((p) => p.id === id) || new Project(),
     "allotments"
   ) as Project;
