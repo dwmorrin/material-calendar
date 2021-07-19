@@ -5,6 +5,7 @@ export interface GroupMember {
     middle?: string;
     last: string;
   };
+  email: string;
 }
 interface UserGroup {
   [k: string]: unknown;

@@ -4,7 +4,7 @@ export interface Invitation {
   id: number;
   confirmed: number;
   project: number;
-  invitor: { id: number; name: { last: string; first: string } };
+  invitor: { id: number; name: { last: string; first: string }; email: string };
   invitees: {
     id: number;
     accepted: number;
