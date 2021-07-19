@@ -269,6 +269,20 @@ const receivedResourcesAfterLocationHoursUpdate: StateHandler = (
   }),
 });
 
+const receivedResourcesAfterRosterImport: StateHandler = (
+  state,
+  { payload }
+) => ({
+  ...state,
+  resources: { ...state.resources, ...payload?.resources },
+  snackbarIsOpen: true,
+  snackbarQueue: enqueue(state.snackbarQueue, {
+    type: "success",
+    message: "Roster imported",
+    autoHideDuration: 6000,
+  }),
+});
+
 const receivedResourcesAfterVirtualWeekUpdate: StateHandler = (
   state,
   { payload }
@@ -371,6 +385,8 @@ const reducer: StateHandler = (state, action) =>
       receivedResourcesAfterLocationHoursUpdate,
     [AdminAction.ReceivedResourcesAfterProjectLocationHoursUpdate]:
       receivedResourcesAfterProjectLocationHoursUpdate,
+    [AdminAction.ReceivedResourcesAfterRosterImport]:
+      receivedResourcesAfterRosterImport,
     [AdminAction.ReceivedResourcesAfterVirtualWeekUpdate]:
       receivedResourcesAfterVirtualWeekUpdate,
     [AdminAction.SelectedDocument]: selectedDocument,
