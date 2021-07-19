@@ -106,7 +106,7 @@ export const fetchDefaultLocation = (
     .then(({ error, data }) => {
       if (error)
         return dispatch({ type: AdminAction.Error, payload: { error } });
-      if (data.length) {
+      if (data && data.length) {
         const id = data[0].id;
         setDefaultLocationId(id);
         dispatch({
