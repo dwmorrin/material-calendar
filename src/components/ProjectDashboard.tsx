@@ -29,6 +29,7 @@ import {
   compareStartDates,
   transition,
 } from "../calendar/projectDashboard";
+import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -57,6 +58,14 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   const splitPoint = groupEvents.findIndex(
     (event) => new Date(event.start).getTime() < now
   );
+
+  const makeOpenEventDetail = (event: Event) => (): void => {
+    dispatch({
+      type: CalendarAction.OpenEventDetail,
+      payload: { currentEvent: event },
+    });
+    fetchCurrentEvent(dispatch, event);
+  };
 
   return (
     <Dialog
@@ -126,12 +135,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         {groupEvents.slice(0, splitPoint).map((event) => (
           <List
             key={`group_event_listing_${event.id}`}
-            onClick={(): void =>
-              dispatch({
-                type: CalendarAction.OpenEventDetail,
-                payload: { currentEvent: event },
-              })
-            }
+            onClick={makeOpenEventDetail(event)}
           >
             <ListItem>{event.title}</ListItem>
             <ListItem>{parseAndFormatSQLDatetimeInterval(event)}</ListItem>
@@ -141,12 +145,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         {groupEvents.slice(splitPoint).map((event) => (
           <List
             key={`group_event_listing_${event.id}`}
-            onClick={(): void =>
-              dispatch({
-                type: CalendarAction.OpenEventDetail,
-                payload: { currentEvent: event },
-              })
-            }
+            onClick={makeOpenEventDetail(event)}
           >
             <ListItem>{event.title}</ListItem>
             <ListItem>{parseAndFormatSQLDatetimeInterval(event)}</ListItem>

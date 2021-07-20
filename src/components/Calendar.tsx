@@ -2,7 +2,6 @@ import React, {
   FunctionComponent,
   useContext,
   useEffect,
-  useState,
   useReducer,
   useRef,
 } from "react";
@@ -44,6 +43,13 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     calendarView: "resourceTimeGridWeek",
   } as CalendarSelections);
 
+  const dispatchError = (error: Error, context = ""): void =>
+    dispatch({
+      type: CalendarAction.Error,
+      payload: { error },
+      meta: context,
+    });
+
   useEffect(() => {
     if (loggedOut || !user.username) return;
     fetchAllResources(
@@ -59,20 +65,15 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     fetch(`/api/invitations/user/${user?.id}/`)
       .then((response) => response.json())
       .then(({ error, data, context }) => {
-        if (error || !data) {
-          return dispatch({
-            type: CalendarAction.Error,
-            payload: { error },
-            meta: context,
-          });
-        }
+        if (error || !data) return dispatchError(error, context);
         dispatch({
           type: CalendarAction.ReceivedInvitations,
           payload: {
             invitations: data,
           },
         });
-      });
+      })
+      .catch(dispatchError);
   }, [user, loggedOut]);
 
   return (

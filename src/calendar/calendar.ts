@@ -1,8 +1,30 @@
-import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
+import {
+  Action,
+  CalendarAction,
+  CalendarUIProps,
+  CalendarUISelectionProps,
+} from "../calendar/types";
 import Event from "../resources/Event";
 import Location from "../resources/Location";
 import Project from "../resources/Project";
 import { deepEqual } from "fast-equals";
+import fetchCurrentEvent from "./fetchCurrentEvent";
+
+export const makeEventClick =
+  (dispatch: (action: Action) => void, events: Event[]) =>
+  // full calendar callback for event click, string ID from full calendar
+  ({ event: { id = "" } }): void => {
+    const dispatchError = (error: Error): void =>
+      dispatch({ type: CalendarAction.Error, payload: { error } });
+    const currentEvent = events.find((event) => event.id === +id);
+    if (!currentEvent) return dispatchError(new Error("Event not found"));
+    dispatch({
+      type: CalendarAction.OpenEventDetail,
+      payload: { currentEvent },
+    });
+    // check for changes on the server
+    fetchCurrentEvent(dispatch, currentEvent);
+  };
 
 const getBackgroundColor = (
   event: Event,

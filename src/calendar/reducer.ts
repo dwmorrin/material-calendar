@@ -207,6 +207,28 @@ const createdEventsReceived: StateHandler = (state, action) => {
   return closeEventEditor(receivedResource(state, action));
 };
 
+const foundStaleCurrentEvent: StateHandler = (state, { payload }) => {
+  if (payload?.currentEvent instanceof Event) {
+    const event = payload?.currentEvent as Event;
+    const index = state.resources[ResourceKey.Events].findIndex(
+      ({ id }) => id === event.id
+    );
+    return {
+      ...state,
+      currentEvent: event,
+      resources: {
+        ...state.resources,
+        [ResourceKey.Events]: [
+          ...state.resources[ResourceKey.Events].slice(0, index),
+          event,
+          ...state.resources[ResourceKey.Events].slice(index + 1),
+        ],
+      },
+    };
+  }
+  return state;
+};
+
 const joinedGroup: StateHandler = (state, action) => {
   const { payload } = action;
   if (!payload?.currentGroup) {
@@ -444,40 +466,7 @@ const togglePicker: StateHandler = (state) => ({
   pickerShowing: !state.pickerShowing,
 });
 
-const updateEvents: StateHandler = (state, action) => {
-  const { payload, meta } = action;
-  const resources = payload?.resources;
-  if (!resources) {
-    return errorRedirect(
-      state,
-      action,
-      "no resources in payload",
-      ErrorType.MISSING_RESOURCE
-    );
-  }
-  const resourceKey = meta as number;
-  if (resourceKey === undefined) {
-    return errorRedirect(
-      state,
-      action,
-      "no context given",
-      ErrorType.MISSING_RESOURCE
-    );
-  }
-  const updatedCurrentEvent = resources[resourceKey].find(
-    (event) => event.id == state.currentEvent?.id
-  ) as Event;
-  return {
-    ...state,
-    currentEvent: updatedCurrentEvent,
-    resources: {
-      ...state.resources,
-      [resourceKey]: resources[resourceKey],
-    },
-  };
-};
-
-const UpdatedEventReceived: StateHandler = (state, action) =>
+const updatedEventReceived: StateHandler = (state, action) =>
   closeEventEditor(
     selectedEvent(
       {
@@ -515,6 +504,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CreatedEventsReceived]: createdEventsReceived,
     [CalendarAction.DisplayMessage]: displayMessage,
     [CalendarAction.Error]: errorHandler,
+    [CalendarAction.FoundStaleCurrentEvent]: foundStaleCurrentEvent,
     [CalendarAction.JoinedGroup]: joinedGroup,
     [CalendarAction.LeftGroup]: leftGroup,
     [CalendarAction.OpenEventDetail]: openEventDetail,
@@ -533,8 +523,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.SelectedProject]: selectedProject,
     [CalendarAction.ToggleDrawer]: toggleDrawer,
     [CalendarAction.TogglePicker]: togglePicker,
-    [CalendarAction.UpdateEvents]: updateEvents,
-    [CalendarAction.UpdatedEventReceived]: UpdatedEventReceived,
+    [CalendarAction.UpdatedEventReceived]: updatedEventReceived,
     [CalendarAction.ViewToday]: viewToday,
   }[action.type](state, action));
 

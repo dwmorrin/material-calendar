@@ -24,6 +24,7 @@ import Project from "../resources/Project";
 import {
   addResourceId,
   compareCalendarStates,
+  makeEventClick,
   makeResources,
   makeSelectedLocationIdSet,
   getEventsByLocationId,
@@ -119,14 +120,7 @@ const FullCalendarBox: FunctionComponent<
             successCallback(byLocationId);
           }
         }}
-        eventClick={(info): void =>
-          dispatch({
-            type: CalendarAction.OpenEventDetail,
-            payload: {
-              currentEvent: events.find((event) => event.id === +info.event.id),
-            },
-          })
-        }
+        eventClick={makeEventClick(dispatch, events)}
         // VISIBLE DATE RANGE
         initialDate={state.currentStart}
         initialView={selections.calendarView}

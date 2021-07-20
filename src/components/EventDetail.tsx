@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useContext } from "react";
+import React, { FunctionComponent, useContext } from "react";
 import {
   Dialog,
   IconButton,
@@ -26,7 +26,6 @@ import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
 import ReservationForm from "./ReservationForm";
 import ListSubheader from "@material-ui/core/ListSubheader";
-import { deepEqual } from "fast-equals";
 import Event from "../resources/Event";
 import { sendMail } from "../utils/mail";
 
@@ -37,49 +36,6 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const { user } = useContext(AuthContext);
-
-  // Update the event when the EventDetail is opened and when reservation form is closed
-  useEffect(() => {
-    if (state.currentEvent?.id)
-      fetch(`${Event.url}/${state.currentEvent.id}`)
-        .then((res) => res.json())
-        .then(({ error, data, context }) => {
-          if (error || !data) {
-            return dispatch({
-              type: CalendarAction.Error,
-              payload: { error },
-              meta: context,
-            });
-          }
-          // Compare the contents of the events
-          if (!deepEqual(new Event(data), state.currentEvent)) {
-            // events out of date, updating
-            fetch(Event.url)
-              .then((res) => res.json())
-              .then(({ error, data, context }) =>
-                dispatch(
-                  error || !data
-                    ? {
-                        type: CalendarAction.Error,
-                        payload: { error },
-                        meta: context,
-                      }
-                    : {
-                        type: CalendarAction.UpdateEvents,
-                        payload: {
-                          resources: {
-                            [ResourceKey.Events]: data.map(
-                              (e: Event) => new Event(e)
-                            ),
-                          },
-                        },
-                        meta: ResourceKey.Events,
-                      }
-                )
-              );
-          }
-        });
-  }, [dispatch, state.detailIsOpen, state.reservationFormIsOpen]);
 
   if (!state.currentEvent || !state.currentEvent.location || !user?.username) {
     return null;

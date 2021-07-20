@@ -19,6 +19,7 @@ export enum CalendarAction {
   CreatedEventsReceived,
   DisplayMessage,
   Error,
+  FoundStaleCurrentEvent,
   JoinedGroup,
   LeftGroup,
   OpenEventDetail,
@@ -37,7 +38,6 @@ export enum CalendarAction {
   SelectedProject,
   ToggleDrawer,
   TogglePicker,
-  UpdateEvents,
   UpdatedEventReceived,
   ViewToday,
 }
