@@ -4,10 +4,33 @@ import Location from "../resources/Location";
 import Project from "../resources/Project";
 import { deepEqual } from "fast-equals";
 
-export const addResourceId = (event: Event): Omit<Event, "id"> => ({
-  ...event,
-  resourceId: event.location.id,
-});
+const getBackgroundColor = (
+  event: Event,
+  walkInDetails = Event.walkInDetails()
+): string => {
+  if (event.reservation) {
+    // highlight user owned reservations
+    // TODO: if (current user owns reservation) ...
+    // indicate someone else's reservation
+    return "salmon";
+  } else if (event.reservable) {
+    // highlight available walk-in times
+    if (Event.isAvailableForWalkIn(event, walkInDetails))
+      return "mediumseagreen";
+    // indicate reservable times
+    return "darkseagreen";
+  }
+  // event is not reservable
+  return "";
+};
+
+export const addResourceId =
+  (walkInDetails = Event.walkInDetails()) =>
+  (event: Event): Omit<Event, "id"> => ({
+    ...event,
+    backgroundColor: getBackgroundColor(event, walkInDetails),
+    resourceId: event.location.id,
+  });
 
 /**
  * 2nd argument to React.memo
@@ -59,21 +82,23 @@ export const makeSelectedLocationIdSet = (
   return set;
 };
 
-/**
- * "reducing by hand" because TS would not infer type of events.reduce() as an Array
- */
 export const getEventsByLocationId = (
   events: Event[],
   projectLocationIds: Set<number>,
   locationIds: number[]
 ): Omit<Event, "id">[] => {
   const result: Omit<Event, "id">[] = [];
+  const walkInDetails = Event.walkInDetails();
   for (const event of events) {
     if (
       projectLocationIds.has(event.location.id) ||
       locationIds.includes(event.location.id)
     )
-      result.push({ ...event, id: String(event.id) });
+      result.push({
+        ...event,
+        backgroundColor: getBackgroundColor(event, walkInDetails),
+        id: String(event.id),
+      });
   }
   return result;
 };

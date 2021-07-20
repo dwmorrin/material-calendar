@@ -1,4 +1,13 @@
-import { formatSQLDatetime } from "../utils/date";
+import {
+  formatSQLDatetime,
+  isSameDay,
+  isValidDateInterval,
+  isWithinInterval,
+  nowInServerTimezone,
+  parseSQLDatetime,
+  subMinutes,
+  todayInServerTimezoneAtHour,
+} from "../utils/date";
 
 export interface ReservationInfo {
   id: number;
@@ -42,6 +51,45 @@ class Event implements Event {
     }
   ) {
     Object.assign(this, event);
+  }
+
+  // 2nd argument should be memoized for best performance if iterating
+  static isAvailableForWalkIn(
+    event: Event,
+    { now, start, end, cutoffMinutes } = Event.walkInDetails()
+  ): boolean {
+    if (!event.reservable) return false;
+    const sameDay = isSameDay(now, parseSQLDatetime(event.start));
+    const withinWalkInPeriod = isWithinInterval(now, {
+      start,
+      end,
+    });
+    const bookingCutoffHasNotPassed = isValidDateInterval({
+      start: now,
+      end: subMinutes(parseSQLDatetime(event.end), cutoffMinutes),
+    });
+    return sameDay && withinWalkInPeriod && bookingCutoffHasNotPassed;
+  }
+
+  // this is expensive and must be memoized before iterating
+  static walkInDetails(): {
+    now: Date;
+    start: Date;
+    end: Date;
+    cutoffMinutes: number;
+  } {
+    return {
+      now: nowInServerTimezone(),
+      start: todayInServerTimezoneAtHour(
+        Number(process.env.REACT_APP_WALK_IN_START_HOUR)
+      ),
+      end: todayInServerTimezoneAtHour(
+        Number(process.env.REACT_APP_WALK_IN_END_HOUR)
+      ),
+      cutoffMinutes: Number(
+        process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF_MINUTES
+      ),
+    };
   }
 }
 

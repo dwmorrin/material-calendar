@@ -30,7 +30,12 @@ import {
 } from "../calendar/calendar";
 import { AuthContext } from "./AuthContext";
 import User from "../resources/User";
-import { parseAndFormatFCString } from "../utils/date";
+import {
+  parseFCString,
+  parseAndFormatFCString,
+  isWithinIntervalFP,
+  parseSQLDatetime,
+} from "../utils/date";
 
 const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
@@ -87,7 +92,7 @@ const FullCalendarBox: FunctionComponent<
           selections.locationIds
         )}
         // EVENTS
-        events={(_, successCallback): void => {
+        events={({ startStr, endStr }, successCallback): void => {
           // https://fullcalendar.io/docs/events-function
           if (
             (
@@ -96,7 +101,19 @@ const FullCalendarBox: FunctionComponent<
           ) {
             // FullCalendar's resource system handles locations automatically
             // so long as we provide a .resourceId prop
-            successCallback(events.map(addResourceId));
+            const inView = isWithinIntervalFP({
+              start: parseFCString(startStr),
+              end: parseFCString(endStr),
+            });
+            const eventsInView = events
+              .filter((event) =>
+                inView(
+                  parseSQLDatetime(event.start) ||
+                    inView(parseSQLDatetime(event.end))
+                )
+              )
+              .map(addResourceId());
+            successCallback(eventsInView);
           } else {
             // We are not using the resource system; we have to manually group locations
             successCallback(byLocationId);

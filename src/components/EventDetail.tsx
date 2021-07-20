@@ -16,13 +16,8 @@ import {
   compareAscSQLDatetime,
   parseAndFormatSQLDatetimeInterval,
   isBefore,
-  isSameDay,
-  isValidDateInterval,
-  isWithinInterval,
   nowInServerTimezone,
   parseSQLDatetime,
-  subMinutes,
-  todayInServerTimezoneAtHour,
 } from "../utils/date";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
@@ -42,27 +37,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const { user } = useContext(AuthContext);
-  const isAvailableForWalkin = (event?: Event): boolean => {
-    if (!event) return false;
-    const now = nowInServerTimezone();
-    const sameDay = isSameDay(now, parseSQLDatetime(event.start));
-    const withinWalkInPeriod = isWithinInterval(now, {
-      start: todayInServerTimezoneAtHour(
-        Number(process.env.REACT_APP_WALK_IN_START_HOUR)
-      ),
-      end: todayInServerTimezoneAtHour(
-        Number(process.env.REACT_APP_WALK_IN_END_HOUR)
-      ),
-    });
-    const bookingCutoffHasNotPassed = isValidDateInterval({
-      start: now,
-      end: subMinutes(
-        parseSQLDatetime(event.end),
-        Number(process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF_MINUTES)
-      ),
-    });
-    return sameDay && withinWalkInPeriod && bookingCutoffHasNotPassed;
-  };
+
   // Update the event when the EventDetail is opened and when reservation form is closed
   useEffect(() => {
     if (state.currentEvent?.id)
@@ -117,7 +92,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
     ({ title, allotments }) =>
       (title === Project.walkInTitle &&
-        isAvailableForWalkin(state.currentEvent)) ||
+        Event.isAvailableForWalkIn(state.currentEvent)) ||
       allotments.some(
         (a) =>
           a.locationId === location.id &&
