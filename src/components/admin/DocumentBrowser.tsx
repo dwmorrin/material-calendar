@@ -18,12 +18,12 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
 }) => {
   const [recordHeight, setRecordHeight] = useState(DEFAULT_RECORD_HEIGHT);
   const [recordsPerPage, setRecordsPerPage] = useState(
-    getRecordsPerPage(DEFAULT_RECORD_HEIGHT)
+    getRecordsPerPage(/*DEFAULT_RECORD_HEIGHT*/)
   );
 
   useEffect(() => {
     const calculateAndSetRecordsPerPage = (): void => {
-      setRecordsPerPage(getRecordsPerPage(recordHeight));
+      setRecordsPerPage(getRecordsPerPage(/*recordHeight*/));
     };
     window.addEventListener("resize", calculateAndSetRecordsPerPage);
     return (): void =>
@@ -35,7 +35,7 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
       document.querySelector(".MuiCard-root")?.clientHeight ||
       DEFAULT_RECORD_HEIGHT;
     setRecordHeight(height);
-    setRecordsPerPage(getRecordsPerPage(height));
+    setRecordsPerPage(getRecordsPerPage(/*height*/));
   }, []);
 
   const { recordPage: page } = state;
