@@ -69,11 +69,6 @@ const FullCalendarBox: FunctionComponent<
     selections.projectIds
   );
   const events = state.resources[ResourceKey.Events] as Event[];
-  const byLocationId = getEventsByLocationId(
-    events,
-    projectLocations,
-    selections.locationIds
-  );
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const classes = useStyles();
 
@@ -95,6 +90,16 @@ const FullCalendarBox: FunctionComponent<
         // EVENTS
         events={({ startStr, endStr }, successCallback): void => {
           // https://fullcalendar.io/docs/events-function
+          const inView = isWithinIntervalFP({
+            start: parseFCString(startStr),
+            end: parseFCString(endStr),
+          });
+          const eventsInView = events.filter((event) =>
+            inView(
+              parseSQLDatetime(event.start) ||
+                inView(parseSQLDatetime(event.end))
+            )
+          );
           if (
             (
               ["resourceTimeGridDay", "resourceTimeGridWeek"] as CalendarView[]
@@ -102,22 +107,16 @@ const FullCalendarBox: FunctionComponent<
           ) {
             // FullCalendar's resource system handles locations automatically
             // so long as we provide a .resourceId prop
-            const inView = isWithinIntervalFP({
-              start: parseFCString(startStr),
-              end: parseFCString(endStr),
-            });
-            const eventsInView = events
-              .filter((event) =>
-                inView(
-                  parseSQLDatetime(event.start) ||
-                    inView(parseSQLDatetime(event.end))
-                )
-              )
-              .map(addResourceId());
-            successCallback(eventsInView);
+            successCallback(eventsInView.map(addResourceId()));
           } else {
             // We are not using the resource system; we have to manually group locations
-            successCallback(byLocationId);
+            successCallback(
+              getEventsByLocationId(
+                eventsInView,
+                projectLocations,
+                selections.locationIds
+              )
+            );
           }
         }}
         eventClick={makeEventClick(dispatch, events)}
