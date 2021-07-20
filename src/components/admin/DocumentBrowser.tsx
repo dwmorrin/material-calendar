@@ -88,7 +88,7 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
             key={index}
             dispatch={dispatch}
             document={record}
-            template={templateRouter(state.resourceKey)(record)}
+            template={templateRouter(state.resourceKey)(record, state)}
           />
         ))
       ) : (

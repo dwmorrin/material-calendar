@@ -12,10 +12,11 @@ import tagRecord from "./tag.record";
 import userRecord from "./user.record";
 import userGroupRecord from "./userGroup.record";
 import virtualWeekRecord from "./virtualWeek.record";
+import { AdminState } from "../types";
 
 const router = (
   key: ResourceKey
-): ((instance: ResourceInstance) => string[][]) =>
+): ((instance: ResourceInstance, state: AdminState) => string[][]) =>
   ({
     [ResourceKey.Categories]: categoryRecord,
     [ResourceKey.Courses]: courseRecord,
