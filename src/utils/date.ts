@@ -5,6 +5,7 @@ import {
 } from "date-fns/fp";
 import {
   compareAsc,
+  differenceInCalendarMonths,
   format,
   formatISO9075,
   isWithinInterval,
@@ -81,10 +82,13 @@ function formatInterval({
   start: Date;
   end: Date;
 }): string {
+  const showYear =
+    differenceInCalendarMonths(end, new Date()) > 11 ||
+    differenceInCalendarMonths(end, start) > 11;
   // formatting constants: potentially admin configurable options
   const timeDelimiter = " \u00B7 ";
   const intervalDelimiter = " - ";
-  const dateFormat = "EE, MMM d";
+  const dateFormat = `EE, MMM d${showYear ? ", yyyy" : ""}`;
   const timeFormat = "h:mm aaa";
 
   const startDateString = format(start, dateFormat);
