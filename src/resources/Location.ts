@@ -12,6 +12,7 @@ interface Location {
   selected?: boolean;
   hours: LocationHours[];
   restriction: number;
+  allowsWalkIns: boolean;
 }
 
 class Location implements Location {
@@ -24,6 +25,7 @@ class Location implements Location {
       groupId: "",
       hours: [] as LocationHours[],
       restriction: 0,
+      allowsWalkIns: false,
     }
   ) {
     Object.assign(this, location);

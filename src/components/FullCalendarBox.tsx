@@ -139,7 +139,12 @@ const FullCalendarBox: FunctionComponent<
                 id: -1,
                 start: parseAndFormatFCString(startStr),
                 end: parseAndFormatFCString(endStr),
-                location: { id: +resource.id, title: resource.title },
+                location: {
+                  id: +resource.id,
+                  title: resource.title,
+                  restriction: 0,
+                  allowsWalkIns: false,
+                },
                 title: "",
                 reservable: false,
               }),

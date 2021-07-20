@@ -32,7 +32,12 @@ interface Event {
   id: number;
   start: string;
   end: string;
-  location: { id: number; title: string; restriction: number };
+  location: {
+    id: number;
+    title: string;
+    restriction: number;
+    allowsWalkIns: boolean;
+  };
   title: string;
   reservable: boolean;
   reservation?: ReservationInfo;
@@ -45,7 +50,7 @@ class Event implements Event {
       id: 0,
       start: formatSQLDatetime(),
       end: formatSQLDatetime(),
-      location: { id: 0, title: "" },
+      location: { id: 0, title: "", restriction: 0, allowsWalkIns: false },
       title: "",
       reservable: false,
     }
@@ -58,7 +63,7 @@ class Event implements Event {
     event: Event,
     { now, start, end, cutoffMinutes } = Event.walkInDetails()
   ): boolean {
-    if (!event.reservable) return false;
+    if (!event.reservable || !event.location.allowsWalkIns) return false;
     const sameDay = isSameDay(now, parseSQLDatetime(event.start));
     const withinWalkInPeriod = isWithinInterval(now, {
       start,
