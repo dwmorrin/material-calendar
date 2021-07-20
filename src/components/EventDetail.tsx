@@ -52,7 +52,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             });
           }
           // Compare the contents of the events
-          if (!deepEqual(data[0], state.currentEvent)) {
+          if (!deepEqual(new Event(data), state.currentEvent)) {
             // events out of date, updating
             fetch(Event.url)
               .then((res) => res.json())
@@ -92,6 +92,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
     ({ title, allotments }) =>
       (title === Project.walkInTitle &&
+        state.currentEvent &&
         Event.isAvailableForWalkIn(state.currentEvent)) ||
       allotments.some(
         (a) =>
