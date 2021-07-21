@@ -3,6 +3,7 @@ import { AdminAction, AdminState } from "../types";
 import eventImport from "./event.import";
 import locationImport from "./location.import";
 import rosterImport from "./roster.import";
+import equipmentImport from "./equipment.import";
 
 export type BulkImporter = (
   dispatch: (action: {
@@ -28,7 +29,7 @@ const router = (key: ResourceKey): [string[], BulkImporter] =>
   ({
     [ResourceKey.Categories]: defaultHeadingsAndDispatch,
     [ResourceKey.Courses]: defaultHeadingsAndDispatch,
-    [ResourceKey.Equipment]: defaultHeadingsAndDispatch,
+    [ResourceKey.Equipment]: equipmentImport,
     [ResourceKey.Events]: eventImport,
     [ResourceKey.Groups]: defaultHeadingsAndDispatch,
     [ResourceKey.Locations]: locationImport,
