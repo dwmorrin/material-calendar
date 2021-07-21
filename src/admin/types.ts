@@ -12,6 +12,7 @@ export interface Action {
 }
 
 export enum AdminAction {
+  AddProjectToLocationSuccess,
   CloseAddProjectToLocation,
   CloseBackups,
   CloseDetail,

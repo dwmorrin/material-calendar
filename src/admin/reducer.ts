@@ -84,6 +84,21 @@ const errorRedirect = (
   });
 
 //--------- NORMAL ACTION HANDLERS ----------
+
+const addProjectToLocationSuccess: StateHandler = (state, { payload }) => {
+  return {
+    ...state,
+    ...payload,
+    addProjectToLocationIsOpen: false,
+    snackbarIsOpen: true,
+    snackbarQueue: enqueue(state.snackbarQueue, {
+      type: "success",
+      message: "Projects added to location",
+      autoHideDuration: 6000,
+    }),
+  };
+};
+
 const closeAddProjectToLocation: StateHandler = (state) => ({
   ...state,
   addProjectToLocationIsOpen: false,
@@ -376,6 +391,7 @@ const toggleDrawer: StateHandler = (state) => ({
 
 const reducer: StateHandler = (state, action) =>
   ({
+    [AdminAction.AddProjectToLocationSuccess]: addProjectToLocationSuccess,
     [AdminAction.CloseAddProjectToLocation]: closeAddProjectToLocation,
     [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
