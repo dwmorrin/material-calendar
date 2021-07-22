@@ -3,7 +3,7 @@ import { AdminAction } from "../types";
 import { ResourceKey } from "../../resources/types";
 import { BulkImporter } from "./router";
 
-export const headings = ["Title", "Group", "Restriction"];
+export const headings = ["Title", "Group", "Restriction", "Allows Walk-Ins"];
 
 const bulkImport: BulkImporter = (dispatch, records): void => {
   const dispatchError = (error: Error): void =>
@@ -17,10 +17,11 @@ const bulkImport: BulkImporter = (dispatch, records): void => {
     );
 
   const body = JSON.stringify(
-    records.map(({ Title, Group, Restriction }) => ({
-      title: Title,
-      location: Group,
-      restriction: Number(Restriction),
+    records.map((record) => ({
+      title: record.Title,
+      location: record.Group,
+      restriction: Number(record.Restriction),
+      allowsWalkIns: Number(record["Allows Walk-Ins"]),
     }))
   );
 
