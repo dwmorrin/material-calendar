@@ -67,6 +67,12 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
       <div>Invalid semester (no start date). Fix the selected semester.</div>
     );
   }
+  if (!locations.length) {
+    return <div>Create some locations first.</div>;
+  }
+  if (selectedLocationId < 1) {
+    return <div>Please select a location.</div>;
+  }
 
   const location =
     locations.find((location) => location.id === selectedLocationId) ||
