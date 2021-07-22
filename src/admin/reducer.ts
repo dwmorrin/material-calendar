@@ -220,12 +220,6 @@ const openSemesterDialog: StateHandler = (state) => ({
   semesterDialogIsOpen: true,
 });
 
-const openVirtualWeeksDialog: StateHandler = (state, { payload }) => ({
-  ...state,
-  ...payload,
-  virtualWeeksDialogIsOpen: true,
-});
-
 const openVirtualWeekSplitDialog: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
@@ -419,7 +413,6 @@ const reducer: StateHandler = (state, action) =>
       openProjectLocationHoursDialog,
     [AdminAction.OpenScheduler]: openScheduler,
     [AdminAction.OpenSemesterDialog]: openSemesterDialog,
-    [AdminAction.OpenVirtualWeeksDialog]: openVirtualWeeksDialog,
     [AdminAction.OpenVirtualWeekModifyDialog]: openVirtualWeekSplitDialog,
     [AdminAction.OpenedFile]: openedFile,
     [AdminAction.ReceivedAllResources]: receivedAllResources,

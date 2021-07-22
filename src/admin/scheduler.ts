@@ -15,11 +15,14 @@ import {
   parseSQLDate,
   areIntervalsOverlappingInclusive,
   subDays,
+  parseAndFormatFCString,
+  parseFCString,
 } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";
 import { deepEqual } from "fast-equals";
 import { ResourceKey } from "../resources/types";
+import { createVirtualWeek } from "./virtualWeeksDialog";
 
 //--- TYPES ---
 
@@ -463,10 +466,11 @@ export const selectionHandler =
             },
           });
         }
-        // if not existing, create a virtual week
-        return dispatch({
-          type: AdminAction.OpenVirtualWeeksDialog,
-          payload,
+        return createVirtualWeek({
+          dispatch,
+          state,
+          start: parseAndFormatFCString(startStr),
+          end: formatSQLDate(subDays(parseFCString(endStr), 1)),
         });
       }
       default: {

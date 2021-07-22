@@ -36,7 +36,6 @@ export enum AdminAction {
   OpenScheduler,
   OpenSemesterDialog,
   OpenVirtualWeekModifyDialog,
-  OpenVirtualWeeksDialog,
   OpenedFile,
   ReceivedAllResources,
   ReceivedResource,

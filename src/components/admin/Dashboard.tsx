@@ -26,7 +26,6 @@ import AddProjectToLocationDialog from "./AddProjectToLocationDialog";
 import ProjectLocationHoursDialog from "./ProjectLocationHoursDialog";
 import ProjectLocationHoursSummaryDialog from "./ProjectLocationHoursSummaryDialog";
 import LocationHoursDialog from "./LocationHoursDialog";
-import VirtualWeeksDialog from "./VirtualWeeksDialog";
 import VirtualWeekModifyDialog from "./VirtualWeekModifyDialog";
 import Snackbar from "../Snackbar";
 import FullCalendar from "@fullcalendar/react";
@@ -74,7 +73,6 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       <ProjectLocationHoursDialog dispatch={dispatch} state={state} />
       <ProjectLocationHoursSummaryDialog dispatch={dispatch} state={state} />
       <LocationHoursDialog dispatch={dispatch} state={state} />
-      <VirtualWeeksDialog dispatch={dispatch} state={state} />
       <VirtualWeekModifyDialog dispatch={dispatch} state={state} />
       <ErrorPage open={state.appIsBroken} error={state.error} />
       <Snackbar
