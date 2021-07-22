@@ -5,7 +5,7 @@ import React, {
   useReducer,
   useRef,
 } from "react";
-import useLocalStorage from "../calendar/useLocalStorage";
+import useLocalStorage from "../utils/useLocalStorage";
 import { RouteComponentProps, Redirect } from "@reach/router";
 import CalendarDrawer from "./CalendarDrawer";
 import CalendarBar from "./CalendarBar";
