@@ -15,7 +15,12 @@ import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
 import { Field, Formik, Form } from "formik";
 import { DatePicker } from "formik-material-ui-pickers";
-import { AdminUIProps, AdminAction, FormValues } from "../../admin/types";
+import {
+  AdminUIProps,
+  AdminAction,
+  FormValues,
+  AdminSelectionProps,
+} from "../../admin/types";
 import {
   addDays,
   areIntervalsOverlappingInclusive,
@@ -38,16 +43,15 @@ enum VirtualWeekModifier {
   delete = "delete",
 }
 
-const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
+const VirtualWeekSplitDialog: FC<AdminUIProps & AdminSelectionProps> = ({
+  dispatch,
+  state,
+  selections,
+}) => {
   const [errors, setErrors] = useState({ start: "", end: "", split: "" });
-  const { calendarEventClickState, selectedSemester, schedulerLocationId } =
-    state;
-  if (
-    !calendarEventClickState ||
-    !selectedSemester ||
-    schedulerLocationId === undefined
-  )
-    return null;
+  const { calendarEventClickState, selectedSemester: semester } = state;
+  const { locationId } = selections;
+  if (!calendarEventClickState || locationId < 1 || !semester) return null;
 
   const { startStr, extendedProps } = calendarEventClickState;
   const selectedId = extendedProps.id as number;
@@ -55,7 +59,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
 
   const virtualWeeks = (
     state.resources[ResourceKey.VirtualWeeks] as VirtualWeek[]
-  ).filter(({ locationId }) => locationId === schedulerLocationId);
+  ).filter(({ locationId: id }) => id === locationId);
   const week = virtualWeeks.find(({ id }) => id === selectedId);
   if (!week) return null;
 
@@ -182,8 +186,8 @@ const VirtualWeekSplitDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
     );
     // disallow extending beyond semester
     const withinSemester = isWithinIntervalFP({
-      start: parseSQLDate(selectedSemester.start),
-      end: parseSQLDate(selectedSemester.end),
+      start: parseSQLDate(semester.start),
+      end: parseSQLDate(semester.end),
     });
     const startNotWithin = withinSemester(values.start as Date)
       ? ""

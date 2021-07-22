@@ -1,5 +1,10 @@
 import React, { FC } from "react";
-import { AdminAction, AdminUIProps, FormValues } from "../../admin/types";
+import {
+  AdminAction,
+  AdminSelectionProps,
+  AdminUIProps,
+  FormValues,
+} from "../../admin/types";
 import {
   Button,
   Dialog,
@@ -18,18 +23,21 @@ import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import Location from "../../resources/Location";
 
-const AddProjectToLocation: FC<AdminUIProps> = ({ state, dispatch }) => {
-  const { resources, schedulerLocationId } = state;
-  if (!schedulerLocationId) return null;
+const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
+  state,
+  dispatch,
+  selections,
+}) => {
+  const { resources } = state;
+  const { locationId } = selections;
+  if (!locationId) return null;
 
   const projectsNotInLocation = (
     resources[ResourceKey.Projects] as Project[]
   ).filter(
     ({ title, locationHours }) =>
       title !== Project.walkInTitle &&
-      !locationHours.some(
-        ({ locationId }) => locationId === schedulerLocationId
-      )
+      !locationHours.some(({ locationId: id }) => id === locationId)
   );
 
   const close = (): void =>
@@ -46,10 +54,7 @@ const AddProjectToLocation: FC<AdminUIProps> = ({ state, dispatch }) => {
       Object.entries(values as { [title: string]: boolean }).reduce(
         (locationHours, [title, selected]) =>
           selected
-            ? [
-                ...locationHours,
-                { project: title, locationId: schedulerLocationId, hours: 0 },
-              ]
+            ? [...locationHours, { project: title, locationId, hours: 0 }]
             : locationHours,
         [] as ProjectLocationHours[]
       )

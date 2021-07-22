@@ -4,6 +4,7 @@ import {
   AdminUIProps,
   AdminState,
   CalendarSelectionState,
+  AdminSelectionProps,
 } from "./types";
 import VirtualWeek from "../resources/VirtualWeek";
 import Project from "../resources/Project";
@@ -87,44 +88,29 @@ const addADay = (s: string): string => {
  * explicitly declare what state FullCalendar depends on for rendering
  */
 export const compareCalendarStates = (
-  prevProps: AdminUIProps,
-  nextProps: AdminUIProps
+  {
+    state: {
+      ref: prevRef,
+      resources: prevResources,
+      selectedSemester: prevSemester,
+    },
+    selections: prevSelections,
+  }: AdminUIProps & AdminSelectionProps,
+  {
+    state: {
+      ref: nextRef,
+      resources: nextResources,
+      selectedSemester: nextSemester,
+    },
+    selections: nextSelections,
+  }: AdminUIProps & AdminSelectionProps
 ): boolean => {
-  const prevState = prevProps.state;
-  const nextState = nextProps.state;
   return (
-    prevState.ref === nextState.ref &&
-    prevState.schedulerLocationId === nextState.schedulerLocationId &&
-    prevState.selectedSemester === nextState.selectedSemester &&
-    deepEqual(prevState.resources, nextState.resources)
+    prevRef === nextRef &&
+    prevSelections.locationId === nextSelections.locationId &&
+    prevSemester === nextSemester &&
+    deepEqual(prevResources, nextResources)
   );
-};
-
-export const fetchDefaultLocation = (
-  dispatch: (action: Action) => void,
-  setDefaultLocationId: (id: number) => void
-): void => {
-  fetch(`${Location.url}/default`)
-    .then((response) => response.json())
-    .then(({ error, data }) => {
-      if (error)
-        return dispatch({ type: AdminAction.Error, payload: { error } });
-      if (data && data.length) {
-        const id = data[0].id;
-        setDefaultLocationId(id);
-        dispatch({
-          type: AdminAction.SelectedSchedulerLocation,
-          payload: { schedulerLocationId: id },
-        });
-      }
-    })
-    .catch((error) =>
-      dispatch({
-        type: AdminAction.Error,
-        payload: { error },
-        meta: "DEFAULT_LOCATION_FETCH",
-      })
-    );
 };
 
 export const millisecondsToDays = (ms: number): number =>
@@ -422,7 +408,12 @@ export const eventClick =
   };
 
 export const selectionHandler =
-  (dispatch: (action: Action) => void, state: AdminState, location: Location) =>
+  (
+    dispatch: (action: Action) => void,
+    state: AdminState,
+    location: Location,
+    semester: Semester
+  ) =>
   ({ startStr, endStr, resource }: SelectProps): void => {
     const calendarSelectionState: CalendarSelectionState = {
       start: startStr,
@@ -469,8 +460,10 @@ export const selectionHandler =
         return createVirtualWeek({
           dispatch,
           state,
+          locationId: location.id,
           start: parseAndFormatFCString(startStr),
           end: formatSQLDate(subDays(parseFCString(endStr), 1)),
+          semester,
         });
       }
       default: {

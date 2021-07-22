@@ -1,4 +1,4 @@
-import React, { FunctionComponent, memo, useEffect, useState } from "react";
+import React, { FunctionComponent, memo, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -10,7 +10,6 @@ import {
   compareCalendarStates,
   daysInInterval,
   eventClick,
-  fetchDefaultLocation,
   makeAllotments,
   makeDailyHours,
   makeResources,
@@ -20,72 +19,72 @@ import {
   resourceClickHandler,
   selectionHandler,
 } from "../../admin/scheduler";
-import { AdminUIProps, AdminAction } from "../../admin/types";
+import {
+  AdminSelectionProps,
+  AdminUIProps,
+  AdminAction,
+} from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import { Fab, Snackbar } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 
-const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
+const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
+  dispatch,
+  state,
+  selections,
+  setSelections,
+}) => {
   const [snackbarDismissed, setSnackbarDismissed] = useState(false);
-  const { schedulerLocationId: locationId, selectedSemester, ref } = state;
+  const { ref } = state;
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const semesters = state.resources[ResourceKey.Semesters] as Semester[];
   const virtualWeeks = state.resources[
     ResourceKey.VirtualWeeks
   ] as VirtualWeek[];
-  const [defaultLocationId, setDefaultLocationId] = useState(-1);
+
   const semester =
-    selectedSemester ||
-    (semesters.length ? semesters.reduce(mostRecent) : undefined);
-
-  useEffect(() => {
-    if (!semesters.length) {
-      // user needs to create a semester; navigate them to that view
-      dispatch({
-        type: AdminAction.SelectedResource,
-        payload: { resourceKey: ResourceKey.Semesters },
-      });
-    } else if (!selectedSemester && semester && ref?.current)
-      // we've automatically "selected" a semester, so update state accordingly
-      dispatch({
-        type: AdminAction.SelectedSemester,
-        payload: {
-          selectedSemester: semester,
-        },
-      });
-  }, [dispatch, selectedSemester, semesters, semester, ref]);
-
-  useEffect(() => {
-    if (!locationId) fetchDefaultLocation(dispatch, setDefaultLocationId);
-  }, [dispatch, locationId]);
-
-  const selectedLocationId = locationId || defaultLocationId;
-
-  if (!semester?.start) {
-    return (
-      <div>Invalid semester (no start date). Fix the selected semester.</div>
-    );
+    selections.semesterId > 0
+      ? semesters.find((semester) => semester.id === selections.semesterId)
+      : semesters.length
+      ? semesters.reduce(mostRecent)
+      : null;
+  if (!semester) {
+    return <div>Create a semester first.</div>;
+  } else if (selections.semesterId !== semester.id) {
+    setSelections({ ...selections, semesterId: semester.id });
+    dispatch({
+      type: AdminAction.SelectedSemester,
+      payload: {
+        selectedSemester: semester,
+      },
+    });
   }
+
   if (!locations.length) {
     return <div>Create some locations first.</div>;
   }
-  if (selectedLocationId < 1) {
+  const location =
+    selections.locationId > 0
+      ? locations.find((location) => location.id === selections.locationId)
+      : locations.length
+      ? locations[0]
+      : null;
+  if (!location) {
     return <div>Please select a location.</div>;
+  } else if (selections.locationId !== location.id) {
+    setSelections({ semesterId: semester.id, locationId: location.id });
   }
 
-  const location =
-    locations.find((location) => location.id === selectedLocationId) ||
-    new Location();
   const numberOfDays = daysInInterval(semester.start, semester.end);
   const dailyHours = makeDailyHours(location);
-  const resources = makeResources(projects, selectedLocationId, semester);
-  const allotments = makeAllotments(projects, selectedLocationId);
+  const resources = makeResources(projects, selections.locationId, semester);
+  const allotments = makeAllotments(projects, selections.locationId);
   const events = [
-    ...processVirtualWeeks(virtualWeeks, selectedLocationId),
+    ...processVirtualWeeks(virtualWeeks, selections.locationId),
     ...allotments,
     ...dailyHours,
-    ...processVirtualWeeksAsHoursRemaining(virtualWeeks, selectedLocationId),
+    ...processVirtualWeeksAsHoursRemaining(virtualWeeks, selections.locationId),
   ];
 
   return (
@@ -124,7 +123,7 @@ const Scheduler: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
         eventClick={eventClick(dispatch, location)}
         // SELECTIONS
         selectable={true}
-        select={selectionHandler(dispatch, state, location)}
+        select={selectionHandler(dispatch, state, location, semester)}
         // VISIBLE DATE RANGE
         initialDate={semester.start}
         initialView="resourceTimelineSemester"

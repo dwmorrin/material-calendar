@@ -9,7 +9,11 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
-import { AdminUIProps, AdminAction } from "../../admin/types";
+import {
+  AdminUIProps,
+  AdminAction,
+  AdminSelectionProps,
+} from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import Semester from "../../resources/Semester";
 import { parseAndFormatSQLDateInterval } from "../../utils/date";
@@ -31,7 +35,12 @@ const byId =
   (semester: Semester): boolean =>
     semester.id === id;
 
-const SemesterDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
+const SemesterDialog: FC<AdminUIProps & AdminSelectionProps> = ({
+  dispatch,
+  state,
+  selections,
+  setSelections,
+}) => {
   const classes = useStyles();
   const { resources, semesterDialogIsOpen } = state;
   const semesters = (resources[ResourceKey.Semesters] as Semester[]).slice();
@@ -46,11 +55,13 @@ const SemesterDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
         semesterDialogIsOpen: false,
       },
     });
-  const setSemester = (id: number) => (): void =>
+  const setSemester = (id: number) => (): void => {
+    setSelections({ ...selections, semesterId: id });
     dispatch({
       type: AdminAction.SelectedSemester,
       payload: { selectedSemester: semesters.find(byId(id)) },
     });
+  };
   return (
     <Dialog open={semesterDialogIsOpen}>
       <Button onClick={close}>Close</Button>

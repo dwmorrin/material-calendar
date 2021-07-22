@@ -12,21 +12,24 @@ import {
   TableRow,
 } from "@material-ui/core";
 import DraggablePaper from "../DraggablePaper";
-import { AdminUIProps, AdminAction } from "../../admin/types";
+import {
+  AdminUIProps,
+  AdminAction,
+  AdminSelectionProps,
+} from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import { formatSlashed, parseSQLDate } from "../../utils/date";
 
-const ProjectLocationHoursSummaryDialog: FC<AdminUIProps> = ({
-  dispatch,
-  state,
-}) => {
-  if (!state.calendarEventClickState) return null;
+const ProjectLocationHoursSummaryDialog: FC<
+  AdminUIProps & AdminSelectionProps
+> = ({ dispatch, state, selections }) => {
+  if (!state.calendarEventClickState || selections.locationId < 1) return null;
 
   const projectId = Number(
     state.calendarEventClickState.extendedProps.projectId
   );
-  if (projectId < 0 || !state.schedulerLocationId) return null;
+  if (projectId < 0) return null;
 
   const project = (state.resources[ResourceKey.Projects] as Project[]).find(
     ({ id }) => id === projectId
@@ -34,7 +37,7 @@ const ProjectLocationHoursSummaryDialog: FC<AdminUIProps> = ({
   if (!project) return null;
 
   const locationHours = project.locationHours.find(
-    ({ locationId }) => locationId === state.schedulerLocationId
+    ({ locationId }) => locationId === selections.locationId
   );
   if (!locationHours) return null;
 

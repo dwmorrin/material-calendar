@@ -46,7 +46,7 @@ const DialogWrapper: FC<AdminUIProps & { onClose: () => void }> = ({
 
 const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const [formErrors, setFormErrors] = useState(initialErrors);
-  if (!state.calendarSelectionState || !state.schedulerLocationId) return null;
+  if (!state.calendarSelectionState) return null;
   const { location, resource } = state.calendarSelectionState;
   const start = parseSQLDate(state.calendarSelectionState.start);
   const end = subDays(parseSQLDate(state.calendarSelectionState.end), 1);

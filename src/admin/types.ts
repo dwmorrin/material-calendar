@@ -71,7 +71,6 @@ export interface AdminState {
   recordPage: number;
   ref: React.RefObject<FullCalendar> | null;
   schedulerIsOpen: boolean;
-  schedulerLocationId?: number;
   semesterDialogIsOpen: boolean;
   snackbarQueue: SnackbarState[];
   virtualWeekModifyDialogIsOpen: boolean;
@@ -121,4 +120,14 @@ export interface ApiResponse {
   error?: Error;
   data?: unknown;
   context?: unknown;
+}
+
+export interface AdminSelections {
+  locationId: number;
+  semesterId: number;
+}
+
+export interface AdminSelectionProps {
+  selections: AdminSelections;
+  setSelections: (selections: AdminSelections) => void;
 }

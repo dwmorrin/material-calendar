@@ -33,33 +33,27 @@ const useStyles = makeStyles({
 const dateLabelFormat = "yyyy-MM-dd [ccc]";
 
 const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
-  const { calendarSelectionState, selectedSemester, schedulerLocationId } =
-    state;
+  const { calendarSelectionState } = state;
 
   const classes = useStyles();
 
-  if (
-    !calendarSelectionState ||
-    !selectedSemester ||
-    schedulerLocationId === undefined
-  )
-    return null;
+  const semester = state.selectedSemester;
+  if (!calendarSelectionState || !semester) return null;
 
-  const { location: currentLocation } = calendarSelectionState;
+  const { location } = calendarSelectionState;
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseLocationHoursDialog });
 
-  const onSubmit = makeOnSubmit(dispatch, state, schedulerLocationId);
+  const onSubmit = makeOnSubmit(dispatch, state, location.id);
 
   const days = eachDayOfInterval({
-    start: parseSQLDate(selectedSemester.start),
-    end: parseSQLDate(selectedSemester.end),
+    start: parseSQLDate(semester.start),
+    end: parseSQLDate(semester.end),
   }).map((date) => ({
     date,
     hours:
-      currentLocation.hours.find((h) => h.date === formatSQLDate(date))
-        ?.hours || 0,
+      location.hours.find((h) => h.date === formatSQLDate(date))?.hours || 0,
   }));
 
   return (
@@ -70,7 +64,7 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       aria-labelledby="draggable-dialog-title"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-        Daily Hours for {currentLocation.title}
+        Daily Hours for {location.title}
       </DialogTitle>
       <DialogContent>
         <MuiPickersUtilsProvider utils={DateFnUtils}>

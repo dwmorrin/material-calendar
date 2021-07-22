@@ -351,9 +351,8 @@ const selectedResource: StateHandler = (state, { payload }) => ({
   recordPage: 0,
 });
 
-const selectedSchedulerLocation: StateHandler = (state, { payload }) => ({
+const selectedSchedulerLocation: StateHandler = (state) => ({
   ...state,
-  ...payload,
   schedulerIsOpen: true,
 });
 

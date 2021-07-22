@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from "react";
 import { RouteComponentProps } from "@reach/router";
-import { AdminAction } from "../../admin/types";
+import { AdminAction, AdminSelections } from "../../admin/types";
 import { Resources } from "../../resources/Resources";
 import reducer from "../../admin/reducer";
 import initialState from "../../admin/initialState";
@@ -16,6 +16,7 @@ import DocumentBrowser from "./DocumentBrowser";
 import DetailsForm from "./DetailsForm";
 import FileImport from "./FileImport";
 import fetchAllResources from "../../utils/fetchAllResources";
+import useLocalStorage from "../../utils/useLocalStorage";
 import Scheduler from "./Scheduler";
 import Backups from "./Backups";
 import { AuthContext } from "../AuthContext";
@@ -41,6 +42,10 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
     ref: useRef<FullCalendar>(null),
   });
   const { user } = useContext(AuthContext);
+  const [selections, setSelections] = useLocalStorage("admin-selections", {
+    locationId: -1,
+    semesterId: -1,
+  } as AdminSelections);
 
   useEffect(() => {
     if (User.isAdmin(user))
@@ -59,21 +64,51 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   return (
     <div>
       <Bar dispatch={dispatch} state={state} />
-      <NavigationDrawer dispatch={dispatch} state={state} />
+      <NavigationDrawer
+        dispatch={dispatch}
+        state={state}
+        selections={selections}
+        setSelections={setSelections}
+      />
       {state.schedulerIsOpen ? (
-        <Scheduler dispatch={dispatch} state={state} />
+        <Scheduler
+          dispatch={dispatch}
+          state={state}
+          selections={selections}
+          setSelections={setSelections}
+        />
       ) : (
         <DocumentBrowser dispatch={dispatch} state={state} />
       )}
       <DetailsForm dispatch={dispatch} state={state} />
       <FileImport dispatch={dispatch} state={state} />
       <Backups dispatch={dispatch} state={state} />
-      <SemesterDialog dispatch={dispatch} state={state} />
-      <AddProjectToLocationDialog dispatch={dispatch} state={state} />
+      <SemesterDialog
+        dispatch={dispatch}
+        state={state}
+        selections={selections}
+        setSelections={setSelections}
+      />
+      <AddProjectToLocationDialog
+        dispatch={dispatch}
+        state={state}
+        selections={selections}
+        setSelections={setSelections}
+      />
       <ProjectLocationHoursDialog dispatch={dispatch} state={state} />
-      <ProjectLocationHoursSummaryDialog dispatch={dispatch} state={state} />
+      <ProjectLocationHoursSummaryDialog
+        dispatch={dispatch}
+        state={state}
+        selections={selections}
+        setSelections={setSelections}
+      />
       <LocationHoursDialog dispatch={dispatch} state={state} />
-      <VirtualWeekModifyDialog dispatch={dispatch} state={state} />
+      <VirtualWeekModifyDialog
+        dispatch={dispatch}
+        state={state}
+        selections={selections}
+        setSelections={setSelections}
+      />
       <ErrorPage open={state.appIsBroken} error={state.error} />
       <Snackbar
         dispatch={dispatch}

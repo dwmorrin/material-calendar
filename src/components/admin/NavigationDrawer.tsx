@@ -8,15 +8,18 @@ import {
   AccordionSummary,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { AdminAction, AdminUIProps } from "../../admin/types";
+import {
+  AdminAction,
+  AdminSelectionProps,
+  AdminUIProps,
+} from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
 import Location from "../../resources/Location";
 import { enumKeys } from "../../utils/enumKeys";
 
-const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
-  dispatch,
-  state,
-}) => {
+const AdminNavigationDrawer: FunctionComponent<
+  AdminUIProps & AdminSelectionProps
+> = ({ dispatch, state, selections, setSelections }) => {
   const onClose = (): void => {
     // TODO clean up after drawer closes
   };
@@ -75,9 +78,10 @@ const AdminNavigationDrawer: FunctionComponent<AdminUIProps> = ({
         meta: "NAV_DRAWER_CLICK_LOCATION",
       });
     }
+    const locationId = Number(event.target.dataset.location);
+    setSelections({ ...selections, locationId });
     dispatch({
       type: AdminAction.SelectedSchedulerLocation,
-      payload: { schedulerLocationId: +event.target.dataset.location },
     });
   };
 
