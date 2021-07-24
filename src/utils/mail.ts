@@ -1,13 +1,9 @@
-import { Action, CalendarAction } from "../calendar/types";
-
 export const sendMail = (
   to: string,
   subject: string,
   text: string,
-  dispatch: (action: Action) => void
+  dispatchError: (error: Error, meta?: unknown) => void
 ): void => {
-  const dispatchError = (error: Error, meta?: unknown): void =>
-    dispatch({ type: CalendarAction.Error, payload: { error }, meta });
   fetch(`/api/mail`, {
     method: "POST",
     headers: {

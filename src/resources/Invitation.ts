@@ -1,19 +1,46 @@
 import User from "./User";
 
-export interface Invitation {
+interface Invitor {
+  id: number;
+  name: { last: string; first: string };
+  email: string;
+}
+
+interface Invitee {
+  id: number;
+  accepted: number;
+  rejected: number;
+  name: { last: string; first: string };
+  email: string;
+}
+interface Invitation {
   id: number;
   confirmed: number;
   project: number;
-  invitor: { id: number; name: { last: string; first: string }; email: string };
-  invitees: {
-    id: number;
-    accepted: number;
-    rejected: number;
-    name: { last: string; first: string };
-  }[];
+  invitor: Invitor;
+  invitees: Invitee[];
   group_id: number;
+  approved: boolean;
+  denied: boolean;
 }
 
+class Invitation implements Invitation {
+  static url = "/api/invitations";
+  constructor(
+    inv = {
+      id: 0,
+      confirmed: 0,
+      project: 0,
+      invitor: { id: 0, name: { last: "", first: "" }, email: "" } as Invitor,
+      invitees: [] as Invitee[],
+      group_id: 0,
+      approved: false,
+      denied: false,
+    }
+  ) {
+    Object.assign(this, inv);
+  }
+}
 export function getUnansweredInvitations(
   user: User,
   invitations: Invitation[]
@@ -23,3 +50,5 @@ export function getUnansweredInvitations(
     return u && u.accepted === 0 && u.rejected === 0;
   });
 }
+
+export default Invitation;

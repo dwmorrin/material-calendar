@@ -234,7 +234,7 @@ export const submitHandler =
                     user.name.last +
                     " has " +
                     body,
-                  dispatch
+                  dispatchError
                 )
               );
           }
@@ -242,7 +242,7 @@ export const submitHandler =
             user.email,
             "You have " + subject,
             "Hello " + user.name.first + ",  You have " + body,
-            dispatch
+            dispatchError
           );
         }
         dispatch({

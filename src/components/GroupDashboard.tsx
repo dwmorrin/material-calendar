@@ -31,6 +31,7 @@ import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import ThumbsUpDownIcon from "@material-ui/icons/ThumbsUpDown";
 import { sendMail } from "../utils/mail";
+import Invitation from "../resources/Invitation";
 
 const transition = makeTransition("right");
 
@@ -40,6 +41,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { currentGroup, currentProject } = state;
   const [users, setUsers] = useState([] as User[]);
+  const [confirmationDialogIsOpen, openConfirmationDialog] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([] as User[]);
   const { user } = useContext(AuthContext);
   const invitations = state.invitations.filter(
@@ -81,6 +83,21 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   const dispatchError = (error: Error, meta?: unknown): void =>
     dispatch({ type: CalendarAction.Error, payload: { error }, meta });
 
+  const invitationIsUnanswered = (invitation: Invitation): boolean =>
+    !invitation.invitees.some(function (invitee) {
+      // Get Invitations where user has yet to respond or are waiting for approval
+      if (
+        invitee.id === user.id &&
+        (invitee.accepted === 1 || invitee.rejected === 1)
+      ) {
+        return true;
+      } else return false;
+    });
+
+  const invitationIsPendingApproval = (invitation: Invitation): boolean => {
+    return !invitation.approved && !invitation.denied;
+  };
+
   const selectUser = (newUser: User): void => {
     const newList: User[] = selectedUsers;
     const valueExisting = newList.map((u: User) => u.id).indexOf(newUser.id);
@@ -98,6 +115,73 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
       TransitionComponent={transition}
       open={state.groupDashboardIsOpen}
     >
+      <Dialog TransitionComponent={transition} open={confirmationDialogIsOpen}>
+        The group size for {state.currentProject?.title} is{" "}
+        {state.currentProject?.groupSize}. <br />
+        You are attempting to create a group of size: {selectedUsers.length + 1}
+        . <br /> <br />
+        You can make a request for admin approval for an irregular sized group,
+        or you can create a group of the specified size
+        <Button
+          size="small"
+          variant="contained"
+          color="inherit"
+          style={{ backgroundColor: "Green", color: "white" }}
+          onClick={(): void => {
+            fetch(`/api/invitations/`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                invitorId: user.id,
+                invitees: selectedUsers.map((u) => u.id),
+                projectId: currentProject?.id,
+                approved: 0,
+              }),
+            })
+              .then((response) => response.json())
+              .then(({ error, data }) => {
+                if (error || !data) {
+                  return dispatch({
+                    type: CalendarAction.Error,
+                    payload: { error },
+                  });
+                } else {
+                  selectedUsers.forEach((u: User) => {
+                    if (!u.email)
+                      return dispatchError(
+                        new Error(`${u.name.first} ${u.name.last} has no email`)
+                      );
+                    sendMail(
+                      u.email,
+                      "You have been invited to a group",
+                      "Hello " +
+                        u.name?.first +
+                        ", " +
+                        user.name?.first +
+                        " " +
+                        user.name?.last +
+                        " has invited you to join their group for " +
+                        currentProject?.title,
+                      dispatchError
+                    );
+                  });
+                }
+              });
+          }}
+        >
+          Request Irregular Group Size Approval
+        </Button>
+        <Button
+          // setting disabled={selectedUsers.length == 0} does not
+          // seem to work, due to local state?
+          size="small"
+          variant="contained"
+          color="inherit"
+          onClick={(): void => openConfirmationDialog(false)}
+        >
+          Go Back
+        </Button>
+      </Dialog>
       <Toolbar>
         <IconButton
           edge="start"
@@ -210,6 +294,14 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                     style={{ justifyContent: "space-between" }}
                   >
                     {"You sent a Group Invitation"}
+
+                    {invitationIsPendingApproval(invitation) && (
+                      <b>
+                        <br />
+                        <br />
+                        Pending Admin Approval
+                      </b>
+                    )}
                     <section
                       style={{
                         textAlign: "center",
@@ -284,18 +376,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                 ))}
               {invitations
                 .filter((invitation) => invitation.invitor.id !== user.id)
-                .filter(
-                  (invitation) =>
-                    !invitation.invitees.some(function (invitee) {
-                      // Get Invitations where user has yet to respond
-                      if (
-                        invitee.id === user.id &&
-                        (invitee.accepted === 1 || invitee.rejected === 1)
-                      ) {
-                        return true;
-                      } else return false;
-                    })
-                )
+                .filter(invitationIsPendingApproval || invitationIsUnanswered)
                 .map((invitation) => (
                   <ListItem
                     key={`invitation${invitation.id}`}
@@ -316,248 +397,282 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                         ? ", and"
                         : "") +
                       " you"}
-                    <ButtonGroup
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                    >
-                      <Button
-                        style={{ backgroundColor: "Green", color: "white" }}
-                        onClick={(): void => {
-                          // Accept Invitation
-                          fetch(`/api/invitations/${invitation.id}`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              accepted: 1,
-                              userId: user.id,
-                            }),
-                          })
-                            .then((response) => response.json())
-                            .then(({ error, data }) => {
-                              if (error || !data) {
-                                return dispatch({
-                                  type: CalendarAction.Error,
-                                  payload: { error },
-                                });
-                              } else {
-                                // If the group already exists, add user to it, otherwise form group with invitor and user
-                                invitation.group_id
-                                  ? // Join Group
-                                    fetch(
-                                      `/api/groups/${invitation.group_id}/invitation/${invitation.id}`,
-                                      {
-                                        method: "POST",
-                                        headers: {
-                                          "Content-Type": "application/json",
-                                        },
-                                        body: "",
-                                      }
-                                    )
-                                      .then((response) => response.json())
-                                      .then(({ error, data }) => {
-                                        if (error || !data) {
-                                          return dispatch({
-                                            type: CalendarAction.Error,
-                                            payload: { error },
-                                          });
-                                        } else {
-                                          // Get new group info and set state.currentGroup to it
-                                          fetch(
-                                            `/api/groups/${invitation.group_id}`
-                                          )
-                                            .then((response) => response.json())
-                                            .then(({ error, data }) => {
-                                              if (error || !data) {
-                                                return dispatch({
-                                                  type: CalendarAction.Error,
-                                                  payload: { error },
-                                                });
-                                              } else {
-                                                console.log(data);
-                                                dispatch({
-                                                  type: CalendarAction.JoinedGroup,
-                                                  payload: {
-                                                    currentGroup: new UserGroup(
-                                                      data
-                                                    ),
-                                                  },
-                                                });
-                                              }
-                                            });
+                    {invitationIsUnanswered(invitation) && (
+                      <ButtonGroup
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                      >
+                        <Button
+                          style={{ backgroundColor: "Green", color: "white" }}
+                          onClick={(): void => {
+                            // Accept Invitation
+                            fetch(`/api/invitations/${invitation.id}`, {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                accepted: 1,
+                                userId: user.id,
+                              }),
+                            })
+                              .then((response) => response.json())
+                              .then(({ error, data }) => {
+                                if (error || !data) {
+                                  return dispatch({
+                                    type: CalendarAction.Error,
+                                    payload: { error },
+                                  });
+                                }
+                                if (invitation.approved) {
+                                  // If the group already exists, add user to it, otherwise form group with invitor and user
+                                  invitation.group_id
+                                    ? // Join Group
+                                      fetch(
+                                        `/api/groups/${invitation.group_id}/invitation/${invitation.id}`,
+                                        {
+                                          method: "POST",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                          },
+                                          body: "",
                                         }
-                                      })
-                                  : // Create group based on invitation id
-                                    fetch(
-                                      `/api/groups/invitation/${invitation.id}`,
-                                      {
-                                        method: "POST",
-                                        headers: {
-                                          "Content-Type": "application/json",
-                                        },
-                                        body: "",
-                                      }
-                                    )
-                                      .then((response) => response.json())
-                                      .then(({ error, data }) => {
-                                        if (error || !data) {
-                                          return dispatch({
-                                            type: CalendarAction.Error,
-                                            payload: { error },
-                                          });
-                                        } else {
-                                          const insertId = data.id;
-                                          // Join Group
-                                          fetch(
-                                            `/api/groups/${insertId}/invitation/${invitation.id}`,
-                                            {
-                                              method: "POST",
-                                              headers: {
-                                                "Content-Type":
-                                                  "application/json",
-                                              },
-                                              body: "",
-                                            }
-                                          )
-                                            .then((response) => response.json())
-                                            .then(({ error, data }) => {
-                                              if (error || !data) {
-                                                return dispatch({
-                                                  type: CalendarAction.Error,
-                                                  payload: { error },
-                                                });
-                                              } else {
-                                                // Get new group info and set state.currentGroup to it
-                                                fetch(`/api/groups/${insertId}`)
-                                                  .then((response) =>
-                                                    response.json()
+                                      )
+                                        .then((response) => response.json())
+                                        .then(({ error, data }) => {
+                                          if (error || !data) {
+                                            return dispatch({
+                                              type: CalendarAction.Error,
+                                              payload: { error },
+                                            });
+                                          } else {
+                                            // Get new group info and set state.currentGroup to it
+                                            fetch(
+                                              `/api/groups/${invitation.group_id}`
+                                            )
+                                              .then((response) =>
+                                                response.json()
+                                              )
+                                              .then(({ error, data }) => {
+                                                if (error || !data) {
+                                                  return dispatch({
+                                                    type: CalendarAction.Error,
+                                                    payload: { error },
+                                                  });
+                                                } else {
+                                                  dispatch({
+                                                    type: CalendarAction.JoinedGroup,
+                                                    payload: {
+                                                      currentGroup:
+                                                        new UserGroup(data),
+                                                    },
+                                                  });
+                                                }
+                                              });
+                                          }
+                                        })
+                                    : // Create group based on invitation id
+                                      fetch(
+                                        `/api/groups/invitation/${invitation.id}`,
+                                        {
+                                          method: "POST",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                          },
+                                          body: "",
+                                        }
+                                      )
+                                        .then((response) => response.json())
+                                        .then(({ error, data }) => {
+                                          if (error || !data) {
+                                            return dispatch({
+                                              type: CalendarAction.Error,
+                                              payload: { error },
+                                            });
+                                          } else {
+                                            const insertId = data.id;
+                                            // Join Group
+                                            fetch(
+                                              `/api/groups/${insertId}/invitation/${invitation.id}`,
+                                              {
+                                                method: "POST",
+                                                headers: {
+                                                  "Content-Type":
+                                                    "application/json",
+                                                },
+                                                body: "",
+                                              }
+                                            )
+                                              .then((response) =>
+                                                response.json()
+                                              )
+                                              .then(({ error, data }) => {
+                                                if (error || !data) {
+                                                  return dispatch({
+                                                    type: CalendarAction.Error,
+                                                    payload: { error },
+                                                  });
+                                                } else {
+                                                  // Get new group info and set state.currentGroup to it
+                                                  fetch(
+                                                    `/api/groups/${insertId}`
                                                   )
-                                                  .then(({ error, data }) => {
-                                                    if (error || !data) {
-                                                      return dispatch({
-                                                        type: CalendarAction.Error,
-                                                        payload: { error },
-                                                      });
-                                                    } else {
-                                                      const newGroup =
-                                                        new UserGroup(data);
-                                                      newGroup.members
-                                                        .filter(
-                                                          (u: GroupMember) =>
-                                                            u.username !==
-                                                            user.username
-                                                        )
-                                                        .forEach(
-                                                          (u: GroupMember) => {
-                                                            if (!u.email)
-                                                              return dispatchError(
-                                                                new Error(
-                                                                  `${u.name.first} ${u.name.last} has no email`
-                                                                )
-                                                              );
-                                                            sendMail(
-                                                              u.email,
-                                                              user.name.first +
-                                                                " " +
-                                                                user.name.last +
-                                                                " has joined your group",
-                                                              "Hello " +
-                                                                u.name?.first +
-                                                                ", " +
+                                                    .then((response) =>
+                                                      response.json()
+                                                    )
+                                                    .then(({ error, data }) => {
+                                                      if (error || !data) {
+                                                        return dispatch({
+                                                          type: CalendarAction.Error,
+                                                          payload: { error },
+                                                        });
+                                                      } else {
+                                                        const newGroup =
+                                                          new UserGroup(data);
+                                                        newGroup.members
+                                                          .filter(
+                                                            (u: GroupMember) =>
+                                                              u.username !==
+                                                              user.username
+                                                          )
+                                                          .forEach(
+                                                            (
+                                                              u: GroupMember
+                                                            ) => {
+                                                              if (!u.email)
+                                                                return dispatchError(
+                                                                  new Error(
+                                                                    `${u.name.first} ${u.name.last} has no email`
+                                                                  )
+                                                                );
+                                                              sendMail(
+                                                                u.email,
                                                                 user.name
                                                                   .first +
-                                                                " " +
-                                                                user.name.last +
-                                                                " has joined your group for " +
-                                                                currentProject?.title,
-                                                              dispatch
-                                                            );
-                                                          }
-                                                        );
-                                                      dispatch({
-                                                        type: CalendarAction.JoinedGroup,
-                                                        payload: {
-                                                          currentGroup:
-                                                            newGroup,
-                                                        },
-                                                      });
-                                                    }
-                                                  });
-                                              }
-                                            });
-                                        }
+                                                                  " " +
+                                                                  user.name
+                                                                    .last +
+                                                                  " has joined your group",
+                                                                "Hello " +
+                                                                  u.name
+                                                                    ?.first +
+                                                                  ", " +
+                                                                  user.name
+                                                                    .first +
+                                                                  " " +
+                                                                  user.name
+                                                                    .last +
+                                                                  " has joined your group for " +
+                                                                  currentProject?.title,
+                                                                dispatchError
+                                                              );
+                                                            }
+                                                          );
+                                                        dispatch({
+                                                          type: CalendarAction.JoinedGroup,
+                                                          payload: {
+                                                            currentGroup:
+                                                              newGroup,
+                                                          },
+                                                        });
+                                                      }
+                                                    });
+                                                }
+                                              });
+                                          }
+                                        });
+                                } else {
+                                  fetch(`/api/invitations/user/${user?.id}`)
+                                    .then((response) => response.json())
+                                    .then(({ error, data }) => {
+                                      if (error || !data) {
+                                        return dispatch({
+                                          type: CalendarAction.Error,
+                                          payload: { error },
+                                        });
+                                      }
+                                      dispatch({
+                                        type: CalendarAction.ReceivedInvitations,
+                                        payload: {
+                                          invitations: data,
+                                        },
                                       });
-                              }
-                            });
-                        }}
-                      >
-                        Accept Invitation
-                      </Button>
-                      <Button
-                        style={{ backgroundColor: "Red", color: "white" }}
-                        onClick={(): void => {
-                          // set invitation to rejected for invitee
-                          fetch(`/api/invitations/${invitation.id}`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              rejected: 1,
-                              userId: user.id,
-                            }),
-                          })
-                            .then((response) => response.json())
-                            .then(({ error, data }) => {
-                              if (error || !data) {
-                                return dispatch({
-                                  type: CalendarAction.Error,
-                                  payload: { error },
-                                });
-                              } else {
-                                fetch(`/api/invitations/user/${user?.id}`)
-                                  .then((response) => response.json())
-                                  .then(({ error, data }) => {
-                                    if (error || !data) {
-                                      return dispatch({
-                                        type: CalendarAction.Error,
-                                        payload: { error },
-                                      });
-                                    }
-                                    dispatch({
-                                      type: CalendarAction.ReceivedInvitations,
-                                      payload: {
-                                        invitations: data,
-                                      },
                                     });
+                                }
+                              });
+                          }}
+                        >
+                          Accept Invitation
+                        </Button>
+                        <Button
+                          style={{ backgroundColor: "Red", color: "white" }}
+                          onClick={(): void => {
+                            // set invitation to rejected for invitee
+                            fetch(`/api/invitations/${invitation.id}`, {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                rejected: 1,
+                                userId: user.id,
+                              }),
+                            })
+                              .then((response) => response.json())
+                              .then(({ error, data }) => {
+                                if (error || !data) {
+                                  return dispatch({
+                                    type: CalendarAction.Error,
+                                    payload: { error },
                                   });
-                                sendMail(
-                                  invitation.invitor.email,
-                                  user.name.first +
-                                    " " +
-                                    user.name.last +
-                                    " has rejected upir group invitation",
-                                  "Hello " +
-                                    invitation.invitor.name.first +
-                                    ", " +
+                                } else {
+                                  fetch(`/api/invitations/user/${user?.id}`)
+                                    .then((response) => response.json())
+                                    .then(({ error, data }) => {
+                                      if (error || !data) {
+                                        return dispatch({
+                                          type: CalendarAction.Error,
+                                          payload: { error },
+                                        });
+                                      }
+                                      dispatch({
+                                        type: CalendarAction.ReceivedInvitations,
+                                        payload: {
+                                          invitations: data,
+                                        },
+                                      });
+                                    });
+                                  sendMail(
+                                    invitation.invitor.email,
                                     user.name.first +
-                                    " " +
-                                    user.name.last +
-                                    " has rejected your group invitation for " +
-                                    currentProject?.title,
-                                  dispatch
-                                );
-                                dispatch({
-                                  type: CalendarAction.DisplayMessage,
-                                  payload: {
-                                    message: "Invitation Rejected",
-                                  },
-                                });
-                              }
-                            });
-                        }}
-                      >
-                        Reject Invitation
-                      </Button>
-                    </ButtonGroup>
+                                      " " +
+                                      user.name.last +
+                                      " has rejected upir group invitation",
+                                    "Hello " +
+                                      invitation.invitor.name.first +
+                                      ", " +
+                                      user.name.first +
+                                      " " +
+                                      user.name.last +
+                                      " has rejected your group invitation for " +
+                                      currentProject?.title,
+                                    dispatchError
+                                  );
+                                  dispatch({
+                                    type: CalendarAction.DisplayMessage,
+                                    payload: {
+                                      message: "Invitation Rejected",
+                                    },
+                                  });
+                                }
+                              });
+                          }}
+                        >
+                          Reject Invitation
+                        </Button>
+                      </ButtonGroup>
+                    )}
+                    {!invitationIsUnanswered(invitation) &&
+                      invitationIsPendingApproval && (
+                        <b>Invitation is pending admin approval</b>
+                      )}
                   </ListItem>
                 ))}
             </Accordion>
@@ -568,6 +683,9 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="body1">Create New Group</Typography>
             </AccordionSummary>
+            <Typography variant="body1">
+              Project group size is: {currentProject?.groupSize}
+            </Typography>
             <List>
               <Button
                 // setting disabled={selectedUsers.length == 0} does not
@@ -578,66 +696,74 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                 onClick={(event): void => {
                   // Because button disable does not work, prevent empty invitations here
                   if (selectedUsers.length > 0) {
-                    event.stopPropagation();
-                    // Create Invitation
-                    fetch(`/api/invitations/`, {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        invitorId: user.id,
-                        invitees: selectedUsers.map((u) => u.id),
-                        projectId: currentProject?.id,
-                      }),
-                    })
-                      .then((response) => response.json())
-                      .then(({ error, data }) => {
-                        if (error || !data) {
-                          return dispatch({
-                            type: CalendarAction.Error,
-                            payload: { error },
-                          });
-                        } else {
-                          selectedUsers.forEach((u: User) => {
-                            if (!u.email)
-                              return dispatchError(
-                                new Error(
-                                  `${u.name.first} ${u.name.last} has no email`
-                                )
-                              );
-                            sendMail(
-                              u.email,
-                              "You have been invited to a group",
-                              "Hello " +
-                                u.name?.first +
-                                ", " +
-                                user.name?.first +
-                                " " +
-                                user.name?.last +
-                                " has invited you to join their group for " +
-                                currentProject?.title,
-                              dispatch
-                            );
-                          });
-                          // Get list of invitations again (to get the new one)
-                          fetch(`/api/invitations/user/${user?.id}`)
-                            .then((response) => response.json())
-                            .then(({ error, data }) => {
-                              if (error || !data) return dispatchError(error);
-                              dispatch({
-                                type: CalendarAction.ReceivedInvitations,
-                                payload: {
-                                  invitations: data,
-                                },
-                              });
+                    const approved =
+                      selectedUsers.length + 1 ===
+                      (currentProject?.groupSize || 0);
+                    if (!approved) {
+                      openConfirmationDialog(true);
+                    } else {
+                      event.stopPropagation();
+                      // Create Invitation
+                      fetch(`/api/invitations/`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          invitorId: user.id,
+                          invitees: selectedUsers.map((u) => u.id),
+                          projectId: currentProject?.id,
+                          approved: approved,
+                        }),
+                      })
+                        .then((response) => response.json())
+                        .then(({ error, data }) => {
+                          if (error || !data) {
+                            return dispatch({
+                              type: CalendarAction.Error,
+                              payload: { error },
                             });
-                          dispatch({
-                            type: CalendarAction.DisplayMessage,
-                            payload: {
-                              message: "Invitation Sent",
-                            },
-                          });
-                        }
-                      });
+                          } else {
+                            selectedUsers.forEach((u: User) => {
+                              if (!u.email)
+                                return dispatchError(
+                                  new Error(
+                                    `${u.name.first} ${u.name.last} has no email`
+                                  )
+                                );
+                              sendMail(
+                                u.email,
+                                "You have been invited to a group",
+                                "Hello " +
+                                  u.name?.first +
+                                  ", " +
+                                  user.name?.first +
+                                  " " +
+                                  user.name?.last +
+                                  " has invited you to join their group for " +
+                                  currentProject?.title,
+                                dispatchError
+                              );
+                            });
+                            // Get list of invitations again (to get the new one)
+                            fetch(`/api/invitations/user/${user?.id}`)
+                              .then((response) => response.json())
+                              .then(({ error, data }) => {
+                                if (error || !data) return dispatchError(error);
+                                dispatch({
+                                  type: CalendarAction.ReceivedInvitations,
+                                  payload: {
+                                    invitations: data,
+                                  },
+                                });
+                              });
+                            dispatch({
+                              type: CalendarAction.DisplayMessage,
+                              payload: {
+                                message: "Invitation Sent",
+                              },
+                            });
+                          }
+                        });
+                    }
                   } else {
                     dispatch({
                       type: CalendarAction.DisplayMessage,

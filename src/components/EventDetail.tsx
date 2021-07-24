@@ -37,6 +37,9 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
 
+  const dispatchError = (error: Error, meta?: unknown): void =>
+    dispatch({ type: CalendarAction.Error, payload: { error }, meta });
+
   if (!state.currentEvent || !state.currentEvent.location || !user?.username) {
     return null;
   }
@@ -212,14 +215,14 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                                 user.name.last +
                                 " has " +
                                 body,
-                              dispatch
+                              dispatchError
                             )
                           );
                         sendMail(
                           user.email,
                           "You have " + subject,
                           "Hello " + user.name.first + ",  You have " + body,
-                          dispatch
+                          dispatchError
                         );
                       }
                       dispatch({ type: CalendarAction.CanceledReservation });

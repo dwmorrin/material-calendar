@@ -4,7 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import UserGroup from "../resources/UserGroup";
 import { ResourceKey, ResourceInstance } from "../resources/types";
 import { SnackbarState } from "../components/Snackbar";
-import { Invitation } from "../resources/Invitation";
+import Invitation from "../resources/Invitation";
 
 export enum CalendarAction {
   CanceledReservation,
