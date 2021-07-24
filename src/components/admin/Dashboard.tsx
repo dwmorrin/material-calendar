@@ -32,6 +32,7 @@ import Snackbar from "../Snackbar";
 import FullCalendar from "@fullcalendar/react";
 import ErrorPage from "../ErrorPage";
 import { CircularProgress } from "@material-ui/core";
+import ExceptionsDashboard from "./ExceptionsDashboard";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
@@ -95,6 +96,9 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
         selections={selections}
         setSelections={setSelections}
       />
+      {state.exceptionsDashboardIsOpen && (
+        <ExceptionsDashboard dispatch={dispatch} state={state} />
+      )}
       <ProjectLocationHoursDialog dispatch={dispatch} state={state} />
       <ProjectLocationHoursSummaryDialog
         dispatch={dispatch}

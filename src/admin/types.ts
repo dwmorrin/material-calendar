@@ -16,6 +16,7 @@ export enum AdminAction {
   CloseAddProjectToLocation,
   CloseBackups,
   CloseDetail,
+  CloseExceptionsDashboard,
   CloseFileImport,
   CloseLocationHoursDialog,
   CloseProjectLocationHoursDialog,
@@ -30,6 +31,7 @@ export enum AdminAction {
   OpenBackups,
   OpenDetail,
   OpenDetailWithResourceInstance,
+  OpenExceptionsDashboard,
   OpenLocationHoursDialog,
   OpenProjectLocationHoursDialog,
   OpenProjectLocationHoursSummaryDialog,
@@ -63,6 +65,7 @@ export interface AdminState {
   detailIsOpen: boolean;
   drawerIsOpen: boolean;
   error?: Error;
+  exceptionsDashboardIsOpen: boolean;
   fileImportIsOpen: boolean;
   initialResourcesPending: boolean;
   locationHoursDialogIsOpen: boolean;

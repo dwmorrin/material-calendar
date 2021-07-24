@@ -125,6 +125,11 @@ const closeDetail: StateHandler = (state) => ({
   resourceInstance: undefined,
 });
 
+const closeExceptionsDashboard: StateHandler = (state) => ({
+  ...state,
+  exceptionsDashboardIsOpen: false,
+});
+
 const closeFileImport: StateHandler = (state) => ({
   ...state,
   fileImportIsOpen: false,
@@ -202,6 +207,11 @@ const openDetailWithResourceInstance: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
   detailIsOpen: true,
+});
+
+const openExceptionsDashboard: StateHandler = (state) => ({
+  ...state,
+  exceptionsDashboardIsOpen: true,
 });
 
 const openLocationHoursDialog: StateHandler = (state, { payload }) => ({
@@ -388,6 +398,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseAddProjectToLocation]: closeAddProjectToLocation,
     [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
+    [AdminAction.CloseExceptionsDashboard]: closeExceptionsDashboard,
     [AdminAction.CloseFileImport]: closeFileImport,
     [AdminAction.CloseLocationHoursDialog]: closeLocationHoursDialog,
     [AdminAction.CloseProjectLocationHoursDialog]:
@@ -407,6 +418,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.OpenDetail]: openDetail,
     [AdminAction.OpenDetailWithResourceInstance]:
       openDetailWithResourceInstance,
+    [AdminAction.OpenExceptionsDashboard]: openExceptionsDashboard,
     [AdminAction.OpenLocationHoursDialog]: openLocationHoursDialog,
     [AdminAction.OpenProjectLocationHoursDialog]:
       openProjectLocationHoursDialog,

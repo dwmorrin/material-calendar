@@ -45,6 +45,8 @@ export const areIntervalsOverlappingInclusive =
 
 export const formatSlashed = lightFormat("MM/dd/yyyy");
 
+export const formatDatetime = lightFormat("MM/dd/yyyy h:mm:ss aaa");
+
 export const formatSQLDate = (date = new Date()): string =>
   formatISO9075(date, { representation: "date" });
 

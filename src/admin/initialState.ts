@@ -19,6 +19,7 @@ const initialState: AdminState = {
   backupsIsOpen: false,
   detailIsOpen: false,
   drawerIsOpen: false,
+  exceptionsDashboardIsOpen: false,
   fileImportIsOpen: false,
   initialResourcesPending: true,
   locationHoursDialogIsOpen: false,

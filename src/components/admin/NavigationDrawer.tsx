@@ -163,6 +163,14 @@ const AdminNavigationDrawer: FunctionComponent<
             >
               Backups
             </ListItem>
+            <ListItem
+              button
+              onClick={(): void =>
+                dispatch({ type: AdminAction.OpenExceptionsDashboard })
+              }
+            >
+              Exception Requests
+            </ListItem>
           </Accordion>
         </List>
       </Fragment>
