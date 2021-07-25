@@ -125,8 +125,10 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             </List>
           )}
           {!userCanUseLocation && (
+            // TODO: Make this an admin configurable message
             <Typography component="h5">
-              You are not authorized to access this space
+              This location is restricted. At this time, you are not permitted
+              to reserve this location.
             </Typography>
           )}
         </section>
