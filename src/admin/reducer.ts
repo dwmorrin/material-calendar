@@ -367,20 +367,16 @@ const selectedSchedulerLocation: StateHandler = (state) => ({
 });
 
 const selectedSemester: StateHandler = (state, action) => {
-  if (!state.ref?.current) {
-    return errorRedirect(state, action, new Error("no ref to calendar"));
-  }
-  if (!action.payload?.selectedSemester?.start) {
+  if (!action.payload?.selectedSemester) {
     return errorRedirect(
       state,
       action,
       new Error("null or invalid semester selected")
     );
   }
-  state.ref.current.getApi().gotoDate(action.payload.selectedSemester.start);
   return {
     ...state,
-    ...action.payload,
+    selectedSemester: action.payload.selectedSemester,
     semesterDialogIsOpen: false,
   };
 };

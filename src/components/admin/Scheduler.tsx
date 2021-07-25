@@ -1,4 +1,4 @@
-import React, { FunctionComponent, memo, useState } from "react";
+import React, { FunctionComponent, memo, useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -39,6 +39,12 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
   const virtualWeeks = state.resources[
     ResourceKey.VirtualWeeks
   ] as VirtualWeek[];
+
+  useEffect(() => {
+    if (state.ref?.current && state.selectedSemester) {
+      state.ref.current.getApi().gotoDate(state.selectedSemester.start);
+    }
+  }, [state.ref, state.selectedSemester]);
 
   const semester = state.selectedSemester;
   if (!semester) {
