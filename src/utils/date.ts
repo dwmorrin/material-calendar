@@ -182,6 +182,14 @@ export const eventGenerator = ({
   },
 });
 
+export const compareAscSQLDate = ({
+  start,
+  end,
+}: {
+  start: string;
+  end: string;
+}): number => compareAsc(parseSQLDate(start), parseSQLDate(end));
+
 export const isValidDateInterval = ({ start, end }: DateInterval): boolean =>
   compareAsc(start, end) < 1;
 
@@ -200,7 +208,7 @@ export const todayInServerTimezoneAtHour = (hours: number): Date =>
     milliseconds: 0,
   });
 
-export const compareAscSQLDate = ({
+export const isValidSQLDateInterval = ({
   start,
   end,
 }: {
@@ -212,7 +220,7 @@ export const compareAscSQLDate = ({
     end: parseSQLDate(end),
   });
 
-export const compareAscSQLDatetime = ({
+export const isValidSQLDatetimeInterval = ({
   start,
   end,
 }: {

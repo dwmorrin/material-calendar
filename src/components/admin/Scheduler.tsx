@@ -1,4 +1,4 @@
-import React, { FunctionComponent, memo, useEffect, useState } from "react";
+import React, { FunctionComponent, memo, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -23,7 +23,7 @@ import {
   AdminAction,
 } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
-import { Fab, Snackbar } from "@material-ui/core";
+import { Fab } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 
 const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
@@ -32,7 +32,6 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
   selections,
   setSelections,
 }) => {
-  const [snackbarDismissed, setSnackbarDismissed] = useState(false);
   const { ref } = state;
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
@@ -66,7 +65,7 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
   }
 
   const numberOfDays = daysInInterval(semester.start, semester.end);
-  const dailyHours = makeDailyHours(location);
+  const dailyHours = makeDailyHours(location, numberOfDays, semester);
   const resources = makeResources(projects, selections.locationId, semester);
   const allotments = makeAllotments(projects, selections.locationId);
   const events = [
@@ -78,12 +77,6 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
 
   return (
     <>
-      <Snackbar
-        open={!dailyHours.length && !snackbarDismissed}
-        message="Start by creating the daily hours for this location."
-        anchorOrigin={{ horizontal: "left", vertical: "top" }}
-        onClick={(): void => setSnackbarDismissed(true)}
-      />
       <FullCalendar
         // RESOURCES
         resources={resources}

@@ -13,7 +13,7 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import CloseIcon from "@material-ui/icons/Close";
 import {
   castSQLDateToSQLDatetime,
-  compareAscSQLDatetime,
+  isValidSQLDatetimeInterval,
   parseAndFormatSQLDatetimeInterval,
   isBefore,
   nowInServerTimezone,
@@ -56,11 +56,11 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       allotments.some(
         (a) =>
           a.locationId === location.id &&
-          compareAscSQLDatetime({
+          isValidSQLDatetimeInterval({
             start: castSQLDateToSQLDatetime(a.start),
             end: start,
           }) &&
-          compareAscSQLDatetime({
+          isValidSQLDatetimeInterval({
             start: end,
             end: castSQLDateToSQLDatetime(a.end),
           })

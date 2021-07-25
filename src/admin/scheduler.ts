@@ -11,13 +11,14 @@ import Project from "../resources/Project";
 import Location from "../resources/Location";
 import {
   addDays,
-  compareAscSQLDate,
-  formatSQLDate,
-  parseSQLDate,
   areIntervalsOverlappingInclusive,
-  subDays,
+  compareAscSQLDate,
+  isValidSQLDateInterval,
+  formatSQLDate,
   parseAndFormatFCString,
   parseFCString,
+  parseSQLDate,
+  subDays,
 } from "../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../resources/Semester";
@@ -211,8 +212,12 @@ export const getFirstLastAndTotalFromAllotments = (
 ): [Allotment, Allotment, number] => {
   if (!first.start || !last.start) return [allot, allot, allot.hours];
   return [
-    compareAscSQLDate({ start: allot.start, end: first.start }) ? allot : first,
-    compareAscSQLDate({ start: last.start, end: allot.start }) ? allot : last,
+    isValidSQLDateInterval({ start: allot.start, end: first.start })
+      ? allot
+      : first,
+    isValidSQLDateInterval({ start: last.start, end: allot.start })
+      ? allot
+      : last,
     total + allot.hours,
   ];
 };
@@ -235,14 +240,47 @@ export const makeAllotments = (
     return allots;
   }, [] as SchedulerEventProps[]);
 
-export const makeDailyHours = (location: Location): SchedulerEventProps[] =>
-  location.hours.map((dailyHours, index) => ({
-    id: `${Location.locationHoursId}-${index}`,
-    start: dailyHours.date,
-    allDay: true,
-    title: "" + dailyHours.hours,
-    resourceId: Location.locationHoursId,
-  }));
+/**
+ * Creates a row of events displaying the numbers of hours available for each date
+ * in the semester.
+ * Uses either hours returned from the database, or a "0" event if no hours are
+ * found for that date.
+ */
+export const makeDailyHours = (
+  location: Location,
+  numberOfDays: number,
+  { start }: Semester
+): SchedulerEventProps[] => {
+  const hours = location.hours.slice();
+  hours.sort(({ date: start }, { date: end }) =>
+    compareAscSQLDate({ start, end })
+  );
+  let currentDate = start;
+  let nextHours = hours.shift();
+  const res = [] as SchedulerEventProps[];
+  while (res.length < numberOfDays) {
+    if (nextHours && nextHours.date === currentDate) {
+      res.push({
+        id: `${Location.locationHoursId}-${res.length}`,
+        start: nextHours.date,
+        allDay: true,
+        title: "" + nextHours.hours,
+        resourceId: Location.locationHoursId,
+      });
+      nextHours = hours.shift();
+    } else {
+      res.push({
+        id: `${Location.locationHoursId}-${res.length}`,
+        start: currentDate,
+        allDay: true,
+        title: "0",
+        resourceId: Location.locationHoursId,
+      });
+    }
+    currentDate = addADay(currentDate);
+  }
+  return res;
+};
 
 export const processVirtualWeeks = (
   virtualWeeks: VirtualWeek[],
