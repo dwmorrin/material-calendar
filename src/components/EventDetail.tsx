@@ -131,7 +131,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           )}
         </section>
 
-        {(userOwns || open) && !!projects.length && (
+        {future && (userOwns || open) && !!projects.length && (
           <Button
             key="MakeBooking"
             style={{
