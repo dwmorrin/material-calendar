@@ -2,7 +2,6 @@ import React, { FunctionComponent, memo, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import interactionPlugin from "@fullcalendar/interaction";
-import Semester from "../../resources/Semester";
 import VirtualWeek from "../../resources/VirtualWeek";
 import Project, { defaultProject } from "../../resources/Project";
 import Location from "../../resources/Location";
@@ -13,7 +12,6 @@ import {
   makeAllotments,
   makeDailyHours,
   makeResources,
-  mostRecent,
   processVirtualWeeks,
   processVirtualWeeksAsHoursRemaining,
   resourceClickHandler,
@@ -38,29 +36,14 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
   const { ref } = state;
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
-  const semesters = state.resources[ResourceKey.Semesters] as Semester[];
   const virtualWeeks = state.resources[
     ResourceKey.VirtualWeeks
   ] as VirtualWeek[];
 
-  const semester =
-    selections.semesterId > 0
-      ? semesters.find((semester) => semester.id === selections.semesterId)
-      : semesters.length
-      ? semesters.reduce(mostRecent)
-      : null;
+  const semester = state.selectedSemester;
   if (!semester) {
     return <div>Create a semester first.</div>;
-  } else if (selections.semesterId !== semester.id) {
-    setSelections({ ...selections, semesterId: semester.id });
-    dispatch({
-      type: AdminAction.SelectedSemester,
-      payload: {
-        selectedSemester: semester,
-      },
-    });
   }
-
   if (!locations.length) {
     return <div>Create some locations first.</div>;
   }

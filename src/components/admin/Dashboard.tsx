@@ -33,9 +33,14 @@ import FullCalendar from "@fullcalendar/react";
 import ErrorPage from "../ErrorPage";
 import { CircularProgress } from "@material-ui/core";
 import ExceptionsDashboard from "./ExceptionsDashboard";
+import { ResourceKey } from "../../resources/types";
+import Semester from "../../resources/Semester";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
+
+const mostRecent = (a: Semester, b: Semester): Semester =>
+  new Date(b.start).valueOf() - new Date(a.start).valueOf() < 0 ? a : b;
 
 const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   const [state, dispatch] = useReducer(reducer, {
@@ -47,6 +52,35 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
     locationId: -1,
     semesterId: -1,
   } as AdminSelections);
+
+  // try to set the current semester
+  useEffect(() => {
+    if (!state.initialResourcesPending && !state.selectedSemester) {
+      const semesters = state.resources[ResourceKey.Semesters] as Semester[];
+      // try to use the user's selected semesterId, or the most recent semester
+      const selectedSemester =
+        selections.semesterId > 0
+          ? semesters.find(({ id }) => id === selections.semesterId)
+          : semesters.length
+          ? semesters.reduce(mostRecent)
+          : null;
+      if (selectedSemester) {
+        if (selectedSemester.id !== selections.semesterId)
+          setSelections({ ...selections, semesterId: selectedSemester.id });
+        dispatch({
+          type: AdminAction.SelectedSemester,
+          payload: { selectedSemester },
+        });
+      }
+    }
+  }, [
+    dispatch,
+    selections,
+    setSelections,
+    state.initialResourcesPending,
+    state.resources,
+    state.selectedSemester,
+  ]);
 
   useEffect(() => {
     if (User.isAdmin(user))
