@@ -13,9 +13,11 @@ interface Reservation {
   groupId: number;
   guests: string;
   cancellation?: {
-    requested: ActionDetails;
-    approved: ActionDetails;
-    rejected: ActionDetails;
+    canceled: ActionDetails;
+    refund?: {
+      approved: ActionDetails;
+      rejected: ActionDetails;
+    };
   } | null;
 }
 

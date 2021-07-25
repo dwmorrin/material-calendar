@@ -73,7 +73,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       (group) => reservation.groupId === group.id
     );
   // Should start be changed to end? or end-15 minutes?
-  const future = isBefore(nowInServerTimezone(), parseSQLDatetime(start));
+  const future = isBefore(nowInServerTimezone(), parseSQLDatetime(end));
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
     : null;
