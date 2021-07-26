@@ -74,6 +74,18 @@ export function isSameDay(a: Date, b: Date): boolean {
   return formatSQLDate(a) === formatSQLDate(b);
 }
 
+export const sqlIntervalInHours = (
+  start: string | undefined,
+  end: string | undefined
+): number => {
+  if (start && end) {
+    return (
+      (parseSQLDatetime(end).getTime() - parseSQLDatetime(start).getTime()) /
+      3600000
+    );
+  } else return 0;
+};
+
 /** @private */
 function formatInterval({
   hasNoTimeInfo,

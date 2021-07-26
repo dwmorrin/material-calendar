@@ -18,6 +18,7 @@ import {
   isBefore,
   nowInServerTimezone,
   parseSQLDatetime,
+  sqlIntervalInHours,
 } from "../utils/date";
 import { AuthContext } from "./AuthContext";
 import { makeTransition } from "./Transition";
@@ -69,12 +70,32 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     cancelationApprovalCutoff
   );
 
+  const projectHoursRemaining = (project: Project): boolean => {
+    const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
+      (group) => group.projectId === project.id
+    );
+
+    if (group) {
+      return (
+        project.groupAllottedHours >
+        (state.resources[ResourceKey.Events] as Event[])
+          .filter((event) => event.reservation?.groupId == group.id)
+          .map((event) => sqlIntervalInHours(event.start, event.end))
+          .reduce((a, b) => a + b, 0) +
+          sqlIntervalInHours(
+            state.currentEvent?.start,
+            state.currentEvent?.start
+          )
+      );
+    } else return false;
+  };
+
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
-    ({ title, allotments }) =>
+    (project) =>
       (title === Project.walkInTitle &&
         state.currentEvent &&
         Event.isAvailableForWalkIn(state.currentEvent)) ||
-      allotments.some(
+      (project.allotments.some(
         (a) =>
           a.locationId === location.id &&
           isValidSQLDatetimeInterval({
@@ -85,7 +106,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             start: end,
             end: castSQLDateToSQLDatetime(a.end),
           })
-      )
+      ) &&
+        projectHoursRemaining(project))
   );
   const open = reservable && !reservation && userCanUseLocation;
   const userOwns =
@@ -94,7 +116,10 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       (group) => reservation.groupId === group.id
     );
 
-  const reservationAllowed = isBefore(nowInServerTimezone(), reservationCutoff);
+  const reservationCutoffHasNotPassed = isBefore(
+    nowInServerTimezone(),
+    reservationCutoff
+  );
 
   const eventHasNotEnded = isBefore(
     nowInServerTimezone(),
@@ -168,25 +193,26 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           )}
         </section>
 
-        {reservationAllowed && (userOwns || open) && !!projects.length && (
-          <Button
-            key="MakeReservation"
-            style={{
-              backgroundColor: "Green",
-              color: "white",
-              maxWidth: "400px",
-            }}
-            onClick={(event): void => {
-              event.stopPropagation();
-              dispatch({
-                type: CalendarAction.OpenReservationForm,
-                payload: { currentEvent: state.currentEvent },
-              });
-            }}
-          >
-            {userOwns ? "Modify Reservation" : "Reserve this time"}
-          </Button>
-        )}
+        {reservationCutoffHasNotPassed &&
+          (userOwns || (open && !!projects.length)) && (
+            <Button
+              key="MakeReservation"
+              style={{
+                backgroundColor: "Green",
+                color: "white",
+                maxWidth: "400px",
+              }}
+              onClick={(event): void => {
+                event.stopPropagation();
+                dispatch({
+                  type: CalendarAction.OpenReservationForm,
+                  payload: { currentEvent: state.currentEvent },
+                });
+              }}
+            >
+              {userOwns ? "Modify Reservation" : "Reserve this time"}
+            </Button>
+          )}
         {userOwns && eventHasNotEnded && (
           <div>
             <Button
