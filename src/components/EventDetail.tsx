@@ -95,7 +95,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       (title === Project.walkInTitle &&
         state.currentEvent &&
         Event.isAvailableForWalkIn(state.currentEvent)) ||
-      (project.allotments.some(
+      project.allotments.some(
         (a) =>
           a.locationId === location.id &&
           isValidSQLDatetimeInterval({
@@ -106,8 +106,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             start: end,
             end: castSQLDateToSQLDatetime(a.end),
           })
-      ) &&
-        projectHoursRemaining(project))
+      )
   );
   const open = reservable && !reservation && userCanUseLocation;
   const userOwns =
@@ -128,7 +127,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
     : null;
-
+  console.log(projects);
   return (
     <Dialog
       fullScreen
@@ -317,7 +316,9 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             <List>
               {projects.map((project) => (
                 <ListItem key={`${project.title}_list_item`}>
-                  {project.title}
+                  {projectHoursRemaining(project)
+                    ? project.title
+                    : project.title + ", NO Project Hours Remaining"}
                 </ListItem>
               ))}
             </List>
@@ -336,7 +337,11 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           </Button>
         )}
       </Paper>
-      <ReservationForm dispatch={dispatch} state={state} projects={projects} />
+      <ReservationForm
+        dispatch={dispatch}
+        state={state}
+        projects={projects.filter(projectHoursRemaining)}
+      />
     </Dialog>
   );
 };
