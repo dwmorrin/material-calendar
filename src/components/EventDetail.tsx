@@ -16,6 +16,7 @@ import {
   isValidSQLDatetimeInterval,
   parseAndFormatSQLDatetimeInterval,
   isBefore,
+  isSameDay,
   nowInServerTimezone,
   parseSQLDatetime,
   sqlIntervalInHours,
@@ -77,9 +78,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     if (walkInProject) {
       return (
         Number(process.env.REACT_APP_WALK_IN_RESERVATIONS_PER_LOCATION) >
-        (state.resources[ResourceKey.Events] as Event[]).filter(
-          (e) => e.location == event.location
-        ).length
+        (state.resources[ResourceKey.Events] as Event[]).filter(function (e) {
+          if (
+            e.location == event.location &&
+            isSameDay(parseSQLDatetime(event.start), nowInServerTimezone())
+          )
+            return true;
+        }).length
       );
     } else return true;
   };
