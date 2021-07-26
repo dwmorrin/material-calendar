@@ -5,17 +5,36 @@ import { formatSQLDate, parseSQLDate } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 
 export const values = (state: AdminState): FormValues => {
+  const courses = state.resources[ResourceKey.Courses] as Course[];
   const project = state.resourceInstance as Project;
   const locationHours = project.locationHours.map((lh) => ({
     ...lh,
     locationId: String(lh.locationId),
   }));
   return {
-    ...project,
+    //...project,
+    id: project.id,
+    title: project.title,
+    course: project.course.title,
+    sections: courses.reduce(
+      (sections, course) => ({
+        ...sections,
+        [course.id]: {
+          ...sections[course.id],
+          [course.section]:
+            course.id === project.course.id &&
+            project.course.sections.includes(course.section),
+        },
+      }),
+      {} as { [k: string]: { [k: string]: boolean } }
+    ),
     start: parseSQLDate(project.start),
     end: parseSQLDate(project.end),
     reservationStart: parseSQLDate(project.reservationStart),
     locationHours,
+    groupSize: project.groupSize,
+    groupAllotedHours: project.groupAllotedHours,
+    open: project.open,
   };
 };
 
@@ -33,7 +52,12 @@ export const update = (state: AdminState, values: FormValues): Project => {
   return {
     ...project,
     ...values,
-    course: { id: selectedCourse.id, title: selectedCourse.title },
+    //! TEMPORARY !!! sections needs to be selected sections
+    course: {
+      id: selectedCourse.id,
+      title: selectedCourse.title,
+      sections: [] as string[],
+    },
     start: formatSQLDate(start as Date),
     end: formatSQLDate(end as Date),
     reservationStart: formatSQLDate(reservationStart as Date),
