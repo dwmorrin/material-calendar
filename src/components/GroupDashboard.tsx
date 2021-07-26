@@ -287,7 +287,6 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
               </AccordionSummary>
               {invitations
                 .filter((invitation) => invitation.invitor.id === user.id)
-                .filter((invitation) => invitation.confirmed !== 1)
                 .map((invitation) => (
                   <ListItem
                     key={`invitation${invitation.id}`}
@@ -375,8 +374,15 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                   </ListItem>
                 ))}
               {invitations
-                .filter((invitation) => invitation.invitor.id !== user.id)
-                .filter(invitationIsPendingApproval || invitationIsUnanswered)
+                .filter(function (invitation) {
+                  if (
+                    invitation.invitor.id !== user.id &&
+                    (invitationIsPendingApproval(invitation) ||
+                      invitationIsUnanswered(invitation))
+                  )
+                    return true;
+                  else return false;
+                })
                 .map((invitation) => (
                   <ListItem
                     key={`invitation${invitation.id}`}
