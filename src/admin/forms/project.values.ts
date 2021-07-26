@@ -86,7 +86,7 @@ export const update = (state: AdminState, values: FormValues): Project => {
     open,
     // numbers (strings in form)
     groupSize: Number(values.groupSize),
-    groupAllottedHours: Number(values.groupAllotedHours),
+    groupAllottedHours: Number(values.groupAllottedHours),
     // dates (stored as string in database)
     start: formatSQLDate(start as Date),
     end: formatSQLDate(end as Date),
