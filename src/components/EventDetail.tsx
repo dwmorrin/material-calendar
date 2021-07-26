@@ -51,11 +51,19 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const userCanUseLocation = user?.restriction >= location.restriction;
 
   const cancelationApprovalCutoff = new Date(
-    parseSQLDatetime(end).setHours(
+    parseSQLDatetime(start).setHours(
       parseSQLDatetime(start).getHours() -
         Number(process.env.REACT_APP_CANCELATION_REFUND_CUTOFF_HOURS)
     )
   );
+
+  const reservationCutoff = new Date(
+    parseSQLDatetime(end).setMinutes(
+      parseSQLDatetime(end).getMinutes() -
+        Number(process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF_MINUTES)
+    )
+  );
+
   const cancelationApproved = isBefore(
     nowInServerTimezone(),
     cancelationApprovalCutoff
@@ -85,8 +93,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     (state.resources[ResourceKey.Groups] as UserGroup[]).find(
       (group) => reservation.groupId === group.id
     );
-  // Should start be changed to end? or end-15 minutes?
-  const future = isBefore(nowInServerTimezone(), parseSQLDatetime(end));
+
+  const reservationAllowed = isBefore(nowInServerTimezone(), reservationCutoff);
+
+  const eventHasNotEnded = isBefore(
+    nowInServerTimezone(),
+    parseSQLDatetime(end)
+  );
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
     : null;
@@ -155,9 +168,9 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           )}
         </section>
 
-        {future && (userOwns || open) && !!projects.length && (
+        {reservationAllowed && (userOwns || open) && !!projects.length && (
           <Button
-            key="MakeBooking"
+            key="MakeReservation"
             style={{
               backgroundColor: "Green",
               color: "white",
@@ -174,10 +187,10 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             {userOwns ? "Modify Reservation" : "Reserve this time"}
           </Button>
         )}
-        {userOwns && future && (
+        {userOwns && eventHasNotEnded && (
           <div>
             <Button
-              key="CancelBooking"
+              key="CancelReservation"
               style={{
                 backgroundColor: "Red",
                 color: "white",
