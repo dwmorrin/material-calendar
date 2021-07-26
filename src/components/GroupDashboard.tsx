@@ -701,87 +701,77 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                 color="inherit"
                 onClick={(event): void => {
                   // Because button disable does not work, prevent empty invitations here
-                  if (selectedUsers.length > 0) {
-                    const approved =
-                      selectedUsers.length + 1 ===
-                      (currentProject?.groupSize || 0);
-                    if (!approved) {
-                      openConfirmationDialog(true);
-                    } else {
-                      event.stopPropagation();
-                      // Create Invitation
-                      fetch(`/api/invitations/`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          invitorId: user.id,
-                          invitees: selectedUsers.map((u) => u.id),
-                          projectId: currentProject?.id,
-                          approved: approved,
-                        }),
-                      })
-                        .then((response) => response.json())
-                        .then(({ error, data }) => {
-                          if (error || !data) {
-                            return dispatch({
-                              type: CalendarAction.Error,
-                              payload: { error },
-                            });
-                          } else {
-                            selectedUsers.forEach((u: User) => {
-                              if (!u.email)
-                                return dispatchError(
-                                  new Error(
-                                    `${u.name.first} ${u.name.last} has no email`
-                                  )
-                                );
-                              sendMail(
-                                u.email,
-                                "You have been invited to a group",
-                                "Hello " +
-                                  u.name?.first +
-                                  ", " +
-                                  user.name?.first +
-                                  " " +
-                                  user.name?.last +
-                                  " has invited you to join their group for " +
-                                  currentProject?.title,
-                                dispatchError
-                              );
-                            });
-                            // Get list of invitations again (to get the new one)
-                            fetch(`/api/invitations/user/${user?.id}`)
-                              .then((response) => response.json())
-                              .then(({ error, data }) => {
-                                if (error || !data) return dispatchError(error);
-                                dispatch({
-                                  type: CalendarAction.ReceivedInvitations,
-                                  payload: {
-                                    invitations: data,
-                                  },
-                                });
-                              });
-                            dispatch({
-                              type: CalendarAction.DisplayMessage,
-                              payload: {
-                                message: "Invitation Sent",
-                              },
-                            });
-                          }
-                        });
-                    }
+                  const approved =
+                    selectedUsers.length + 1 ===
+                    (currentProject?.groupSize || 0);
+                  if (!approved) {
+                    openConfirmationDialog(true);
                   } else {
-                    dispatch({
-                      type: CalendarAction.DisplayMessage,
-                      payload: {
-                        message:
-                          "You must select at least one user to create a group invitation",
-                      },
-                    });
+                    event.stopPropagation();
+                    // Create Invitation
+                    fetch(`/api/invitations/`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        invitorId: user.id,
+                        invitees: selectedUsers.map((u) => u.id),
+                        projectId: currentProject?.id,
+                        approved: approved,
+                      }),
+                    })
+                      .then((response) => response.json())
+                      .then(({ error, data }) => {
+                        if (error || !data) {
+                          return dispatch({
+                            type: CalendarAction.Error,
+                            payload: { error },
+                          });
+                        } else {
+                          selectedUsers.forEach((u: User) => {
+                            if (!u.email)
+                              return dispatchError(
+                                new Error(
+                                  `${u.name.first} ${u.name.last} has no email`
+                                )
+                              );
+                            sendMail(
+                              u.email,
+                              "You have been invited to a group",
+                              "Hello " +
+                                u.name?.first +
+                                ", " +
+                                user.name?.first +
+                                " " +
+                                user.name?.last +
+                                " has invited you to join their group for " +
+                                currentProject?.title,
+                              dispatchError
+                            );
+                          });
+                          // Get list of invitations again (to get the new one)
+                          fetch(`/api/invitations/user/${user?.id}`)
+                            .then((response) => response.json())
+                            .then(({ error, data }) => {
+                              if (error || !data) return dispatchError(error);
+                              dispatch({
+                                type: CalendarAction.ReceivedInvitations,
+                                payload: {
+                                  invitations: data,
+                                },
+                              });
+                            });
+                          dispatch({
+                            type: CalendarAction.DisplayMessage,
+                            payload: {
+                              message: "Invitation Sent",
+                            },
+                          });
+                        }
+                      });
                   }
                 }}
               >
-                Invite Selected Users to Group
+                Create Group
               </Button>
               {users
                 ?.filter((individual) => individual.id !== user.id)
