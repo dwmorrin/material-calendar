@@ -573,6 +573,44 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                                               );
                                                             }
                                                           );
+                                                        //Cancel User's created invitations
+                                                        invitations.forEach(
+                                                          (invitation) =>
+                                                            fetch(
+                                                              `/api/invitations/${invitation.id}`,
+                                                              {
+                                                                method:
+                                                                  "DELETE",
+                                                                headers: {},
+                                                                body: null,
+                                                              }
+                                                            )
+                                                              .then(
+                                                                (response) =>
+                                                                  response.json()
+                                                              )
+                                                              .then(
+                                                                ({
+                                                                  error,
+                                                                  data,
+                                                                }) => {
+                                                                  if (
+                                                                    error ||
+                                                                    !data
+                                                                  ) {
+                                                                    return dispatch(
+                                                                      {
+                                                                        type: CalendarAction.Error,
+                                                                        payload:
+                                                                          {
+                                                                            error,
+                                                                          },
+                                                                      }
+                                                                    );
+                                                                  }
+                                                                }
+                                                              )
+                                                        );
                                                         dispatch({
                                                           type: CalendarAction.JoinedGroup,
                                                           payload: {
