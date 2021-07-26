@@ -18,7 +18,18 @@ export class Course implements Course {
       instructor: "",
     }
   ) {
-    Object.assign(this, course);
+    const {
+      id = 0,
+      title = "",
+      catalogId = "",
+      section = "",
+      instructor = "",
+    } = course;
+    this.id = id;
+    this.title = String(title);
+    this.catalogId = String(catalogId);
+    this.instructor = String(instructor);
+    this.section = String(section); // database bug: can send title "1" as 1
   }
 }
 
