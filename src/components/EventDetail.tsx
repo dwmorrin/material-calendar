@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from "react";
+import React, { FunctionComponent, useContext, useState } from "react";
 import {
   Dialog,
   IconButton,
@@ -28,6 +28,7 @@ import ReservationForm from "./ReservationForm";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Event from "../resources/Event";
 import { sendMail } from "../utils/mail";
+import CancelationDialog from "./CancelationDialog";
 
 const transition = makeTransition("left");
 
@@ -36,6 +37,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const { user } = useContext(AuthContext);
+  const [cancelationDialogIsOpen, openCancelationDialog] = useState(false);
 
   const dispatchError = (error: Error, meta?: unknown): void =>
     dispatch({ type: CalendarAction.Error, payload: { error }, meta });
@@ -47,6 +49,17 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const { end, location, reservable, start, title, reservation } =
     state.currentEvent;
   const userCanUseLocation = user?.restriction >= location.restriction;
+
+  const cancelationApprovalCutoff = new Date(
+    parseSQLDatetime(end).setHours(
+      parseSQLDatetime(start).getHours() -
+        Number(process.env.REACT_APP_CANCELATION_REFUND_CUTOFF_HOURS)
+    )
+  );
+  const cancelationApproved = isBefore(
+    nowInServerTimezone(),
+    cancelationApprovalCutoff
+  );
 
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
     ({ title, allotments }) =>
@@ -96,6 +109,15 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           <CloseIcon />
         </IconButton>
       </Toolbar>
+      {cancelationDialogIsOpen && (
+        <CancelationDialog
+          state={state}
+          dispatch={dispatch}
+          cancelationDialogIsOpen={cancelationDialogIsOpen}
+          openCancelationDialog={openCancelationDialog}
+          cancelationApprovalCutoff={cancelationApprovalCutoff}
+        />
+      )}
       <Paper
         style={{
           display: "flex",
@@ -163,73 +185,83 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               }}
               onClick={(event): void => {
                 event.stopPropagation();
-                fetch(
-                  `/api/reservations/${state.currentEvent?.reservation?.id}`,
-                  {
-                    method: "DELETE",
-                    headers: {},
-                    body: null,
-                  }
-                )
-                  .then((response) => response.json())
-                  .then(({ error, data, context }) => {
-                    if (error || !data) {
-                      return dispatch({
-                        type: CalendarAction.Error,
-                        payload: { error },
-                        meta: context,
-                      });
-                    } else {
-                      const group = (
-                        state.resources[ResourceKey.Groups] as UserGroup[]
-                      ).find(
-                        (group) =>
-                          group.id === state.currentEvent?.reservation?.groupId
-                      );
-                      const project = (
-                        state.resources[ResourceKey.Projects] as Project[]
-                      ).find((project) => project.id === group?.projectId);
-                      if (group) {
-                        const subject = "canceled a reservation for your group";
-                        const body =
-                          subject +
-                          " for " +
-                          project?.title +
-                          " on " +
-                          state.currentEvent?.start +
-                          " in " +
-                          state.currentEvent?.location.title;
-                        group.members
-                          .filter((member) => member.username !== user.username)
-                          .forEach((member) =>
+                cancelationApproved
+                  ? fetch(
+                      `/api/reservations/cancel/${state.currentEvent?.reservation?.id}`,
+                      {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          userId: user.id,
+                          refundApproved: 1,
+                        }),
+                      }
+                    )
+                      .then((response) => response.json())
+                      .then(({ error, data }) => {
+                        if (error || !data) {
+                          return dispatch({
+                            type: CalendarAction.Error,
+                            payload: { error },
+                          });
+                        } else {
+                          const group = (
+                            state.resources[ResourceKey.Groups] as UserGroup[]
+                          ).find(
+                            (group) =>
+                              group.id ===
+                              state.currentEvent?.reservation?.groupId
+                          );
+                          const project = (
+                            state.resources[ResourceKey.Projects] as Project[]
+                          ).find((project) => project.id === group?.projectId);
+                          if (group) {
+                            const subject =
+                              "canceled a reservation for your group";
+                            const body =
+                              subject +
+                              " for " +
+                              project?.title +
+                              " on " +
+                              state.currentEvent?.start +
+                              " in " +
+                              state.currentEvent?.location.title;
+                            group.members
+                              .filter(
+                                (member) => member.username !== user.username
+                              )
+                              .forEach((member) =>
+                                sendMail(
+                                  member.email,
+                                  user.name.first +
+                                    " " +
+                                    user.name.last +
+                                    " has " +
+                                    subject,
+                                  "Hello " +
+                                    member.name.first +
+                                    ", " +
+                                    user.name.first +
+                                    " " +
+                                    user.name.last +
+                                    " has " +
+                                    body,
+                                  dispatchError
+                                )
+                              );
                             sendMail(
-                              member.email,
-                              user.name.first +
-                                " " +
-                                user.name.last +
-                                " has " +
-                                subject,
+                              user.email,
+                              "You have " + subject,
                               "Hello " +
-                                member.name.first +
-                                ", " +
                                 user.name.first +
-                                " " +
-                                user.name.last +
-                                " has " +
+                                ",  You have " +
                                 body,
                               dispatchError
-                            )
-                          );
-                        sendMail(
-                          user.email,
-                          "You have " + subject,
-                          "Hello " + user.name.first + ",  You have " + body,
-                          dispatchError
-                        );
-                      }
-                      dispatch({ type: CalendarAction.CanceledReservation });
-                    }
-                  });
+                            );
+                          }
+                        }
+                      })
+                  : openCancelationDialog(true);
               }}
             >
               Cancel Reservation
