@@ -142,15 +142,19 @@ test("makeAllotments", () =>
 
 test("makeDailyHours", () =>
   expect(
-    makeDailyHours({
-      hours: [
-        {
-          date: "2020-06-18",
-          id: 0,
-          hours: 0,
-        },
-      ],
-    })
+    makeDailyHours(
+      {
+        hours: [
+          {
+            date: "2020-06-18",
+            id: 0,
+            hours: 0,
+          },
+        ],
+      },
+      1,
+      { start: "2020-06-18", end: "2020-06-18" }
+    )
   ).toEqual([
     {
       allDay: true,
