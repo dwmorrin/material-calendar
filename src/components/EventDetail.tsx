@@ -70,11 +70,24 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     cancelationApprovalCutoff
   );
 
+  const hasMetWalkInQuota = (event: Event): boolean => {
+    const walkInProject = (
+      state.resources[ResourceKey.Projects] as Project[]
+    ).find((project) => project.title === Project.walkInTitle);
+    if (walkInProject) {
+      return (
+        Number(process.env.REACT_APP_WALK_IN_RESERVATIONS_PER_LOCATION) >
+        (state.resources[ResourceKey.Events] as Event[]).filter(
+          (e) => e.location == event.location
+        ).length
+      );
+    } else return true;
+  };
+
   const projectHoursRemaining = (project: Project): boolean => {
     const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
       (group) => group.projectId === project.id
     );
-
     if (group) {
       return (
         project.groupAllottedHours >
@@ -94,7 +107,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     (project) =>
       (title === Project.walkInTitle &&
         state.currentEvent &&
-        Event.isAvailableForWalkIn(state.currentEvent)) ||
+        Event.isAvailableForWalkIn(state.currentEvent) &&
+        !hasMetWalkInQuota(state.currentEvent)) ||
       project.allotments.some(
         (a) =>
           a.locationId === location.id &&
