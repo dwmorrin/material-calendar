@@ -141,7 +141,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
     : null;
-  console.log(projects);
+
   return (
     <Dialog
       fullScreen
