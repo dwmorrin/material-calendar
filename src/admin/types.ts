@@ -30,6 +30,7 @@ export enum AdminAction {
   OpenAddProjectToLocation,
   OpenBackups,
   OpenDetail,
+  OpenDetailWithProjectById,
   OpenDetailWithResourceInstance,
   OpenExceptionsDashboard,
   OpenLocationHoursDialog,

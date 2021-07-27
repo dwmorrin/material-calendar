@@ -14,7 +14,7 @@ import {
   makeResources,
   processVirtualWeeks,
   processVirtualWeeksAsHoursRemaining,
-  resourceClickHandler,
+  resourceClick,
   selectionHandler,
 } from "../../admin/scheduler";
 import {
@@ -89,15 +89,13 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
         }}
         resourceOrder="id" // TODO user preference; create an order prop
         resourcesInitiallyExpanded={true} // TODO user preference
-        resourceLabelDidMount={({ resource: { id, title }, el }): void => {
+        resourceLabelDidMount={({ resource: { id }, el }): void => {
           el.style.cursor = "default"; //! TODO move to CSS
-          el.onclick = resourceClickHandler({
+          el.onclick = resourceClick({
             id,
-            title,
             dispatch,
             location,
             semester,
-            state,
           });
         }}
         // EVENTS

@@ -2,6 +2,7 @@ import { Action, AdminState, AdminAction } from "./types";
 import { ResourceKey } from "../resources/types";
 import { enqueue, dequeue } from "../utils/queue";
 import { ErrorType } from "../utils/error";
+import Project from "../resources/Project";
 
 type StateHandler = (state: AdminState, action: Action) => AdminState;
 
@@ -202,6 +203,25 @@ const openDetail: StateHandler = (state) => ({
   ...state,
   detailIsOpen: true,
 });
+
+const openDetailWithProjectById: StateHandler = (state, action) => {
+  const { meta } = action;
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const resourceInstance = projects.find(({ id }) => id === meta);
+  if (!resourceInstance)
+    return errorRedirect(
+      state,
+      action,
+      new Error("Could not open project. ID did not match any projects."),
+      ErrorType.MISSING_RESOURCE
+    );
+  return {
+    ...state,
+    resourceInstance,
+    resourceKey: ResourceKey.Projects,
+    detailIsOpen: true,
+  };
+};
 
 const openDetailWithResourceInstance: StateHandler = (state, { payload }) => ({
   ...state,
@@ -412,6 +432,7 @@ const reducer: StateHandler = (state, action) =>
       openProjectLocationHoursSummaryDialog,
     [AdminAction.OpenBackups]: openBackups,
     [AdminAction.OpenDetail]: openDetail,
+    [AdminAction.OpenDetailWithProjectById]: openDetailWithProjectById,
     [AdminAction.OpenDetailWithResourceInstance]:
       openDetailWithResourceInstance,
     [AdminAction.OpenExceptionsDashboard]: openExceptionsDashboard,

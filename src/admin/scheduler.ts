@@ -318,21 +318,17 @@ export const mostRecent = (a: Semester, b: Semester): Semester =>
 
 //--- EVENT HANDLERS ---
 
-export const resourceClickHandler =
+export const resourceClick =
   ({
     id,
-    title,
     dispatch,
     location,
     semester,
-    state,
   }: {
     id: string;
-    title: string;
     dispatch: (a: Action) => void;
     location: Location;
     semester: Semester;
-    state: AdminState;
   }): ((this: GlobalEventHandlers, ev: MouseEvent) => unknown) | null =>
   (event): void => {
     if (
@@ -359,18 +355,9 @@ export const resourceClickHandler =
           });
         }
         default: {
-          // assume ID is a project ID
-          const project = state.resources[ResourceKey.Projects].find(
-            (p) => p.id === Number(id)
-          );
-          if (!project)
-            return console.log(`no handler for ID: ${id}, TITLE: ${title}`);
           return dispatch({
-            type: AdminAction.OpenDetailWithResourceInstance,
-            payload: {
-              resourceKey: ResourceKey.Projects,
-              resourceInstance: project,
-            },
+            type: AdminAction.OpenDetailWithProjectById,
+            meta: Number(id),
           });
         }
       }
