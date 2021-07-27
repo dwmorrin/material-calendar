@@ -45,7 +45,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   const [selectedUsers, setSelectedUsers] = useState([] as User[]);
   const { user } = useContext(AuthContext);
   const invitations = state.invitations.filter(
-    (invitation) => invitation.project === currentProject?.id
+    (invitation) => invitation.projectId === currentProject?.id
   );
   const isNotCurrentUser = ({ id }: { id: number }): boolean => id !== user.id;
   useEffect(() => {
@@ -86,10 +86,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   const invitationIsUnanswered = (invitation: Invitation): boolean =>
     !invitation.invitees.some(function (invitee) {
       // Get Invitations where user has yet to respond or are waiting for approval
-      if (
-        invitee.id === user.id &&
-        (invitee.accepted === 1 || invitee.rejected === 1)
-      ) {
+      if (invitee.id === user.id && (invitee.accepted || invitee.rejected)) {
         return true;
       } else return false;
     });
@@ -237,7 +234,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       return dispatchError(error);
                     } else {
                       const invitation = invitations.find(
-                        (invitation) => invitation.group_id === currentGroup.id
+                        (invitation) => invitation.groupId === currentGroup.id
                       );
                       //Mark group Invitation Rejected so it doesn't show up again
                       if (invitation !== undefined) {
@@ -431,10 +428,10 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                 }
                                 if (invitation.approved) {
                                   // If the group already exists, add user to it, otherwise form group with invitor and user
-                                  invitation.group_id
+                                  invitation.groupId
                                     ? // Join Group
                                       fetch(
-                                        `/api/groups/${invitation.group_id}/invitation/${invitation.id}`,
+                                        `/api/groups/${invitation.groupId}/invitation/${invitation.id}`,
                                         {
                                           method: "POST",
                                           headers: {
@@ -453,7 +450,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                           } else {
                                             // Get new group info and set state.currentGroup to it
                                             fetch(
-                                              `/api/groups/${invitation.group_id}`
+                                              `/api/groups/${invitation.groupId}`
                                             )
                                               .then((response) =>
                                                 response.json()

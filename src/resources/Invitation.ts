@@ -8,18 +8,18 @@ interface Invitor {
 
 interface Invitee {
   id: number;
-  accepted: number;
-  rejected: number;
+  accepted: boolean;
+  rejected: boolean;
   name: { last: string; first: string };
   email: string;
 }
 interface Invitation {
   id: number;
-  confirmed: number;
-  project: number;
+  confirmed: boolean;
+  projectId: number;
   invitor: Invitor;
   invitees: Invitee[];
-  group_id: number;
+  groupId: number;
   approved: boolean;
   denied: boolean;
 }
@@ -29,11 +29,11 @@ class Invitation implements Invitation {
   constructor(
     inv = {
       id: 0,
-      confirmed: 0,
-      project: 0,
+      confirmed: false,
+      projectId: 0,
       invitor: { id: 0, name: { last: "", first: "" }, email: "" } as Invitor,
       invitees: [] as Invitee[],
-      group_id: 0,
+      groupId: 0,
       approved: false,
       denied: false,
     }
@@ -47,7 +47,7 @@ export function getUnansweredInvitations(
 ): Invitation[] {
   return invitations.filter((inv) => {
     const u = inv.invitees.find(({ id }) => id === user.id);
-    return u && u.accepted === 0 && u.rejected === 0;
+    return u && !u.accepted && !u.rejected;
   });
 }
 

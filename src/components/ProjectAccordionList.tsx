@@ -46,8 +46,8 @@ const ProjectAccordionList: FunctionComponent<
       <Badge
         color="secondary"
         badgeContent={
-          unansweredInvitations.filter((invitation) =>
-            courseProjects.some((project) => project.id === invitation.project)
+          unansweredInvitations.filter(({ projectId }) =>
+            courseProjects.some(({ id }) => id === projectId)
           ).length
         }
       >
@@ -100,7 +100,7 @@ const ProjectAccordionList: FunctionComponent<
               setSelections={setSelections}
               invitations={
                 unansweredInvitations.filter(
-                  (invitation) => invitation.project === project.id
+                  ({ projectId }) => projectId === project.id
                 ).length
               }
             />

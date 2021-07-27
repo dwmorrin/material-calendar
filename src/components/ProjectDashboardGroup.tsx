@@ -65,7 +65,7 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
         color="secondary"
         badgeContent={
           unansweredInvitations.filter(
-            (invitation) => currentProject.id === invitation.project
+            ({ projectId }) => projectId === currentProject.id
           ).length
         }
       >
