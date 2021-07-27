@@ -50,23 +50,27 @@ const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
   }
 
   const onSubmit = (values: FormValues): void => {
-    const body = JSON.stringify(
-      Object.entries(values as { [title: string]: boolean }).reduce(
-        (locationHours, [title, selected]) =>
-          selected
-            ? [...locationHours, { project: title, locationId, hours: 0 }]
-            : locationHours,
-        [] as ProjectLocationHours[]
-      )
+    const selectedProjects = Object.entries(
+      values as { [title: string]: boolean }
+    ).reduce(
+      (locationHours, [title, selected]) =>
+        selected
+          ? [...locationHours, { project: title, locationId, hours: 0 }]
+          : locationHours,
+      [] as ProjectLocationHours[]
     );
+
+    if (!selectedProjects.length) return close();
+
     fetch(`${Project.url}/location-hours`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body,
+      body: JSON.stringify(selectedProjects),
     })
       .then((res) => res.json())
       .then(({ error, data }) => {
-        if (error) dispatch({ type: AdminAction.Error, payload: { error } });
+        if (error)
+          return dispatch({ type: AdminAction.Error, payload: { error } });
         dispatch({
           type: AdminAction.AddProjectToLocationSuccess,
           payload: {
