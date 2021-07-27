@@ -1,22 +1,14 @@
 import React, { FunctionComponent } from "react";
-import { Field, FieldArray } from "formik";
+import { Field } from "formik";
 import { TextField, RadioGroup, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker } from "formik-material-ui-pickers";
 import { FormTemplateProps } from "../../../admin/types";
-import {
-  Button,
-  FormControlLabel,
-  FormLabel,
-  IconButton,
-  List,
-  Radio,
-} from "@material-ui/core";
+import { FormControlLabel, FormLabel, List, Radio } from "@material-ui/core";
 import { ResourceKey } from "../../../resources/types";
 import Course from "../../../resources/Course";
 import Project from "../../../resources/Project";
 import Location from "../../../resources/Location";
-import DeleteIcon from "@material-ui/icons/Delete";
-import { ListItem } from "@material-ui/core";
+import { ProjectValues } from "../../../admin/forms/project.values";
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = ({
   state,
@@ -88,40 +80,25 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
       />
       <br />
       <FormLabel>Locations</FormLabel>
-      <FieldArray
-        name="locationHours"
-        render={({ remove, push }): JSX.Element => (
-          <>
-            {(values.locationHours as []).map((_, index) => (
-              <div key={index}>
-                <Field
-                  component={TextField}
-                  name={`locationHours.${index}.locationId`}
-                  label="Location ID"
-                />
-                <Field
-                  component={TextField}
-                  name={`locationHours.${index}.hours`}
-                  label="Hours"
-                />
-                <IconButton
-                  aria-label="delete"
-                  onClick={(): void => remove(index)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </div>
-            ))}
-            <Button onClick={(): void => push({ locationId: "?", hours: 0 })}>
-              Add location to project
-            </Button>
-          </>
-        )}
-      />
+      <br />
       {locations.map(({ id, title }, index) => (
-        <ListItem key={`locationLookupList${index}`}>
-          ID {id}: {title}
-        </ListItem>
+        <>
+          <Field
+            key={`location-checkbox-${id}-${index}`}
+            component={CheckboxWithLabel}
+            type="checkbox"
+            name={`locations.${id}.selected`}
+            Label={{ label: title }}
+          />
+          {(values as ProjectValues).locations[id].selected && (
+            <Field
+              component={TextField}
+              name={`locations.${id}.hours`}
+              label="Hours"
+            />
+          )}
+          <br />
+        </>
       ))}
     </List>
   );

@@ -1,10 +1,11 @@
-import Project from "../../resources/Project";
+import Project, { ProjectLocationHours } from "../../resources/Project";
 import Course from "../../resources/Course";
+import Location from "../../resources/Location";
 import { AdminState, FormValues } from "../types";
 import { formatSQLDate, parseSQLDate } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 
-interface ProjectValues extends FormValues {
+export interface ProjectValues extends FormValues {
   id: number;
   title: string;
   course: string;
@@ -12,7 +13,7 @@ interface ProjectValues extends FormValues {
   start: Date;
   end: Date;
   reservationStart: Date;
-  locationHours: { hours: string; locationId: string }[];
+  locations: { [locationId: string]: { selected: boolean; hours: string } };
   groupAllottedHours: string;
   groupSize: string;
   open: boolean;
@@ -21,10 +22,21 @@ interface ProjectValues extends FormValues {
 export const values = (state: AdminState): FormValues => {
   const courses = state.resources[ResourceKey.Courses] as Course[];
   const project = state.resourceInstance as Project;
-  const locationHours = project.locationHours.map(({ hours, locationId }) => ({
-    hours: String(hours),
-    locationId: String(locationId),
-  }));
+  const locations = state.resources[ResourceKey.Locations] as Location[];
+  const allLocations = locations.reduce(
+    (res, { id }) => ({
+      ...res,
+      [id]: { selected: false, hours: "0" },
+    }),
+    {}
+  );
+  const projectLocations = project.locationHours.reduce(
+    (res, { hours, locationId }) => ({
+      ...res,
+      [locationId]: { selected: true, hours: String(hours) },
+    }),
+    {}
+  );
   return {
     //...project,
     id: project.id,
@@ -45,7 +57,7 @@ export const values = (state: AdminState): FormValues => {
     start: parseSQLDate(project.start),
     end: parseSQLDate(project.end),
     reservationStart: parseSQLDate(project.reservationStart),
-    locationHours,
+    locations: { ...allLocations, ...projectLocations },
     groupSize: String(project.groupSize),
     groupAllottedHours: String(project.groupAllottedHours),
     open: project.open,
@@ -57,7 +69,7 @@ export const update = (state: AdminState, values: FormValues): Project => {
   const {
     course,
     end,
-    locationHours,
+    locations,
     open,
     reservationStart,
     sections: _sections,
@@ -75,6 +87,18 @@ export const update = (state: AdminState, values: FormValues): Project => {
   const sections = Object.entries(selectedSections).reduce(
     (res, [section, selected]) => (selected ? [...res, section] : res),
     [] as string[]
+  );
+  const locationHours = Object.entries(locations).reduce(
+    (res, [id, { selected, hours }]) => {
+      if (selected) {
+        res.push({
+          locationId: Number(id),
+          hours: Number(hours),
+        });
+      }
+      return res;
+    },
+    [] as ProjectLocationHours[]
   );
 
   return {
@@ -97,11 +121,6 @@ export const update = (state: AdminState, values: FormValues): Project => {
       title: selectedCourse.title,
       sections,
     },
-    locationHours: locationHours.map((lh) => ({
-      locationId: Array.isArray(lh.locationId)
-        ? Number(lh.locationId[0])
-        : Number(lh.locationId),
-      hours: lh.hours ? Number(lh.hours) : 0,
-    })),
+    locationHours,
   };
 };
