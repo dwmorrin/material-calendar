@@ -17,9 +17,11 @@ const headings = [
   "Project",
 ];
 
-const bulkImport: BulkImporter = (dispatch, records) => {
-  const dispatchError = (error: Error): void =>
+const bulkImport: BulkImporter = (setSubmitting, dispatch, records) => {
+  const dispatchError = (error: Error): void => {
+    setSubmitting(false);
     dispatch({ type: AdminAction.Error, payload: { error } });
+  };
 
   if (!Array.isArray(records))
     return dispatchError(
@@ -36,6 +38,7 @@ const bulkImport: BulkImporter = (dispatch, records) => {
     .then((res) => res.json())
     .then(({ error, data }) => {
       if (error) return dispatchError(error);
+      setSubmitting(false);
       dispatch({
         type: AdminAction.ReceivedResourcesAfterRosterImport,
         payload: {

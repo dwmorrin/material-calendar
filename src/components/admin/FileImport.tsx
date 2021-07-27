@@ -44,6 +44,7 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const [delimiter, setDelimiter] = useState(",");
   const [text, setText] = useState("");
   const [parsed, setParsed] = useState(csvParse(""));
+  const [submitting, setSubmitting] = useState(false);
   const classes = useStyles();
   const [headings, onSubmit] = importRouter(state.resourceKey);
 
@@ -94,7 +95,11 @@ const FileImport: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
       </FormLabel>
       <Button
         variant="contained"
-        onClick={(): void => onSubmit(dispatch, parsed, state)}
+        disabled={submitting}
+        onClick={(): void => {
+          setSubmitting(true);
+          onSubmit(setSubmitting, dispatch, parsed, state);
+        }}
       >
         Submit
       </Button>

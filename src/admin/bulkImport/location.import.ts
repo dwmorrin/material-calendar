@@ -5,9 +5,11 @@ import { BulkImporter } from "./router";
 
 export const headings = ["Title", "Group", "Restriction", "Allows Walk-Ins"];
 
-const bulkImport: BulkImporter = (dispatch, records): void => {
-  const dispatchError = (error: Error): void =>
+const bulkImport: BulkImporter = (setSubmitting, dispatch, records): void => {
+  const dispatchError = (error: Error): void => {
+    setSubmitting(false);
     dispatch({ type: AdminAction.Error, payload: { error } });
+  };
 
   if (!Array.isArray(records))
     return dispatchError(
@@ -33,6 +35,7 @@ const bulkImport: BulkImporter = (dispatch, records): void => {
     .then((res) => res.json())
     .then(({ error, data }) => {
       if (error) return dispatchError(error);
+      setSubmitting(false);
       dispatch({
         type: AdminAction.ReceivedResourcesAfterLocationImport,
         payload: {

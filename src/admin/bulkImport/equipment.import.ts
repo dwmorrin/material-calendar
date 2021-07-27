@@ -16,9 +16,11 @@ const headings = [
   "Restriction",
 ];
 
-const bulkImport: BulkImporter = (dispatch, events) => {
-  const dispatchError = (error: Error): void =>
+const bulkImport: BulkImporter = (setSubmitting, dispatch, events) => {
+  const dispatchError = (error: Error): void => {
+    setSubmitting(false);
     dispatch({ type: AdminAction.Error, payload: { error } });
+  };
   if (!Array.isArray(events))
     return dispatchError(
       new Error(
@@ -59,6 +61,7 @@ const bulkImport: BulkImporter = (dispatch, events) => {
     .then((response) => response.json())
     .then(({ data, error }) => {
       if (error) return dispatchError(error);
+      setSubmitting(false);
       dispatch({
         type: AdminAction.FileImportSuccess,
         payload: {

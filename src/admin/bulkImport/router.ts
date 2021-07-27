@@ -6,6 +6,7 @@ import rosterImport from "./roster.import";
 import equipmentImport from "./equipment.import";
 
 export type BulkImporter = (
+  setSubmitting: (submitting: boolean) => void,
   dispatch: (action: {
     type: AdminAction;
     payload: Record<string, unknown>;
@@ -14,11 +15,13 @@ export type BulkImporter = (
   state?: AdminState
 ) => void;
 
-const defaultImporter: BulkImporter = (dispatch) =>
+const defaultImporter: BulkImporter = (setSubmitting, dispatch) => {
+  setSubmitting(false);
   dispatch({
     type: AdminAction.Error,
     payload: { error: new Error("resource has no bulk importer defined") },
   });
+};
 
 const defaultHeadingsAndDispatch: [string[], BulkImporter] = [
   ["Error: no headers defined"],
