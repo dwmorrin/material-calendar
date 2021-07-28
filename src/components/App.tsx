@@ -5,15 +5,17 @@ import AuthProvider from "./AuthContext";
 import Calendar from "./Calendar";
 import Dashboard from "./admin/Dashboard";
 import Landing from "./Landing";
+import SignIn from "./SignIn";
 
 const App = (): JSX.Element => {
   return (
     <AuthProvider>
-      <Router>
+      <SignIn />
+      {/* <Router>
         <Landing path="/" />
         <Calendar path="/calendar" />
         <Dashboard path="/admin" />
-      </Router>
+      </Router> */}
     </AuthProvider>
   );
 };
