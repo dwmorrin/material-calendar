@@ -1,19 +1,14 @@
-import React, {
-  FunctionComponent,
-  MouseEvent,
-  useContext,
-  useState,
-} from "react";
+import React, { FunctionComponent, MouseEvent, useState } from "react";
 import { IconButton, Menu, Typography, MenuItem } from "@material-ui/core";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { navigate } from "@reach/router";
-import { AuthContext } from "./AuthContext";
+import { useAuth, AuthStatus } from "./AuthProvider";
 import User from "../resources/User";
 
 const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   inAdminApp,
 }) => {
-  const { user, setUser, setLoggedOut } = useContext(AuthContext);
+  const { user, setUser, setStatus } = useAuth();
   const isAdmin = process.env.NODE_ENV === "development" || User.isAdmin(user);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = !!anchorEl;
@@ -24,10 +19,17 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   const handleClose = (): void => setAnchorEl(null);
 
   const logout = (): void => {
-    // if server-side cleanup needed, uncomment below
-    // fetch("/logout", { method: "POST" });
-    setLoggedOut(true);
-    setUser(new User());
+    fetch("/logout", { method: "POST", credentials: "include" })
+      .then((res) => res.json())
+      .then(({ error }) => {
+        if (error) console.error(error);
+      })
+      .catch(console.error)
+      .finally(() => {
+        setStatus(AuthStatus.loggedOut);
+        setUser(new User());
+        navigate("/");
+      });
   };
 
   return (

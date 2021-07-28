@@ -12,7 +12,7 @@ import {
   List,
   ListItem,
 } from "@material-ui/core";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {
@@ -35,7 +35,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const classes = useStyles();
   const { currentProject, currentGroup, projectDashboardIsOpen, resources } =
     state;

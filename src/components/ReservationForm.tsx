@@ -28,7 +28,7 @@ import {
   transition,
   getValuesFromReservation,
 } from "../calendar/reservationForm";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
 
 const RadioYesNo: FunctionComponent<{
@@ -65,7 +65,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
     dispatch({ type: CalendarAction.CloseReservationForm });
     if (state.currentEvent) fetchCurrentEvent(dispatch, state.currentEvent);
   };
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
 
   return (
     <Dialog

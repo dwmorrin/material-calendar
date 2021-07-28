@@ -1,10 +1,4 @@
-import React, {
-  FunctionComponent,
-  useEffect,
-  useReducer,
-  useContext,
-  useRef,
-} from "react";
+import React, { FunctionComponent, useEffect, useReducer, useRef } from "react";
 import { RouteComponentProps } from "@reach/router";
 import { AdminAction, AdminSelections } from "../../admin/types";
 import { Resources } from "../../resources/Resources";
@@ -19,7 +13,7 @@ import fetchAllResources from "../../utils/fetchAllResources";
 import useLocalStorage from "../../utils/useLocalStorage";
 import Scheduler from "./Scheduler";
 import Backups from "./Backups";
-import { AuthContext } from "../AuthContext";
+import { useAuth } from "../AuthProvider";
 import { Redirect } from "@reach/router";
 import User from "../../resources/User";
 import SemesterDialog from "./SemesterDialog";
@@ -47,7 +41,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
     ...initialState,
     ref: useRef<FullCalendar>(null),
   });
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [selections, setSelections] = useLocalStorage("admin-selections", {
     locationId: -1,
     semesterId: -1,

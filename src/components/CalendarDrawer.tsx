@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from "react";
+import React, { FunctionComponent } from "react";
 import { SwipeableDrawer, Typography } from "@material-ui/core";
 import {
   CalendarAction,
@@ -7,7 +7,7 @@ import {
 } from "../calendar/types";
 import LocationList from "./LocationList";
 import ProjectList from "./ProjectList";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import Location from "../resources/Location";
 import { ResourceKey } from "../resources/types";
 import { getUnansweredInvitations } from "../resources/Invitation";
@@ -33,7 +33,7 @@ const CalendarDrawer: FunctionComponent<
     }
     dispatch({ type: CalendarAction.ToggleDrawer });
   };
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const unansweredInvitations = getUnansweredInvitations(
     user,
     state.invitations

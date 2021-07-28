@@ -29,7 +29,7 @@ import {
   makeSelectedLocationIdSet,
   getEventsByLocationId,
 } from "../calendar/calendar";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import User from "../resources/User";
 import {
   parseFCString,
@@ -61,7 +61,7 @@ const SelectALocationMessage: FunctionComponent = () => {
 const FullCalendarBox: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
 > = ({ dispatch, state, selections }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const isAdmin = process.env.NODE_ENV === "development" || User.isAdmin(user);
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const projectLocations = makeSelectedLocationIdSet(

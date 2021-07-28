@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import UserGroup from "../resources/UserGroup";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import { getUnansweredInvitations } from "../resources/Invitation";
 
 const availableHoursAsPercent = (maximum: number, used: number): number =>
@@ -25,7 +25,7 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
       (g) => g.projectId === currentProject?.id
     ) || new UserGroup();
 
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   if (!currentProject || isNaN(currentProject.groupAllottedHours)) return null;
 
   const unansweredInvitations = getUnansweredInvitations(

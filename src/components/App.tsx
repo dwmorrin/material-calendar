@@ -1,19 +1,12 @@
-import React from "react";
-import "typeface-roboto";
-import { Router } from "@reach/router";
-import AuthProvider from "./AuthContext";
-import Calendar from "./Calendar";
-import Dashboard from "./admin/Dashboard";
+import React, { FC } from "react";
+import AuthProvider from "./AuthProvider";
 import Landing from "./Landing";
+import "typeface-roboto";
 
-const App = (): JSX.Element => {
+const App: FC = () => {
   return (
     <AuthProvider>
-      <Router>
-        <Landing path="/" />
-        <Calendar path="/calendar" />
-        <Dashboard path="/admin" />
-      </Router>
+      <Landing />
     </AuthProvider>
   );
 };

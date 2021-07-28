@@ -1,7 +1,7 @@
-import React, { FunctionComponent, useContext } from "react";
+import React, { FunctionComponent } from "react";
 import { Dialog, Button } from "@material-ui/core";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
@@ -25,7 +25,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
 }) => {
   const dispatchError = (error: Error, meta?: unknown): void =>
     dispatch({ type: CalendarAction.Error, payload: { error }, meta });
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   return (
     <Dialog TransitionComponent={transition} open={cancelationDialogIsOpen}>
       The cancelation window for this booking has passed. You can still cancel

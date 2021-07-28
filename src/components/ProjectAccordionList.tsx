@@ -14,7 +14,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ProjectListItem from "./ProjectListItem";
 import Project from "../resources/Project";
 import { ResourceKey } from "../resources/types";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import { getUnansweredInvitations } from "../resources/Invitation";
 
 interface ProjectAccordionListProps extends CalendarUIProps {
@@ -35,7 +35,7 @@ const ProjectAccordionList: FunctionComponent<
     !checked &&
     courseProjects.some(({ id }) => selections.projectIds.includes(id));
 
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const unansweredInvitations = getUnansweredInvitations(
     user,
     state.invitations

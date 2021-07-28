@@ -1,17 +1,11 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-} from "react";
+import React, { FunctionComponent, useEffect, useReducer, useRef } from "react";
 import useLocalStorage from "../utils/useLocalStorage";
 import { RouteComponentProps, Redirect } from "@reach/router";
 import CalendarDrawer from "./CalendarDrawer";
 import CalendarBar from "./CalendarBar";
 import StaticDatePicker from "./DatePicker";
 import FullCalendar from "@fullcalendar/react";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import reducer from "../calendar/reducer";
 import FullCalendarBox from "./FullCalendarBox";
 import EventDetail from "./EventDetail";
@@ -31,7 +25,7 @@ import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
-  const { user, loggedOut } = useContext(AuthContext);
+  const { user } = useAuth();
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
@@ -51,7 +45,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     });
 
   useEffect(() => {
-    if (loggedOut || !user.username) return;
+    if (!user.username) return;
     fetchAllResources(
       dispatch,
       CalendarAction.ReceivedAllResources,
@@ -74,10 +68,10 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         });
       })
       .catch(dispatchError);
-  }, [user, loggedOut]);
+  }, [user]);
 
   return (
-    (!loggedOut && !!user.username && (
+    (!!user.username && (
       <Box>
         <ErrorPage open={state.appIsBroken} error={state.error} />
         <ProjectDashboard dispatch={dispatch} state={state} />

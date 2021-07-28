@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useEffect,
-  useState,
-  useContext,
-} from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import {
   Dialog,
   Toolbar,
@@ -24,13 +19,13 @@ import Invitation from "../../resources/Invitation";
 import Reservation from "../../resources/Reservation";
 import { formatDatetime, parseSQLDatetime } from "../../utils/date";
 import { sendMail } from "../../utils/mail";
-import { AuthContext } from "../AuthContext";
+import { useAuth } from "../AuthProvider";
 
 const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [invitations, setInvitations] = useState(
     [] as (Invitation & { projectTitle: string; projectGroupSize: number })[]
   );

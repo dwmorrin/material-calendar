@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useContext } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import {
   List,
   AppBar,
@@ -28,7 +28,7 @@ import EquipmentViewToggleMenu from "./EquipmentViewToggleMenu";
 import EquipmentCart from "./EquipmentCart";
 import EquipmentStandardList from "./EquipmentStandardList";
 import Equipment from "../resources/Equipment";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 
 const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   open,
@@ -37,7 +37,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   setFieldValue,
   event,
 }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [state, dispatch] = React.useReducer(reducer, {
     ...initialState,
     setFieldValue,

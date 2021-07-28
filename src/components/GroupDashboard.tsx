@@ -24,7 +24,7 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { makeTransition } from "./Transition";
 import { parseAndFormatSQLDateInterval } from "../utils/date";
 import UserGroup, { GroupMember } from "../resources/UserGroup";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import User from "../resources/User";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
@@ -43,7 +43,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   const [users, setUsers] = useState([] as User[]);
   const [confirmationDialogIsOpen, openConfirmationDialog] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([] as User[]);
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const invitations = state.invitations.filter(
     (invitation) => invitation.projectId === currentProject?.id
   );

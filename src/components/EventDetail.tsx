@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, useState } from "react";
+import React, { FunctionComponent, useState } from "react";
 import {
   Dialog,
   IconButton,
@@ -21,7 +21,7 @@ import {
   parseSQLDatetime,
   sqlIntervalInHours,
 } from "../utils/date";
-import { AuthContext } from "./AuthContext";
+import { useAuth } from "./AuthProvider";
 import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
@@ -38,7 +38,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [cancelationDialogIsOpen, openCancelationDialog] = useState(false);
 
   const dispatchError = (error: Error, meta?: unknown): void =>
@@ -47,6 +47,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   if (!state.currentEvent || !state.currentEvent.location || !user?.username) {
     return null;
   }
+  const events = state.resources[ResourceKey.Events] as Event[];
 
   const { end, location, reservable, start, title, reservation } =
     state.currentEvent;
@@ -71,31 +72,32 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     cancelationApprovalCutoff
   );
 
-  const hasMetWalkInQuota = (event: Event): boolean => {
-    const walkInProject = (
-      state.resources[ResourceKey.Projects] as Project[]
-    ).find((project) => project.title === Project.walkInTitle);
-    if (walkInProject) {
-      return (
-        Number(process.env.REACT_APP_WALK_IN_RESERVATIONS_PER_LOCATION) >
-        (state.resources[ResourceKey.Events] as Event[]).filter(function (e) {
-          if (
-            e.location == event.location &&
-            isSameDay(parseSQLDatetime(event.start), nowInServerTimezone())
-          )
-            return true;
-        }).length
-      );
-    } else return true;
+  const walkInReservationLimit = Number(
+    process.env.REACT_APP_WALK_IN_RESERVATIONS_PER_LOCATION
+  );
+
+  const currentUserWalkInProject =
+    user.projects.find((project) => project.title === Project.walkInTitle) ||
+    new Project();
+
+  const hasReachedTheWalkInLimit = (event: Event): boolean => {
+    const myReservations = events.filter(
+      ({ location, reservation }) =>
+        location === event.location &&
+        isSameDay(parseSQLDatetime(event.start), nowInServerTimezone()) &&
+        reservation &&
+        reservation.groupId === currentUserWalkInProject.id
+    ).length;
+    return walkInReservationLimit <= myReservations;
   };
 
   const projectHoursRemaining = (project: Project): boolean => {
     const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
       (group) => group.projectId === project.id
     );
-    if (group) {
-      return (
-        project.groupAllottedHours >
+    return (
+      !!group &&
+      project.groupAllottedHours >
         (state.resources[ResourceKey.Events] as Event[])
           .filter((event) => event.reservation?.groupId == group.id)
           .map((event) => sqlIntervalInHours(event.start, event.end))
@@ -104,16 +106,15 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             state.currentEvent?.start,
             state.currentEvent?.start
           )
-      );
-    } else return false;
+    );
   };
 
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
     (project) =>
-      (title === Project.walkInTitle &&
+      (project.title === Project.walkInTitle &&
         state.currentEvent &&
         Event.isAvailableForWalkIn(state.currentEvent) &&
-        !hasMetWalkInQuota(state.currentEvent)) ||
+        !hasReachedTheWalkInLimit(state.currentEvent)) ||
       project.allotments.some(
         (a) =>
           a.locationId === location.id &&
@@ -127,6 +128,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           })
       )
   );
+
   const open = reservable && !reservation && userCanUseLocation;
   const userOwns =
     reservation &&
