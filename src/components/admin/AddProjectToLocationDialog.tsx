@@ -3,7 +3,6 @@ import {
   AdminAction,
   AdminSelectionProps,
   AdminUIProps,
-  FormValues,
 } from "../../admin/types";
 import {
   Button,
@@ -49,7 +48,7 @@ const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
     hours: number;
   }
 
-  const onSubmit = (values: FormValues): void => {
+  const onSubmit = (values: Record<string, unknown>): void => {
     const selectedProjects = Object.entries(
       values as { [title: string]: boolean }
     ).reduce(

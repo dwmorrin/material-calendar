@@ -1,10 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { Form, FormikProps } from "formik";
-import {
-  FormValues,
-  FormTemplateProps,
-  AdminState,
-} from "../../../admin/types";
+import { AdminState, FormTemplateProps } from "../../../admin/types";
 import { Box, DialogContent, Paper } from "@material-ui/core";
 import SaveButton from "./SaveButton";
 import DeleteButton from "./DeleteButton";
@@ -15,7 +11,7 @@ interface ResourceFormProps {
 }
 
 const ResourceForm: FunctionComponent<
-  FormikProps<FormValues> & ResourceFormProps
+  FormikProps<Record<string, unknown>> & ResourceFormProps
 > = ({ FormFields, handleSubmit, setFieldValue, values, state }) => (
   <DialogContent>
     <Paper>

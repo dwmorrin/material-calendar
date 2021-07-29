@@ -93,16 +93,8 @@ export type AdminUIProps = {
   state: AdminState;
 };
 
-export type ValueDictionary = {
-  [k: string]: boolean;
-};
-
-export interface FormValues {
-  [k: string]: unknown;
-}
-
 export interface FormTemplateProps {
-  values: FormValues;
+  values: Record<string, unknown>;
   state: AdminState;
 }
 

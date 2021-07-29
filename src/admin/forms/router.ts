@@ -5,7 +5,7 @@
  *   big.
  */
 import { FunctionComponent } from "react";
-import { AdminState, FormTemplateProps, FormValues } from "../types";
+import { AdminState, FormTemplateProps } from "../types";
 import { ResourceKey, ResourceInstance } from "../../resources/types";
 import {
   values as categoryValues,
@@ -71,9 +71,12 @@ import VirtualWeekForm from "../../components/admin/forms/VirtualWeek";
 const router = (
   key: ResourceKey
 ): {
-  valuator: (state: AdminState) => FormValues;
+  valuator: (state: AdminState) => Record<string, unknown>;
   template: FunctionComponent<FormTemplateProps>;
-  updater: (state: AdminState, values: FormValues) => ResourceInstance;
+  updater: (
+    state: AdminState,
+    values: Record<string, unknown>
+  ) => ResourceInstance;
 } =>
   ({
     [ResourceKey.Categories]: {

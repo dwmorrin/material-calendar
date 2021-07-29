@@ -1,14 +1,17 @@
 import Event from "../../resources/Event";
 import Location from "../../resources/Location";
 import { ResourceKey } from "../../resources/types";
-import { AdminState, FormValues } from "../types";
+import { AdminState } from "../types";
 
-export const values = (state: AdminState): FormValues => {
+export const values = (state: AdminState): Record<string, unknown> => {
   const event = state.resourceInstance as Event;
   return { ...event };
 };
 
-export const update = (state: AdminState, values: FormValues): Event => {
+export const update = (
+  state: AdminState,
+  values: Record<string, unknown>
+): Event => {
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const event = new Event(state.resourceInstance as Event);
   return {

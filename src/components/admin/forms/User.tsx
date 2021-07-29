@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { Field, FieldArray } from "formik";
 import { CheckboxWithLabel, TextField } from "formik-material-ui";
-import { FormTemplateProps, FormValues } from "../../../admin/types";
+import { FormTemplateProps } from "../../../admin/types";
 import { List } from "@material-ui/core";
 import FieldList from "./FieldList";
 import { ResourceKey } from "../../../resources/types";
@@ -13,7 +13,7 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
 }) => {
   const projects = (state.resources[ResourceKey.Projects] as Project[]).reduce(
     (dict, { title, id }) => ({ ...dict, [title]: String(id) }),
-    {} as { [k: string]: string }
+    {} as Record<string, string>
   );
   return (
     <List>

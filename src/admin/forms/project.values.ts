@@ -1,11 +1,11 @@
 import Project, { ProjectLocationHours } from "../../resources/Project";
 import Course from "../../resources/Course";
 import Location from "../../resources/Location";
-import { AdminState, FormValues } from "../types";
+import { AdminState } from "../types";
 import { formatSQLDate, parseSQLDate } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 
-export interface ProjectValues extends FormValues {
+export interface ProjectValues extends Record<string, unknown> {
   id: number;
   title: string;
   course: string;
@@ -19,7 +19,7 @@ export interface ProjectValues extends FormValues {
   open: boolean;
 }
 
-export const values = (state: AdminState): FormValues => {
+export const values = (state: AdminState): Record<string, unknown> => {
   const courses = state.resources[ResourceKey.Courses] as Course[];
   const project = state.resourceInstance as Project;
   const locations = state.resources[ResourceKey.Locations] as Location[];
@@ -37,8 +37,8 @@ export const values = (state: AdminState): FormValues => {
     }),
     {}
   );
+
   return {
-    //...project,
     id: project.id,
     title: project.title,
     course: project.course.title,
@@ -52,7 +52,7 @@ export const values = (state: AdminState): FormValues => {
             project.course.sections.includes(course.section),
         },
       }),
-      {} as { [k: string]: { [k: string]: boolean } }
+      {} as Record<string, Record<string, boolean>>
     ),
     start: parseSQLDate(project.start),
     end: parseSQLDate(project.end),
@@ -61,10 +61,13 @@ export const values = (state: AdminState): FormValues => {
     groupSize: String(project.groupSize),
     groupAllottedHours: String(project.groupAllottedHours),
     open: project.open,
-  };
+  } as ProjectValues;
 };
 
-export const update = (state: AdminState, values: FormValues): Project => {
+export const update = (
+  state: AdminState,
+  values: Record<string, unknown>
+): Project => {
   const project = new Project(state.resourceInstance as Project);
   const {
     course,

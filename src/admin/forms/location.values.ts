@@ -1,14 +1,17 @@
 import Location from "../../resources/Location";
-import { FormValues, AdminState } from "../types";
+import { AdminState } from "../types";
 
-export const values = (state: AdminState): FormValues => {
+export const values = (state: AdminState): Record<string, unknown> => {
   const location = state.resourceInstance as Location;
   return {
     ...location,
   };
 };
 
-export const update = (state: AdminState, values: FormValues): Location => {
+export const update = (
+  state: AdminState,
+  values: Record<string, unknown>
+): Location => {
   const location = new Location(state.resourceInstance as Location);
   return {
     ...location,

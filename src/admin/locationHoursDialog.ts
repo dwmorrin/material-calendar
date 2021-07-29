@@ -1,11 +1,5 @@
 import { FormikValues } from "formik";
-import {
-  FormValues,
-  Action,
-  AdminAction,
-  AdminState,
-  ApiResponse,
-} from "./types";
+import { Action, AdminAction, AdminState, ApiResponse } from "./types";
 import Location, { LocationHours } from "../resources/Location";
 import { ResourceKey } from "../resources/types";
 import { formatSQLDate } from "../utils/date";
@@ -15,7 +9,7 @@ export type DailyHoursValue = { date: Date; hours: number };
 
 export const makeOnSubmit =
   (dispatch: (action: Action) => void, state: AdminState, locationId: number) =>
-  (values: FormValues, actions: FormikValues): void => {
+  (values: Record<string, unknown>, actions: FormikValues): void => {
     const { days } = values as { days: DailyHoursValue[] };
 
     const makeDailyHours = (

@@ -14,7 +14,7 @@ import {
 import { TextField } from "formik-material-ui";
 import DraggablePaper from "../DraggablePaper";
 import { Formik, Form, Field, FormikValues } from "formik";
-import { AdminUIProps, AdminAction, FormValues } from "../../admin/types";
+import { AdminUIProps, AdminAction } from "../../admin/types";
 import {
   parseSQLDate,
   subDays,
@@ -108,7 +108,7 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       </DialogWrapper>
     );
 
-  const validate = (values: FormValues): void => {
+  const validate = (values: Record<string, unknown>): void => {
     const hours = Number(values.hours);
     setFormErrors({
       hours: !isNaN(hours) && hours >= 0 ? "" : "Please enter a number",
@@ -120,7 +120,10 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
    * On success, we need to update projects and virtual weeks so those are fetched
    * from the server. This should update the "hours remaining" section of the calendar.
    */
-  const onSubmit = (values: FormValues, actions: FormikValues): void => {
+  const onSubmit = (
+    values: Record<string, unknown>,
+    actions: FormikValues
+  ): void => {
     const dispatchError = (error: Error): void =>
       dispatch({ type: AdminAction.Error, payload: { error } });
     fetch(`${Project.url}/${project.id}/allotments`, {

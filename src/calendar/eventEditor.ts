@@ -3,7 +3,6 @@ import { Action, ApiResponse, CalendarAction } from "../calendar/types";
 import Event from "../resources/Event";
 import { FormikValues } from "formik";
 import { eventGenerator, formatSQLDatetime } from "../utils/date";
-import { FormValues } from "../admin/types";
 import { ResourceKey } from "../resources/types";
 
 export const useStyles = makeStyles({
@@ -52,7 +51,7 @@ export const mapRepeatToNumber = (repeat: string): number => {
   }
 };
 
-const getRepeats = (repeats: FormValues): number[] =>
+const getRepeats = (repeats: Record<string, unknown>): number[] =>
   Object.entries(repeats).reduce(
     (days, [day, selected]) =>
       selected ? [...days, mapRepeatToNumber(day)] : days,

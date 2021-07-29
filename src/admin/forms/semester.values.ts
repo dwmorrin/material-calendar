@@ -1,8 +1,8 @@
 import Semester from "../../resources/Semester";
-import { AdminState, FormValues } from "../types";
+import { AdminState } from "../types";
 import { formatSQLDate, parseSQLDate } from "../../utils/date";
 
-export const values = (state: AdminState): FormValues => {
+export const values = (state: AdminState): Record<string, unknown> => {
   const semester = state.resourceInstance as Semester;
   return {
     ...semester,
@@ -11,7 +11,10 @@ export const values = (state: AdminState): FormValues => {
   };
 };
 
-export const update = (state: AdminState, values: FormValues): Semester => {
+export const update = (
+  state: AdminState,
+  values: Record<string, unknown>
+): Semester => {
   const semester = new Semester(state.resourceInstance as Semester);
   return {
     ...semester,

@@ -9,15 +9,15 @@
 Each database resource should have its own template components, of type
 `<FormFields>` in `/src/components/admin/forms/{{Resource}}.tsx`.
 
-## `FormValues` and updating the `ResourceInstance`
+## `Record<string, unknown>` and updating the `ResourceInstance`
 
 Each database resource should have a file in this directory named
 `./{name}.values.ts`.
 
 Each file should contain two exported functions:
 
-1. A function that produces `FormValues` from a `ResourceInstance`.
-1. A function that produces a `ResourceInstance` from `FormValues`.
+1. A function that produces `Record<string, unknown>` from a `ResourceInstance`.
+1. A function that produces a `ResourceInstance` from `Record<string, unknown>`.
 
 ### valuator
 

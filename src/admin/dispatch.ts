@@ -1,4 +1,4 @@
-import { AdminAction, Action, AdminState, FormValues } from "./types";
+import { AdminAction, Action, AdminState } from "./types";
 import { ResourceInstance } from "../resources/types";
 import { Resources } from "../resources/Resources";
 import { FormikValues } from "formik";
@@ -34,9 +34,12 @@ export const dispatchOneResource =
   (
     dispatch: (action: Action) => void,
     state: AdminState,
-    updater: (state: AdminState, values: FormValues) => ResourceInstance
+    updater: (
+      state: AdminState,
+      values: Record<string, unknown>
+    ) => ResourceInstance
   ) =>
-  (values: FormValues, actions: FormikValues): void => {
+  (values: Record<string, unknown>, actions: FormikValues): void => {
     const deleting = values.__delete__;
     const id = state.resourceInstance?.id || "";
     if (deleting && Number(id) < 1)

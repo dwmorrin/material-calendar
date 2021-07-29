@@ -18,7 +18,6 @@ import { DatePicker } from "formik-material-ui-pickers";
 import {
   AdminUIProps,
   AdminAction,
-  FormValues,
   AdminSelectionProps,
 } from "../../admin/types";
 import {
@@ -75,7 +74,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps & AdminSelectionProps> = ({
   const dispatchError = (error: Error): void =>
     dispatch({ type: AdminAction.Error, payload: { error } });
 
-  const onSubmit = (values: FormValues): void => {
+  const onSubmit = (values: Record<string, unknown>): void => {
     const url = `${VirtualWeek.url}/${week.id}`;
     switch (values.mode as VirtualWeekModifier) {
       case VirtualWeekModifier.resize:
@@ -173,7 +172,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps & AdminSelectionProps> = ({
     mode: VirtualWeekModifier.resize,
   };
 
-  const validate = (values: FormValues): void => {
+  const validate = (values: Record<string, unknown>): void => {
     // disallow virtual week overlap
     const overlaps = areIntervalsOverlappingInclusive({
       start: values.start as Date,

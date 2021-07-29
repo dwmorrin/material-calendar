@@ -1,7 +1,7 @@
 import Equipment from "../../resources/Equipment";
-import { AdminState, FormValues } from "../types";
+import { AdminState } from "../types";
 
-export const values = (state: AdminState): FormValues => {
+export const values = (state: AdminState): Record<string, unknown> => {
   const equip = state.resourceInstance as Equipment;
   return {
     ...equip,
