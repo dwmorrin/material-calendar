@@ -1,47 +1,59 @@
 import React, { FunctionComponent } from "react";
-import { Field, FieldArray } from "formik";
+import { Field } from "formik";
 import { CheckboxWithLabel, TextField } from "formik-material-ui";
 import { FormTemplateProps } from "../../../admin/types";
-import { List } from "@material-ui/core";
-import FieldList from "./FieldList";
-import { ResourceKey } from "../../../resources/types";
-import Project from "../../../resources/Project";
+import { FormLabel, List } from "@material-ui/core";
+import { UserValues } from "../../../admin/forms/user.values";
 
-const FormTemplate: FunctionComponent<FormTemplateProps> = ({
-  values,
-  state,
-}) => {
-  const projects = (state.resources[ResourceKey.Projects] as Project[]).reduce(
-    (dict, { title, id }) => ({ ...dict, [title]: String(id) }),
-    {} as Record<string, string>
-  );
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({ values }) => {
+  const { password } = values as UserValues;
   return (
     <List>
       <Field component={TextField} name="name.first" label="First" />
       <Field component={TextField} name="name.middle" label="Middle" />
       <Field component={TextField} name="name.last" label="Last" />
-      <Field fullWidth component={TextField} name="username" label="Username" />
+      <br />
+      <Field component={TextField} name="username" label="Username" />
+      <br />
       <Field component={TextField} name="email" label="Email" />
+      <br />
       <Field component={TextField} name="phone" label="Phone" />
-      <FieldList name="roles" values={values.roles as string[]} />
-      <FieldArray
-        name="projects"
-        render={(): JSX.Element => (
-          <>
-            {Object.entries(projects).map(([label, value], index) => (
-              <div key={index}>
-                <Field
-                  type="checkbox"
-                  component={CheckboxWithLabel}
-                  name={"projects.index.title"}
-                  Label={{ label }}
-                  value={value}
-                />
-              </div>
-            ))}
-          </>
-        )}
+      <br />
+      <Field component={TextField} name="restriction" label="Restriction" />
+      {/* TODO remove hardcoded roles; get roles from database */}
+      <br />
+      <FormLabel>Roles</FormLabel>
+      <br />
+      <Field
+        component={CheckboxWithLabel}
+        type="checkbox"
+        name={"roles.admin"}
+        Label={{ label: "Admin" }}
       />
+      <br />
+      <Field
+        component={CheckboxWithLabel}
+        type="checkbox"
+        name={"roles.user"}
+        Label={{ label: "User" }}
+      />
+      <br />
+      <br />
+      <Field
+        component={CheckboxWithLabel}
+        type="checkbox"
+        name={"password.reset"}
+        Label={{ label: "Reset password?" }}
+      />
+      <br />
+      {password.reset && (
+        <Field
+          component={TextField}
+          type="password"
+          name="password.value"
+          label="New password"
+        />
+      )}
     </List>
   );
 };
