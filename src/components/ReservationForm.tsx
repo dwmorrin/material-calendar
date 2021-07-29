@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, useState } from "react";
+import React, { FunctionComponent, useState } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   Button,
