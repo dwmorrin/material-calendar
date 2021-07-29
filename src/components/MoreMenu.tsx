@@ -8,8 +8,7 @@ import User from "../resources/User";
 const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   inAdminApp,
 }) => {
-  const { user, setUser, setStatus } = useAuth();
-  const isAdmin = process.env.NODE_ENV === "development" || User.isAdmin(user);
+  const { isAdmin, setUser, setStatus } = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = !!anchorEl;
 
@@ -22,8 +21,10 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
     fetch("/logout", { method: "POST", credentials: "include" })
       .then((res) => res.json())
       .then(({ error }) => {
+        // eslint-disable-next-line no-console
         if (error) console.error(error);
       })
+      // eslint-disable-next-line no-console
       .catch(console.error)
       .finally(() => {
         setStatus(AuthStatus.loggedOut);
@@ -53,7 +54,7 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
         <MenuItem onClick={logout}>
           <Typography>Logout</Typography>
         </MenuItem>
-        {isAdmin && (
+        {(process.env.NODE_ENV === "development" || isAdmin) && (
           <MenuItem
             onClick={(): Promise<void> =>
               navigate(inAdminApp ? "/calendar" : "/admin")

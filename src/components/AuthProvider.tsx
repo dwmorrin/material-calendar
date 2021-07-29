@@ -23,6 +23,7 @@ interface AuthContext {
   setUser: React.Dispatch<SetStateAction<User>>;
   status: AuthStatus;
   setStatus: React.Dispatch<SetStateAction<AuthStatus>>;
+  isAdmin: boolean;
   isPending: boolean;
   isResolved: boolean;
   isRejected: boolean;
@@ -36,6 +37,7 @@ export const useAuth = (): AuthContext => {
   if (!state) throw new Error("useAuth called outside AuthProvider");
   return {
     ...state,
+    isAdmin: state.user?.roles.includes("admin"),
     isPending: state?.status === AuthStatus.pending,
     isResolved: state?.status === AuthStatus.resolved,
     isRejected: state?.status === AuthStatus.rejected,
@@ -51,6 +53,7 @@ const AuthProvider: FunctionComponent = ({ children }) => {
     setUser,
     status,
     setStatus,
+    isAdmin: false,
     isPending: status === AuthStatus.pending,
     isResolved: status === AuthStatus.resolved,
     isRejected: status === AuthStatus.rejected,

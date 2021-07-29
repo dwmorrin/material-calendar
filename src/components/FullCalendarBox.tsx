@@ -1,4 +1,4 @@
-import React, { FunctionComponent, memo, useContext } from "react";
+import React, { FunctionComponent, memo } from "react";
 import {
   CircularProgress,
   makeStyles,
@@ -30,7 +30,6 @@ import {
   getEventsByLocationId,
 } from "../calendar/calendar";
 import { useAuth } from "./AuthProvider";
-import User from "../resources/User";
 import {
   parseFCString,
   parseAndFormatFCString,
@@ -61,8 +60,7 @@ const SelectALocationMessage: FunctionComponent = () => {
 const FullCalendarBox: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
 > = ({ dispatch, state, selections }) => {
-  const { user } = useAuth();
-  const isAdmin = process.env.NODE_ENV === "development" || User.isAdmin(user);
+  const { isAdmin } = useAuth();
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const projectLocations = makeSelectedLocationIdSet(
     projects,
@@ -126,7 +124,7 @@ const FullCalendarBox: FunctionComponent<
         // HEADER CONFIG
         headerToolbar={false}
         // INTERACTIONS
-        selectable={isAdmin}
+        selectable={process.env.NODE_ENV === "development" || isAdmin}
         select={({
           resource = { id: -1, title: "" },
           startStr,

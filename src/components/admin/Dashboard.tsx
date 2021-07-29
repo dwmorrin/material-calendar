@@ -15,7 +15,6 @@ import Scheduler from "./Scheduler";
 import Backups from "./Backups";
 import { useAuth } from "../AuthProvider";
 import { Redirect } from "@reach/router";
-import User from "../../resources/User";
 import SemesterDialog from "./SemesterDialog";
 import AddProjectToLocationDialog from "./AddProjectToLocationDialog";
 import ProjectLocationHoursDialog from "./ProjectLocationHoursDialog";
@@ -41,7 +40,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
     ...initialState,
     ref: useRef<FullCalendar>(null),
   });
-  const { user } = useAuth();
+  const { isAdmin } = useAuth();
   const [selections, setSelections] = useLocalStorage("admin-selections", {
     locationId: -1,
     semesterId: -1,
@@ -77,16 +76,16 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   ]);
 
   useEffect(() => {
-    if (User.isAdmin(user))
+    if (isAdmin)
       fetchAllResources(
         dispatch,
         AdminAction.ReceivedAllResources,
         AdminAction.Error,
         ...makeUrlsForAllResources()
       );
-  }, [user]);
+  }, [isAdmin]);
 
-  if (!User.isAdmin(user)) {
+  if (!isAdmin) {
     return <Redirect to="/" replace={true} noThrow={true} />;
   }
   if (state.initialResourcesPending) return <CircularProgress />;

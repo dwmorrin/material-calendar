@@ -1,7 +1,6 @@
 import React, { FC, useEffect } from "react";
 import { RouteComponentProps, navigate, Router } from "@reach/router";
 import { useAuth } from "./AuthProvider";
-import User from "../resources/User";
 import Calendar from "./Calendar";
 import Dashboard from "./admin/Dashboard";
 
@@ -9,15 +8,15 @@ import Dashboard from "./admin/Dashboard";
  * Redirect user to the appropriate page
  */
 const Landing: FC<RouteComponentProps> = () => {
-  const { user } = useAuth();
+  const { isAdmin } = useAuth();
   useEffect(() => {
-    if (User.isAdmin(user)) navigate("/admin");
+    if (isAdmin) navigate("/admin");
     else navigate("/calendar");
-  }, [user]);
+  }, [isAdmin]);
   return (
     <Router>
       <Calendar path="/calendar" />
-      {User.isAdmin(user) && <Dashboard path="/admin" />}
+      {isAdmin && <Dashboard path="/admin" />}
     </Router>
   );
 };
