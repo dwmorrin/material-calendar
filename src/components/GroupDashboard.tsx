@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useState,
-  useEffect,
-  useContext,
-} from "react";
+import React, { FunctionComponent, useState, useEffect } from "react";
 import {
   Dialog,
   Toolbar,
@@ -17,6 +12,7 @@ import {
   AccordionSummary,
   Box,
   Checkbox,
+  CircularProgress,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -92,7 +88,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
     });
 
   const invitationIsPendingApproval = (invitation: Invitation): boolean => {
-    return !invitation.approved && !invitation.denied;
+    return !invitation.approvedId && !invitation.deniedId;
   };
 
   const selectUser = (newUser: User): void => {
@@ -426,7 +422,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                     payload: { error },
                                   });
                                 }
-                                if (invitation.approved) {
+                                if (invitation.approvedId) {
                                   // If the group already exists, add user to it, otherwise form group with invitor and user
                                   invitation.groupId
                                     ? // Join Group

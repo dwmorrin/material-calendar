@@ -15,8 +15,8 @@ interface Reservation {
   cancellation?: {
     canceled: ActionDetails;
     refund?: {
-      approved: ActionDetails;
-      rejected: ActionDetails;
+      approvedId: ActionDetails;
+      deniedId: ActionDetails;
     };
   } | null;
 }

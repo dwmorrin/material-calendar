@@ -20,8 +20,8 @@ interface Invitation {
   invitor: Invitor;
   invitees: Invitee[];
   groupId: number;
-  approved: boolean;
-  denied: boolean;
+  approvedId: boolean;
+  deniedId: boolean;
 }
 
 class Invitation implements Invitation {
