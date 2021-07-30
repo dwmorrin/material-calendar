@@ -12,7 +12,6 @@ import {
   AccordionSummary,
   Box,
   Checkbox,
-  CircularProgress,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -92,7 +91,7 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
   };
 
   const selectUser = (newUser: User): void => {
-    const newList: User[] = selectedUsers;
+    const newList: User[] = [...selectedUsers];
     const valueExisting = newList.map((u: User) => u.id).indexOf(newUser.id);
     if (valueExisting !== -1) {
       newList.splice(valueExisting, 1);
@@ -158,6 +157,25 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       dispatchError
                     );
                   });
+                  fetch(`/api/invitations/user/${user?.id}`)
+                    .then((response) => response.json())
+                    .then(({ error, data }) => {
+                      if (error || !data) return dispatchError(error);
+                      dispatch({
+                        type: CalendarAction.ReceivedInvitations,
+                        payload: {
+                          invitations: data,
+                        },
+                      });
+                    });
+                  dispatch({
+                    type: CalendarAction.DisplayMessage,
+                    payload: {
+                      message: "Invitation Sent",
+                    },
+                  });
+                  setSelectedUsers([]);
+                  openConfirmationDialog(false);
                 }
               });
           }}
@@ -285,7 +303,9 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                     key={`invitation${invitation.id}`}
                     style={{ justifyContent: "space-between" }}
                   >
-                    {"You sent a Group Invitation"}
+                    {invitation.invitees.length == 0
+                      ? "You requested to group by self"
+                      : "You sent a Group Invitation"}
 
                     {invitationIsPendingApproval(invitation) && (
                       <b>
@@ -797,12 +817,15 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                               message: "Invitation Sent",
                             },
                           });
+                          setSelectedUsers([]);
                         }
                       });
                   }
                 }}
               >
-                Create Group
+                {selectedUsers.length == 0
+                  ? "Create a group by yourself"
+                  : "Create Group"}
               </Button>
               {users
                 ?.filter((individual) => individual.id !== user.id)
@@ -816,8 +839,9 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                       onChange={(): void => selectUser(individual)}
                       size="small"
                       inputProps={{
-                        "aria-label": individual.username + " Checkbox",
+                        "aria-label": individual.username + "Checkbox",
                       }}
+                      checked={selectedUsers.includes(individual)}
                     />
                   </ListItem>
                 ))}
