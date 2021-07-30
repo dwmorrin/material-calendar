@@ -11,6 +11,7 @@ import {
   Accordion,
   AccordionSummary,
   Paper,
+  CircularProgress,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -46,14 +47,25 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
     })[]
   );
 
+  const [invitationsAreLoading, setInvitationsAreLoading] = useState(false);
+  const [reservationsAreLoading, setReservationsAreLoading] = useState(false);
+
   useEffect(() => {
+    setInvitationsAreLoading(true);
     fetch("/api/invitations/exceptions")
       .then((response) => response.json())
-      .then(({ data }) => setInvitations(data))
+      .then(({ data }) => {
+        setInvitations(data);
+        setInvitationsAreLoading(false);
+      })
       .catch(console.error);
+    setReservationsAreLoading(true);
     fetch("/api/reservations/exceptions")
       .then((response) => response.json())
-      .then(({ data }) => setReservations(data))
+      .then(({ data }) => {
+        setReservations(data);
+        setReservationsAreLoading(false);
+      })
       .catch(console.error);
   }, []);
 
@@ -79,7 +91,9 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h6">Group size exception requests</Typography>
         </AccordionSummary>
-        {invitations && invitations.length > 0 ? (
+        {invitationsAreLoading ? (
+          <CircularProgress />
+        ) : invitations && invitations.length > 0 ? (
           <List>
             {invitations.map((invitation) => (
               <ListItem
@@ -328,7 +342,9 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
             Reservation Cancelation Exceptions
           </Typography>
         </AccordionSummary>
-        {reservations && reservations.length > 0 ? (
+        {reservationsAreLoading ? (
+          <CircularProgress />
+        ) : reservations && reservations.length > 0 ? (
           <List>
             {reservations.map((reservation) => (
               <ListItem
