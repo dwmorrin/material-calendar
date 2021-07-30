@@ -21,7 +21,8 @@ export interface Student {
     middle: string;
     last: string;
   };
-  id: string;
+  id: number;
+  username: string;
 }
 
 export interface RosterRecord {
@@ -42,7 +43,11 @@ export class RosterRecord implements RosterRecord {
         section: "",
         instructor: "",
       },
-      student: { name: { first: "", middle: "", last: "" }, id: "" },
+      student: {
+        name: { first: "", middle: "", last: "" },
+        id: -1,
+        username: "",
+      },
     }
   ) {
     Object.assign(this, rosterRecord);
