@@ -12,24 +12,24 @@ import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import Reservation from "../resources/Reservation";
-import Event from "../resources/Event";
 import UserGroup from "../resources/UserGroup";
-import { Mail } from "../utils/mail";
-import { formatDatetime } from "../utils/date";
+import Event from "../resources/Event";
+import { Mail, adminEmail } from "../utils/mail";
+import { formatDatetime, isBefore, nowInServerTimezone } from "../utils/date";
 
 const transition = makeTransition("left");
 
 interface CancelationDialogProps extends CalendarUIProps {
-  cancelationDialogIsOpen: boolean;
-  setCancelationDialogIsOpen: (state: boolean) => void;
+  open: boolean;
+  setOpen: (state: boolean) => void;
   cancelationApprovalCutoff: Date;
 }
 
 const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   dispatch,
   state,
-  cancelationDialogIsOpen,
-  setCancelationDialogIsOpen,
+  open,
+  setOpen,
   cancelationApprovalCutoff,
 }) => {
   const dispatchError = (error: Error, meta?: unknown): void =>
@@ -63,6 +63,10 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     dispatchError(new Error("No project"));
     return null;
   }
+  const autoApprove = isBefore(
+    nowInServerTimezone(),
+    cancelationApprovalCutoff
+  );
   const groupEmail = group.members.map(({ email }) => email).join(", ");
   const subject = "canceled a reservation for your group";
   const location = currentEvent.location.title;
@@ -76,15 +80,16 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   const onCancelationRequest = ({ refund = false } = {}): void => {
     const mailbox = [] as Mail[];
     const refundMessage = refund
-      ? "requested that project hours be refunded. The request has been sent to the administrator."
-      : "did not request that project hours be refunded, so the hours have been forfeited.";
-    const adminEmail = process.env.REACT_APP_ADMIN_EMAIL;
+      ? " They requested that project hours be refunded. The request has been sent to the administrator."
+      : " They did not request that project hours be refunded, so the hours have been forfeited.";
     mailbox.push({
       to: groupEmail,
       subject: `${myName} has ${subject}`,
-      text: `Your receiving this because you are a member of ${group.title}. ${myName} has ${body}. They ${refundMessage}`,
+      text: `Your receiving this because you are a member of ${
+        group.title
+      }. ${myName} has ${body}.${autoApprove ? "" : refundMessage}`,
     });
-    if (adminEmail && refund)
+    if (!autoApprove && adminEmail && refund)
       mailbox.push({
         to: adminEmail,
         subject: "Project Hour Refund Request",
@@ -94,7 +99,13 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(
-        refund
+        autoApprove
+          ? {
+              userId,
+              refundApproved: 1,
+              mailbox,
+            }
+          : refund
           ? {
               refundRequest: true,
               refundComment: message,
@@ -115,7 +126,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         const reservations = (
           state.resources[ResourceKey.Reservations] as Reservation[]
         ).filter(({ id }) => id !== reservation.id);
-        setCancelationDialogIsOpen(false);
+        setOpen(false);
         dispatch({
           type: CalendarAction.ReceivedReservationCancelation,
           payload: {
@@ -131,51 +142,68 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   };
 
   return (
-    <Dialog TransitionComponent={transition} open={cancelationDialogIsOpen}>
-      <DialogContent>
-        <p>
-          The cancelation window for this booking has passed. You can still
-          cancel this session, but your project hours will not be automatically
-          refunded. You can request that the administrator refund your hours
-          below.
-        </p>
-        <p>
-          (For this reservation, you needed to cancel{" "}
-          {Reservation.rules.refundCutoffHours.toString()} hours before the
-          start of your reservation, which was at{" "}
-          {cancelationApprovalCutoffString}.)
-        </p>
-      </DialogContent>
-      <TextField
-        id="filled-basic"
-        label="If requesting a refund, you can leave a message to the admin here"
-        variant="filled"
-        onChange={(event): void => {
-          event.stopPropagation();
-          setMessage(event.target.value);
-        }}
-      />
-      <DialogActions>
-        <Button
-          color="primary"
-          variant="contained"
-          // style={{ backgroundColor: "yellow", color: "black" }}
-          onClick={(): void => onCancelationRequest({ refund: true })}
-        >
-          Cancel Reservation and request refund
-        </Button>
-        <Button
-          color="secondary"
-          variant="contained"
-          // style={{ backgroundColor: "salmon", color: "white" }}
-          onClick={(): void => onCancelationRequest()}
-        >
-          Cancel Reservation without refund
-        </Button>
-        <Button onClick={(): void => setCancelationDialogIsOpen(false)}>
-          Go Back
-        </Button>
-      </DialogActions>
+    <Dialog TransitionComponent={transition} open={open}>
+      {autoApprove ? (
+        <DialogContent>Are you sure you want to cancel?</DialogContent>
+      ) : (
+        <DialogContent>
+          <p>
+            You can still cancel, but your time will not be automatically
+            refunded.
+          </p>
+          <p>
+            (You needed to cancel{" "}
+            {Reservation.rules.refundCutoffHours.toString()} hours before the
+            start of your reservation, which was at{" "}
+            {cancelationApprovalCutoffString}.)
+          </p>
+          <p>
+            You can send a message to the administrator using the text box
+            below.
+          </p>
+          <TextField
+            id="filled-basic"
+            label="You can type a message here"
+            variant="filled"
+            onChange={(event): void => {
+              event.stopPropagation();
+              setMessage(event.target.value);
+            }}
+          />
+        </DialogContent>
+      )}
+      {autoApprove ? (
+        <DialogActions>
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={(): void => onCancelationRequest({ refund: true })}
+          >
+            Cancel reservation
+          </Button>
+          <Button onClick={(): void => setOpen(false)}>Go Back</Button>
+        </DialogActions>
+      ) : (
+        <DialogActions>
+          <Button
+            color="primary"
+            variant="contained"
+            // style={{ backgroundColor: "yellow", color: "black" }}
+            onClick={(): void => onCancelationRequest({ refund: true })}
+          >
+            Cancel Reservation and request refund
+          </Button>
+          <Button
+            color="secondary"
+            variant="contained"
+            // style={{ backgroundColor: "salmon", color: "white" }}
+            onClick={(): void => onCancelationRequest()}
+          >
+            Cancel Reservation without refund
+          </Button>
+          <Button onClick={(): void => setOpen(false)}>Go Back</Button>
+        </DialogActions>
+      )}
     </Dialog>
   );
 };

@@ -32,3 +32,5 @@ export interface Mail {
   text: string;
   html?: string;
 }
+
+export const adminEmail = process.env.REACT_APP_ADMIN_EMAIL || "";

@@ -60,16 +60,6 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     Reservation.rules.refundCutoffHours
   );
 
-  const reservationCutoff = subHours(
-    endDate,
-    Reservation.rules.refundCutoffHours
-  );
-
-  const cancelationApproved = isBefore(
-    nowInServerTimezone(),
-    cancelationApprovalCutoff
-  );
-
   const currentUserWalkInProject = user.projects.find(
     (project) => project.title === Project.walkInTitle
   );
@@ -87,17 +77,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     return Reservation.rules.maxWalkInsPerLocation <= myReservations;
   };
 
-  const projectHoursRemaining = (project: Project): boolean => {
+  const projectHasHoursRemaining = (project: Project): boolean => {
     const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
       (group) => group.projectId === project.id
     );
     if (!group) return false;
     const thisEventHours = sqlIntervalInHours(start, end);
-    const sumOfGroupHours = (state.resources[ResourceKey.Events] as Event[])
-      .filter(({ reservation }) => reservation?.groupId === group.id)
-      .map((event) => sqlIntervalInHours(event.start, event.end))
-      .reduce((a, b) => a + b);
-    return project.groupAllottedHours > sumOfGroupHours + thisEventHours;
+    return project.groupAllottedHours > group.reservedHours + thisEventHours;
   };
 
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
@@ -129,7 +115,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   const reservationCutoffHasNotPassed = isBefore(
     nowInServerTimezone(),
-    reservationCutoff
+    subHours(endDate, Reservation.rules.refundCutoffHours)
   );
 
   const eventHasNotEnded = isBefore(
@@ -139,58 +125,6 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
     : [];
-
-  const onCancel = (event: React.MouseEvent): void => {
-    event.stopPropagation();
-    if (!cancelationApproved) return setCancelationDialogIsOpen(true);
-    const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-      (group) => group.id === state.currentEvent?.reservation?.groupId
-    );
-    if (!group) throw new Error("No group");
-    const project = (state.resources[ResourceKey.Projects] as Project[]).find(
-      (project) => project.id === group?.projectId
-    );
-    if (!project) throw new Error("No project");
-    const { currentEvent } = state;
-    if (!currentEvent) throw new Error("No current event");
-    const groupEmail = group.members.map(({ email }) => email).join(", ");
-    const whatWhenWhere = `${project.title} on ${currentEvent.start} in ${location}`;
-    const subject = "canceled a reservation for your group";
-    const body = `${subject} for ${whatWhenWhere}`;
-
-    fetch(`/api/reservations/cancel/${state.currentEvent?.reservation?.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: user.id,
-        refundApproved: 1,
-        mailbox: [{ to: groupEmail, subject, text: body }],
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ error, data }) => {
-        if (error || !data)
-          return dispatch({ type: CalendarAction.Error, payload: { error } });
-        // remove the reservation from state
-        const currentEvent = new Event(data.event);
-        const events = (state.resources[ResourceKey.Events] as Event[]).filter(
-          ({ id }) => id !== currentEvent.id
-        );
-        const reservations = (
-          state.resources[ResourceKey.Reservations] as Reservation[]
-        ).filter(({ id }) => id !== reservation?.id);
-        dispatch({
-          type: CalendarAction.ReceivedReservationCancelation,
-          payload: {
-            currentEvent,
-            resources: {
-              [ResourceKey.Events]: [...events, currentEvent],
-              [ResourceKey.Reservations]: [...reservations],
-            },
-          },
-        });
-      });
-  };
 
   return (
     <Dialog
@@ -210,15 +144,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           <CloseIcon />
         </IconButton>
       </Toolbar>
-      {cancelationDialogIsOpen && (
-        <CancelationDialog
-          state={state}
-          dispatch={dispatch}
-          cancelationDialogIsOpen={cancelationDialogIsOpen}
-          setCancelationDialogIsOpen={setCancelationDialogIsOpen}
-          cancelationApprovalCutoff={cancelationApprovalCutoff}
-        />
-      )}
+      <CancelationDialog
+        state={state}
+        dispatch={dispatch}
+        open={cancelationDialogIsOpen}
+        setOpen={setCancelationDialogIsOpen}
+        cancelationApprovalCutoff={cancelationApprovalCutoff}
+      />
       <Paper
         style={{
           display: "flex",
@@ -234,7 +166,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             {parseAndFormatSQLDatetimeInterval({ start, end })}
           </Typography>
 
-          {equipmentList.length && (
+          {!!equipmentList.length && (
             <List
               subheader={
                 <ListSubheader component="div" id="nested-list-subheader">
@@ -285,7 +217,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 color: "white",
                 maxWidth: "400px",
               }}
-              onClick={onCancel}
+              onClick={(): void => setCancelationDialogIsOpen(true)}
             >
               Cancel Reservation
             </Button>
@@ -301,7 +233,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             <List>
               {projects.map((project) => (
                 <ListItem key={`${project.title}_list_item`}>
-                  {projectHoursRemaining(project)
+                  {projectHasHoursRemaining(project)
                     ? project.title
                     : project.title + ", NO Project Hours Remaining"}
                 </ListItem>
@@ -325,7 +257,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       <ReservationForm
         dispatch={dispatch}
         state={state}
-        projects={projects.filter(projectHoursRemaining)}
+        projects={projects.filter(projectHasHoursRemaining)}
       />
     </Dialog>
   );
