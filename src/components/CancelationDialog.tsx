@@ -1,9 +1,10 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useState } from "react";
 import {
   Dialog,
   Button,
   DialogContent,
   DialogActions,
+  TextField,
 } from "@material-ui/core";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import { useAuth } from "./AuthProvider";
@@ -36,6 +37,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   const { user } = useAuth();
   const myName = `${user.name.first} ${user.name.last}`;
   const userId = user.id;
+  const [message, setMessage] = useState("");
 
   const { currentEvent } = state;
   if (!currentEvent) {
@@ -106,7 +108,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
           ? {
               // TODO do not use integers if these are booleans
               refundRequest: 1,
-              refundComment: 1,
+              refundComment: message,
               userId,
               mailbox,
             }
@@ -158,6 +160,15 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
           your reservation, which was at {cancelationApprovalCutoffString}.)
         </p>
       </DialogContent>
+      <TextField
+        id="filled-basic"
+        label="If requesting a refund, you can leave a message to the admin here"
+        variant="filled"
+        onChange={(event): void => {
+          event.stopPropagation();
+          setMessage(event.target.value);
+        }}
+      />
       <DialogActions>
         <Button
           color="primary"
