@@ -43,10 +43,7 @@ const FilterList: FunctionComponent<QuantityListProps> = ({
             ))}
           </div>
         ) : (
-          <div>
-            You haven&apos;t reserved any equipment yet! Click the button below
-            to add equipment to your cart
-          </div>
+          <div>Cart is empty.</div>
         )}
       </List>
     </div>
