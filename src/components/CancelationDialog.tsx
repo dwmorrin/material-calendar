@@ -106,7 +106,6 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       body: JSON.stringify(
         refund
           ? {
-              // TODO do not use integers if these are booleans
               refundRequest: true,
               refundComment: message,
               userId,
