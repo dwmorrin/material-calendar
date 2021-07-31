@@ -31,6 +31,7 @@ export enum CalendarAction {
   PickedDate,
   ReceivedAllResources,
   ReceivedInvitations,
+  ReceivedReservationCancelation,
   ReceivedResource,
   SelectedEvent,
   SelectedGroup,

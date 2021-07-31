@@ -370,6 +370,19 @@ const openReservationForm: StateHandler = (state) => ({
   reservationFormIsOpen: true,
 });
 
+const receivedReservationCancelation: StateHandler = (state, { payload }) => {
+  return {
+    ...state,
+    currentEvent: payload?.currentEvent,
+    resources: {
+      ...state.resources,
+      ...payload?.resources,
+    },
+    detailIsOpen: false,
+    reservationFormIsOpen: false,
+  };
+};
+
 const receivedAllResources: StateHandler = (state, { payload }) => ({
   ...state,
   resources: { ...state.resources, ...payload?.resources },
@@ -516,6 +529,8 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,
     [CalendarAction.ReceivedInvitations]: receivedInvitations,
+    [CalendarAction.ReceivedReservationCancelation]:
+      receivedReservationCancelation,
     [CalendarAction.ReceivedResource]: receivedResource,
     [CalendarAction.SelectedEvent]: selectedEvent,
     [CalendarAction.SelectedGroup]: selectedGroup,

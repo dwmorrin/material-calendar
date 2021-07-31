@@ -18,7 +18,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AdminAction, AdminUIProps } from "../../admin/types";
 import Invitation from "../../resources/Invitation";
 import Reservation from "../../resources/Reservation";
-import { formatDatetime, parseSQLDatetime } from "../../utils/date";
+import { formatDatetimeSeconds, parseSQLDatetime } from "../../utils/date";
 import { sendMail } from "../../utils/mail";
 import { useAuth } from "../AuthProvider";
 
@@ -394,7 +394,7 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                       key={`reservation-${reservation.id}-reservationStart}`}
                     >
                       {"Reservation Start: " +
-                        formatDatetime(
+                        formatDatetimeSeconds(
                           parseSQLDatetime(reservation.event.start)
                         )}
                     </ListItem>
@@ -409,7 +409,7 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                       key={`reservation-${reservation.id}-cancelationRequested}`}
                     >
                       {"Refund Requested: " +
-                        formatDatetime(
+                        formatDatetimeSeconds(
                           parseSQLDatetime(
                             reservation.cancellation?.canceled.on || ""
                           )
