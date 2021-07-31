@@ -31,8 +31,4 @@ export interface Mail {
   subject: string;
   text: string;
   html?: string;
-  onError: (error: Error, meta?: unknown) => void;
 }
-
-export const sendMailOptions = ({ to, subject, text, onError }: Mail): void =>
-  sendMail(to, subject, text, onError);

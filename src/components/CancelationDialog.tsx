@@ -83,14 +83,12 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       to: groupEmail,
       subject: `${myName} has ${subject}`,
       text: `Your receiving this because you are a member of ${group.title}. ${myName} has ${body}. They ${refundMessage}`,
-      onError: dispatchError,
     });
     if (adminEmail && refund)
       mailbox.push({
         to: adminEmail,
         subject: "Project Hour Refund Request",
         text: `${myName} is requesting a project hour refund for their booking: ${whatWhenWhere}`,
-        onError: dispatchError,
       });
     fetch(`${Reservation.url}/cancel/${reservation.id}`, {
       method: "PUT",
