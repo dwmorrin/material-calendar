@@ -7,7 +7,7 @@ import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import Reservation from "../resources/Reservation";
 import UserGroup from "../resources/UserGroup";
-import { sendMailOptions } from "../utils/mail";
+import { Mail } from "../utils/mail";
 
 const transition = makeTransition("left");
 
@@ -55,75 +55,49 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     return null;
   }
   const groupEmail = group.members.map(({ email }) => email).join(", ");
+  const subject = "canceled a reservation for your group";
+  const location = currentEvent.location.title;
+  const whatWhenWhere = `${project.title} on ${currentEvent.start} in ${location}`;
+  const body = `${subject} for ${whatWhenWhere}`;
 
-  // TODO just send the mail in the first body; don't double fetch
-  const onRequestIrregularGroupSizeApproval = (): void => {
-    fetch(`${Reservation.url}/cancel/${reservation.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        // TODO do not use integers if these are booleans
-        refundRequest: 1,
-        refundComment: 1,
-        userId,
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ error, data }) => {
-        if (error || !data)
-          return dispatch({
-            type: CalendarAction.Error,
-            payload: { error: error || new Error("no data") },
-          });
-        const subject = "canceled a reservation for your group";
-        const body = `${subject} for ${project.title} on ${currentEvent.start} in ${currentEvent.location.title}`;
-        const refundMessage =
-          "requested that project hours be refunded, so a request has been sent to the admin.";
-        sendMailOptions({
-          to: groupEmail,
-          subject: `${myName} has ${subject}`,
-          body: `Hello ${group.title}, ${myName} has ${body}. They ${refundMessage}`,
-          onError: dispatchError,
-        });
-        const adminEmail = process.env.REACT_APP_ADMIN_EMAIL;
-        if (adminEmail)
-          sendMailOptions({
-            to: adminEmail,
-            subject: "Project Hour Refund Request",
-            body:
-              `Hello,
-            ${myName} is requesting a project hour refund for their booking for ${project.title} ` +
-              `in ${currentEvent.location.title} on ${currentEvent.start}`,
-            onError: dispatchError,
-          });
+  const onCancelationRequest = ({ refund = false } = {}): void => {
+    const mailbox = [] as Mail[];
+    const refundMessage = refund
+      ? "requested that project hours be refunded, so a request has been sent to the admin."
+      : "did not request that project hours be refunded, so the hours have been forfeit.";
+    const adminEmail = process.env.REACT_APP_ADMIN_EMAIL;
+    mailbox.push({
+      to: groupEmail,
+      subject: `${myName} has ${subject}`,
+      body: `Hello ${group.title}, ${myName} has ${body}. They ${refundMessage}`,
+      onError: dispatchError,
+    });
+    if (adminEmail && refund)
+      mailbox.push({
+        to: adminEmail,
+        subject: "Project Hour Refund Request",
+        body: `${myName} is requesting a project hour refund for their booking: ${whatWhenWhere}`,
+        onError: dispatchError,
       });
-  };
-
-  // TODO just send the mail in the first body; don't double fetch
-  const onCancelWithoutRefund = (): void => {
     fetch(`${Reservation.url}/cancel/${reservation.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
+      body: JSON.stringify(
+        refund
+          ? {
+              // TODO do not use integers if these are booleans
+              refundRequest: 1,
+              refundComment: 1,
+              userId,
+              mailbox,
+            }
+          : { userId, mailbox }
+      ),
     })
       .then((response) => response.json())
-      .then(({ error, data }) => {
-        if (error || !data) {
-          return dispatch({
-            type: CalendarAction.Error,
-            payload: { error: error || new Error("no data") },
-          });
-        }
-        const subject = "canceled a reservation for your group";
-        const body = `${subject} for ${project?.title} on ${currentEvent.start} in ${currentEvent.location.title}`;
-        const refundMessage =
-          "did not request that project hours be refunded, so the hours have been forfeit.";
-        sendMailOptions({
-          to: groupEmail,
-          subject: `${myName} has ${subject}`,
-          body: `Hello ${group.title}, ${myName} has ${body}. They ${refundMessage}`,
-          onError: dispatchError,
-        });
+      .then(({ error }) => {
+        // TODO this is missing the part where we update the state to reflect the cancellation
+        if (error) return dispatchError(error);
       });
   };
 
@@ -139,14 +113,14 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       <Button
         color="primary"
         style={{ backgroundColor: "yellow", color: "black" }}
-        onClick={onRequestIrregularGroupSizeApproval}
+        onClick={(): void => onCancelationRequest({ refund: true })}
       >
-        Request Irregular Group Size Approval
+        Cancel Reservation and request project hours be refunded
       </Button>
       <Button
         color="inherit"
         style={{ backgroundColor: "salmon", color: "white" }}
-        onClick={onCancelWithoutRefund}
+        onClick={(): void => onCancelationRequest()}
       >
         Cancel Reservation and do not request project hours be refunded
       </Button>
