@@ -118,14 +118,18 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       .then(({ error, data }) => {
         if (error || !data) return dispatchError(error || new Error("no data"));
         // data = {reservation: new reservation, event: new event}
-        const { event, reservation } = data;
-        const currentEvent = new Event(event);
+        const { reservation, ...currentEvent } =
+          state.currentEvent || new Event();
         const events = (state.resources[ResourceKey.Events] as Event[]).filter(
           ({ id }) => id !== currentEvent.id
         );
+        if (!reservation) {
+          const { event, reservation } = data;
+        }
         const reservations = (
           state.resources[ResourceKey.Reservations] as Reservation[]
-        ).filter(({ id }) => id !== reservation.id);
+        ).filter(({ id }) => id !== reservation?.id);
+        console.log([...events, currentEvent]);
         openCancelationDialog(false);
         dispatch({
           type: CalendarAction.ReceivedReservationCancelation,
@@ -134,10 +138,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
             resources: {
               ...state.resources,
               [ResourceKey.Events]: [...events, currentEvent],
-              [ResourceKey.Reservations]: [
-                ...reservations,
-                new Reservation(reservation),
-              ],
+              [ResourceKey.Reservations]: reservations,
             },
           },
         });

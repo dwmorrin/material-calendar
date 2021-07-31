@@ -371,16 +371,24 @@ const openReservationForm: StateHandler = (state) => ({
 });
 
 const receivedReservationCancelation: StateHandler = (state, { payload }) => {
-  return {
-    ...state,
-    currentEvent: payload?.currentEvent,
-    resources: {
-      ...state.resources,
-      ...payload?.resources,
+  return displayMessage(
+    {
+      ...state,
+      currentEvent: payload?.currentEvent,
+      resources: {
+        ...state.resources,
+        ...payload?.resources,
+      },
+      detailIsOpen: false,
+      reservationFormIsOpen: false,
     },
-    detailIsOpen: false,
-    reservationFormIsOpen: false,
-  };
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: "Your Reservation has been Canceled",
+      },
+    }
+  );
 };
 
 const receivedAllResources: StateHandler = (state, { payload }) => ({
