@@ -123,13 +123,9 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         const events = (state.resources[ResourceKey.Events] as Event[]).filter(
           ({ id }) => id !== currentEvent.id
         );
-        if (!reservation) {
-          const { event, reservation } = data;
-        }
         const reservations = (
           state.resources[ResourceKey.Reservations] as Reservation[]
         ).filter(({ id }) => id !== reservation?.id);
-        console.log([...events, currentEvent]);
         openCancelationDialog(false);
         dispatch({
           type: CalendarAction.ReceivedReservationCancelation,
