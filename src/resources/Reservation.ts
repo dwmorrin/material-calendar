@@ -23,6 +23,14 @@ interface Reservation {
 
 class Reservation implements Reservation {
   static url = "/api/reservations";
+  static rules = {
+    refundCutoffHours: Number(
+      process.env.REACT_APP_CANCELATION_REFUND_CUTOFF_HOURS || "24"
+    ),
+    maxWalkInsPerLocation: Number(
+      process.env.REACT_APP_MAX_WALK_IN_RESERVATIONS_PER_LOCATION || "0"
+    ),
+  };
   constructor(
     res = {
       id: 0,

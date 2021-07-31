@@ -22,6 +22,7 @@ export {
   isBefore,
   isWithinInterval,
   subDays,
+  subHours,
   subMinutes,
 } from "date-fns";
 export {

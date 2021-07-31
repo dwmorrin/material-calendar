@@ -63,14 +63,6 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     dispatchError(new Error("No project"));
     return null;
   }
-  const { REACT_APP_CANCELATION_REFUND_CUTOFF_HOURS } = process.env;
-  if (
-    !REACT_APP_CANCELATION_REFUND_CUTOFF_HOURS ||
-    isNaN(Number(REACT_APP_CANCELATION_REFUND_CUTOFF_HOURS))
-  ) {
-    dispatchError(new Error("no cancelation refund cutoff hours set"));
-    return null;
-  }
   const groupEmail = group.members.map(({ email }) => email).join(", ");
   const subject = "canceled a reservation for your group";
   const location = currentEvent.location.title;
@@ -152,8 +144,9 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         </p>
         <p>
           (For this reservation, you needed to cancel{" "}
-          {REACT_APP_CANCELATION_REFUND_CUTOFF_HOURS} hours before the start of
-          your reservation, which was at {cancelationApprovalCutoffString}.)
+          {Reservation.rules.refundCutoffHours.toString()} hours before the
+          start of your reservation, which was at{" "}
+          {cancelationApprovalCutoffString}.)
         </p>
       </DialogContent>
       <TextField

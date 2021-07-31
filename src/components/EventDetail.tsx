@@ -51,20 +51,19 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   const { end, location, reservable, start, title, reservation } =
     state.currentEvent;
-  const userCanUseLocation = user?.restriction >= location.restriction;
+  const userCanUseLocation = user.restriction >= location.restriction;
 
-  const cancelationApprovalCutoff = new Date(
-    parseSQLDatetime(start).setHours(
-      parseSQLDatetime(start).getHours() -
-        Number(process.env.REACT_APP_CANCELATION_REFUND_CUTOFF_HOURS)
-    )
+  const startDate = parseSQLDatetime(start);
+  const endDate = parseSQLDatetime(end);
+
+  const cancelationApprovalCutoff = subHours(
+    startDate,
+    Reservation.rules.refundCutoffHours
   );
 
-  const reservationCutoff = new Date(
-    parseSQLDatetime(end).setMinutes(
-      parseSQLDatetime(end).getMinutes() -
-        Number(process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF_MINUTES)
-    )
+  const reservationCutoff = subHours(
+    endDate,
+    Reservation.rules.refundCutoffHours
   );
 
   const cancelationApproved = isBefore(
