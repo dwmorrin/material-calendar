@@ -25,3 +25,16 @@ export const sendMail = (
     })
     .catch(dispatchError);
 };
+interface MailOptions {
+  to: string;
+  subject: string;
+  body: string;
+  onError: (error: Error, meta?: unknown) => void;
+}
+
+export const sendMailOptions = ({
+  to,
+  subject,
+  body,
+  onError,
+}: MailOptions): void => sendMail(to, subject, body, onError);

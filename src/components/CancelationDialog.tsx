@@ -7,7 +7,7 @@ import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import Reservation from "../resources/Reservation";
 import UserGroup from "../resources/UserGroup";
-import { sendMail } from "../utils/mail";
+import { sendMailOptions } from "../utils/mail";
 
 const transition = makeTransition("left");
 
@@ -27,102 +27,84 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   const dispatchError = (error: Error, meta?: unknown): void =>
     dispatch({ type: CalendarAction.Error, payload: { error }, meta });
   const { user } = useAuth();
+  const myName = `${user.name.first} ${user.name.last}`;
+  const userId = user.id;
 
+  const { currentEvent } = state;
+  if (!currentEvent) {
+    dispatchError(new Error("No event selected"));
+    return null;
+  }
+  const { reservation } = currentEvent;
+  if (!reservation) {
+    dispatchError(new Error("No reservation to cancel"));
+    return null;
+  }
+  const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
+    ({ id }) => id === reservation.groupId
+  );
+  if (!group) {
+    dispatchError(new Error("No group"));
+    return null;
+  }
+  const project = (state.resources[ResourceKey.Projects] as Project[]).find(
+    ({ id }) => id === group.projectId
+  );
+  if (!project) {
+    dispatchError(new Error("No project"));
+    return null;
+  }
+  const groupEmail = group.members.map(({ email }) => email).join(", ");
+
+  // TODO just send the mail in the first body; don't double fetch
   const onRequestIrregularGroupSizeApproval = (): void => {
-    fetch(`${Reservation.url}/cancel/${state.currentEvent?.reservation?.id}`, {
+    fetch(`${Reservation.url}/cancel/${reservation.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        // TODO do not use integers if these are booleans
         refundRequest: 1,
         refundComment: 1,
-        userId: user.id,
+        userId,
       }),
     })
       .then((response) => response.json())
       .then(({ error, data }) => {
-        if (error || !data) {
+        if (error || !data)
           return dispatch({
             type: CalendarAction.Error,
             payload: { error: error || new Error("no data") },
           });
-        } else {
-          const group = (
-            state.resources[ResourceKey.Groups] as UserGroup[]
-          ).find(
-            (group) => group.id === state.currentEvent?.reservation?.groupId
-          );
-          const project = (
-            state.resources[ResourceKey.Projects] as Project[]
-          ).find((project) => project.id === group?.projectId);
-          if (group) {
-            const subject = "canceled a reservation for your group";
-            const body =
-              subject +
-              " for " +
-              project?.title +
-              " on " +
-              state.currentEvent?.start +
-              " in " +
-              state.currentEvent?.location.title;
-            const refundMessage =
-              "requested that project hours be refunded, so a request has been sent to the admin.";
-            group.members
-              .filter((member) => member.username !== user.username)
-              .forEach((member) =>
-                sendMail(
-                  member.email,
-                  user.name.first + " " + user.name.last + " has " + subject,
-                  "Hello " +
-                    member.name.first +
-                    ", " +
-                    user.name.first +
-                    " " +
-                    user.name.last +
-                    " has " +
-                    body +
-                    ". They " +
-                    refundMessage,
-                  dispatchError
-                )
-              );
-            sendMail(
-              user.email,
-              "You have " + subject,
-              "Hello " +
-                user.name.first +
-                ",  You have " +
-                body +
-                ". You " +
-                refundMessage,
-              dispatchError
-            );
-            sendMail(
-              process.env.REACT_APP_ADMIN_EMAIL || "",
-              "Project Hour Refund Request",
-              "Hello, " +
-                user.name.first +
-                " " +
-                user.name.last +
-                "  is requesting a project hour refund for their booking for" +
-                project?.title +
-                " in " +
-                state.currentEvent?.location.title +
-                " on " +
-                state.currentEvent?.start,
-              dispatchError
-            );
-          }
-        }
+        const subject = "canceled a reservation for your group";
+        const body = `${subject} for ${project.title} on ${currentEvent.start} in ${currentEvent.location.title}`;
+        const refundMessage =
+          "requested that project hours be refunded, so a request has been sent to the admin.";
+        sendMailOptions({
+          to: groupEmail,
+          subject: `${myName} has ${subject}`,
+          body: `Hello ${group.title}, ${myName} has ${body}. They ${refundMessage}`,
+          onError: dispatchError,
+        });
+        const adminEmail = process.env.REACT_APP_ADMIN_EMAIL;
+        if (adminEmail)
+          sendMailOptions({
+            to: adminEmail,
+            subject: "Project Hour Refund Request",
+            body:
+              `Hello,
+            ${myName} is requesting a project hour refund for their booking for ${project.title} ` +
+              `in ${currentEvent.location.title} on ${currentEvent.start}`,
+            onError: dispatchError,
+          });
       });
   };
 
+  // TODO just send the mail in the first body; don't double fetch
   const onCancelWithoutRefund = (): void => {
-    fetch(`${Reservation.url}/cancel/${state.currentEvent?.reservation?.id}`, {
+    fetch(`${Reservation.url}/cancel/${reservation.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: user.id,
-      }),
+      body: JSON.stringify({ userId }),
     })
       .then((response) => response.json())
       .then(({ error, data }) => {
@@ -131,59 +113,17 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
             type: CalendarAction.Error,
             payload: { error: error || new Error("no data") },
           });
-        } else {
-          const group = (
-            state.resources[ResourceKey.Groups] as UserGroup[]
-          ).find(
-            (group) => group.id === state.currentEvent?.reservation?.groupId
-          );
-          const project = (
-            state.resources[ResourceKey.Projects] as Project[]
-          ).find((project) => project.id === group?.projectId);
-          if (group) {
-            const subject = "canceled a reservation for your group";
-            const body =
-              subject +
-              " for " +
-              project?.title +
-              " on " +
-              state.currentEvent?.start +
-              " in " +
-              state.currentEvent?.location.title;
-            const refundMessage =
-              "did not request that project hours be refunded, so the hours have been forfeit.";
-            group.members
-              .filter((member) => member.username !== user.username)
-              .forEach((member) =>
-                sendMail(
-                  member.email,
-                  user.name.first + " " + user.name.last + " has " + subject,
-                  "Hello " +
-                    member.name.first +
-                    ", " +
-                    user.name.first +
-                    " " +
-                    user.name.last +
-                    " has " +
-                    body +
-                    ". They " +
-                    refundMessage,
-                  dispatchError
-                )
-              );
-            sendMail(
-              user.email,
-              "You have " + subject,
-              "Hello " +
-                user.name.first +
-                ",  You have " +
-                body +
-                ". you " +
-                refundMessage,
-              dispatchError
-            );
-          }
         }
+        const subject = "canceled a reservation for your group";
+        const body = `${subject} for ${project?.title} on ${currentEvent.start} in ${currentEvent.location.title}`;
+        const refundMessage =
+          "did not request that project hours be refunded, so the hours have been forfeit.";
+        sendMailOptions({
+          to: groupEmail,
+          subject: `${myName} has ${subject}`,
+          body: `Hello ${group.title}, ${myName} has ${body}. They ${refundMessage}`,
+          onError: dispatchError,
+        });
       });
   };
 
