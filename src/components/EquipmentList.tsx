@@ -81,7 +81,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                 })
               }
             >
-              {branch.title + " [" + contents + "]"}
+              {`${branch.title} (${contents})`}
             </AccordionSummary>
             <AccordionDetails>
               <List
