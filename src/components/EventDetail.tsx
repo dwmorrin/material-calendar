@@ -20,16 +20,17 @@ import {
   nowInServerTimezone,
   parseSQLDatetime,
   sqlIntervalInHours,
+  subHours,
 } from "../utils/date";
 import { useAuth } from "./AuthProvider";
 import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
+import Reservation from "../resources/Reservation";
 import UserGroup from "../resources/UserGroup";
 import ReservationForm from "./ReservationForm";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Event from "../resources/Event";
-import { sendMail } from "../utils/mail";
 import CancelationDialog from "./CancelationDialog";
 
 const transition = makeTransition("left");
@@ -38,15 +39,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { user } = useAuth();
-  const [cancelationDialogIsOpen, openCancelationDialog] = useState(false);
+  const { isAdmin, user } = useAuth();
+  const [cancelationDialogIsOpen, setCancelationDialogIsOpen] = useState(false);
 
-  const dispatchError = (error: Error, meta?: unknown): void =>
-    dispatch({ type: CalendarAction.Error, payload: { error }, meta });
-
-  if (!state.currentEvent || !state.currentEvent.location || !user?.username) {
+  if (!state.currentEvent || !state.currentEvent.location || !user.username) {
     return null;
   }
+
   const events = state.resources[ResourceKey.Events] as Event[];
 
   const { end, location, reservable, start, title, reservation } =
@@ -71,15 +70,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     cancelationApprovalCutoff
   );
 
-  const walkInReservationLimit = Number(
-    process.env.REACT_APP_WALK_IN_RESERVATIONS_PER_LOCATION
+  const currentUserWalkInProject = user.projects.find(
+    (project) => project.title === Project.walkInTitle
   );
 
-  const currentUserWalkInProject =
-    user.projects.find((project) => project.title === Project.walkInTitle) ||
-    new Project();
-
+  // returns true if there is no walk-in project
   const hasReachedTheWalkInLimit = (event: Event): boolean => {
+    if (!currentUserWalkInProject) return true;
     const myReservations = events.filter(
       ({ location, reservation }) =>
         location === event.location &&
@@ -87,34 +84,29 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         reservation &&
         reservation.groupId === currentUserWalkInProject.id
     ).length;
-    return walkInReservationLimit <= myReservations;
+    return Reservation.rules.maxWalkInsPerLocation <= myReservations;
   };
 
   const projectHoursRemaining = (project: Project): boolean => {
     const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
       (group) => group.projectId === project.id
     );
-    return (
-      !!group &&
-      project.groupAllottedHours >
-        (state.resources[ResourceKey.Events] as Event[])
-          .filter((event) => event.reservation?.groupId == group.id)
-          .map((event) => sqlIntervalInHours(event.start, event.end))
-          .reduce((a, b) => a + b, 0) +
-          sqlIntervalInHours(
-            state.currentEvent?.start,
-            state.currentEvent?.start
-          )
-    );
+    if (!group) return false;
+    const thisEventHours = sqlIntervalInHours(start, end);
+    const sumOfGroupHours = (state.resources[ResourceKey.Events] as Event[])
+      .filter(({ reservation }) => reservation?.groupId === group.id)
+      .map((event) => sqlIntervalInHours(event.start, event.end))
+      .reduce((a, b) => a + b);
+    return project.groupAllottedHours > sumOfGroupHours + thisEventHours;
   };
 
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
-    (project) =>
-      (project.title === Project.walkInTitle &&
+    ({ title, allotments }) =>
+      (title === Project.walkInTitle &&
         state.currentEvent &&
         Event.isAvailableForWalkIn(state.currentEvent) &&
         !hasReachedTheWalkInLimit(state.currentEvent)) ||
-      project.allotments.some(
+      allotments.some(
         (a) =>
           a.locationId === location.id &&
           isValidSQLDatetimeInterval({
@@ -146,7 +138,59 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   );
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
-    : null;
+    : [];
+
+  const onCancel = (event: React.MouseEvent): void => {
+    event.stopPropagation();
+    if (!cancelationApproved) return setCancelationDialogIsOpen(true);
+    const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
+      (group) => group.id === state.currentEvent?.reservation?.groupId
+    );
+    if (!group) throw new Error("No group");
+    const project = (state.resources[ResourceKey.Projects] as Project[]).find(
+      (project) => project.id === group?.projectId
+    );
+    if (!project) throw new Error("No project");
+    const { currentEvent } = state;
+    if (!currentEvent) throw new Error("No current event");
+    const groupEmail = group.members.map(({ email }) => email).join(", ");
+    const whatWhenWhere = `${project.title} on ${currentEvent.start} in ${location}`;
+    const subject = "canceled a reservation for your group";
+    const body = `${subject} for ${whatWhenWhere}`;
+
+    fetch(`/api/reservations/cancel/${state.currentEvent?.reservation?.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: user.id,
+        refundApproved: 1,
+        mailbox: [{ to: groupEmail, subject, text: body }],
+      }),
+    })
+      .then((response) => response.json())
+      .then(({ error, data }) => {
+        if (error || !data)
+          return dispatch({ type: CalendarAction.Error, payload: { error } });
+        // remove the reservation from state
+        const currentEvent = new Event(data.event);
+        const events = (state.resources[ResourceKey.Events] as Event[]).filter(
+          ({ id }) => id !== currentEvent.id
+        );
+        const reservations = (
+          state.resources[ResourceKey.Reservations] as Reservation[]
+        ).filter(({ id }) => id !== reservation?.id);
+        dispatch({
+          type: CalendarAction.ReceivedReservationCancelation,
+          payload: {
+            currentEvent,
+            resources: {
+              [ResourceKey.Events]: [...events, currentEvent],
+              [ResourceKey.Reservations]: [...reservations],
+            },
+          },
+        });
+      });
+  };
 
   return (
     <Dialog
@@ -171,7 +215,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           state={state}
           dispatch={dispatch}
           cancelationDialogIsOpen={cancelationDialogIsOpen}
-          openCancelationDialog={openCancelationDialog}
+          setCancelationDialogIsOpen={setCancelationDialogIsOpen}
           cancelationApprovalCutoff={cancelationApprovalCutoff}
         />
       )}
@@ -190,7 +234,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             {parseAndFormatSQLDatetimeInterval({ start, end })}
           </Typography>
 
-          {equipmentList && (
+          {equipmentList.length && (
             <List
               subheader={
                 <ListSubheader component="div" id="nested-list-subheader">
@@ -241,86 +285,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 color: "white",
                 maxWidth: "400px",
               }}
-              onClick={(event): void => {
-                event.stopPropagation();
-                cancelationApproved
-                  ? fetch(
-                      `/api/reservations/cancel/${state.currentEvent?.reservation?.id}`,
-                      {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          userId: user.id,
-                          refundApproved: 1,
-                        }),
-                      }
-                    )
-                      .then((response) => response.json())
-                      .then(({ error, data }) => {
-                        if (error || !data) {
-                          return dispatch({
-                            type: CalendarAction.Error,
-                            payload: { error },
-                          });
-                        } else {
-                          const group = (
-                            state.resources[ResourceKey.Groups] as UserGroup[]
-                          ).find(
-                            (group) =>
-                              group.id ===
-                              state.currentEvent?.reservation?.groupId
-                          );
-                          const project = (
-                            state.resources[ResourceKey.Projects] as Project[]
-                          ).find((project) => project.id === group?.projectId);
-                          if (group) {
-                            const subject =
-                              "canceled a reservation for your group";
-                            const body =
-                              subject +
-                              " for " +
-                              project?.title +
-                              " on " +
-                              state.currentEvent?.start +
-                              " in " +
-                              state.currentEvent?.location.title;
-                            group.members
-                              .filter(
-                                (member) => member.username !== user.username
-                              )
-                              .forEach((member) =>
-                                sendMail(
-                                  member.email,
-                                  user.name.first +
-                                    " " +
-                                    user.name.last +
-                                    " has " +
-                                    subject,
-                                  "Hello " +
-                                    member.name.first +
-                                    ", " +
-                                    user.name.first +
-                                    " " +
-                                    user.name.last +
-                                    " has " +
-                                    body,
-                                  dispatchError
-                                )
-                              );
-                            sendMail(
-                              user.email,
-                              "You have " + subject,
-                              "Hello " +
-                                user.name.first +
-                                ",  You have " +
-                                body,
-                              dispatchError
-                            );
-                          }
-                        }
-                      })
-                  : openCancelationDialog(true);
-              }}
+              onClick={onCancel}
             >
               Cancel Reservation
             </Button>
@@ -344,7 +309,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             </List>
           </section>
         )}
-        {user.roles.includes("admin") && (
+        {isAdmin && (
           <Button
             onClick={(): void =>
               dispatch({

@@ -21,7 +21,7 @@ const transition = makeTransition("left");
 
 interface CancelationDialogProps extends CalendarUIProps {
   cancelationDialogIsOpen: boolean;
-  openCancelationDialog: (state: boolean) => void;
+  setCancelationDialogIsOpen: (state: boolean) => void;
   cancelationApprovalCutoff: Date;
 }
 
@@ -29,7 +29,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   dispatch,
   state,
   cancelationDialogIsOpen,
-  openCancelationDialog,
+  setCancelationDialogIsOpen,
   cancelationApprovalCutoff,
 }) => {
   const dispatchError = (error: Error, meta?: unknown): void =>
@@ -108,15 +108,14 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       .then(({ error, data }) => {
         if (error || !data) return dispatchError(error || new Error("no data"));
         // data = {reservation: new reservation, event: new event}
-        const { reservation, ...currentEvent } =
-          state.currentEvent || new Event();
+        const { currentEvent } = data;
         const events = (state.resources[ResourceKey.Events] as Event[]).filter(
           ({ id }) => id !== currentEvent.id
         );
         const reservations = (
           state.resources[ResourceKey.Reservations] as Reservation[]
-        ).filter(({ id }) => id !== reservation?.id);
-        openCancelationDialog(false);
+        ).filter(({ id }) => id !== reservation.id);
+        setCancelationDialogIsOpen(false);
         dispatch({
           type: CalendarAction.ReceivedReservationCancelation,
           payload: {
@@ -124,7 +123,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
             resources: {
               ...state.resources,
               [ResourceKey.Events]: [...events, currentEvent],
-              [ResourceKey.Reservations]: reservations,
+              [ResourceKey.Reservations]: [...reservations],
             },
           },
         });
@@ -173,7 +172,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         >
           Cancel Reservation without refund
         </Button>
-        <Button onClick={(): void => openCancelationDialog(false)}>
+        <Button onClick={(): void => setCancelationDialogIsOpen(false)}>
           Go Back
         </Button>
       </DialogActions>
