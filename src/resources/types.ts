@@ -6,6 +6,7 @@ import Project from "./Project";
 import Course from "./Course";
 import Reservation from "./Reservation";
 import RosterRecord from "./RosterRecord";
+import Section from "./Section";
 import Semester from "./Semester";
 import Tag from "./Tag";
 import User from "./User";
@@ -21,6 +22,7 @@ export type Resource =
   | typeof Course
   | typeof Reservation
   | typeof RosterRecord
+  | typeof Section
   | typeof Semester
   | typeof Tag
   | typeof User
@@ -39,6 +41,7 @@ export enum ResourceKey {
   Courses,
   Reservations,
   RosterRecords,
+  Sections,
   Semesters,
   Tags,
   Users,

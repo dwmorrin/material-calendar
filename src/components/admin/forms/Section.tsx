@@ -10,12 +10,15 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({ state }) => {
   const courses = state.resources[ResourceKey.Courses] as Course[];
   return (
     <List>
-      <h3>
-        This interface is labeled wrong. Editing this edits course sections not
-        courses.
-      </h3>
+      <Field fullWidth component={TextField} name="title" label="Title" />
+      <Field
+        fullWidth
+        component={TextField}
+        name="instructor"
+        label="Instructor"
+      />
       <FormLabel>Course</FormLabel>
-      <Field component={RadioGroup} name="id">
+      <Field component={RadioGroup} name="courseId">
         {courses.map(({ id, title, catalogId }, index) => (
           <FormControlLabel
             key={`course-${id}-${index}`}
@@ -25,13 +28,6 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({ state }) => {
           />
         ))}
       </Field>
-      <Field fullWidth component={TextField} name="section" label="Title" />
-      <Field
-        fullWidth
-        component={TextField}
-        name="instructor"
-        label="Instructor"
-      />
     </List>
   );
 };

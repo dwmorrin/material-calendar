@@ -39,6 +39,7 @@ const router = (key: ResourceKey): [string[], BulkImporter] =>
     [ResourceKey.Projects]: defaultHeadingsAndDispatch,
     [ResourceKey.Reservations]: defaultHeadingsAndDispatch,
     [ResourceKey.RosterRecords]: rosterImport,
+    [ResourceKey.Sections]: defaultHeadingsAndDispatch,
     [ResourceKey.Semesters]: defaultHeadingsAndDispatch,
     [ResourceKey.Tags]: defaultHeadingsAndDispatch,
     [ResourceKey.Users]: defaultHeadingsAndDispatch,

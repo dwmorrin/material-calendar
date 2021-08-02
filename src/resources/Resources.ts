@@ -6,6 +6,7 @@ import Project from "./Project";
 import Course from "./Course";
 import Reservation from "./Reservation";
 import RosterRecord from "./RosterRecord";
+import Section from "./Section";
 import Semester from "./Semester";
 import Tag from "./Tag";
 import User from "./User";
@@ -25,6 +26,7 @@ export const FindResource = (key: ResourceKey): Resource =>
     [ResourceKey.Projects]: Project,
     [ResourceKey.Reservations]: Reservation,
     [ResourceKey.RosterRecords]: RosterRecord,
+    [ResourceKey.Sections]: Section,
     [ResourceKey.Semesters]: Semester,
     [ResourceKey.Tags]: Tag,
     [ResourceKey.Users]: User,

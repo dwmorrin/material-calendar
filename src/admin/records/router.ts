@@ -7,6 +7,7 @@ import projectRecord from "./project.record";
 import courseRecord from "./course.record";
 import reservationRecord from "./reservation.record";
 import rosterRecord from "./roster.record";
+import sectionRecord from "./section.record";
 import semesterRecord from "./semester.record";
 import tagRecord from "./tag.record";
 import userRecord from "./user.record";
@@ -27,6 +28,7 @@ const router = (
     [ResourceKey.Projects]: projectRecord,
     [ResourceKey.Reservations]: reservationRecord,
     [ResourceKey.RosterRecords]: rosterRecord,
+    [ResourceKey.Sections]: sectionRecord,
     [ResourceKey.Semesters]: semesterRecord,
     [ResourceKey.Tags]: tagRecord,
     [ResourceKey.Users]: userRecord,

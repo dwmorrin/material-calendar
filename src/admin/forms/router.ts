@@ -45,6 +45,11 @@ import {
 } from "./roster.values";
 import RosterForm from "../../components/admin/forms/RosterRecord";
 import {
+  values as sectionValues,
+  update as sectionUpdate,
+} from "./section.values";
+import SectionForm from "../../components/admin/forms/Section";
+import {
   values as semesterValues,
   update as semesterUpdate,
 } from "./semester.values";
@@ -123,6 +128,11 @@ const router = (
       template: RosterForm,
       valuator: rosterValues,
       updater: rosterUpdate,
+    },
+    [ResourceKey.Sections]: {
+      template: SectionForm,
+      valuator: sectionValues,
+      updater: sectionUpdate,
     },
     [ResourceKey.Semesters]: {
       template: SemesterForm,
