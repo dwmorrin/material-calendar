@@ -1,9 +1,9 @@
 import React, { FunctionComponent } from "react";
 import { Field } from "formik";
-import { TextField, CheckboxWithLabel } from "formik-material-ui";
+import { TextField, CheckboxWithLabel, RadioGroup } from "formik-material-ui";
 import { FormTemplateProps } from "../../../admin/types";
-import { List, FormLabel } from "@material-ui/core";
-import FieldList from "./FieldList";
+import { FormLabel, FormControlLabel, List, Radio } from "@material-ui/core";
+// import FieldList from "./FieldList"; // TODO: implement tags
 import Category from "../../../resources/Category";
 import { ResourceKey } from "../../../resources/types";
 
@@ -13,16 +13,18 @@ const getCategoryPath = (categories: Category[], id: number): string => {
   return Category.path(categories, found);
 };
 
-/**
- * does not include reservations (edit reservations in the reservation form)
- * TODO consider adding a way to jump to a reservation through a selection here
- */
-const FormTemplate: FunctionComponent<FormTemplateProps> = ({
-  values,
-  state,
-}) => {
-  const { category, tags, consumable } = values;
+interface CategoryListItem {
+  id: number;
+  path: string;
+}
+
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({ state }) => {
   const categories = state.resources[ResourceKey.Categories] as Category[];
+  const catList = categories.map(({ id }) => ({
+    id,
+    path: getCategoryPath(categories, id),
+  })) as CategoryListItem[];
+  catList.sort(({ path: a }, { path: b }) => (a < b ? -1 : a > b ? 1 : 0));
   return (
     <List>
       <Field
@@ -39,24 +41,35 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
         label="Description"
       />
       <Field fullWidth component={TextField} name="sku" label="SKU" />
-      <Field fullWidth component={TextField} name="quantity" label="Quantity" />
+      <Field fullWidth component={TextField} name="serial" label="Serial" />
       <Field
         fullWidth
         component={TextField}
-        name="category"
-        label="Category ID"
+        name="restriction"
+        label="Restriction"
       />
-      <FormLabel>
-        {getCategoryPath(categories, +(category as string))}
-      </FormLabel>
-      <FieldList name="tags" values={tags as string[]} />
+      <Field fullWidth component={TextField} name="quantity" label="Quantity" />
       <Field
         type="checkbox"
         component={CheckboxWithLabel}
         name="consumable"
         Label={{ label: "Consumable" }}
-        checked={consumable}
       />
+      <br />
+      <FormLabel>Category</FormLabel>
+      <Field component={RadioGroup} name="categoryId">
+        {catList.map(({ id, path }) => (
+          <FormControlLabel
+            key={id}
+            label={path}
+            value={String(id)}
+            control={<Radio />}
+          />
+        ))}
+      </Field>
+      <Field fullWidth component={TextField} name="notes" label="Notes" />
+      {/* TODO: implement tags feature */}
+      {/* <FieldList name="tags" values={tags as string[]} /> */}
     </List>
   );
 };
