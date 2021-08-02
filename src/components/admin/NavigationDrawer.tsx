@@ -17,6 +17,10 @@ import { ResourceKey } from "../../resources/types";
 import Location from "../../resources/Location";
 import { enumKeys } from "../../utils/enumKeys";
 
+// "CamelCase" to "Camel Case", for displaying resource keys
+const splitCamelCase = (s: string): string =>
+  s[0] + s.slice(1).replaceAll(/([A-Z])/g, " $1");
+
 const AdminNavigationDrawer: FunctionComponent<
   AdminUIProps & AdminSelectionProps
 > = ({ dispatch, state, selections, setSelections }) => {
@@ -146,7 +150,7 @@ const AdminNavigationDrawer: FunctionComponent<
                 onClick={fetchResource}
                 data-resource={key}
               >
-                {ResourceKey[key]}
+                {splitCamelCase(ResourceKey[key])}
               </ListItem>
             ))}
           </Accordion>
