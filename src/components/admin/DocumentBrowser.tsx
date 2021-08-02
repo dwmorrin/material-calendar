@@ -1,5 +1,12 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { Paper, Typography, CircularProgress, Button } from "@material-ui/core";
+import {
+  Paper,
+  Typography,
+  CircularProgress,
+  Button,
+  TextField,
+  FormLabel,
+} from "@material-ui/core";
 import Pager, { getTotalPages } from "../Pager";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { ResourceKey, ResourceInstance } from "../../resources/types";
@@ -17,10 +24,13 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
   dispatch,
   state,
 }) => {
+  const [filter, setFilter] = useState("");
   const [recordHeight, setRecordHeight] = useState(DEFAULT_RECORD_HEIGHT);
   const [recordsPerPage, setRecordsPerPage] = useState(
     getRecordsPerPage(/*DEFAULT_RECORD_HEIGHT*/)
   );
+
+  const [template, filterKey, filterFn] = templateRouter(state.resourceKey);
 
   useEffect(() => {
     const calculateAndSetRecordsPerPage = (): void => {
@@ -45,10 +55,13 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
       type: AdminAction.SelectedRecordPage,
       payload: { recordPage: page },
     });
-  const resources = state.resources[state.resourceKey].slice(
-    page * recordsPerPage,
-    page * recordsPerPage + recordsPerPage
-  );
+  const resources = state.resources[state.resourceKey]
+    .filter(filterFn(filter))
+    .slice(
+      // const resources = state.resources[state.resourceKey].slice(
+      page * recordsPerPage,
+      page * recordsPerPage + recordsPerPage
+    );
   const title = splitCamelCase(ResourceKey[state.resourceKey]);
   const handleNewDocument = (): void =>
     dispatch({
@@ -83,13 +96,21 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
         accept=".txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
         onChange={dispatchFile(dispatch)}
       />
+      <br />
+      <FormLabel>Filter by {filterKey}</FormLabel>
+      <br />
+      <TextField
+        value={filter}
+        onChange={(event): void => setFilter(event.target.value)}
+      />
+      <br />
       {resources.length ? (
         resources.map((record: ResourceInstance, index) => (
           <Record
             key={index}
             dispatch={dispatch}
             document={record}
-            template={templateRouter(state.resourceKey)(record, state)}
+            template={template(record, state)}
           />
         ))
       ) : (

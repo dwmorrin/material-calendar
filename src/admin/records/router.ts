@@ -15,24 +15,43 @@ import userGroupRecord from "./userGroup.record";
 import virtualWeekRecord from "./virtualWeek.record";
 import { AdminState } from "../types";
 
-const router = (
-  key: ResourceKey
-): ((instance: ResourceInstance, state: AdminState) => string[][]) =>
+type Template = (instance: ResourceInstance, state: AdminState) => string[][];
+type FilterFn = (key: string) => (instance: ResourceInstance) => boolean;
+type TemplateKeyFilter = [Template, string, FilterFn];
+
+const allPass = () => (): boolean => true;
+
+const userFilter =
+  (username: string) =>
+  (instance: ResourceInstance): boolean =>
+    "username" in instance &&
+    (instance.username as string).startsWith(username);
+
+const rosterFilter =
+  (username: string) =>
+  (instance: ResourceInstance): boolean => {
+    if (!("student" in instance)) return false;
+    const student = instance.student as { username: string };
+    if (!("username" in student)) return false;
+    return student.username.startsWith(username);
+  };
+
+const router = (key: ResourceKey): TemplateKeyFilter =>
   ({
-    [ResourceKey.Categories]: categoryRecord,
-    [ResourceKey.Courses]: courseRecord,
-    [ResourceKey.Equipment]: equipmentRecord,
-    [ResourceKey.Events]: eventRecord,
-    [ResourceKey.Groups]: userGroupRecord,
-    [ResourceKey.Locations]: locationRecord,
-    [ResourceKey.Projects]: projectRecord,
-    [ResourceKey.Reservations]: reservationRecord,
-    [ResourceKey.RosterRecords]: rosterRecord,
-    [ResourceKey.Sections]: sectionRecord,
-    [ResourceKey.Semesters]: semesterRecord,
-    [ResourceKey.Tags]: tagRecord,
-    [ResourceKey.Users]: userRecord,
-    [ResourceKey.VirtualWeeks]: virtualWeekRecord,
-  }[key]);
+    [ResourceKey.Categories]: [categoryRecord, "not working yet", allPass],
+    [ResourceKey.Courses]: [courseRecord, "not working yet", allPass],
+    [ResourceKey.Equipment]: [equipmentRecord, "not working yet", allPass],
+    [ResourceKey.Events]: [eventRecord, "not working yet", allPass],
+    [ResourceKey.Groups]: [userGroupRecord, "not working yet", allPass],
+    [ResourceKey.Locations]: [locationRecord, "not working yet", allPass],
+    [ResourceKey.Projects]: [projectRecord, "not working yet", allPass],
+    [ResourceKey.Reservations]: [reservationRecord, "not working yet", allPass],
+    [ResourceKey.RosterRecords]: [rosterRecord, "Username", rosterFilter],
+    [ResourceKey.Sections]: [sectionRecord, "not working yet", allPass],
+    [ResourceKey.Semesters]: [semesterRecord, "not working yet", allPass],
+    [ResourceKey.Tags]: [tagRecord, "not working yet", allPass],
+    [ResourceKey.Users]: [userRecord, "Username", userFilter],
+    [ResourceKey.VirtualWeeks]: [virtualWeekRecord, "not working yet", allPass],
+  }[key] as TemplateKeyFilter);
 
 export default router;
