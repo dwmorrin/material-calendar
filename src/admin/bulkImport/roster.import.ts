@@ -40,7 +40,7 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, records) => {
       if (error) return dispatchError(error);
       setSubmitting(false);
       dispatch({
-        type: AdminAction.ReceivedResourcesAfterRosterImport,
+        type: AdminAction.FileImportSuccess,
         payload: {
           resources: {
             [ResourceKey.Courses]: (data.courses as Course[]).map(

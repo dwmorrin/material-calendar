@@ -320,34 +320,6 @@ const receivedResourcesAfterLocationHoursUpdate: StateHandler = (
   }),
 });
 
-const receivedResourcesAfterLocationImport: StateHandler = (
-  state,
-  { payload }
-) => ({
-  ...state,
-  resources: { ...state.resources, ...payload?.resources },
-  snackbarIsOpen: true,
-  snackbarQueue: enqueue(state.snackbarQueue, {
-    type: "success",
-    message: "Locations imported",
-    autoHideDuration: 6000,
-  }),
-});
-
-const receivedResourcesAfterRosterImport: StateHandler = (
-  state,
-  { payload }
-) => ({
-  ...state,
-  resources: { ...state.resources, ...payload?.resources },
-  snackbarIsOpen: true,
-  snackbarQueue: enqueue(state.snackbarQueue, {
-    type: "success",
-    message: "Roster imported",
-    autoHideDuration: 6000,
-  }),
-});
-
 const receivedResourcesAfterVirtualWeekUpdate: StateHandler = (
   state,
   { payload }
@@ -449,10 +421,6 @@ const reducer: StateHandler = (state, action) =>
       receivedResourcesAfterLocationHoursUpdate,
     [AdminAction.ReceivedResourcesAfterProjectLocationHoursUpdate]:
       receivedResourcesAfterProjectLocationHoursUpdate,
-    [AdminAction.ReceivedResourcesAfterLocationImport]:
-      receivedResourcesAfterLocationImport,
-    [AdminAction.ReceivedResourcesAfterRosterImport]:
-      receivedResourcesAfterRosterImport,
     [AdminAction.ReceivedResourcesAfterVirtualWeekUpdate]:
       receivedResourcesAfterVirtualWeekUpdate,
     [AdminAction.SelectedDocument]: selectedDocument,

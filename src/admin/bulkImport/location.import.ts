@@ -37,7 +37,7 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, records): void => {
       if (error) return dispatchError(error);
       setSubmitting(false);
       dispatch({
-        type: AdminAction.ReceivedResourcesAfterLocationImport,
+        type: AdminAction.FileImportSuccess,
         payload: {
           resources: {
             [ResourceKey.Locations]: (data as Location[]).map(

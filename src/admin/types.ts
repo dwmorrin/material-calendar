@@ -44,8 +44,6 @@ export enum AdminAction {
   ReceivedResource,
   ReceivedResourcesAfterLocationHoursUpdate,
   ReceivedResourcesAfterProjectLocationHoursUpdate,
-  ReceivedResourcesAfterLocationImport,
-  ReceivedResourcesAfterRosterImport,
   ReceivedResourcesAfterVirtualWeekUpdate,
   SelectedDocument,
   SelectedRecordPage,
