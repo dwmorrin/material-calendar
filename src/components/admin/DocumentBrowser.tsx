@@ -11,6 +11,7 @@ import {
   DEFAULT_RECORD_HEIGHT,
   getRecordsPerPage,
 } from "../../admin/documentBrowser";
+import splitCamelCase from "../../utils/splitCamelCase";
 
 const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
   dispatch,
@@ -48,7 +49,7 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
     page * recordsPerPage,
     page * recordsPerPage + recordsPerPage
   );
-  const title = ResourceKey[state.resourceKey];
+  const title = splitCamelCase(ResourceKey[state.resourceKey]);
   const handleNewDocument = (): void =>
     dispatch({
       type: AdminAction.SelectedDocument,

@@ -16,10 +16,7 @@ import {
 import { ResourceKey } from "../../resources/types";
 import Location from "../../resources/Location";
 import { enumKeys } from "../../utils/enumKeys";
-
-// "CamelCase" to "Camel Case", for displaying resource keys
-const splitCamelCase = (s: string): string =>
-  s[0] + s.slice(1).replaceAll(/([A-Z])/g, " $1");
+import splitCamelCase from "../../utils/splitCamelCase";
 
 const AdminNavigationDrawer: FunctionComponent<
   AdminUIProps & AdminSelectionProps
