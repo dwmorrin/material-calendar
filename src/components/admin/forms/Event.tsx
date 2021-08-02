@@ -1,18 +1,14 @@
 import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField, CheckboxWithLabel, Select } from "formik-material-ui";
-import { DatePicker } from "formik-material-ui-pickers";
+import { DateTimePicker } from "formik-material-ui-pickers";
 import { FormTemplateProps } from "../../../admin/types";
 import { List, MenuItem, InputLabel } from "@material-ui/core";
 import { ResourceKey } from "../../../resources/types";
 import Location from "../../../resources/Location";
 
-/**
- * value of "location" (singular) is the actual value for the event
- */
-const Template: FunctionComponent<FormTemplateProps> = ({ state, values }) => {
+const FormTemplate: FunctionComponent<FormTemplateProps> = ({ state }) => {
   const locations = state.resources[ResourceKey.Locations] as Location[];
-  const reservable = values.reservable as boolean;
   return (
     <List>
       <Field
@@ -20,7 +16,6 @@ const Template: FunctionComponent<FormTemplateProps> = ({ state, values }) => {
         component={CheckboxWithLabel}
         name={"reservable"}
         Label={{ label: "Accepting reservation requests" }}
-        checked={reservable}
       />
       <InputLabel htmlFor="eventLocation">Location</InputLabel>
       <Field
@@ -35,18 +30,10 @@ const Template: FunctionComponent<FormTemplateProps> = ({ state, values }) => {
         ))}
       </Field>
       <Field fullWidth component={TextField} name="title" label="Title" />
-      <Field
-        fullWidth
-        component={TextField}
-        name="description"
-        label="Description"
-        multiline
-      />
-      <Field fullWidth component={DatePicker} name="start" label="Start" />
-      <Field fullWidth component={DatePicker} name="end" label="End" />
-      <Field fullWidth component={TextField} name="groupId" label="Group" />
+      <Field fullWidth component={DateTimePicker} name="start" label="Start" />
+      <Field fullWidth component={DateTimePicker} name="end" label="End" />
     </List>
   );
 };
 
-export default Template;
+export default FormTemplate;
