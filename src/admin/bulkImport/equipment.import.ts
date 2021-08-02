@@ -1,5 +1,6 @@
 import { AdminAction } from "../types";
 import Equipment from "../../resources/Equipment";
+import Category from "../../resources/Category";
 import { BulkImporter } from "./router";
 import { ResourceKey } from "../../resources/types";
 
@@ -62,12 +63,16 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, events) => {
     .then(({ data, error }) => {
       if (error) return dispatchError(error);
       setSubmitting(false);
+      const { equipment, categories } = data;
       dispatch({
         type: AdminAction.FileImportSuccess,
         payload: {
           resources: {
-            [ResourceKey.Equipment]: (data as Equipment[]).map(
+            [ResourceKey.Equipment]: (equipment as Equipment[]).map(
               (e) => new Equipment(e)
+            ),
+            [ResourceKey.Categories]: (categories as Category[]).map(
+              (c) => new Category(c)
             ),
           },
         },
