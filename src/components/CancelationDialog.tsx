@@ -118,8 +118,8 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error || !data) return dispatchError(error || new Error("no data"));
-        // data = {reservation: new reservation, event: new event}
-        const { currentEvent } = data;
+        const { event } = data as { event: Event };
+        const currentEvent = new Event(event);
         const events = (state.resources[ResourceKey.Events] as Event[]).filter(
           ({ id }) => id !== currentEvent.id
         );
