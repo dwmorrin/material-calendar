@@ -21,6 +21,7 @@ import {
   parseSQLDatetime,
   sqlIntervalInHours,
   subHours,
+  subMinutes,
 } from "../utils/date";
 import { useAuth } from "./AuthProvider";
 import { makeTransition } from "./Transition";
@@ -115,7 +116,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   const reservationCutoffHasNotPassed = isBefore(
     nowInServerTimezone(),
-    subHours(endDate, Reservation.rules.refundCutoffHours)
+    subMinutes(endDate, Reservation.rules.inProgressCutoffMinutes)
   );
 
   const eventHasNotEnded = isBefore(
