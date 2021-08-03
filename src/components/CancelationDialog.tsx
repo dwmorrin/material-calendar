@@ -40,29 +40,18 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   const [message, setMessage] = useState("");
 
   const { currentEvent } = state;
-  if (!currentEvent) {
-    dispatchError(new Error("No event selected"));
-    return null;
-  }
+  if (!currentEvent) return null;
   const { reservation } = currentEvent;
-  if (!reservation) {
-    dispatchError(new Error("No reservation to cancel"));
-    return null;
-  }
+  if (!reservation) return null;
   const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
     ({ id }) => id === reservation.groupId
   );
-  if (!group) {
-    dispatchError(new Error("No group"));
-    return null;
-  }
+  if (!group) return null;
   const project = (state.resources[ResourceKey.Projects] as Project[]).find(
     ({ id }) => id === group.projectId
   );
-  if (!project) {
-    dispatchError(new Error("No project"));
-    return null;
-  }
+  if (!project) return null;
+
   const autoApprove = isBefore(
     nowInServerTimezone(),
     cancelationApprovalCutoff

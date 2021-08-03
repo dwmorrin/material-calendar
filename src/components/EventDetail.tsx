@@ -144,13 +144,15 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           <CloseIcon />
         </IconButton>
       </Toolbar>
-      <CancelationDialog
-        state={state}
-        dispatch={dispatch}
-        open={cancelationDialogIsOpen}
-        setOpen={setCancelationDialogIsOpen}
-        cancelationApprovalCutoff={cancelationApprovalCutoff}
-      />
+      {!!state.currentEvent.reservation && (
+        <CancelationDialog
+          state={state}
+          dispatch={dispatch}
+          open={cancelationDialogIsOpen}
+          setOpen={setCancelationDialogIsOpen}
+          cancelationApprovalCutoff={cancelationApprovalCutoff}
+        />
+      )}
       <Paper
         style={{
           display: "flex",
