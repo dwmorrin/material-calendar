@@ -33,8 +33,10 @@ export const makeOnSubmit =
         locations: Location[];
         virtualWeeks: VirtualWeek[];
       };
-      if (!locations.length || !virtualWeeks.length)
-        return dispatchError(new Error("No data"));
+      if (!Array.isArray(locations) || !Array.isArray(virtualWeeks))
+        return dispatchError(
+          new Error("Updated locations and virtual weeks not sent.")
+        );
       dispatch({
         type: AdminAction.ReceivedResourcesAfterLocationHoursUpdate,
         payload: {
