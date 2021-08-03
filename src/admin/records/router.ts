@@ -21,11 +21,14 @@ type TemplateKeyFilter = [Template, string, FilterFn];
 
 const allPass = () => (): boolean => true;
 
+const lowerIncludes = (a: string, b: string): boolean =>
+  a.toLowerCase().includes(b.toLowerCase());
+
 const userFilter =
   (username: string) =>
   (instance: ResourceInstance): boolean =>
     "username" in instance &&
-    (instance.username as string).startsWith(username);
+    lowerIncludes(instance.username as string, username);
 
 const rosterFilter =
   (username: string) =>
@@ -33,25 +36,30 @@ const rosterFilter =
     if (!("student" in instance)) return false;
     const student = instance.student as { username: string };
     if (!("username" in student)) return false;
-    return student.username.startsWith(username);
+    return lowerIncludes(student.username, username);
   };
+
+const byTitle =
+  (title: string) =>
+  (instance: ResourceInstance): boolean =>
+    "title" in instance && lowerIncludes(instance.title as string, title);
 
 const router = (key: ResourceKey): TemplateKeyFilter =>
   ({
-    [ResourceKey.Categories]: [categoryRecord, "not working yet", allPass],
-    [ResourceKey.Courses]: [courseRecord, "not working yet", allPass],
-    [ResourceKey.Equipment]: [equipmentRecord, "not working yet", allPass],
-    [ResourceKey.Events]: [eventRecord, "not working yet", allPass],
-    [ResourceKey.Groups]: [userGroupRecord, "not working yet", allPass],
-    [ResourceKey.Locations]: [locationRecord, "not working yet", allPass],
-    [ResourceKey.Projects]: [projectRecord, "not working yet", allPass],
-    [ResourceKey.Reservations]: [reservationRecord, "not working yet", allPass],
+    [ResourceKey.Categories]: [categoryRecord, "Title", byTitle],
+    [ResourceKey.Courses]: [courseRecord, "Title", byTitle],
+    [ResourceKey.Equipment]: [equipmentRecord, "", allPass],
+    [ResourceKey.Events]: [eventRecord, "", allPass],
+    [ResourceKey.Groups]: [userGroupRecord, "Title", byTitle],
+    [ResourceKey.Locations]: [locationRecord, "Title", byTitle],
+    [ResourceKey.Projects]: [projectRecord, "Title", byTitle],
+    [ResourceKey.Reservations]: [reservationRecord, "", allPass],
     [ResourceKey.RosterRecords]: [rosterRecord, "Username", rosterFilter],
-    [ResourceKey.Sections]: [sectionRecord, "not working yet", allPass],
-    [ResourceKey.Semesters]: [semesterRecord, "not working yet", allPass],
-    [ResourceKey.Tags]: [tagRecord, "not working yet", allPass],
+    [ResourceKey.Sections]: [sectionRecord, "Title", byTitle],
+    [ResourceKey.Semesters]: [semesterRecord, "", allPass],
+    [ResourceKey.Tags]: [tagRecord, "", allPass],
     [ResourceKey.Users]: [userRecord, "Username", userFilter],
-    [ResourceKey.VirtualWeeks]: [virtualWeekRecord, "not working yet", allPass],
+    [ResourceKey.VirtualWeeks]: [virtualWeekRecord, "", allPass],
   }[key] as TemplateKeyFilter);
 
 export default router;

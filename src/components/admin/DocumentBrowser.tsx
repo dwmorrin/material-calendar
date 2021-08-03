@@ -5,7 +5,7 @@ import {
   CircularProgress,
   Button,
   TextField,
-  FormLabel,
+  Grid,
 } from "@material-ui/core";
 import Pager, { getTotalPages } from "../Pager";
 import { AdminUIProps, AdminAction } from "../../admin/types";
@@ -24,6 +24,7 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
   dispatch,
   state,
 }) => {
+  const unfilteredRecords = state.resources[state.resourceKey];
   const [filter, setFilter] = useState("");
   const [recordHeight, setRecordHeight] = useState(DEFAULT_RECORD_HEIGHT);
   const [recordsPerPage, setRecordsPerPage] = useState(
@@ -31,6 +32,7 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
   );
 
   const [template, filterKey, filterFn] = templateRouter(state.resourceKey);
+  const filteredRecords = unfilteredRecords.filter(filterFn(filter));
 
   useEffect(() => {
     const calculateAndSetRecordsPerPage = (): void => {
@@ -55,13 +57,10 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
       type: AdminAction.SelectedRecordPage,
       payload: { recordPage: page },
     });
-  const resources = state.resources[state.resourceKey]
-    .filter(filterFn(filter))
-    .slice(
-      // const resources = state.resources[state.resourceKey].slice(
-      page * recordsPerPage,
-      page * recordsPerPage + recordsPerPage
-    );
+  const recordsForThisPage = filteredRecords.slice(
+    page * recordsPerPage,
+    page * recordsPerPage + recordsPerPage
+  );
   const title = splitCamelCase(ResourceKey[state.resourceKey]);
   const handleNewDocument = (): void =>
     dispatch({
@@ -80,7 +79,7 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
         : page + 1
     );
 
-  if (!resources) {
+  if (!recordsForThisPage) {
     return <CircularProgress />;
   }
   return (
@@ -88,24 +87,31 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
       <Typography variant="h4" component="h1">
         {title}
       </Typography>
-      <Button onClick={handleNewDocument}>Create new {title}</Button>
-      <Typography variant="body2">Bulk upload:</Typography>
-      <input
-        type="file"
-        name="file"
-        accept=".txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
-        onChange={dispatchFile(dispatch)}
-      />
-      <br />
-      <FormLabel>Filter by {filterKey}</FormLabel>
-      <br />
-      <TextField
-        value={filter}
-        onChange={(event): void => setFilter(event.target.value)}
-      />
-      <br />
-      {resources.length ? (
-        resources.map((record: ResourceInstance, index) => (
+      <Grid container spacing={4}>
+        <Grid item>
+          <Button onClick={handleNewDocument}>Create new {title}</Button>
+        </Grid>
+        <Grid item>
+          <Typography variant="button">Bulk upload</Typography>
+          <input
+            type="file"
+            name="file"
+            accept=".txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
+            onChange={dispatchFile(dispatch)}
+          />
+        </Grid>
+        {!!filterKey && (
+          <Grid item>
+            <TextField
+              placeholder={`Filter by ${filterKey}`}
+              value={filter}
+              onChange={(event): void => setFilter(event.target.value)}
+            />
+          </Grid>
+        )}
+      </Grid>
+      {recordsForThisPage.length ? (
+        recordsForThisPage.map((record: ResourceInstance, index) => (
           <Record
             key={index}
             dispatch={dispatch}
@@ -122,10 +128,7 @@ const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
       <Button onClick={handlePreviousPage}>Prev</Button>
       <Pager
         page={page}
-        pages={getTotalPages(
-          state.resources[state.resourceKey].length,
-          recordsPerPage
-        )}
+        pages={getTotalPages(filteredRecords.length, recordsPerPage)}
         setPage={setPage}
       />
       <Button onClick={handleNextPage}>Next</Button>
