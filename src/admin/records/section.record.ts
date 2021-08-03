@@ -3,10 +3,6 @@ import Course from "../../resources/Course";
 import { AdminState } from "../types";
 import { ResourceKey } from "../../resources/types";
 
-// actually showing a list of sections
-// the same course can appear multiple times
-// therefore omitting course ID
-// catalog ID suffices as an ID
 const template = (section: unknown, state: AdminState): string[][] => {
   const courses = state.resources[ResourceKey.Courses] as Course[];
   if (section instanceof Section) {
