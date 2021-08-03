@@ -10,12 +10,14 @@ import User from "../resources/User";
 import { CircularProgress } from "@material-ui/core";
 import Login from "./Login";
 import LoggedOut from "./LoggedOut";
+import ErrorPage from "./ErrorPage";
 
 export enum AuthStatus {
   pending = "pending",
-  resolved = "resolved",
-  rejected = "rejected",
+  authenticated = "authenticated",
+  notAuthenticated = "notAuthenticated",
   loggedOut = "loggedOut",
+  serverError = "serverError",
 }
 
 interface AuthContext {
@@ -25,9 +27,10 @@ interface AuthContext {
   setStatus: React.Dispatch<SetStateAction<AuthStatus>>;
   isAdmin: boolean;
   isPending: boolean;
-  isResolved: boolean;
-  isRejected: boolean;
+  isAuthenticated: boolean;
+  isNotAuthenticated: boolean;
   isLoggedOut: boolean;
+  isBroken: boolean;
 }
 
 export const AuthContext = createContext<AuthContext | undefined>(undefined);
@@ -39,9 +42,10 @@ export const useAuth = (): AuthContext => {
     ...state,
     isAdmin: state.user?.roles.includes("admin"),
     isPending: state?.status === AuthStatus.pending,
-    isResolved: state?.status === AuthStatus.resolved,
-    isRejected: state?.status === AuthStatus.rejected,
+    isAuthenticated: state?.status === AuthStatus.authenticated,
+    isNotAuthenticated: state?.status === AuthStatus.notAuthenticated,
     isLoggedOut: state?.status === AuthStatus.loggedOut,
+    isBroken: state?.status === AuthStatus.serverError,
   };
 };
 
@@ -55,23 +59,29 @@ const AuthProvider: FunctionComponent = ({ children }) => {
     setStatus,
     isAdmin: false,
     isPending: status === AuthStatus.pending,
-    isResolved: status === AuthStatus.resolved,
-    isRejected: status === AuthStatus.rejected,
+    isAuthenticated: status === AuthStatus.authenticated,
+    isNotAuthenticated: status === AuthStatus.notAuthenticated,
     isLoggedOut: status === AuthStatus.loggedOut,
+    isBroken: status === AuthStatus.serverError,
   };
 
   useEffect(() => {
     fetch("/login")
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) return response.json();
+        throw response.status;
+      })
       .then(({ data, error }) => {
-        if (error || !data) {
-          return setStatus(AuthStatus.rejected);
-        }
+        if (error || !data) throw 500;
         const user = new User(data);
         if (user.id && user.username) {
           setUser(user);
-          setStatus(AuthStatus.resolved);
-        }
+          setStatus(AuthStatus.authenticated);
+        } else throw 500;
+      })
+      .catch((err) => {
+        if ([401, 403].includes(err)) setStatus(AuthStatus.notAuthenticated);
+        else setStatus(AuthStatus.serverError);
       });
   }, []);
 
@@ -79,12 +89,14 @@ const AuthProvider: FunctionComponent = ({ children }) => {
     <AuthContext.Provider value={value}>
       {value.isPending ? (
         <CircularProgress />
-      ) : value.isRejected ? (
+      ) : value.isNotAuthenticated ? (
         <Login />
       ) : value.isLoggedOut ? (
         <LoggedOut />
-      ) : (
+      ) : value.isAuthenticated ? (
         children
+      ) : (
+        <ErrorPage open error={new Error("Server appears to be down")} />
       )}
     </AuthContext.Provider>
   );

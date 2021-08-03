@@ -53,25 +53,25 @@ const login = (
     },
     body: JSON.stringify({ username, password }),
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (response.status === 200) return response.json();
+      throw response.status;
+    })
     .then(({ data, error }) => {
-      if (error || !data) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-        setErrors({ username: true, password: false });
-      }
+      if (error || !data) throw 500;
       const user = new User(data);
       if (user && user.id) {
         setUser(user);
-        setStatus(AuthStatus.resolved);
+        setStatus(AuthStatus.authenticated);
       } else {
         setErrors({ username: true, password: false });
       }
     })
     .catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error(error);
-      setErrors({ username: true, password: false });
+      if ([401, 403].includes(error)) {
+        setStatus(AuthStatus.notAuthenticated);
+        setErrors({ username: true, password: false });
+      } else setStatus(AuthStatus.serverError);
     });
 };
 
