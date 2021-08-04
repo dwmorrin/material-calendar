@@ -8,6 +8,7 @@ import {
   differenceInCalendarMonths,
   format,
   formatISO9075,
+  getDay,
   isWithinInterval,
   parse,
   parseISO,
@@ -254,3 +255,37 @@ export const isIntervalWithinInterval =
   (inner: DateInterval) =>
   (outer: DateInterval): boolean =>
     isWithinInterval(inner.start, outer) && isWithinInterval(inner.end, outer);
+
+export const getDayNumberFromSQLDate = (date: string): number =>
+  getDay(parseSQLDate(date));
+
+export const getDayFromNumber = (
+  dayNumber: number
+):
+  | "sunday"
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday" => {
+  const days = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ] as [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday"
+  ];
+  return days[Math.floor(dayNumber) % 7];
+};

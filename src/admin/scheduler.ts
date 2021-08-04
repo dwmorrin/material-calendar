@@ -15,6 +15,8 @@ import {
   compareAscSQLDate,
   isValidSQLDateInterval,
   formatSQLDate,
+  getDayFromNumber,
+  getDayNumberFromSQLDate,
   parseAndFormatFCString,
   parseFCString,
   parseSQLDate,
@@ -243,8 +245,7 @@ export const makeAllotments = (
 /**
  * Creates a row of events displaying the numbers of hours available for each date
  * in the semester.
- * Uses either hours returned from the database, or a "0" event if no hours are
- * found for that date.
+ * Uses either hours returned from the database, or the locations default hours.
  */
 export const makeDailyHours = (
   location: Location,
@@ -257,6 +258,7 @@ export const makeDailyHours = (
   );
   let currentDate = start;
   let nextHours = hours.shift();
+  let dayPointer = getDayNumberFromSQLDate(currentDate);
   const res = [] as SchedulerEventProps[];
   while (res.length < numberOfDays) {
     if (nextHours && nextHours.date === currentDate) {
@@ -269,15 +271,17 @@ export const makeDailyHours = (
       });
       nextHours = hours.shift();
     } else {
+      const day = getDayFromNumber(dayPointer);
       res.push({
         id: `${Location.locationHoursId}-${res.length}`,
         start: currentDate,
         allDay: true,
-        title: "0",
+        title: String(location.defaultHours[day]),
         resourceId: Location.locationHoursId,
       });
     }
     currentDate = addADay(currentDate);
+    dayPointer = (dayPointer + 1) % 7;
   }
   return res;
 };

@@ -13,6 +13,15 @@ interface Location {
   hours: LocationHours[];
   restriction: number;
   allowsWalkIns: boolean;
+  defaultHours: {
+    monday: number;
+    tuesday: number;
+    wednesday: number;
+    thursday: number;
+    friday: number;
+    saturday: number;
+    sunday: number;
+  };
 }
 
 class Location implements Location {
@@ -26,6 +35,15 @@ class Location implements Location {
       hours: [] as LocationHours[],
       restriction: 0,
       allowsWalkIns: false,
+      defaultHours: {
+        monday: 0,
+        tuesday: 0,
+        wednesday: 0,
+        thursday: 0,
+        friday: 0,
+        saturday: 0,
+        sunday: 0,
+      },
     }
   ) {
     Object.assign(this, location);

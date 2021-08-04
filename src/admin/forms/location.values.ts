@@ -7,6 +7,9 @@ interface LocationValues extends Record<string, unknown> {
   groupId: string;
   restriction: string;
   allowsWalkIns: boolean;
+  defaultHours: {
+    [key: string]: string;
+  };
 }
 
 export const values = (state: AdminState): Record<string, unknown> => {
@@ -17,6 +20,10 @@ export const values = (state: AdminState): Record<string, unknown> => {
     groupId: location.groupId,
     restriction: String(location.restriction),
     allowsWalkIns: location.allowsWalkIns,
+    defaultHours: Object.entries(location.defaultHours).reduce(
+      (res, [day, hours]) => ({ ...res, [day]: String(hours) }),
+      {}
+    ),
   } as LocationValues;
 };
 
@@ -24,7 +31,7 @@ export const update = (
   state: AdminState,
   values: Record<string, unknown>
 ): Location => {
-  const { title, groupId, restriction, allowsWalkIns } =
+  const { title, groupId, restriction, allowsWalkIns, defaultHours } =
     values as LocationValues;
   const location = new Location(state.resourceInstance as Location);
   return {
@@ -33,5 +40,17 @@ export const update = (
     groupId,
     restriction: Number(restriction),
     allowsWalkIns,
+    defaultHours: Object.entries(defaultHours).reduce(
+      (res, [day, hours]) => ({ ...res, [day]: Number(hours) }),
+      {} as {
+        monday: number;
+        tuesday: number;
+        wednesday: number;
+        thursday: number;
+        friday: number;
+        saturday: number;
+        sunday: number;
+      }
+    ),
   };
 };
