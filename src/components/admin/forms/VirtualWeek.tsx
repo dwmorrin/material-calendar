@@ -14,18 +14,6 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = () => (
       name="locationId"
       label="Location ID"
     />
-    <Field
-      fullWidth
-      component={TextField}
-      name="locationHours"
-      label="Location hours"
-    />
-    <Field
-      fullWidth
-      component={TextField}
-      name="projectHours"
-      label="Project hours"
-    />
   </List>
 );
 export default FormTemplate;
