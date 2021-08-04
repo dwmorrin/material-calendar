@@ -1,3 +1,13 @@
+import {
+  addDays,
+  compareAscSQLDate,
+  daysInInterval,
+  formatSQLDate,
+  getDayFromNumber,
+  getDayNumberFromSQLDate,
+  parseSQLDate,
+} from "../utils/date";
+
 export interface LocationHours {
   id: number;
   hours: number;
@@ -47,6 +57,65 @@ class Location implements Location {
     }
   ) {
     Object.assign(this, location);
+  }
+
+  static getHours(
+    location: Location,
+    { start, end }: { start: string; end: string }
+  ): Omit<LocationHours, "id">[] {
+    const numberOfDays = daysInInterval({ start, end });
+    const addADay = (s: string): string =>
+      formatSQLDate(addDays(parseSQLDate(s), 1));
+    const hours = location.hours.slice();
+    hours.sort(({ date: start }, { date: end }) =>
+      compareAscSQLDate({ start, end })
+    );
+    let currentDate = start;
+    let nextHours = hours.shift();
+    let dayPointer = getDayNumberFromSQLDate(currentDate);
+    const res = [] as Omit<LocationHours, "id">[];
+    while (res.length < numberOfDays) {
+      if (nextHours && nextHours.date === currentDate) {
+        res.push({ date: nextHours.date, hours: nextHours.hours });
+        nextHours = hours.shift();
+      } else {
+        const day = getDayFromNumber(dayPointer);
+        const hours = location.defaultHours[day];
+        res.push({ date: currentDate, hours });
+      }
+      currentDate = addADay(currentDate);
+      dayPointer = (dayPointer + 1) % 7;
+    }
+    return res;
+  }
+
+  static getTotalHours(
+    location: Location,
+    { start, end }: { start: string; end: string }
+  ): number {
+    const numberOfDays = daysInInterval({ start, end });
+    const addADay = (s: string): string =>
+      formatSQLDate(addDays(parseSQLDate(s), 1));
+    const hours = location.hours.slice();
+    hours.sort(({ date: start }, { date: end }) =>
+      compareAscSQLDate({ start, end })
+    );
+    let currentDate = start;
+    let nextHours = hours.shift();
+    let dayPointer = getDayNumberFromSQLDate(currentDate);
+    let total = 0;
+    for (let i = 0; i < numberOfDays; ++i) {
+      if (nextHours && nextHours.date === currentDate) {
+        total += nextHours.hours;
+        nextHours = hours.shift();
+      } else {
+        const day = getDayFromNumber(dayPointer);
+        total += location.defaultHours[day];
+      }
+      currentDate = addADay(currentDate);
+      dayPointer = (dayPointer + 1) % 7;
+    }
+    return total;
   }
 }
 

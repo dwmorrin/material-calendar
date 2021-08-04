@@ -1,39 +1,35 @@
 import { FormikValues } from "formik";
 import { Action, AdminAction, AdminState, ApiResponse } from "./types";
-import Location, { LocationHours } from "../resources/Location";
+import Location from "../resources/Location";
 import { ResourceKey } from "../resources/types";
 import { formatSQLDate } from "../utils/date";
-import VirtualWeek from "../resources/VirtualWeek";
 
-export type DailyHoursValue = { date: Date; hours: number };
+export interface LocationHoursValues {
+  date: Date;
+  hours: string;
+  useDefault: boolean;
+}
 
 export const makeOnSubmit =
   (dispatch: (action: Action) => void, state: AdminState, locationId: number) =>
   (values: Record<string, unknown>, actions: FormikValues): void => {
-    const { days } = values as { days: DailyHoursValue[] };
+    const { days } = values as { days: LocationHoursValues[] };
 
-    const makeDailyHours = (
-      date: string,
-      hours: string | number
-    ): Omit<LocationHours, "id"> => ({
+    const dailyHours = days.map(({ date, hours, useDefault }) => ({
+      date: formatSQLDate(date),
       hours: Number(hours),
-      date,
-    });
-
-    const dailyHours = days.map(({ date, hours }) =>
-      makeDailyHours(formatSQLDate(date), hours)
-    );
+      useDefault,
+    }));
 
     const dispatchError = (error: Error): void =>
       dispatch({ type: AdminAction.Error, payload: { error } });
 
     const handleData = ({ error, data }: ApiResponse): void => {
       if (error) return dispatchError(error);
-      const { locations, virtualWeeks } = data as {
+      const { locations } = data as {
         locations: Location[];
-        virtualWeeks: VirtualWeek[];
       };
-      if (!Array.isArray(locations) || !Array.isArray(virtualWeeks))
+      if (!Array.isArray(locations))
         return dispatchError(
           new Error("Updated locations and virtual weeks not sent.")
         );
@@ -44,9 +40,6 @@ export const makeOnSubmit =
             ...state.resources,
             [ResourceKey.Locations]: locations.map(
               (l: Location) => new Location(l)
-            ),
-            [ResourceKey.VirtualWeeks]: virtualWeeks.map(
-              (v: VirtualWeek) => new VirtualWeek(v)
             ),
           },
         },

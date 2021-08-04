@@ -13,6 +13,7 @@ import {
   addDays,
   areIntervalsOverlappingInclusive,
   compareAscSQLDate,
+  daysInInterval,
   isValidSQLDateInterval,
   formatSQLDate,
   getDayFromNumber,
@@ -73,10 +74,14 @@ type SchedulerEventProps = {
   extendedProps?: Record<string, unknown>;
 };
 
+interface DailyHours {
+  date: string;
+  hours: number;
+}
+
 //--- MODULE CONSTANTS ---
 
 const RESOURCE_COLUMN_TEXT_CLASSNAME = "fc-datagrid-cell-main";
-const MILLISECONDS_PER_DAY = 8.64e7;
 
 //--- MODULE FUNCTIONS ---
 
@@ -114,18 +119,6 @@ export const compareCalendarStates = (
     prevSemester === nextSemester &&
     deepEqual(prevResources, nextResources)
   );
-};
-
-export const millisecondsToDays = (ms: number): number =>
-  ms < 0
-    ? Math.ceil(ms / MILLISECONDS_PER_DAY)
-    : Math.floor(ms / MILLISECONDS_PER_DAY);
-
-export const daysInInterval = (start: string, end: string): number => {
-  const inclusive = millisecondsToDays(
-    new Date(end).valueOf() - new Date(start).valueOf()
-  );
-  return inclusive + 1 * (inclusive < 0 ? -1 : 1);
 };
 
 export const makeResources = (
@@ -251,7 +244,7 @@ export const makeDailyHours = (
   location: Location,
   numberOfDays: number,
   { start }: Semester
-): SchedulerEventProps[] => {
+): [SchedulerEventProps[], DailyHours[]] => {
   const hours = location.hours.slice();
   hours.sort(({ date: start }, { date: end }) =>
     compareAscSQLDate({ start, end })
@@ -259,51 +252,67 @@ export const makeDailyHours = (
   let currentDate = start;
   let nextHours = hours.shift();
   let dayPointer = getDayNumberFromSQLDate(currentDate);
-  const res = [] as SchedulerEventProps[];
-  while (res.length < numberOfDays) {
+  const hoursAsEvents = [] as SchedulerEventProps[];
+  const hoursForCalc = [] as DailyHours[];
+  while (hoursAsEvents.length < numberOfDays) {
     if (nextHours && nextHours.date === currentDate) {
-      res.push({
-        id: `${Location.locationHoursId}-${res.length}`,
+      hoursAsEvents.push({
+        id: `${Location.locationHoursId}-${hoursAsEvents.length}`,
         start: nextHours.date,
         allDay: true,
         title: "" + nextHours.hours,
         resourceId: Location.locationHoursId,
       });
+      hoursForCalc.push({ date: nextHours.date, hours: nextHours.hours });
       nextHours = hours.shift();
     } else {
       const day = getDayFromNumber(dayPointer);
-      res.push({
-        id: `${Location.locationHoursId}-${res.length}`,
+      const hours = location.defaultHours[day];
+      hoursAsEvents.push({
+        id: `${Location.locationHoursId}-${hoursAsEvents.length}`,
         start: currentDate,
         allDay: true,
-        title: String(location.defaultHours[day]),
+        title: String(hours),
         resourceId: Location.locationHoursId,
       });
+      hoursForCalc.push({ date: currentDate, hours });
     }
     currentDate = addADay(currentDate);
     dayPointer = (dayPointer + 1) % 7;
   }
-  return res;
+  return [hoursAsEvents, hoursForCalc];
 };
 
+// need to calculate total hours for each week from the DailyHours
 export const processVirtualWeeks = (
   virtualWeeks: VirtualWeek[],
-  locationId: number
-): SchedulerEventProps[] => {
-  return virtualWeeks
+  locationId: number,
+  hoursForCalc: DailyHours[]
+): [SchedulerEventProps[], (VirtualWeek & { totalHours: number })[]] => {
+  const res = [] as (VirtualWeek & { totalHours: number })[];
+  const vwEvents = virtualWeeks
     .filter((vw) => vw.locationId === locationId)
-    .map((vw) => ({
-      ...vw,
-      end: addADay(vw.end),
-      id: `${VirtualWeek.eventPrefix}${vw.id}`,
-      resourceId: VirtualWeek.resourceId,
-      allDay: true,
-      title: `${vw.locationHours}`,
-    }));
+    .map((vw) => {
+      // calculate total hours for each week
+      const start = hoursForCalc.findIndex(({ date }) => date === vw.start);
+      const end = hoursForCalc.findIndex(({ date }) => date === vw.end);
+      let totalHours = 0;
+      for (let i = start; i <= end; i++) totalHours += hoursForCalc[i].hours;
+      res.push({ ...vw, totalHours });
+      return {
+        ...vw,
+        end: addADay(vw.end),
+        id: `${VirtualWeek.eventPrefix}${vw.id}`,
+        resourceId: VirtualWeek.resourceId,
+        allDay: true,
+        title: String(totalHours),
+      };
+    });
+  return [vwEvents, res];
 };
 
 export const processVirtualWeeksAsHoursRemaining = (
-  virtualWeeks: VirtualWeek[],
+  virtualWeeks: (VirtualWeek & { totalHours: number })[],
   locationId: number
 ): SchedulerEventProps[] =>
   virtualWeeks
@@ -314,7 +323,7 @@ export const processVirtualWeeksAsHoursRemaining = (
       id: `hr${vw.id}`,
       resourceId: VirtualWeek.hoursRemainingId,
       allDay: true,
-      title: `${vw.locationHours - vw.projectHours}`,
+      title: `${vw.totalHours - vw.projectHours}`,
     }));
 
 export const mostRecent = (a: Semester, b: Semester): Semester =>

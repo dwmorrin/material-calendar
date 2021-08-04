@@ -1,6 +1,4 @@
 import {
-  millisecondsToDays,
-  daysInInterval,
   makeResources,
   makeAllotmentEventMap,
   makeAllotmentSummaryEvent,
@@ -13,27 +11,6 @@ import {
 import VirtualWeek from "../resources/VirtualWeek";
 import Location from "../resources/Location";
 import Project from "../resources/Project";
-
-test("there are 1e3 * 60 * 60 * 24 ms in a day", () =>
-  expect(millisecondsToDays(1e3 * 60 * 60 * 24)).toEqual(1));
-
-test("millisecondsToDays works for zero", () =>
-  expect(millisecondsToDays(0)).toEqual(0));
-
-test("millisecondsToDays works for undefined", () =>
-  expect(millisecondsToDays()).toEqual(NaN));
-
-test("millisecondsToDays works for negative", () =>
-  expect(millisecondsToDays(-1)).toEqual(-0));
-
-test("daysInInterval returns 1 for same inputs", () =>
-  expect(daysInInterval("2020-06-18", "2020-06-18")).toEqual(1));
-
-test("daysInInterval returns positive days", () =>
-  expect(daysInInterval("2020-06-18", "2020-06-19")).toEqual(2));
-
-test("daysInInterval returns negative days", () =>
-  expect(daysInInterval("2020-06-21", "2020-06-19")).toEqual(-3));
 
 test("makeResources", () =>
   expect(

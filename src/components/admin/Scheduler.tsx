@@ -7,7 +7,6 @@ import Project, { defaultProject } from "../../resources/Project";
 import Location from "../../resources/Location";
 import {
   compareCalendarStates,
-  daysInInterval,
   eventClick,
   makeAllotments,
   makeDailyHours,
@@ -17,6 +16,7 @@ import {
   resourceClick,
   selectionHandler,
 } from "../../admin/scheduler";
+import { daysInInterval } from "../../utils/date";
 import {
   AdminSelectionProps,
   AdminUIProps,
@@ -64,15 +64,24 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
     setSelections({ semesterId: semester.id, locationId: location.id });
   }
 
-  const numberOfDays = daysInInterval(semester.start, semester.end);
-  const dailyHours = makeDailyHours(location, numberOfDays, semester);
+  const numberOfDays = daysInInterval(semester);
+  const [dailyHours, hoursForCalc] = makeDailyHours(
+    location,
+    numberOfDays,
+    semester
+  );
+  const [vwEvents, vwForCalc] = processVirtualWeeks(
+    virtualWeeks,
+    selections.locationId,
+    hoursForCalc
+  );
   const resources = makeResources(projects, selections.locationId, semester);
   const allotments = makeAllotments(projects, selections.locationId);
   const events = [
-    ...processVirtualWeeks(virtualWeeks, selections.locationId),
+    ...vwEvents,
     ...allotments,
     ...dailyHours,
-    ...processVirtualWeeksAsHoursRemaining(virtualWeeks, selections.locationId),
+    ...processVirtualWeeksAsHoursRemaining(vwForCalc, selections.locationId),
   ];
 
   return (

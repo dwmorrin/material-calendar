@@ -23,6 +23,7 @@ import {
   isIntervalWithinInterval,
 } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
+import Location from "../../resources/Location";
 import Project from "../../resources/Project";
 import VirtualWeek from "../../resources/VirtualWeek";
 import fetchProjectsAndVirtualWeeks from "../../admin/fetchProjectsAndVirtualWeeks";
@@ -108,6 +109,8 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       </DialogWrapper>
     );
 
+  const locationHours = Location.getTotalHours(location, selectedWeek);
+
   const validate = (values: Record<string, unknown>): void => {
     const hours = Number(values.hours);
     setFormErrors({
@@ -180,7 +183,7 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
             </TableRow>
             <TableRow>
               <TableCell>Location hours</TableCell>
-              <TableCell>{selectedWeek.locationHours}</TableCell>
+              <TableCell>{locationHours}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Project hours</TableCell>
@@ -188,9 +191,7 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
             </TableRow>
             <TableRow>
               <TableCell>Hours remaining</TableCell>
-              <TableCell>
-                {selectedWeek.locationHours - selectedWeek.projectHours}
-              </TableCell>
+              <TableCell>{locationHours - selectedWeek.projectHours}</TableCell>
             </TableRow>
           </Table>
         </TableContainer>

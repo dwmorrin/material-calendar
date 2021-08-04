@@ -5,6 +5,7 @@ import {
 } from "date-fns/fp";
 import {
   compareAsc,
+  differenceInCalendarDays,
   differenceInCalendarMonths,
   format,
   formatISO9075,
@@ -289,3 +290,6 @@ export const getDayFromNumber = (
   ];
   return days[Math.floor(dayNumber) % 7];
 };
+
+export const daysInInterval = ({ start, end }: DateStringInterval): number =>
+  differenceInCalendarDays(parseSQLDate(end), parseSQLDate(start)) + 1;

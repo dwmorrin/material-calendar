@@ -8,7 +8,6 @@ const template = (virtualWeek: unknown): string[][] =>
         ["Start", formatSlashed(parseSQLDate(virtualWeek.start))],
         ["End", formatSlashed(parseSQLDate(virtualWeek.end))],
         ["Location ID", virtualWeek.locationId.toString()],
-        ["Location hours", virtualWeek.locationHours.toString()],
         ["Project hours", virtualWeek.projectHours.toString()],
       ]
     : [["", JSON.stringify(virtualWeek)]];
