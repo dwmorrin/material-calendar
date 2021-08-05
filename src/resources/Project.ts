@@ -26,6 +26,7 @@ export interface Project {
   open: boolean;
   groupSize: number;
   groupAllottedHours: number;
+  totalAllottedHours: number;
 }
 
 const defaultProject = {
@@ -40,6 +41,7 @@ const defaultProject = {
   open: false,
   groupSize: 0,
   groupAllottedHours: 0,
+  totalAllottedHours: 0,
 };
 
 export class Project implements Project {
@@ -49,10 +51,6 @@ export class Project implements Project {
   static walkInTitle = "Walk-in";
   constructor(project = defaultProject) {
     Object.assign(this, project);
-  }
-
-  static totalAllottedHours(project: Project): number {
-    return project.allotments.reduce((acc, { hours }) => acc + hours, 0);
   }
 }
 

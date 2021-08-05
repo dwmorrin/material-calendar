@@ -154,8 +154,8 @@ export const makeResources = (
       extendedProps: { projectId: project.id },
     })),
     ...projectsOfInterest.map((project) => ({
-      id: `Allotments${project.id}`,
-      title: "Allotments",
+      id: `${Project.allotmentPrefix}${project.id}`,
+      title: `Allotments (Global total: ${project.totalAllottedHours})`,
       parentId: project.id,
       eventBackgroundColor: getColor("" + project.id),
       extendedProps: { projectId: project.id },
@@ -192,7 +192,7 @@ export const makeAllotmentEventMap =
     ...a,
     end: addADay(a.end),
     id: `${Project.allotmentPrefix}${p.id}-${index}`,
-    resourceId: `Allotments${p.id}`,
+    resourceId: `${Project.allotmentPrefix}${p.id}`,
     allDay: true,
     title: "" + a.hours,
     extendedProps: {
@@ -367,10 +367,17 @@ export const resourceClick =
           });
         }
         default: {
-          return dispatch({
-            type: AdminAction.OpenDetailWithProjectById,
-            meta: Number(id),
-          });
+          const maybeProjectId = id.startsWith(Project.allotmentPrefix)
+            ? Number(id.replace(Project.allotmentPrefix, ""))
+            : Number(id);
+          if (!isNaN(maybeProjectId) && maybeProjectId > 0)
+            // warning: we're assuming this project exists; throws if not
+            return dispatch({
+              type: AdminAction.OpenDetailWithProjectById,
+              meta: maybeProjectId,
+            });
+          // else we don't know what to do with this resource
+          console.log("unhandled resource click, ID: " + id);
         }
       }
     }

@@ -108,6 +108,7 @@ export const update = (
     // not editable properties
     id: project.id,
     allotments: project.allotments,
+    totalAllottedHours: project.totalAllottedHours,
     // simple editable properties
     title,
     open,
