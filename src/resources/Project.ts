@@ -50,6 +50,10 @@ export class Project implements Project {
   constructor(project = defaultProject) {
     Object.assign(this, project);
   }
+
+  static totalAllottedHours(project: Project): number {
+    return project.allotments.reduce((acc, { hours }) => acc + hours, 0);
+  }
 }
 
 export { defaultProject };
