@@ -13,7 +13,6 @@ import {
   addDays,
   areIntervalsOverlappingInclusive,
   compareAscSQLDate,
-  daysInInterval,
   isValidSQLDateInterval,
   formatSQLDate,
   getDayFromNumber,
