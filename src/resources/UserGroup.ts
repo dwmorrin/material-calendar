@@ -16,17 +16,19 @@ interface UserGroup {
   reservedHours: number;
 }
 
-class UserGroup implements UserGroup {
-  static makeTitle(members: GroupMember[]): string {
-    if (members.length === 1) {
-      return members[0].name.first + " " + members[0].name.last;
-    }
-    const lastNames = members.map((member) => member.name.last);
-    if (lastNames.length < 3) {
-      return lastNames.join(" and ");
-    }
-    return lastNames.slice(0, -1).join(", ") + ", and " + lastNames.slice(-1);
+// private helper function to dynamically generate group titles if none exist
+const makeTitle = (members: GroupMember[]): string => {
+  if (members.length === 1) {
+    return members[0].name.first + " " + members[0].name.last;
   }
+  const lastNames = members.map((member) => member.name.last);
+  if (lastNames.length < 3) {
+    return lastNames.join(" and ");
+  }
+  return lastNames.slice(0, -1).join(", ") + ", and " + lastNames.slice(-1);
+};
+
+class UserGroup implements UserGroup {
   static url = "/api/groups";
   constructor(
     group = {
@@ -39,7 +41,7 @@ class UserGroup implements UserGroup {
   ) {
     Object.assign(this, group);
     if (!this.title) {
-      this.title = UserGroup.makeTitle(this.members);
+      this.title = makeTitle(this.members);
     }
   }
 }
