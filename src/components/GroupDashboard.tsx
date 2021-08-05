@@ -280,6 +280,31 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                             }
                           })
                           .catch(dispatchError);
+                      } else {
+                        currentGroup.members.forEach((u) => {
+                          if (!u.email)
+                            return dispatchError(
+                              new Error(
+                                `${u.name.first} ${u.name.last} has no email`
+                              )
+                            );
+                          sendMail(
+                            u.email,
+                            user.name.first +
+                              " " +
+                              user.name.last +
+                              " has left the group",
+                            "Hello " +
+                              u.name?.first +
+                              ", " +
+                              user.name.first +
+                              " " +
+                              user.name.last +
+                              " has left your group for " +
+                              currentProject?.title,
+                            dispatchError
+                          );
+                        });
                       }
                       dispatch({ type: CalendarAction.LeftGroup });
                     }
@@ -354,6 +379,31 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                   payload: { error },
                                 });
                               } else {
+                                invitation.invitees.forEach((u) => {
+                                  if (!u.email)
+                                    return dispatchError(
+                                      new Error(
+                                        `${u.name.first} ${u.name.last} has no email`
+                                      )
+                                    );
+                                  sendMail(
+                                    u.email,
+                                    user.name.first +
+                                      " " +
+                                      user.name.last +
+                                      " has canceled the group invitation",
+                                    "Hello " +
+                                      u.name?.first +
+                                      ", " +
+                                      user.name.first +
+                                      " " +
+                                      user.name.last +
+                                      " has canceled the group invitation" +
+                                      " they sent to you for " +
+                                      currentProject?.title,
+                                    dispatchError
+                                  );
+                                });
                                 //Get updated invitations
                                 fetch(`/api/invitations/user/${user?.id}`)
                                   .then((response) => response.json())
