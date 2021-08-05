@@ -88,8 +88,10 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const isWithinSelection = isIntervalWithinInterval({ start, end });
 
   // is the selection under an existing allotment?
-  const existing = project.allotments.find(({ start, end }) =>
-    isWithinSelection({ start: parseSQLDate(start), end: parseSQLDate(end) })
+  const existing = project.allotments.find(
+    ({ start, end, locationId }) =>
+      locationId === location.id &&
+      isWithinSelection({ start: parseSQLDate(start), end: parseSQLDate(end) })
   );
 
   // find closest virtual week to the selection
