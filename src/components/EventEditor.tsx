@@ -135,7 +135,7 @@ const EventEditor: FunctionComponent<EventEditorProps> = ({
                   />
                   <Field
                     component={DatePicker}
-                    label="Until"
+                    label="Through (inclusive)"
                     name="__options__.until"
                   />
                 </Fragment>
