@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from "react";
+import { FormLabel, List, ListItem } from "@material-ui/core";
 import { Field } from "formik";
 import { CheckboxWithLabel, TextField } from "formik-material-ui";
 import { FormTemplateProps } from "../../../admin/types";
-import { List, ListItem } from "@material-ui/core";
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = () => (
   <List>
@@ -22,6 +22,9 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = () => (
         name={"allowsWalkIns"}
         Label={{ label: "Walk-in reservations are allowed" }}
       />
+    </ListItem>
+    <ListItem>
+      <FormLabel>Default hours per day (0-24)</FormLabel>
     </ListItem>
     <ListItem>
       <Field component={TextField} name="defaultHours.monday" label="Monday" />
