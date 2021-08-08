@@ -267,7 +267,7 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                             });
                         }}
                       >
-                        Grant Exception
+                        Approve Exception
                       </Button>
                       <Button
                         style={{ backgroundColor: "Red", color: "white" }}
@@ -324,7 +324,7 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                             });
                         }}
                       >
-                        Reject Exception
+                        Deny Exception
                       </Button>
                     </ButtonGroup>
                   </section>
@@ -464,10 +464,10 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                                   );
                                 sendMail(
                                   u.email,
-                                  "Your booking cancelation exception has been granted",
+                                  "Your booking cancelation exception has been approved",
                                   "Hello " +
                                     u.name?.first +
-                                    ", your booking cancelation exception has been granted for your session in " +
+                                    ", your booking cancelation exception has been approved for your session in " +
                                     reservation.event.location +
                                     " on " +
                                     reservation.event.start +
@@ -484,7 +484,7 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                             });
                         }}
                       >
-                        Grant Exception
+                        Approve Exception
                       </Button>
                       <Button
                         style={{ backgroundColor: "Red", color: "white" }}
@@ -537,7 +537,7 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                             });
                         }}
                       >
-                        Reject Exception
+                        Deny Exception
                       </Button>
                     </ButtonGroup>
                   </section>

@@ -154,6 +154,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
             id="filled-basic"
             label="You can type a message here"
             variant="filled"
+            fullWidth
             onChange={(event): void => {
               event.stopPropagation();
               setMessage(event.target.value);

@@ -715,28 +715,28 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
                                     user.name.first +
                                       " " +
                                       user.name.last +
-                                      " has rejected upir group invitation",
+                                      " has declined your group invitation",
                                     "Hello " +
                                       invitation.invitor.name.first +
                                       ", " +
                                       user.name.first +
                                       " " +
                                       user.name.last +
-                                      " has rejected your group invitation for " +
+                                      " has declined your group invitation for " +
                                       currentProject?.title,
                                     dispatchError
                                   );
                                   dispatch({
                                     type: CalendarAction.DisplayMessage,
                                     payload: {
-                                      message: "Invitation Rejected",
+                                      message: "Invitation Declined",
                                     },
                                   });
                                 }
                               });
                           }}
                         >
-                          Reject Invitation
+                          Decline Invitation
                         </Button>
                       </ButtonGroup>
                     )}

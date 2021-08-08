@@ -82,7 +82,11 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
         >
           <CloseIcon />
         </IconButton>
-        <Typography variant="h6">Make Reservation</Typography>
+        <Typography variant="h6">
+          {state.currentEvent?.reservation
+            ? "Update Reservation"
+            : "Make Reservation"}
+        </Typography>
       </Toolbar>
 
       <DialogContent>
@@ -165,7 +169,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                 />
               )}
               <RadioYesNo
-                label="Do you have any notes about your reservation for the Tech Staff?"
+                label="Do you have any notes about your reservation for the Tech Staff? (Please do not put equipment requests in the notes)"
                 name="hasNotes"
                 className={classes.item}
               />

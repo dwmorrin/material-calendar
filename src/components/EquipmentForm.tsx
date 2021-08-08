@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import FilterDrawer from "./FilterDrawer";
-import TuneIcon from "@material-ui/icons/Tune";
+import SearchIcon from "@material-ui/icons/Search";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import EquipmentList from "./EquipmentList";
 import {
@@ -156,7 +156,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
                   onClick={toggleFilterDrawer}
                   aria-label="filter"
                 >
-                  <TuneIcon />
+                  <SearchIcon />
                 </IconButton>
               )}
               <EquipmentViewToggleMenu state={state} dispatch={dispatch} />
