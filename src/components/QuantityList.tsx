@@ -1,13 +1,9 @@
 import React, { FunctionComponent } from "react";
 import { List, ListItem, Typography } from "@material-ui/core";
+import { EquipmentValue } from "../equipmentForm/types";
 
 interface QuantityListProps {
-  selectedEquipment: {
-    [k: string]: {
-      quantity: number;
-      items?: { id: number; quantity: number }[];
-    };
-  };
+  selectedEquipment: { [k: string]: EquipmentValue };
 }
 const FilterList: FunctionComponent<QuantityListProps> = ({
   selectedEquipment,
@@ -38,7 +34,7 @@ const FilterList: FunctionComponent<QuantityListProps> = ({
           >
             {selectedItems.map((key) => (
               <ListItem key={key}>
-                {key + ": " + selectedEquipment[key].quantity}
+                {key + ": " + selectedEquipment[key]}
               </ListItem>
             ))}
           </div>

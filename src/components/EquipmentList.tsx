@@ -7,7 +7,7 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import List from "@material-ui/core/List";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { EquipmentActionTypes } from "../equipmentForm/types";
+import { EquipmentActionTypes, EquipmentValue } from "../equipmentForm/types";
 import Category from "../resources/Category";
 
 interface EquipmentListProps {
@@ -16,10 +16,7 @@ interface EquipmentListProps {
   reserveEquipment: (id: number, quantity: number) => void;
   equipmentList: Equipment[] | undefined;
   selectedEquipment: {
-    [k: string]: {
-      quantity: number;
-      items?: { id: number; quantity: number }[];
-    };
+    [k: string]: EquipmentValue;
   };
   userRestriction: number;
 }

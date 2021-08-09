@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent } from "react";
 import {
   List,
   AppBar,
@@ -13,7 +13,6 @@ import SearchIcon from "@material-ui/icons/Search";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import EquipmentList from "./EquipmentList";
 import {
-  fetchAllEquipmentResources,
   filterItems,
   quantizeEquipment,
   transition,
@@ -46,8 +45,6 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   const quantizedEquipment = quantizeEquipment(
     Equipment.getAvailableItems(state.equipment, event)
   );
-  //const quantizedEquipment = quantizeEquipment(state.equipment);
-  //console.log(quantizedEquipment);
 
   const reserveEquipment = (id: number, quantity: number): void => {
     let quantityToReserve = quantity;
@@ -83,7 +80,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
     );
   };
 
-  useEffect(() => fetchAllEquipmentResources(dispatch), []);
+  // useEffect(() => fetchAllEquipmentResources(dispatch), []);
   if (!user?.username) return null;
 
   const toggleFilterDrawer = (): void =>
@@ -92,7 +89,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   const toggleEquipmentCart = (): void =>
     dispatch({ type: EquipmentActionTypes.ToggleEquipmentCart, payload: {} });
   return (
-    <Dialog fullScreen open={open} TransitionComponent={transition}>
+    <Dialog open={open} TransitionComponent={transition}>
       <div className={classes.root}>
         <FilterDrawer
           state={state}

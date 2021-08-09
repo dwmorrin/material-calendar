@@ -2,14 +2,15 @@ import { makeStyles } from "@material-ui/core";
 import { makeTransition } from "../components/Transition";
 import { object, string } from "yup";
 import { FormikValues } from "formik";
-import { CalendarAction, CalendarState, Action } from "./types";
+import { CalendarAction, Action } from "./types";
 import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
 import Reservation from "../resources/Reservation";
+import Equipment from "../resources/Equipment";
 import Event from "../resources/Event";
-import { ResourceKey } from "../resources/types";
 import { Mail } from "../utils/mail";
 import User from "../resources/User";
+import { EquipmentValue } from "../equipmentForm/types";
 
 interface ReservationFormValues extends Record<string, unknown> {
   event?: number;
@@ -22,10 +23,7 @@ interface ReservationFormValues extends Record<string, unknown> {
   hasGuests: string;
   hasNotes: string;
   equipment: {
-    [k: string]: {
-      quantity: number;
-      items?: { id: number; quantity: number }[];
-    };
+    [makeModelDescription: string]: EquipmentValue;
   };
   hasEquipment: string;
 }
@@ -141,16 +139,20 @@ export const submitHandler =
   };
 
 export const makeInitialValues = (
-  state: CalendarState,
-  projects: Project[]
+  event: Event,
+  group: UserGroup,
+  equipment: Equipment[],
+  project: Project
 ): ReservationFormValues => {
-  const project = projects[0] || new Project();
-  const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-    ({ projectId }) => projectId === project.id
-  );
-  return {
-    event: state.currentEvent?.id,
-    groupId: group?.id,
+  const reservation = event.reservation;
+  const equipmentValues = equipment.reduce((acc, item) => {
+    const hash = Equipment.makeNameHash(item);
+    if (!(hash in acc)) acc[hash] = { quantity: 0, items: [] };
+    return acc;
+  }, {} as { [hash: string]: EquipmentValue });
+  const defaultValues = {
+    event: event.id,
+    groupId: group.id,
     phone: "",
     description: "",
     guests: "",
@@ -159,29 +161,50 @@ export const makeInitialValues = (
     hasGuests: "no",
     hasNotes: "no",
     hasEquipment: "no",
-    equipment: {},
+    equipment: equipmentValues,
   };
+  if (reservation) {
+    // update equipment quantities
+
+    // override defaults
+    return {
+      id: reservation.id,
+      groupId: reservation.groupId,
+      project: reservation.projectId,
+      description: reservation.description,
+      phone: reservation.contact,
+      liveRoom: reservation.liveRoom ? "yes" : "no",
+      guests: reservation.guests,
+      hasGuests: reservation.guests ? "yes" : "no",
+      hasNotes: reservation.notes ? "yes" : "no",
+      notes: reservation.notes,
+      //equipment: reservation.equipment || {},
+      equipment: defaultValues.equipment,
+      hasEquipment: reservation.equipment ? "yes" : "no",
+    };
+  }
+  return defaultValues;
 };
 
-export const getValuesFromReservation = (
-  event?: Event
-): ReservationFormValues | null => {
-  if (!event?.reservation) {
-    return null;
-  }
-  return {
-    id: event.reservation.id,
-    event: event.id,
-    groupId: event.reservation.groupId,
-    project: event.reservation.projectId,
-    description: event.reservation.description,
-    phone: event.reservation.contact,
-    liveRoom: event.reservation.liveRoom ? "yes" : "no",
-    guests: event.reservation.guests,
-    hasGuests: event.reservation.guests ? "yes" : "no",
-    hasNotes: event.reservation.notes ? "yes" : "no",
-    notes: event.reservation.notes,
-    equipment: event.reservation.equipment || {},
-    hasEquipment: event.reservation.equipment ? "yes" : "no",
-  };
-};
+// export const getValuesFromReservation = (
+//   event?: Event
+// ): ReservationFormValues | null => {
+//   if (!event?.reservation) {
+//     return null;
+//   }
+//   return {
+//     id: event.reservation.id,
+//     event: event.id,
+//     groupId: event.reservation.groupId,
+//     project: event.reservation.projectId,
+//     description: event.reservation.description,
+//     phone: event.reservation.contact,
+//     liveRoom: event.reservation.liveRoom ? "yes" : "no",
+//     guests: event.reservation.guests,
+//     hasGuests: event.reservation.guests ? "yes" : "no",
+//     hasNotes: event.reservation.notes ? "yes" : "no",
+//     notes: event.reservation.notes,
+//     equipment: event.reservation.equipment || {},
+//     hasEquipment: event.reservation.equipment ? "yes" : "no",
+//   };
+// };

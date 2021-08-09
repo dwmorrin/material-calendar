@@ -3,6 +3,16 @@ import Equipment from "../resources/Equipment";
 import Tag from "../resources/Tag";
 import Event from "../resources/Event";
 
+export type EquipmentValue = {
+  quantity: number;
+  items?:
+    | {
+        id: number;
+        quantity: number;
+      }[];
+};
+
+export type EquipmentFormValue = string | number | boolean | EquipmentValue;
 export interface EquipmentState {
   filterDrawerIsOpen: boolean;
   equipmentCartIsOpen: boolean;
@@ -14,22 +24,7 @@ export interface EquipmentState {
   selectedTags: { [k: string]: boolean };
   selectedCategory: Category | null;
   categoryPath: Category[];
-  setFieldValue: (
-    field: string,
-    value:
-      | string
-      | number
-      | boolean
-      | {
-          quantity: number;
-          items?:
-            | {
-                id: number;
-                quantity: number;
-              }[]
-            | undefined;
-        }
-  ) => void;
+  setFieldValue: (field: string, value: EquipmentFormValue) => void;
 }
 
 export enum EquipmentActionTypes {
@@ -53,27 +48,15 @@ export interface EquipmentAction {
 export interface EquipmentFormProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  selectedEquipment: {
-    [k: string]: {
-      quantity: number;
-      items?: { id: number; quantity: number }[];
-    };
-  };
-  setFieldValue: (
-    field: string,
-    value:
-      | string
-      | number
-      | boolean
-      | {
-          quantity: number;
-          items?:
-            | {
-                id: number;
-                quantity: number;
-              }[]
-            | undefined;
-        }
-  ) => void;
+  selectedEquipment: { [k: string]: EquipmentValue };
+  setFieldValue: (field: string, value: EquipmentFormValue) => void;
   event: Event;
+}
+
+export interface EquipmentCartProps {
+  state: EquipmentState;
+  onClose: () => void;
+  onOpen: () => void;
+  selectedEquipment: { [k: string]: EquipmentValue };
+  setFieldValue: (field: string, value: EquipmentFormValue) => void;
 }

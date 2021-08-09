@@ -5,23 +5,10 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import React, { FunctionComponent } from "react";
 import ErrorIcon from "@material-ui/icons/Error";
 import Equipment from "../resources/Equipment";
+import { EquipmentFormValue } from "../equipmentForm/types";
 
 const getItemName = ({ manufacturer, model, description }: Equipment): string =>
   [manufacturer, model, description].filter(String).join(" ");
-
-type EquipmentFormValue =
-  | string
-  | number
-  | boolean
-  | {
-      quantity: number;
-      items?:
-        | {
-            id: number;
-            quantity: number;
-          }[]
-        | undefined;
-    };
 
 interface EquipmentItemProps {
   item: Equipment;

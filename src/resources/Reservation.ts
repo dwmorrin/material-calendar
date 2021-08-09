@@ -1,3 +1,5 @@
+import Equipment from "./Equipment";
+
 interface ActionDetails {
   on: string;
   by: string;
@@ -20,6 +22,7 @@ interface Reservation {
       deniedId: ActionDetails;
     };
   } | null;
+  equipment: Equipment[];
 }
 
 class Reservation implements Reservation {
@@ -46,6 +49,7 @@ class Reservation implements Reservation {
       projectId: 0,
       groupId: 0,
       guests: "",
+      equipment: [] as Equipment[],
     }
   ) {
     Object.assign(this, res);

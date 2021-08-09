@@ -3,6 +3,19 @@ import List from "@material-ui/core/List";
 import EquipmentItem from "./EquipmentItem";
 import Equipment from "../resources/Equipment";
 
+type EquipmentValue =
+  | string
+  | number
+  | boolean
+  | {
+      quantity: number;
+      items?:
+        | {
+            id: number;
+            quantity: number;
+          }[]
+        | undefined;
+    };
 interface EquipmentStandardListProps {
   equipmentList?: Equipment[];
   reserveEquipment: (id: number, quantity: number) => void;
@@ -13,22 +26,7 @@ interface EquipmentStandardListProps {
     };
   };
   userRestriction: number;
-  setFieldValue: (
-    field: string,
-    value:
-      | string
-      | number
-      | boolean
-      | {
-          quantity: number;
-          items?:
-            | {
-                id: number;
-                quantity: number;
-              }[]
-            | undefined;
-        }
-  ) => void;
+  setFieldValue: (field: string, value: EquipmentValue) => void;
 }
 const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
   equipmentList,

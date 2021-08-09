@@ -26,10 +26,10 @@ import {
   useStyles,
   submitHandler,
   transition,
-  getValuesFromReservation,
 } from "../calendar/reservationForm";
 import { useAuth } from "./AuthProvider";
 import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
+import Equipment from "../resources/Equipment";
 
 const RadioYesNo: FunctionComponent<{
   label: string;
@@ -67,6 +67,14 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   };
   const { user } = useAuth();
 
+  if (!state.currentEvent) return null;
+  const project = projects[0] || new Project();
+  const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
+    ({ projectId }) => projectId === project.id
+  );
+  if (!group) return null;
+  const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
+
   return (
     <Dialog
       fullScreen
@@ -83,7 +91,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
           <CloseIcon />
         </IconButton>
         <Typography variant="h6">
-          {state.currentEvent?.reservation
+          {state.currentEvent.reservation
             ? "Update Reservation"
             : "Make Reservation"}
         </Typography>
@@ -91,10 +99,12 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
 
       <DialogContent>
         <Formik
-          initialValues={
-            getValuesFromReservation(state.currentEvent) ||
-            makeInitialValues(state, projects)
-          }
+          initialValues={makeInitialValues(
+            state.currentEvent,
+            group,
+            equipment,
+            project
+          )}
           onSubmit={submitHandler(
             closeForm,
             dispatch,
@@ -228,7 +238,10 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                   event={state.currentEvent}
                 />
               )}
-              <pre>{JSON.stringify(values, null, 2)}</pre>
+              <pre>
+                {process.env.NODE_ENV === "development" &&
+                  JSON.stringify(values, null, 2)}
+              </pre>
             </Form>
           )}
         </Formik>

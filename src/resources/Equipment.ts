@@ -88,6 +88,10 @@ class Equipment implements Equipment {
     Object.assign(this, equip);
     if (typeof this.model === "number") this.model = String(this.model);
   }
+
+  static makeNameHash({ manufacturer, model, description }: Equipment): string {
+    return [manufacturer, model, description].filter(String).join(" ");
+  }
 }
 
 export default Equipment;

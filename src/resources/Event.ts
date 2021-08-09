@@ -23,7 +23,7 @@ export interface ReservationInfo {
   equipment?: {
     [k: string]: {
       quantity: number;
-      items?: { id: number; quantity: number }[];
+      items: { id: number; quantity: number }[];
     };
   };
 }

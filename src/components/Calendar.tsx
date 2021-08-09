@@ -20,9 +20,11 @@ import ProjectForm from "./ProjectForm";
 import Snackbar from "./Snackbar";
 import ErrorPage from "./ErrorPage";
 import User from "../resources/User";
+import Equipment from "../resources/Equipment";
 import Event from "../resources/Event";
 import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
+import Category from "../resources/Category";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useAuth();
@@ -54,7 +56,9 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `${Location.url}?context=${ResourceKey.Locations}`,
       `${User.url}/${user.id}/courses?context=${ResourceKey.Courses}`,
       `${UserGroup.url}/user/${user.id}/?context=${ResourceKey.Groups}`,
-      `${User.url}/${user.id}/projects?context=${ResourceKey.Projects}`
+      `${User.url}/${user.id}/projects?context=${ResourceKey.Projects}`,
+      `${Equipment.url}?context=${ResourceKey.Equipment}`,
+      `${Category.url}?context=${ResourceKey.Categories}`
     );
     fetch(`/api/invitations/user/${user?.id}/`)
       .then((response) => response.json())

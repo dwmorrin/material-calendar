@@ -1,37 +1,10 @@
 import React, { FunctionComponent } from "react";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-import { EquipmentState } from "../equipmentForm/types";
+import { EquipmentCartProps } from "../equipmentForm/types";
 import MenuItem from "@material-ui/core/MenuItem";
 import { List, ListItem, ListItemText, Typography } from "@material-ui/core";
 import Select from "@material-ui/core/Select";
 
-interface EquipmentCartProps {
-  state: EquipmentState;
-  onClose: () => void;
-  onOpen: () => void;
-  selectedEquipment: {
-    [k: string]: {
-      quantity: number;
-      items?: { id: number; quantity: number }[];
-    };
-  };
-  setFieldValue: (
-    field: string,
-    value:
-      | string
-      | number
-      | boolean
-      | {
-          quantity: number;
-          items?:
-            | {
-                id: number;
-                quantity: number;
-              }[]
-            | undefined;
-        }
-  ) => void;
-}
 const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
   state,
   onClose,
@@ -39,11 +12,11 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
   selectedEquipment,
   setFieldValue,
 }) => {
-  const selectedItems = Object.keys(selectedEquipment).filter(function (
-    key: string
-  ) {
-    return selectedEquipment[key].quantity > 0;
-  });
+  // const selectedItems = Object.keys(selectedEquipment).filter(function (
+  //   key: string
+  // ) {
+  //   return selectedEquipment[key] > 0;
+  // });
 
   return (
     <SwipeableDrawer
@@ -53,9 +26,9 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
       onOpen={onOpen}
     >
       <Typography variant="subtitle2" style={{ textAlign: "center" }}>
-        Equipment in your cart
+        Equipment in your cart (this is broken for now)
       </Typography>
-      <hr
+      {/* <hr
         style={{
           minWidth: "100%",
         }}
@@ -69,7 +42,7 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
                   (item.manufacturer && item.model
                     ? item.manufacturer + " " + item.model
                     : item.description) === key
-              )?.quantity || selectedEquipment[key].quantity;
+              ) || selectedEquipment[key];
             const selectOptions = Array.from({
               length: maxQuantity + 1,
             }).map((_, i) => (
@@ -92,7 +65,7 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
                   <Select
                     labelId={key + "Quantity Select"}
                     name={"equipment[" + key + "]"}
-                    value={selectedEquipment[key].quantity}
+                    value={selectedEquipment[key]}
                     onChange={(event): void =>
                       setFieldValue("equipment[" + key + "]", {
                         ...selectedEquipment[key],
@@ -109,7 +82,7 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
         </List>
       ) : (
         <div>Cart is empty.</div>
-      )}
+      )} */}
     </SwipeableDrawer>
   );
 };
