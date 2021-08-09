@@ -6,10 +6,22 @@ import React, { FunctionComponent } from "react";
 import ErrorIcon from "@material-ui/icons/Error";
 import Equipment from "../resources/Equipment";
 
-const getItemName = (item: Equipment): string =>
-  item.manufacturer && item.model
-    ? item.manufacturer + " " + item.model
-    : item.description;
+const getItemName = ({ manufacturer, model, description }: Equipment): string =>
+  [manufacturer, model, description].filter(String).join(" ");
+
+type EquipmentFormValue =
+  | string
+  | number
+  | boolean
+  | {
+      quantity: number;
+      items?:
+        | {
+            id: number;
+            quantity: number;
+          }[]
+        | undefined;
+    };
 
 interface EquipmentItemProps {
   item: Equipment;
@@ -17,25 +29,11 @@ interface EquipmentItemProps {
     quantity: number;
     items?: { id: number; quantity: number }[];
   };
-  setFieldValue: (
-    field: string,
-    value:
-      | string
-      | number
-      | boolean
-      | {
-          quantity: number;
-          items?:
-            | {
-                id: number;
-                quantity: number;
-              }[]
-            | undefined;
-        }
-  ) => void;
+  setFieldValue: (field: string, value: EquipmentFormValue) => void;
   reserveEquipment: (id: number, quantity: number) => void;
   userRestriction: number;
 }
+
 const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   item,
   values,
