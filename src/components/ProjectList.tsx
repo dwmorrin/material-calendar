@@ -13,7 +13,7 @@ const ProjectList: FunctionComponent<
   const courses = state.resources[ResourceKey.Courses] as Course[];
   return (
     <div>
-      {projects.length ? <Typography variant="body1">Projects</Typography> : ""}
+      {projects.length ? <Typography variant="body1">Courses</Typography> : ""}
       {courses &&
         courses.map((course, index) => (
           <ProjectAccordionList
