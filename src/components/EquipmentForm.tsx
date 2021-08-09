@@ -6,6 +6,7 @@ import {
   IconButton,
   Typography,
   Dialog,
+  Button,
 } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import FilterDrawer from "./FilterDrawer";
@@ -68,10 +69,10 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
         <AppBar position="sticky">
           <List>
             <Toolbar>
-              <IconButton
+              <Button
                 type="submit"
-                edge="start"
-                color="inherit"
+                style={{ backgroundColor: "salmon", color: "white" }}
+                variant="contained"
                 aria-label="close"
                 onClick={(): void =>
                   state.categoryDrawerView && state.selectedCategory
@@ -82,8 +83,8 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
                     : setOpen(false)
                 }
               >
-                <ArrowBackIosIcon />
-              </IconButton>
+                Continue with Reservation
+              </Button>
               {state.categoryDrawerView ? (
                 <Typography
                   style={{
