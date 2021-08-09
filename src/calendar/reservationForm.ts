@@ -5,11 +5,30 @@ import { FormikValues } from "formik";
 import { CalendarAction, CalendarState, Action } from "./types";
 import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
-import Equipment from "../resources/Equipment";
+import Reservation from "../resources/Reservation";
 import Event from "../resources/Event";
 import { ResourceKey } from "../resources/types";
-import { sendMail } from "../utils/mail";
+import { Mail } from "../utils/mail";
 import User from "../resources/User";
+
+interface ReservationFormValues extends Record<string, unknown> {
+  event?: number;
+  groupId?: number;
+  project: number;
+  description: string;
+  phone: string;
+  liveRoom: string;
+  guests: string;
+  hasGuests: string;
+  hasNotes: string;
+  equipment: {
+    [k: string]: {
+      quantity: number;
+      items?: { id: number; quantity: number }[];
+    };
+  };
+  hasEquipment: string;
+}
 
 export const useStyles = makeStyles({
   list: {
@@ -37,89 +56,7 @@ export const validationSchema = object().shape({
   }),
 });
 
-export function getEquipmentIds(
-  requests: {
-    [k: string]: {
-      quantity: number;
-      items?: { id: number; quantity: number }[];
-    };
-  },
-  event: Event
-): {
-  [k: number]: number;
-} {
-  const equipmentList: Equipment[] = [];
-  const newList: {
-    [k: string]: number;
-  } = {};
-  fetch(`/api/equipment`)
-    .then((response) => response.json())
-    .then((data) => {
-      data.data.map((item: Equipment) =>
-        equipmentList.push(new Equipment(item))
-      );
-    })
-    .then(() => {
-      const filteredList = Equipment.availableItems(equipmentList, event);
-      Object.keys(requests).forEach((key) => {
-        // TODO Determine why this can't be used directly with a ternary of ||
-        // when setting quantityToChange
-        const items: { id: number; quantity: number }[] =
-          requests[key].items || [];
-        // Put the current reservations into the reservation form.
-        items.forEach((item) => (newList[item.id] = item.quantity));
-        // set the quantity to reserve to the quantity to change from
-        // the current reservation. If it is positive, reserve more, if it is
-        // negative, set item reservations to 0 until the
-        // requests[key].quantity is equal to the sum of requests[key].items
-        // quantities
-        let quantityToChange =
-          requests[key].quantity -
-          items.map((item) => item.quantity).reduce((a, b) => a + b, 0);
-        while (quantityToChange > 0) {
-          const item = filteredList
-            .filter((item) => !newList[item.id])
-            .find(
-              (item) =>
-                (item.manufacturer && item.model
-                  ? item.manufacturer + " " + item.model
-                  : item.description) === key
-            );
-          if (!item) {
-            // This is an error, no item found with given modelId
-            return null;
-          }
-          if (item.quantity >= quantityToChange) {
-            newList[item.id] = quantityToChange;
-            quantityToChange = 0;
-          } else {
-            newList[item.id] = item.quantity;
-            quantityToChange = quantityToChange - item.quantity;
-          }
-        }
-        for (let i = 0; quantityToChange < 0; ++i) {
-          const item = items[i];
-          // if we need to remove more than this item's quantity
-          if (Math.abs(quantityToChange) >= item.quantity) {
-            // bring quantityToChange closer to 0 by adding the item's
-            // quantity as it is removed
-            quantityToChange = quantityToChange + item.quantity;
-            // set this requested item's quantity to 0
-            newList[item.id] = 0;
-          }
-          // if we can reduce this single item to satisfy quantityToChange
-          else {
-            //reduce the item by the quantityToChange
-            newList[item.id] = item.quantity + quantityToChange;
-            // set quantity to reserve to 0, we are done
-            quantityToChange = 0;
-          }
-        }
-      });
-    });
-  return newList;
-}
-
+// TODO: please include EQUIPMENT in this form
 const updater = (values: Record<string, unknown>): Record<string, unknown> => {
   const updated = {
     allotmentId: values.event,
@@ -134,17 +71,19 @@ const updater = (values: Record<string, unknown>): Record<string, unknown> => {
   return values.id ? { ...updated, id: values.id } : updated;
 };
 
-export const makeEquipmentRequests = (
-  equipment: Record<string, unknown>,
-  bookingId: number
-): { id: string; bookingId: number; quantity: number }[] => {
-  return Object.entries(equipment).map(([key, value]) => {
-    return {
-      id: key,
-      bookingId: bookingId,
-      quantity: value as number,
-    };
-  });
+const groupMail = (
+  { name: { first, last } }: User,
+  { title }: Project,
+  { members }: UserGroup,
+  { start, location }: Event,
+  type: "modified" | "created"
+): Mail => {
+  const subject = `${first} ${last} has ${type} a reservation for your group`;
+  return {
+    to: members.map(({ email }) => email).join(),
+    subject,
+    text: `${subject} for ${title} on ${start} in ${location.title}`,
+  };
 };
 
 export const submitHandler =
@@ -156,95 +95,35 @@ export const submitHandler =
     groups: UserGroup[],
     projects: Project[]
   ) =>
-  (values: { [k: string]: unknown }, actions: FormikValues): void => {
-    values = {
-      ...values,
-      equipment: getEquipmentIds(
-        values.equipment as {
-          [k: string]: {
-            quantity: number;
-            items?: { id: number; quantity: number }[];
-          };
-        },
-        values.event as Event
-      ),
-    };
+  (values: ReservationFormValues, actions: FormikValues): void => {
     actions.setSubmitting(true);
     const dispatchError = (error: Error): void =>
       dispatch({ type: CalendarAction.Error, payload: { error } });
-    fetch(`/api/reservations${values.id ? `/${values.id}` : ""}`, {
+
+    const group = groups.find((group) => group.id === values.groupId);
+    const project = projects.find((project) => project.id === values.project);
+    const mail =
+      group && project && event
+        ? groupMail(
+            user,
+            project,
+            group,
+            event,
+            values.id ? "modified" : "created"
+          )
+        : undefined;
+
+    fetch(`${Reservation.url}${values.id ? `/${values.id}` : ""}`, {
       method: values.id ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updater(values)),
+      body: JSON.stringify({ ...updater(values), mail }),
     })
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error) return dispatchError(error);
-        if (
-          Object.entries(values.equipment as Record<string, unknown>).length
-        ) {
-          fetch(`/api/reservations/equipment/${data.id || values.id}`, {
-            method: values.id ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(
-              makeEquipmentRequests(
-                values.equipment as Record<string, unknown>,
-                values.id || data.id
-              )
-            ),
-          })
-            .then((response) => response.json())
-            .then(({ error }) => {
-              if (error) dispatchError(error);
-            })
-            .catch(dispatchError);
-        }
-      })
-      .catch(dispatchError)
-      .finally(() => {
-        actions.setSubmitting(false);
-        if (event) {
-          const group = groups.find((group) => group.id === values.groupId);
-          const project = projects.find(
-            (project) => project.id === values.project
-          );
-          const subject =
-            (values.id ? "modified" : "created") +
-            " a reservation for your group";
-          const body =
-            subject +
-            " for " +
-            project?.title +
-            " on " +
-            event.start +
-            " in " +
-            event.location.title;
-          if (group) {
-            group.members
-              .filter((member) => member.username !== user.username)
-              .forEach((member) =>
-                sendMail(
-                  member.email,
-                  user.name.first + " " + user.name.last + " has " + subject,
-                  "Hello " +
-                    member.name.first +
-                    ", " +
-                    user.name.first +
-                    " " +
-                    user.name.last +
-                    " has " +
-                    body,
-                  dispatchError
-                )
-              );
-          }
-          sendMail(
-            user.email,
-            "You have " + subject,
-            "Hello " + user.name.first + ",  You have " + body,
-            dispatchError
-          );
-        }
+        if (!data) return dispatchError(new Error("No data returned"));
+        // TODO: Update the reservation.
+        // TODO: Update the equipment.
         dispatch({
           type: CalendarAction.DisplayMessage,
           payload: {
@@ -253,6 +132,10 @@ export const submitHandler =
               : "Your Reservation has been made!",
           },
         });
+      })
+      .catch(dispatchError)
+      .finally(() => {
+        actions.setSubmitting(false);
         closeForm();
       });
   };
@@ -260,27 +143,10 @@ export const submitHandler =
 export const makeInitialValues = (
   state: CalendarState,
   projects: Project[]
-): {
-  event: number | undefined;
-  groupId: number | undefined;
-  project: number;
-  description: string;
-  phone: string;
-  liveRoom: string;
-  guests: string;
-  hasGuests: string;
-  hasNotes: string;
-  equipment: {
-    [k: string]: {
-      quantity: number;
-      items?: { id: number; quantity: number }[];
-    };
-  };
-  hasEquipment: string;
-} => {
+): ReservationFormValues => {
   const project = projects[0] || new Project();
   const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-    (group) => group.projectId === project.id
+    ({ projectId }) => projectId === project.id
   );
   return {
     event: state.currentEvent?.id,
@@ -298,27 +164,8 @@ export const makeInitialValues = (
 };
 
 export const getValuesFromReservation = (
-  event: Event | undefined
-): {
-  id: number;
-  event: number;
-  groupId: number;
-  project: number;
-  description: string;
-  phone: string;
-  liveRoom: string;
-  guests: string;
-  hasGuests: string;
-  hasNotes: string;
-  notes: string;
-  equipment: {
-    [k: string]: {
-      quantity: number;
-      items?: { id: number; quantity: number }[];
-    };
-  };
-  hasEquipment: string;
-} | null => {
+  event?: Event
+): ReservationFormValues | null => {
   if (!event?.reservation) {
     return null;
   }

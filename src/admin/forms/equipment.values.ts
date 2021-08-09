@@ -10,6 +10,7 @@ interface EquipmentValues extends Record<string, unknown> {
   serial: string;
   description: string;
   sku: string;
+  barcode: string;
   restriction: string;
   quantity: string;
   categoryId: string;
@@ -27,6 +28,7 @@ export const values = (state: AdminState): Record<string, unknown> => {
     serial: equip.serial,
     description: equip.description,
     sku: equip.sku,
+    barcode: equip.barcode,
     restriction: String(equip.restriction),
     quantity: String(equip.quantity),
     categoryId: String(equip.category.id),
@@ -44,6 +46,7 @@ export const update = (state: AdminState, values: unknown): Equipment => {
     serial,
     description,
     sku,
+    barcode,
     restriction,
     quantity,
     categoryId,
@@ -59,6 +62,7 @@ export const update = (state: AdminState, values: unknown): Equipment => {
     serial,
     description,
     sku,
+    barcode,
     quantity: Number(quantity),
     category: {
       id: Number(categoryId),

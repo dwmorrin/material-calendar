@@ -44,7 +44,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   });
   const classes = useStyles();
   const quantizedEquipment = quantizeEquipment(
-    Equipment.availableItems(state.equipment, event)
+    Equipment.getAvailableItems(state.equipment, event)
   );
   //const quantizedEquipment = quantizeEquipment(state.equipment);
   //console.log(quantizedEquipment);

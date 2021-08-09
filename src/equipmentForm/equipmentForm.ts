@@ -71,64 +71,6 @@ export const fetchAllEquipmentResources = (
   );
 };
 
-export const makeValidTags = (
-  tags: Tag[],
-  selectedCategory: string
-): string[] =>
-  tags
-    .filter((tag) => tag.category.title === selectedCategory)
-    .map((tag) => tag.title)
-    .filter((v, i, a) => a.indexOf(v) === i);
-
-export const makeToggleFilterDrawer =
-  (
-    currentState: boolean,
-    setFilterDrawerIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  ) =>
-  (event?: React.KeyboardEvent | React.MouseEvent): void => {
-    if (
-      event?.type === "keydown" &&
-      ((event as React.KeyboardEvent).key === "Tab" ||
-        (event as React.KeyboardEvent).key === "Shift")
-    ) {
-      return;
-    }
-    setFilterDrawerIsOpen(!currentState);
-  };
-
-export function queryEquipment(
-  equipment: Equipment[],
-  searchString: string
-): Equipment[] {
-  if (!searchString) {
-    return equipment;
-  }
-  const queries = searchString.trim().toLowerCase().split(/\W+/);
-  return equipment.filter((equipment) =>
-    queries.every(
-      (query) =>
-        equipment.description.toLowerCase().includes(query) ||
-        equipment.category.title.toLowerCase().includes(query) ||
-        equipment.tags.some((tag) => tag.title.toLowerCase().includes(query))
-    )
-  );
-}
-
-// Filtering Function to reduce the size of the equipment array being passed down
-export function filterEquipment(
-  equipment: Equipment[],
-  filters: { [k: string]: boolean }
-): Equipment[] | undefined {
-  const activeFilters = Object.keys(filters)
-    .filter((key) => filters[key])
-    .map((key) => key.trim().toLowerCase());
-  return equipment.filter((item) =>
-    activeFilters.every((filter) =>
-      item.tags.some((tag) => tag.title.toLowerCase().includes(filter))
-    )
-  );
-}
-
 const last = (array: Equipment[]): Equipment => array[array.length - 1];
 const byDescription = (a: Equipment, b: Equipment): number =>
   a.description < b.description ? -1 : a.description > b.description ? 1 : 0;
@@ -138,23 +80,24 @@ const copyAndSortByDescription = (array: Equipment[]): Equipment[] => {
   return copy;
 };
 
-const byManufacturerandModel = (a: Equipment, b: Equipment): number =>
-  (a.manufacturer || "") + " " + (a.model || "") <
-  (b.manufacturer || "") + " " + (b.model || "")
+const byManufacturerAndModel = (
+  { manufacturer: makeA, model: modelA }: Equipment,
+  { manufacturer: makeB, model: modelB }: Equipment
+): number =>
+  makeA + " " + modelA < makeB + " " + modelB
     ? -1
-    : (a.manufacturer || "") + " " + (a.model || "") <
-      (b.manufacturer || "") + " " + (b.model || "")
+    : makeA + " " + modelA < makeB + " " + modelB
     ? 1
     : 0;
-const copyAndSortByManufacturerandModel = (array: Equipment[]): Equipment[] => {
+const copyAndSortByManufacturerAndModel = (array: Equipment[]): Equipment[] => {
   const copy = array.slice();
-  copy.sort(byManufacturerandModel);
+  copy.sort(byManufacturerAndModel);
   return copy;
 };
 
 export function quantizeEquipment(equipment: Equipment[]): Equipment[] {
   if (!equipment.length) return [];
-  const toBeQuantized = copyAndSortByManufacturerandModel(
+  const toBeQuantized = copyAndSortByManufacturerAndModel(
     copyAndSortByDescription(equipment)
   );
   const quantized = [{ ...toBeQuantized[0] }];

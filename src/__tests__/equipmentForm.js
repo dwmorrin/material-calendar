@@ -1,6 +1,4 @@
 import {
-  queryEquipment,
-  filterEquipment,
   quantizeEquipment,
   filterItems,
   makeQueryRegExp,
@@ -50,34 +48,6 @@ const mic = {
 Object.freeze(mic);
 
 //--------- TESTS ----------------//
-
-test("query with nothing returns all input", () => {
-  const equipment = [guitar];
-  expect(queryEquipment(equipment, "")).toEqual(equipment);
-});
-
-test("query matches description", () => {
-  const equipment = [guitar];
-  expect(queryEquipment(equipment, "guitar")).toEqual(equipment);
-});
-
-test("query matches category title", () => {
-  const equipment = [guitar];
-  expect(queryEquipment(equipment, "instruments")).toEqual(equipment);
-});
-
-test("query matches tags", () => {
-  const equipment = [guitar];
-  expect(queryEquipment(equipment, "single-coil")).toEqual(equipment);
-});
-
-test("filter matches tags", () => {
-  const equipment = [guitar, mic];
-  const filters = {
-    "single-coil": true,
-  };
-  expect(filterEquipment(equipment, filters)).toEqual([guitar]);
-});
 
 test("quantize collapses items of same description", () => {
   const equipment = [guitar, mic, guitar, mic, guitar];

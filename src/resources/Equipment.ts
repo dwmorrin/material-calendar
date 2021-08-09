@@ -6,15 +6,15 @@ import { parseSQLDatetime } from "../utils/date";
 interface Equipment {
   [k: string]: unknown;
   id: number;
-  description: string; //! required
-  category: Category; // hierchial; use sparingly
+  description: string;
+  category: Category; // hierarchial; use sparingly
   tags: Tag[];
-  manufacturer?: string;
-  model?: string;
-  sku?: string;
-  serial?: string;
-  barcode?: string;
-  notes?: string; //! string or string[]?
+  manufacturer: string;
+  model: string;
+  sku: string;
+  serial: string;
+  barcode: string;
+  notes: string;
   quantity: number; // default=1
   consumable: boolean; // default=false; for admins for periodic reordering
   reservations: {
@@ -28,39 +28,46 @@ interface Equipment {
 
 class Equipment implements Equipment {
   // returns the number of an item available during an event
-  static isAvailable(item: Equipment, event: Event): number {
+  static getNumberAvailable(item: Equipment, event: Event): number {
     if (item.reservations.length === 0) {
       return item.quantity;
     }
+    const eventStartDate = parseSQLDatetime(event.start);
+    const eventEndDate = parseSQLDatetime(event.end);
     const reserved = item.reservations
-      .filter(
-        (reservation) =>
-          (event.reservation?.id !== reservation.bookingId &&
-            parseSQLDatetime(reservation.start) <=
-              parseSQLDatetime(event.start) &&
-            parseSQLDatetime(reservation.end) >
-              parseSQLDatetime(event.start)) ||
-          (parseSQLDatetime(reservation.start) < parseSQLDatetime(event.end) &&
-            parseSQLDatetime(reservation.start) >=
-              parseSQLDatetime(event.start))
-      )
-      .map((reservation) => {
-        // TODO: Remove this and figure out why the filter above is not working.
-        if (reservation.bookingId === event.reservation?.id) {
-          return 0;
-        }
-        return reservation.quantity;
+      .filter(({ bookingId, start, end }) => {
+        const resStartDate = parseSQLDatetime(start);
+        const resEndDate = parseSQLDatetime(end);
+        return (
+          (event.reservation?.id !== bookingId &&
+            resStartDate <= eventStartDate &&
+            resEndDate > eventStartDate) ||
+          (resStartDate < eventEndDate && resStartDate >= eventStartDate)
+        );
       })
+      .map((reservation) =>
+        // TODO: Remove this and figure out why the filter above is not working.
+        reservation.bookingId === event.reservation?.id
+          ? 0
+          : reservation.quantity
+      )
       .reduce((a, b) => a + b, 0);
     return item.quantity - reserved;
   }
-  static availableItems(items: Equipment[], event: Event): Equipment[] {
-    return items
-      .map((item) => {
-        return { ...item, quantity: Equipment.isAvailable(item, event) };
-      })
-      .filter((item) => item.quantity > 0);
+
+  static getAvailableItems(items: Equipment[], event: Event): Equipment[] {
+    return items.reduce((available, item) => {
+      const numberAvailable = Equipment.getNumberAvailable(item, event);
+      if (numberAvailable > 0) {
+        available.push({
+          ...item,
+          quantity: numberAvailable,
+        });
+      }
+      return available;
+    }, [] as Equipment[]);
   }
+
   static url = "/api/equipment";
   constructor(
     equip = {
