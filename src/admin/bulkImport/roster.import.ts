@@ -30,10 +30,10 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, records) => {
       )
     );
 
-  fetch(`${RosterRecord.url}/import`, {
+  fetch(`${RosterRecord.url}/bulk`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ records }),
+    body: JSON.stringify(records),
   })
     .then((res) => res.json())
     .then(({ error, data }) => {
