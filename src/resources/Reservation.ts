@@ -12,6 +12,7 @@ interface Reservation {
   projectId: number;
   groupId: number;
   guests: string;
+  created: string;
   cancellation?: {
     canceled: ActionDetails;
     refund?: {
@@ -32,6 +33,9 @@ class Reservation implements Reservation {
     ),
     maxWalkInsPerLocation: Number(
       process.env.REACT_APP_WALK_IN_RESERVATIONS_PER_LOCATION || "0"
+    ),
+    refundGracePeriodMinutes: Number(
+      process.env.REACT_APP_CANCELATION_REFUND_GRACE_PERIOD_MINUTES || "15"
     ),
   };
   constructor(

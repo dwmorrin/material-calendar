@@ -23,6 +23,8 @@ interface CancelationDialogProps extends CalendarUIProps {
   open: boolean;
   setOpen: (state: boolean) => void;
   cancelationApprovalCutoff: Date;
+  gracePeriodCutoff: Date;
+  isWalkIn: boolean;
 }
 
 const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
@@ -31,6 +33,8 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   open,
   setOpen,
   cancelationApprovalCutoff,
+  gracePeriodCutoff,
+  isWalkIn,
 }) => {
   const dispatchError = (error: Error, meta?: unknown): void =>
     dispatch({ type: CalendarAction.Error, payload: { error }, meta });
@@ -52,10 +56,9 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   );
   if (!project) return null;
 
-  const autoApprove = isBefore(
-    nowInServerTimezone(),
-    cancelationApprovalCutoff
-  );
+  const autoApprove =
+    isBefore(nowInServerTimezone(), cancelationApprovalCutoff) ||
+    (isBefore(nowInServerTimezone(), gracePeriodCutoff) && !isWalkIn);
   const groupEmail = group.members.map(({ email }) => email).join(", ");
   const subject = "canceled a reservation for your group";
   const location = currentEvent.location.title;
@@ -65,7 +68,11 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   const cancelationApprovalCutoffString = formatDatetime(
     cancelationApprovalCutoff
   );
-
+  console.log({
+    display: autoApprove || isWalkIn,
+    autoApprove: autoApprove,
+    isWalkIn: isWalkIn,
+  });
   const onCancelationRequest = ({ refund = false } = {}): void => {
     const mailbox = [] as Mail[];
     const refundMessage = refund
@@ -132,7 +139,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
 
   return (
     <Dialog TransitionComponent={transition} open={open}>
-      {autoApprove ? (
+      {autoApprove || isWalkIn ? (
         <DialogContent>Are you sure you want to cancel?</DialogContent>
       ) : (
         <DialogContent>
@@ -170,6 +177,18 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
             onClick={(): void => onCancelationRequest({ refund: true })}
           >
             Cancel reservation
+          </Button>
+          <Button onClick={(): void => setOpen(false)}>Go Back</Button>
+        </DialogActions>
+      ) : isWalkIn ? (
+        <DialogActions>
+          <Button
+            color="secondary"
+            variant="contained"
+            // style={{ backgroundColor: "salmon", color: "white" }}
+            onClick={(): void => onCancelationRequest()}
+          >
+            Cancel Reservation
           </Button>
           <Button onClick={(): void => setOpen(false)}>Go Back</Button>
         </DialogActions>

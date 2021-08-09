@@ -33,6 +33,7 @@ import ReservationForm from "./ReservationForm";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Event from "../resources/Event";
 import CancelationDialog from "./CancelationDialog";
+import { addMinutes } from "date-fns/esm";
 
 const transition = makeTransition("left");
 
@@ -55,10 +56,16 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   const startDate = parseSQLDatetime(start);
   const endDate = parseSQLDatetime(end);
+  const reservationCreated = parseSQLDatetime(reservation?.created || "");
 
   const cancelationApprovalCutoff = subHours(
     startDate,
     Reservation.rules.refundCutoffHours
+  );
+
+  const gracePeriodCutoff = addMinutes(
+    reservationCreated,
+    Reservation.rules.refundGracePeriodMinutes
   );
 
   const currentUserWalkInProject = user.projects.find(
@@ -152,6 +159,11 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           open={cancelationDialogIsOpen}
           setOpen={setCancelationDialogIsOpen}
           cancelationApprovalCutoff={cancelationApprovalCutoff}
+          gracePeriodCutoff={gracePeriodCutoff}
+          isWalkIn={
+            state.currentEvent.reservation.projectId ===
+            currentUserWalkInProject?.id
+          }
         />
       )}
       <Paper

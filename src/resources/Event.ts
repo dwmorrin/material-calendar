@@ -18,6 +18,7 @@ export interface ReservationInfo {
   guests: string;
   notes: string;
   contact: string;
+  created: string;
   // this and the same in the EquipmentItem should be changed so that it is a dictionary of objects.
   equipment?: {
     [k: string]: {
