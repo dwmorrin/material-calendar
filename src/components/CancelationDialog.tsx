@@ -68,11 +68,6 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   const cancelationApprovalCutoffString = formatDatetime(
     cancelationApprovalCutoff
   );
-  console.log({
-    display: autoApprove || isWalkIn,
-    autoApprove: autoApprove,
-    isWalkIn: isWalkIn,
-  });
   const onCancelationRequest = ({ refund = false } = {}): void => {
     const mailbox = [] as Mail[];
     const refundMessage = refund
@@ -81,7 +76,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     mailbox.push({
       to: groupEmail,
       subject: `${myName} has ${subject}`,
-      text: `Your receiving this because you are a member of ${
+      text: `You' re receiving this because you are a member of ${
         group.title
       }. ${myName} has ${body}.${autoApprove ? "" : refundMessage}`,
     });
