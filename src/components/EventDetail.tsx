@@ -77,10 +77,10 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     if (!currentUserWalkInProject) return true;
     const myReservations = events.filter(
       ({ location, reservation }) =>
-        location === event.location &&
+        location.groupId === event.location.groupId &&
         isSameDay(parseSQLDatetime(event.start), nowInServerTimezone()) &&
         reservation &&
-        reservation.groupId === currentUserWalkInProject.id
+        reservation.groupId === currentUserWalkInProject.groupId
     ).length;
     return Reservation.rules.maxWalkInsPerLocation <= myReservations;
   };
@@ -94,12 +94,13 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     return project.groupAllottedHours > group.reservedHours + thisEventHours;
   };
 
+  const walkInValid =
+    Event.isAvailableForWalkIn(state.currentEvent) &&
+    !hasReachedTheWalkInLimit(state.currentEvent);
+
   const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
     ({ title, allotments }) =>
-      (title === Project.walkInTitle &&
-        state.currentEvent &&
-        Event.isAvailableForWalkIn(state.currentEvent) &&
-        !hasReachedTheWalkInLimit(state.currentEvent)) ||
+      (title === Project.walkInTitle && state.currentEvent && walkInValid) ||
       allotments.some(
         (a) =>
           a.locationId === location.id &&
@@ -220,7 +221,11 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 });
               }}
             >
-              {userOwns ? "Modify Reservation" : "Reserve this time"}
+              {userOwns
+                ? "Modify Reservation"
+                : walkInValid
+                ? "Reserve Walk-In Time"
+                : "Reserve this time"}
             </Button>
           )}
         {userOwns && eventHasNotEnded && (
@@ -238,7 +243,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             </Button>
           </div>
         )}
-        {open && (
+        {open && !walkInValid && (
           <section>
             <Typography component="h3">
               {projects.length

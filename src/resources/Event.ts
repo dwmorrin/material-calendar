@@ -35,6 +35,7 @@ interface Event {
   end: string;
   location: {
     id: number;
+    groupId: string;
     title: string;
     restriction: number;
     allowsWalkIns: boolean;
