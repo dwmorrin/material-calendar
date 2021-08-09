@@ -147,7 +147,15 @@ export const makeInitialValues = (
   const reservation = event.reservation;
   const equipmentValues = equipment.reduce((acc, item) => {
     const hash = Equipment.makeNameHash(item);
-    if (!(hash in acc)) acc[hash] = { quantity: 0, items: [] };
+    if (!(hash in acc))
+      acc[hash] = {
+        quantity: 0,
+        maxQuantity: 0,
+        restriction: item.restriction,
+        category: { id: item.category.id },
+        items: [],
+      };
+    acc[hash].maxQuantity += item.quantity;
     return acc;
   }, {} as { [hash: string]: EquipmentValue });
   const defaultValues = {

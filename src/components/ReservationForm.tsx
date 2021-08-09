@@ -30,6 +30,7 @@ import {
 import { useAuth } from "./AuthProvider";
 import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
 import Equipment from "../resources/Equipment";
+import Category from "../resources/Category";
 
 const RadioYesNo: FunctionComponent<{
   label: string;
@@ -55,11 +56,6 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   projects,
 }) => {
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
-  const groups = state.resources[ResourceKey.Groups] as UserGroup[];
-  const findGroup = (id: number): UserGroup | undefined => {
-    return groups.find((group) => group.projectId === id);
-  };
-  new UserGroup();
   const classes = useStyles();
   const closeForm = (): void => {
     dispatch({ type: CalendarAction.CloseReservationForm });
@@ -74,6 +70,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   );
   if (!group) return null;
   const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
+  const categories = state.resources[ResourceKey.Categories] as Category[];
 
   return (
     <Dialog
@@ -118,16 +115,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
             <Form className={classes.list} onSubmit={handleSubmit}>
               <FormLabel>Project:</FormLabel>
-              <Field
-                component={Select}
-                name="project"
-                onClick={(event: { target: { value: number } }): void => {
-                  setFieldValue(
-                    "groupId",
-                    findGroup(event.target.value)?.id || values.groupId
-                  );
-                }}
-              >
+              <Field component={Select} name="project">
                 {projects.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
                     {p.title}
@@ -135,10 +123,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                 ))}
               </Field>
               <FormLabel className={classes.item}>Group:</FormLabel>
-              {(
-                groups.find((group) => group.projectId === values.project) ||
-                new UserGroup()
-              ).members.map(({ username, name }) => (
+              {group.members.map(({ username, name }) => (
                 <Typography key={username}>
                   {`${name.first} ${name.last}`}
                 </Typography>
@@ -210,9 +195,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                     disabled={isSubmitting}
                     onClick={(): void => setEquipmentFormIsOpen(true)}
                   >
-                    {Object.keys(values.equipment).length > 0
-                      ? "Add/Remove Equipment"
-                      : "Add Equipment"}
+                    Open equipment shopping cart
                   </Button>
                 </section>
               )}
@@ -236,6 +219,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                   selectedEquipment={values.equipment}
                   setFieldValue={setFieldValue}
                   event={state.currentEvent}
+                  categories={categories}
                 />
               )}
               <pre>

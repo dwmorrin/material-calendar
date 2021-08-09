@@ -1,5 +1,4 @@
 import {
-  quantizeEquipment,
   filterItems,
   makeQueryRegExp,
   makeQueryTest,
@@ -46,24 +45,6 @@ const mic = {
   category: microphonesCategory,
 };
 Object.freeze(mic);
-
-//--------- TESTS ----------------//
-
-test("quantize collapses items of same description", () => {
-  const equipment = [guitar, mic, guitar, mic, guitar];
-  expect(quantizeEquipment(equipment).length).toBe(2);
-  expect(
-    quantizeEquipment(equipment).find(
-      (item) => item.description === guitar.description
-    ).quantity
-  ).toBe(3);
-});
-
-test("quantize empty array return empty array", () => {
-  expect(quantizeEquipment([])).toEqual([]);
-});
-
-//-------------------ALTERNATIVES--------------//
 
 test("filterItems with no filter inputs returns all items", () => {
   const equipment = [guitar];

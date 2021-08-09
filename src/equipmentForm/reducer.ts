@@ -1,6 +1,5 @@
 import { EquipmentState, EquipmentAction, EquipmentActionTypes } from "./types";
 import Category from "../resources/Category";
-import Equipment from "../resources/Equipment";
 import Tag from "../resources/Tag";
 
 export const initialState = {
@@ -8,7 +7,6 @@ export const initialState = {
   equipmentCartIsOpen: false,
   categoryDrawerView: false,
   searchString: "",
-  equipment: [] as Equipment[],
   tags: [] as Tag[],
   categories: [] as Category[],
   selectedTags: {} as { [k: string]: boolean },

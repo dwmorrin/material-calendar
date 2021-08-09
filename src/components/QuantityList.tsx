@@ -34,7 +34,7 @@ const FilterList: FunctionComponent<QuantityListProps> = ({
           >
             {selectedItems.map((key) => (
               <ListItem key={key}>
-                {key + ": " + selectedEquipment[key]}
+                {key + ": " + selectedEquipment[key].quantity}
               </ListItem>
             ))}
           </div>

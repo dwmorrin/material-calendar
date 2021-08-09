@@ -83,29 +83,6 @@ class Category implements Category {
     return list.find((item) => item?.id === id) || null;
   }
 
-  static hasContents(
-    category: Category | null,
-    equipment: Equipment[]
-  ): number {
-    if (!category) {
-      return 0;
-    }
-    const sum = equipment.filter((item) => item.category.id === category.id)
-      .length;
-
-    if (category.children) {
-      return (
-        sum +
-        category.children
-          .map((child) => {
-            return Category.hasContents(child, equipment);
-          })
-          .reduce((a, b) => a + b, 0)
-      );
-    }
-    return sum;
-  }
-
   static existsOnCategoryOrChildren(
     category: Category | null,
     item: Equipment | Tag

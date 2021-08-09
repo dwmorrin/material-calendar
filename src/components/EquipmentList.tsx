@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from "react";
-import Equipment from "../resources/Equipment";
 import EquipmentStandardList from "./EquipmentStandardList";
 import { EquipmentState, EquipmentAction } from "../equipmentForm/types";
 import Accordion from "@material-ui/core/Accordion";
@@ -12,9 +11,8 @@ import Category from "../resources/Category";
 
 interface EquipmentListProps {
   state: EquipmentState;
+  categories: Category[];
   dispatch: (action: EquipmentAction) => void;
-  reserveEquipment: (id: number, quantity: number) => void;
-  equipmentList: Equipment[] | undefined;
   selectedEquipment: {
     [k: string]: EquipmentValue;
   };
@@ -23,13 +21,20 @@ interface EquipmentListProps {
 const EquipmentList: FunctionComponent<EquipmentListProps> = ({
   state,
   dispatch,
-  equipmentList,
   selectedEquipment,
-  reserveEquipment,
   userRestriction,
+  categories,
 }) => {
-  const tree = Category.tree(state.categories, null);
-  if (!state.equipment.length) return null;
+  const tree = Category.tree(categories, null);
+  const itemsByCategory = Object.entries(selectedEquipment).reduce(
+    (acc, [hash, info]) => {
+      if (!(info.category.id in acc))
+        acc[info.category.id] = {} as Record<string, EquipmentValue>;
+      acc[info.category.id][hash] = info;
+      return acc;
+    },
+    {} as Record<string, Record<string, EquipmentValue>>
+  );
   return (
     <div
       style={{
@@ -37,13 +42,14 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
       }}
     >
       {tree.map(function climb(branch) {
-        if (!branch || !equipmentList) {
+        if (!branch) {
           return null;
         }
-        const contents = Category.hasContents(branch, equipmentList);
+        const contents = itemsByCategory[branch.id];
         if (!contents) {
           return null;
         }
+        const contentsLength = Object.keys(contents).length;
         const expanded =
           state.categoryPath.find((entry) => entry.id === branch.id) !==
           undefined;
@@ -78,7 +84,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
                 })
               }
             >
-              {`${branch.title} (${contents})`}
+              {`${branch.title} (${contentsLength})`}
             </AccordionSummary>
             <AccordionDetails>
               <List
@@ -91,12 +97,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
 
                 {!state.categoryDrawerView && expanded && (
                   <EquipmentStandardList
-                    equipmentList={equipmentList.filter(
-                      (item) => item.category.id === branch.id
-                    )}
-                    selectedEquipment={selectedEquipment}
+                    selectedEquipment={contents}
                     setFieldValue={state.setFieldValue}
-                    reserveEquipment={reserveEquipment}
                     userRestriction={userRestriction}
                   />
                 )}

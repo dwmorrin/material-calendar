@@ -12,11 +12,11 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
   selectedEquipment,
   setFieldValue,
 }) => {
-  // const selectedItems = Object.keys(selectedEquipment).filter(function (
-  //   key: string
-  // ) {
-  //   return selectedEquipment[key] > 0;
-  // });
+  const selectedItems = Object.keys(selectedEquipment).filter(function (
+    key: string
+  ) {
+    return selectedEquipment[key].quantity > 0;
+  });
 
   return (
     <SwipeableDrawer
@@ -26,9 +26,9 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
       onOpen={onOpen}
     >
       <Typography variant="subtitle2" style={{ textAlign: "center" }}>
-        Equipment in your cart (this is broken for now)
+        Equipment in your cart
       </Typography>
-      {/* <hr
+      <hr
         style={{
           minWidth: "100%",
         }}
@@ -36,15 +36,9 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
       {selectedItems.length > 0 ? (
         <List>
           {selectedItems.map((key) => {
-            const maxQuantity =
-              state.equipment.find(
-                (item) =>
-                  (item.manufacturer && item.model
-                    ? item.manufacturer + " " + item.model
-                    : item.description) === key
-              ) || selectedEquipment[key];
+            const item = selectedEquipment[key];
             const selectOptions = Array.from({
-              length: maxQuantity + 1,
+              length: item.maxQuantity + 1,
             }).map((_, i) => (
               <MenuItem key={i} value={i}>
                 {i === 0 ? "0 (Delete)" : i}
@@ -82,7 +76,7 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
         </List>
       ) : (
         <div>Cart is empty.</div>
-      )} */}
+      )}
     </SwipeableDrawer>
   );
 };

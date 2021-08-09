@@ -5,6 +5,9 @@ import Event from "../resources/Event";
 
 export type EquipmentValue = {
   quantity: number;
+  maxQuantity: number;
+  category: { id: number };
+  restriction: number;
   items?:
     | {
         id: number;
@@ -12,15 +15,13 @@ export type EquipmentValue = {
       }[];
 };
 
-export type EquipmentFormValue = string | number | boolean | EquipmentValue;
+type EquipmentFormValue = string | number | boolean | EquipmentValue;
 export interface EquipmentState {
   filterDrawerIsOpen: boolean;
   equipmentCartIsOpen: boolean;
   categoryDrawerView: boolean;
   searchString: string;
-  equipment: Equipment[];
   tags: Tag[];
-  categories: Category[];
   selectedTags: { [k: string]: boolean };
   selectedCategory: Category | null;
   categoryPath: Category[];
@@ -51,6 +52,7 @@ export interface EquipmentFormProps {
   selectedEquipment: { [k: string]: EquipmentValue };
   setFieldValue: (field: string, value: EquipmentFormValue) => void;
   event: Event;
+  categories: Category[];
 }
 
 export interface EquipmentCartProps {
@@ -58,5 +60,19 @@ export interface EquipmentCartProps {
   onClose: () => void;
   onOpen: () => void;
   selectedEquipment: { [k: string]: EquipmentValue };
+  setFieldValue: (field: string, value: EquipmentFormValue) => void;
+}
+
+export interface EquipmentItemProps {
+  item: EquipmentValue;
+  name: string;
+  setFieldValue: (field: string, value: EquipmentFormValue) => void;
+  userRestriction: number;
+}
+
+export interface EquipmentStandardListProps {
+  equipmentList?: Equipment[];
+  selectedEquipment: { [k: string]: EquipmentValue };
+  userRestriction: number;
   setFieldValue: (field: string, value: EquipmentFormValue) => void;
 }

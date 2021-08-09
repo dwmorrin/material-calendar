@@ -1,49 +1,19 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Button from "@material-ui/core/Button";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
+import { ListItem, ListItemText, Button, ButtonGroup } from "@material-ui/core";
 import React, { FunctionComponent } from "react";
-import ErrorIcon from "@material-ui/icons/Error";
-import Equipment from "../resources/Equipment";
-import { EquipmentFormValue } from "../equipmentForm/types";
-
-const getItemName = ({ manufacturer, model, description }: Equipment): string =>
-  [manufacturer, model, description].filter(String).join(" ");
-
-interface EquipmentItemProps {
-  item: Equipment;
-  values: {
-    quantity: number;
-    items?: { id: number; quantity: number }[];
-  };
-  setFieldValue: (field: string, value: EquipmentFormValue) => void;
-  reserveEquipment: (id: number, quantity: number) => void;
-  userRestriction: number;
-}
+import { EquipmentItemProps } from "../equipmentForm/types";
 
 const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
+  name,
   item,
-  values,
   setFieldValue,
   userRestriction,
 }) => {
-  const [errors, setErrors] = React.useState({} as { [k: string]: boolean });
-  const itemName = getItemName(item);
-  if (!values) {
-    values = { quantity: 0 };
-  }
   const changeValue = (newValue: number): void => {
-    if (newValue < 0) return;
-    if (newValue > item.quantity) {
-      return setErrors({ ...errors, itemName: true });
-    }
-    if (itemName in errors) setErrors({ ...errors, itemName: false });
-    setFieldValue("equipment[" + itemName + "]", {
-      ...values,
-      quantity: newValue,
-    });
+    if (newValue < 0 || newValue > item.maxQuantity) return;
+    setFieldValue(`equipment["${name}"].quantity`, newValue);
   };
   const userCanUseEquipment = userRestriction >= item.restriction;
+  const { quantity } = item;
 
   return (
     <div
@@ -53,7 +23,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
       }}
     >
       <ListItem>
-        <ListItemText primary={itemName} />
+        <ListItemText primary={name} />
         {userCanUseEquipment ? (
           <section
             style={{
@@ -61,39 +31,30 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
               flexDirection: "column",
             }}
           >
-            {values.quantity}
+            {quantity}
             <br />
             <ButtonGroup
               variant="contained"
               color="primary"
-              aria-label={itemName + "Quantity Buttons"}
+              aria-label={"change item quantity"}
               size="small"
             >
               <Button
-                disabled={values.quantity - 1 < 0}
-                onClick={(): void => {
-                  changeValue(values.quantity - 1);
-                }}
+                disabled={quantity === 0}
+                onClick={(): void => changeValue(quantity - 1)}
               >
                 -
               </Button>
               <Button
-                disabled={values.quantity + 1 > item.quantity}
-                onClick={(): void => {
-                  changeValue(values.quantity + 1);
-                }}
+                disabled={quantity === item.maxQuantity}
+                onClick={(): void => changeValue(quantity + 1)}
               >
                 +
               </Button>
             </ButtonGroup>
-            {errors[itemName] && (
-              <div>
-                <ErrorIcon />
-              </div>
-            )}
           </section>
         ) : (
-          <p>You are not authorized to use this item</p>
+          <p>Restricted item</p>
         )}
       </ListItem>
     </div>
