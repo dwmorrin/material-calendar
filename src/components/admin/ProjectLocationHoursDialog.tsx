@@ -26,7 +26,6 @@ import { ResourceKey } from "../../resources/types";
 import Location from "../../resources/Location";
 import Project from "../../resources/Project";
 import VirtualWeek from "../../resources/VirtualWeek";
-import fetchProjectsAndVirtualWeeks from "../../admin/fetchProjectsAndVirtualWeeks";
 
 const initialErrors = { hours: "" };
 
@@ -141,12 +140,22 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       headers: { "Content-Type": "application/json" },
     })
       .then((response) => response.json())
-      .then(({ error }) => {
+      .then(({ error, data }) => {
         if (error) return dispatchError(error);
-        fetchProjectsAndVirtualWeeks({
-          dispatch,
-          state,
+        if (!data) return dispatchError(new Error("No data returned"));
+        const { projects, weeks } = data as {
+          projects: Project[];
+          weeks: VirtualWeek[];
+        };
+        dispatch({
           type: AdminAction.ReceivedResourcesAfterProjectLocationHoursUpdate,
+          payload: {
+            resources: {
+              ...state.resources,
+              [ResourceKey.Projects]: projects.map((p) => new Project(p)),
+              [ResourceKey.VirtualWeeks]: weeks.map((w) => new VirtualWeek(w)),
+            },
+          },
         });
       })
       .catch(dispatchError)

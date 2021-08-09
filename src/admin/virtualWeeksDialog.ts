@@ -2,6 +2,7 @@ import { Action, AdminAction, AdminState, ApiResponse } from "./types";
 import { ResourceKey } from "../resources/types";
 import VirtualWeek from "../resources/VirtualWeek";
 import Semester from "../resources/Semester";
+import Project from "../resources/Project";
 
 interface CreateVirtualWeekProps {
   dispatch: (action: Action) => void;
@@ -24,29 +25,24 @@ export const createVirtualWeek = ({
   const dispatchError = (error: Error): void =>
     dispatch({ type: AdminAction.Error, payload: { error } });
 
-  const handleData = ({ error }: ApiResponse): void => {
+  const handleData = ({ error, data }: ApiResponse): void => {
     if (error) return dispatchError(error);
-    fetch(`${VirtualWeek.url}`)
-      .then((response) => response.json())
-      .then(({ error, data }) =>
-        dispatch(
-          error || !data
-            ? { type: AdminAction.Error, payload: { error } }
-            : {
-                type: AdminAction.ReceivedResource,
-                meta: ResourceKey.VirtualWeeks,
-                payload: {
-                  resources: {
-                    ...state.resources,
-                    [ResourceKey.VirtualWeeks]: (data as VirtualWeek[]).map(
-                      (vw) => new VirtualWeek(vw)
-                    ),
-                  },
-                },
-              }
-        )
-      )
-      .catch(dispatchError);
+    if (!data)
+      return dispatchError(new Error("No data from create virtual week."));
+    const { weeks, projects } = data as {
+      weeks: VirtualWeek[];
+      projects: Project[];
+    };
+    dispatch({
+      type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
+      payload: {
+        resources: {
+          ...state.resources,
+          [ResourceKey.VirtualWeeks]: weeks.map((vw) => new VirtualWeek(vw)),
+          [ResourceKey.Projects]: projects.map((p) => new Project(p)),
+        },
+      },
+    });
   };
 
   fetch(`${VirtualWeek.url}/`, {

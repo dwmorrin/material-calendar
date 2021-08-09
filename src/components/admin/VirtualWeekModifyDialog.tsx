@@ -19,6 +19,7 @@ import {
   AdminUIProps,
   AdminAction,
   AdminSelectionProps,
+  ApiResponse,
 } from "../../admin/types";
 import {
   addDays,
@@ -32,7 +33,7 @@ import {
 } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 import VirtualWeek from "../../resources/VirtualWeek";
-import fetchProjectsAndVirtualWeeks from "../../admin/fetchProjectsAndVirtualWeeks";
+import Project from "../../resources/Project";
 import ErrorFormLabel from "../ErrorFormLabel";
 
 enum VirtualWeekModifier {
@@ -71,8 +72,33 @@ const VirtualWeekSplitDialog: FC<AdminUIProps & AdminSelectionProps> = ({
 
   const close = (): void =>
     dispatch({ type: AdminAction.CloseVirtualWeekModifyDialog });
+
   const dispatchError = (error: Error): void =>
     dispatch({ type: AdminAction.Error, payload: { error } });
+
+  const onReceivedResponse = ({ error, data }: ApiResponse): void => {
+    if (error) return dispatchError(error);
+    if (!data)
+      return dispatchError(new Error("No data from virtual week update"));
+    const { weeks, projects } = data as {
+      weeks: VirtualWeek[];
+      projects: Project[];
+    };
+    if (!Array.isArray(weeks))
+      return dispatchError(new Error("No updated weeks"));
+    if (!Array.isArray(projects))
+      return dispatchError(new Error("No updated projects"));
+    dispatch({
+      type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
+      payload: {
+        resources: {
+          ...state.resources,
+          [ResourceKey.VirtualWeeks]: weeks.map((vw) => new VirtualWeek(vw)),
+          [ResourceKey.Projects]: projects.map((p) => new Project(p)),
+        },
+      },
+    });
+  };
 
   const onSubmit = (values: Record<string, unknown>): void => {
     const url = `${VirtualWeek.url}/${week.id}`;
@@ -88,14 +114,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps & AdminSelectionProps> = ({
           headers: { "Content-Type": "application/json" },
         })
           .then((res) => res.json())
-          .then(({ error }) => {
-            if (error) dispatchError(error);
-            fetchProjectsAndVirtualWeeks({
-              dispatch,
-              state,
-              type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
-            });
-          })
+          .then(onReceivedResponse)
           .catch(dispatchError);
         break;
       case VirtualWeekModifier.split: {
@@ -116,14 +135,7 @@ const VirtualWeekSplitDialog: FC<AdminUIProps & AdminSelectionProps> = ({
           headers: { "Content-Type": "application/json" },
         })
           .then((res) => res.json())
-          .then(({ error }) => {
-            if (error) dispatchError(error);
-            fetchProjectsAndVirtualWeeks({
-              dispatch,
-              state,
-              type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
-            });
-          })
+          .then(onReceivedResponse)
           .catch(dispatchError);
         break;
       }
@@ -138,28 +150,14 @@ const VirtualWeekSplitDialog: FC<AdminUIProps & AdminSelectionProps> = ({
           headers: { "Content-Type": "application/json" },
         })
           .then((res) => res.json())
-          .then(({ error }) => {
-            if (error) dispatchError(error);
-            fetchProjectsAndVirtualWeeks({
-              dispatch,
-              state,
-              type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
-            });
-          })
+          .then(onReceivedResponse)
           .catch(dispatchError);
         break;
       }
       case VirtualWeekModifier.delete:
         fetch(url, { method: "DELETE" })
           .then((res) => res.json())
-          .then(({ error }) => {
-            if (error) dispatch(error);
-            fetchProjectsAndVirtualWeeks({
-              dispatch,
-              state,
-              type: AdminAction.ReceivedResourcesAfterVirtualWeekUpdate,
-            });
-          })
+          .then(onReceivedResponse)
           .catch(dispatchError);
         break;
     }
