@@ -5,6 +5,7 @@ import { FormTemplateProps } from "../../../admin/types";
 import { List, FormLabel } from "@material-ui/core";
 import Event from "../../../resources/Event";
 import Project from "../../../resources/Project";
+import UserGroup from "../../../resources/UserGroup";
 import { ResourceKey } from "../../../resources/types";
 
 const getEventById = (events: Event[], id: number): Event =>
@@ -21,6 +22,9 @@ const getProjectById = (projects: Project[], id: number): Project =>
     projects.find((p) => p.id === id) || new Project(),
     "allotments"
   ) as Project;
+
+const getGroupById = (groups: UserGroup[], id: number): UserGroup =>
+  groups.find((g) => g.id === id) || new UserGroup();
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = ({
   state,
@@ -57,6 +61,18 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
         getProjectById(
           state.resources[ResourceKey.Projects] as Project[],
           Number(values.projectId)
+        ),
+        null,
+        2
+      )}
+    </pre>
+    <Field fullWidth component={TextField} name="groupId" label="Group ID" />
+    <FormLabel>Group details</FormLabel>
+    <pre>
+      {JSON.stringify(
+        getGroupById(
+          state.resources[ResourceKey.Groups] as UserGroup[],
+          Number(values.groupId)
         ),
         null,
         2

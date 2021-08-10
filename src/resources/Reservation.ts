@@ -6,6 +6,14 @@ interface ActionDetails {
   comment?: string;
 }
 
+export interface ReservationCancelation {
+  canceled: ActionDetails;
+  refund?: {
+    approvedId: ActionDetails;
+    deniedId: ActionDetails;
+  };
+}
+
 interface Reservation {
   [k: string]: unknown;
   id: number;
@@ -15,13 +23,7 @@ interface Reservation {
   groupId: number;
   guests: string;
   created: string;
-  cancellation?: {
-    canceled: ActionDetails;
-    refund?: {
-      approvedId: ActionDetails;
-      deniedId: ActionDetails;
-    };
-  } | null;
+  cancellation: ReservationCancelation | null;
   equipment: Equipment[];
 }
 
