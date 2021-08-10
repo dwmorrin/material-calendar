@@ -22,7 +22,7 @@ export interface EquipmentState {
   categoryDrawerView: boolean;
   searchString: string;
   tags: Tag[];
-  selectedTags: { [k: string]: boolean };
+  selectedTags: Record<string, boolean>;
   selectedCategory: Category | null;
   categoryPath: Category[];
   setFieldValue: (field: string, value: EquipmentFormValue) => void;
@@ -49,7 +49,7 @@ export interface EquipmentAction {
 export interface EquipmentFormProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  selectedEquipment: { [k: string]: EquipmentValue };
+  selectedEquipment: Record<string, EquipmentValue>;
   setFieldValue: (field: string, value: EquipmentFormValue) => void;
   event: Event;
   categories: Category[];
@@ -59,7 +59,7 @@ export interface EquipmentCartProps {
   state: EquipmentState;
   onClose: () => void;
   onOpen: () => void;
-  selectedEquipment: { [k: string]: EquipmentValue };
+  selectedEquipment: Record<string, EquipmentValue>;
   setFieldValue: (field: string, value: EquipmentFormValue) => void;
 }
 
@@ -72,7 +72,7 @@ export interface EquipmentItemProps {
 
 export interface EquipmentStandardListProps {
   equipmentList?: Equipment[];
-  selectedEquipment: { [k: string]: EquipmentValue };
+  selectedEquipment: Record<string, EquipmentValue>;
   userRestriction: number;
   setFieldValue: (field: string, value: EquipmentFormValue) => void;
 }

@@ -22,9 +22,7 @@ interface ReservationFormValues extends Record<string, unknown> {
   guests: string;
   hasGuests: string;
   hasNotes: string;
-  equipment: {
-    [makeModelDescription: string]: EquipmentValue;
-  };
+  equipment: Record<string, EquipmentValue>;
   hasEquipment: string;
 }
 
@@ -138,14 +136,10 @@ export const submitHandler =
       });
   };
 
-export const makeInitialValues = (
-  event: Event,
-  group: UserGroup,
-  equipment: Equipment[],
-  project: Project
-): ReservationFormValues => {
-  const reservation = event.reservation;
-  const equipmentValues = equipment.reduce((acc, item) => {
+export const makeEquipmentValues = (
+  equipment: Equipment[]
+): { [hash: string]: EquipmentValue } =>
+  equipment.reduce((acc, item) => {
     const hash = Equipment.makeNameHash(item);
     if (!(hash in acc))
       acc[hash] = {
@@ -158,6 +152,14 @@ export const makeInitialValues = (
     acc[hash].maxQuantity += item.quantity;
     return acc;
   }, {} as { [hash: string]: EquipmentValue });
+
+export const makeInitialValues = (
+  event: Event,
+  group: UserGroup,
+  equipment: { [hash: string]: EquipmentValue },
+  project: Project
+): ReservationFormValues => {
+  const reservation = event.reservation;
   const defaultValues = {
     event: event.id,
     groupId: group.id,
@@ -169,11 +171,9 @@ export const makeInitialValues = (
     hasGuests: "no",
     hasNotes: "no",
     hasEquipment: "no",
-    equipment: equipmentValues,
+    equipment,
   };
   if (reservation) {
-    // update equipment quantities
-
     // override defaults
     return {
       id: reservation.id,
@@ -186,6 +186,7 @@ export const makeInitialValues = (
       hasGuests: reservation.guests ? "yes" : "no",
       hasNotes: reservation.notes ? "yes" : "no",
       notes: reservation.notes,
+      // TODO use reservation equipment
       //equipment: reservation.equipment || {},
       equipment: defaultValues.equipment,
       hasEquipment: reservation.equipment ? "yes" : "no",
@@ -193,26 +194,3 @@ export const makeInitialValues = (
   }
   return defaultValues;
 };
-
-// export const getValuesFromReservation = (
-//   event?: Event
-// ): ReservationFormValues | null => {
-//   if (!event?.reservation) {
-//     return null;
-//   }
-//   return {
-//     id: event.reservation.id,
-//     event: event.id,
-//     groupId: event.reservation.groupId,
-//     project: event.reservation.projectId,
-//     description: event.reservation.description,
-//     phone: event.reservation.contact,
-//     liveRoom: event.reservation.liveRoom ? "yes" : "no",
-//     guests: event.reservation.guests,
-//     hasGuests: event.reservation.guests ? "yes" : "no",
-//     hasNotes: event.reservation.notes ? "yes" : "no",
-//     notes: event.reservation.notes,
-//     equipment: event.reservation.equipment || {},
-//     hasEquipment: event.reservation.equipment ? "yes" : "no",
-//   };
-// };

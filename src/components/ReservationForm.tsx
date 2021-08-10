@@ -26,6 +26,7 @@ import {
   useStyles,
   submitHandler,
   transition,
+  makeEquipmentValues,
 } from "../calendar/reservationForm";
 import { useAuth } from "./AuthProvider";
 import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
@@ -62,6 +63,8 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
     if (state.currentEvent) fetchCurrentEvent(dispatch, state.currentEvent);
   };
   const { user } = useAuth();
+  const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
+  const equipmentValues = makeEquipmentValues(equipment);
 
   if (!state.currentEvent) return null;
   const project = projects[0] || new Project();
@@ -69,7 +72,6 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
     ({ projectId }) => projectId === project.id
   );
   if (!group) return null;
-  const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
   const categories = state.resources[ResourceKey.Categories] as Category[];
 
   return (
@@ -99,7 +101,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
           initialValues={makeInitialValues(
             state.currentEvent,
             group,
-            equipment,
+            equipmentValues,
             project
           )}
           onSubmit={submitHandler(

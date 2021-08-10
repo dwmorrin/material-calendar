@@ -3,7 +3,7 @@ import { List, ListItem, Typography } from "@material-ui/core";
 import { EquipmentValue } from "../equipmentForm/types";
 
 interface QuantityListProps {
-  selectedEquipment: { [k: string]: EquipmentValue };
+  selectedEquipment: Record<string, EquipmentValue>;
 }
 const FilterList: FunctionComponent<QuantityListProps> = ({
   selectedEquipment,
