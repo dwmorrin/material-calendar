@@ -10,6 +10,7 @@ import {
   AccordionDetails,
   List,
   ListItem,
+  ListItemText,
   Select,
   MenuItem,
 } from "@material-ui/core";
@@ -17,8 +18,11 @@ import { AdminAction, AdminUIProps } from "../../admin/types";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {
+  isAfter,
+  nowInServerTimezone,
   parseAndFormatSQLDateInterval,
   parseAndFormatSQLDatetimeInterval,
+  parseSQLDatetime,
 } from "../../utils/date";
 import ProjectLocationHours from "../ProjectLocationHours";
 import { ResourceKey } from "../../resources/types";
@@ -30,7 +34,24 @@ import {
 } from "../../calendar/projectDashboard";
 import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";
+import ProjectDashboardGroup from "./ProjectDashboardGroup";
 
+const SessionInfo: FunctionComponent<{ event: Event }> = ({ event }) => {
+  return (
+    <List>
+      <ListItem>
+        <ListItemText
+          primary={
+            event.location.title +
+            " - " +
+            parseAndFormatSQLDatetimeInterval(event)
+          }
+          secondary={event.title}
+        />
+      </ListItem>
+    </List>
+  );
+};
 interface DashboardSelections {
   projectId: number;
   groupId: number;
@@ -80,9 +101,9 @@ const ProjectDashboard: FunctionComponent<AdminUIProps> = ({
       event.reservation.groupId === currentGroup.id
   );
   groupEvents.sort(compareStartDates);
-  const now = Date.now();
-  const splitPoint = groupEvents.findIndex(
-    (event) => new Date(event.start).getTime() < now
+  const now = nowInServerTimezone();
+  const splitPoint = groupEvents.findIndex(({ start }) =>
+    isAfter(parseSQLDatetime(start), now)
   );
 
   return (
@@ -92,9 +113,6 @@ const ProjectDashboard: FunctionComponent<AdminUIProps> = ({
       open={state.userGroupDashboardIsOpen}
       TransitionComponent={transition}
     >
-      {/* {state.groupDashboardIsOpen && (
-        <GroupDashboard state={state} dispatch={dispatch} />
-      )} */}
       <Toolbar className={classes.toolbar}>
         <IconButton
           edge="start"
@@ -112,7 +130,6 @@ const ProjectDashboard: FunctionComponent<AdminUIProps> = ({
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          // justifyContent: "space-between",
         }}
       >
         <Select
@@ -159,11 +176,13 @@ const ProjectDashboard: FunctionComponent<AdminUIProps> = ({
                 {location.title as string}
               </Typography>
               <ProjectLocationHours
+                // allotments={[]}
                 allotments={
                   currentProject?.allotments.filter(
                     (a) => a.locationId === location.id
                   ) || []
                 }
+                events={groupEvents}
               />
             </AccordionDetails>
           ))}
@@ -172,29 +191,20 @@ const ProjectDashboard: FunctionComponent<AdminUIProps> = ({
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="body1">Group Info</Typography>
           </AccordionSummary>
-          {/* <AccordionDetails>
-            <ProjectDashboardGroup dispatch={dispatch} state={state} />
-          </AccordionDetails> */}
+          <AccordionDetails>
+            <ProjectDashboardGroup
+              currentProject={currentProject}
+              currentGroup={currentGroup}
+            />
+          </AccordionDetails>
         </Accordion>
         <Typography>Upcoming Sessions</Typography>
         {groupEvents.slice(0, splitPoint).map((event) => (
-          <List
-            key={`group_event_listing_${event.id}`}
-            // onClick={makeOpenEventDetail(event)}
-          >
-            <ListItem>{event.title}</ListItem>
-            <ListItem>{parseAndFormatSQLDatetimeInterval(event)}</ListItem>
-          </List>
+          <SessionInfo key={`group_event_listing_${event.id}`} event={event} />
         ))}
         <Typography>Previous Sessions</Typography>
         {groupEvents.slice(splitPoint).map((event) => (
-          <List
-            key={`group_event_listing_${event.id}`}
-            // onClick={makeOpenEventDetail(event)}
-          >
-            <ListItem>{event.title}</ListItem>
-            <ListItem>{parseAndFormatSQLDatetimeInterval(event)}</ListItem>
-          </List>
+          <SessionInfo key={`group_event_listing_${event.id}`} event={event} />
         ))}
       </Paper>
     </Dialog>
