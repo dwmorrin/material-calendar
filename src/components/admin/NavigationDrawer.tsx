@@ -160,6 +160,14 @@ const AdminNavigationDrawer: FunctionComponent<
             </AccordionSummary>
             <ListItem
               button
+              onClick={(): void =>
+                dispatch({ type: AdminAction.OpenUserGroupDashboard })
+              }
+            >
+              Groups
+            </ListItem>
+            <ListItem
+              button
               onClick={(): void => dispatch({ type: AdminAction.OpenBackups })}
             >
               Backups

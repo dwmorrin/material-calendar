@@ -28,6 +28,7 @@ import { CircularProgress } from "@material-ui/core";
 import ExceptionsDashboard from "./ExceptionsDashboard";
 import { ResourceKey } from "../../resources/types";
 import Semester from "../../resources/Semester";
+import ProjectDashboard from "./ProjectDashboard";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
@@ -110,6 +111,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       )}
       <DetailsForm dispatch={dispatch} state={state} />
       <FileImport dispatch={dispatch} state={state} />
+      <ProjectDashboard dispatch={dispatch} state={state} />
       <Backups dispatch={dispatch} state={state} />
       <SemesterDialog
         dispatch={dispatch}

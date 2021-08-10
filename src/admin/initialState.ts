@@ -28,6 +28,7 @@ const initialState: AdminState = {
   schedulerIsOpen: true,
   semesterDialogIsOpen: false,
   snackbarQueue: [],
+  userGroupDashboardIsOpen: false,
   virtualWeeksDialogIsOpen: false,
   virtualWeekModifyDialogIsOpen: false,
 

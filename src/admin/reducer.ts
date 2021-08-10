@@ -152,6 +152,11 @@ const closeSemesterDialog: StateHandler = (state) => ({
   semesterDialogIsOpen: false,
 });
 
+const closeUserGroupDashboard: StateHandler = (state) => ({
+  ...state,
+  userGroupDashboardIsOpen: false,
+});
+
 const closeVirtualWeeksDialog: StateHandler = (state) => ({
   ...state,
   virtualWeeksDialogIsOpen: false,
@@ -248,6 +253,12 @@ const openScheduler: StateHandler = (state) => ({
 const openSemesterDialog: StateHandler = (state) => ({
   ...state,
   semesterDialogIsOpen: true,
+});
+
+const openUserGroupDashboard: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
+  userGroupDashboardIsOpen: true,
 });
 
 const openVirtualWeekSplitDialog: StateHandler = (state, { payload }) => ({
@@ -395,6 +406,7 @@ const reducer: StateHandler = (state, action) =>
       closeProjectLocationHoursSummaryDialog,
     [AdminAction.CloseSemesterDialog]: closeSemesterDialog,
     [AdminAction.CloseSnackbar]: closeSnackbar,
+    [AdminAction.CloseUserGroupDashboard]: closeUserGroupDashboard,
     [AdminAction.CloseVirtualWeeksDialog]: closeVirtualWeeksDialog,
     [AdminAction.CloseVirtualWeekModifyDialog]: closeVirtualWeekSplitDialog,
     [AdminAction.Error]: errorHandler,
@@ -413,6 +425,7 @@ const reducer: StateHandler = (state, action) =>
       openProjectLocationHoursDialog,
     [AdminAction.OpenScheduler]: openScheduler,
     [AdminAction.OpenSemesterDialog]: openSemesterDialog,
+    [AdminAction.OpenUserGroupDashboard]: openUserGroupDashboard,
     [AdminAction.OpenVirtualWeekModifyDialog]: openVirtualWeekSplitDialog,
     [AdminAction.OpenedFile]: openedFile,
     [AdminAction.ReceivedAllResources]: receivedAllResources,

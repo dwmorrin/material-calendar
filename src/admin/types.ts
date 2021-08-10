@@ -23,6 +23,7 @@ export enum AdminAction {
   CloseProjectLocationHoursSummaryDialog,
   CloseSemesterDialog,
   CloseSnackbar,
+  CloseUserGroupDashboard,
   CloseVirtualWeekModifyDialog,
   CloseVirtualWeeksDialog,
   Error,
@@ -38,6 +39,7 @@ export enum AdminAction {
   OpenProjectLocationHoursSummaryDialog,
   OpenScheduler,
   OpenSemesterDialog,
+  OpenUserGroupDashboard,
   OpenVirtualWeekModifyDialog,
   OpenedFile,
   ReceivedAllResources,
@@ -75,6 +77,7 @@ export interface AdminState {
   schedulerIsOpen: boolean;
   semesterDialogIsOpen: boolean;
   snackbarQueue: SnackbarState[];
+  userGroupDashboardIsOpen: boolean;
   virtualWeekModifyDialogIsOpen: boolean;
   virtualWeeksDialogIsOpen: boolean;
 
