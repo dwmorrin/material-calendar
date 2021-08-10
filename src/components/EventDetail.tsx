@@ -30,6 +30,7 @@ import Project from "../resources/Project";
 import Reservation from "../resources/Reservation";
 import UserGroup from "../resources/UserGroup";
 import ReservationForm from "./ReservationForm";
+import ReservationFormAdmin from "./ReservationFormAdmin";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Event from "../resources/Event";
 import CancelationDialog from "./CancelationDialog";
@@ -286,6 +287,16 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         state={state}
         projects={projects.filter(projectHasHoursRemaining)}
       />
+      {isAdmin && (
+        <Button
+          onClick={(): void =>
+            dispatch({ type: CalendarAction.OpenReservationFormAdmin })
+          }
+        >
+          ADMIN RESERVATION FORM
+        </Button>
+      )}
+      {isAdmin && <ReservationFormAdmin dispatch={dispatch} state={state} />}
     </Dialog>
   );
 };

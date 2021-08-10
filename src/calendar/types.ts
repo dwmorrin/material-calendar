@@ -15,6 +15,7 @@ export enum CalendarAction {
   CloseProjectDashboard,
   CloseProjectForm,
   CloseReservationForm,
+  CloseReservationFormAdmin,
   CloseSnackbar,
   CreatedEventsReceived,
   DisplayMessage,
@@ -28,6 +29,7 @@ export enum CalendarAction {
   OpenProjectDashboard,
   OpenProjectForm,
   OpenReservationForm,
+  OpenReservationFormAdmin,
   PickedDate,
   ReceivedAllResources,
   ReceivedInvitations,
@@ -64,6 +66,7 @@ export interface CalendarState {
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
   reservationFormIsOpen: boolean;
+  reservationFormAdminIsOpen: boolean;
   projectFormIsOpen: boolean;
   ref: React.RefObject<FullCalendar> | null;
   snackbarQueue: SnackbarState[];

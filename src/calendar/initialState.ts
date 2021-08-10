@@ -25,6 +25,7 @@ export const initialCalendarState: CalendarState = {
   projectFormIsOpen: false,
   ref: null,
   reservationFormIsOpen: false,
+  reservationFormAdminIsOpen: false,
   resources,
   snackbarQueue: [],
 };

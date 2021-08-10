@@ -198,6 +198,11 @@ const closeReservationForm: StateHandler = (state) => ({
   reservationFormIsOpen: false,
 });
 
+const closeReservationFormAdmin: StateHandler = (state) => ({
+  ...state,
+  reservationFormAdminIsOpen: false,
+});
+
 const closeSnackbar: StateHandler = (state) => {
   const [snackbarQueue] = dequeue(state.snackbarQueue);
   return { ...state, snackbarQueue };
@@ -370,6 +375,11 @@ const openReservationForm: StateHandler = (state) => ({
   reservationFormIsOpen: true,
 });
 
+const openReservationFormAdmin: StateHandler = (state) => ({
+  ...state,
+  reservationFormAdminIsOpen: true,
+});
+
 const receivedReservationCancelation: StateHandler = (state, { payload }) => {
   return displayMessage(
     {
@@ -521,6 +531,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CloseProjectDashboard]: closeProjectDashboard,
     [CalendarAction.CloseProjectForm]: closeProjectForm,
     [CalendarAction.CloseReservationForm]: closeReservationForm,
+    [CalendarAction.CloseReservationFormAdmin]: closeReservationFormAdmin,
     [CalendarAction.CloseSnackbar]: closeSnackbar,
     [CalendarAction.CreatedEventsReceived]: createdEventsReceived,
     [CalendarAction.DisplayMessage]: displayMessage,
@@ -534,6 +545,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,
     [CalendarAction.OpenProjectForm]: openProjectForm,
     [CalendarAction.OpenReservationForm]: openReservationForm,
+    [CalendarAction.OpenReservationFormAdmin]: openReservationFormAdmin,
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,
     [CalendarAction.ReceivedInvitations]: receivedInvitations,

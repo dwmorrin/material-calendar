@@ -1,4 +1,7 @@
-import React, { FunctionComponent, useState } from "react";
+// allows admin user to create reservations without normal limitations
+// admin can freely assign project and group
+
+import React, { FC, useEffect, useState } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   Button,
@@ -18,6 +21,7 @@ import EquipmentForm from "./EquipmentForm";
 import QuantityList from "./QuantityList";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
+import Event from "../resources/Event";
 import {
   validationSchema,
   makeInitialValues,
@@ -32,37 +36,52 @@ import Equipment from "../resources/Equipment";
 import Category from "../resources/Category";
 import RadioYesNo from "./RadioYesNo";
 
-interface ReservationFormProps extends CalendarUIProps {
-  projects: Project[];
-}
-
-const ReservationForm: FunctionComponent<ReservationFormProps> = ({
-  dispatch,
-  state,
-  projects,
-}) => {
+const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
+  const [groups, setGroups] = useState<UserGroup[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const classes = useStyles();
   const closeForm = (): void => {
-    dispatch({ type: CalendarAction.CloseReservationForm });
+    dispatch({ type: CalendarAction.CloseReservationFormAdmin });
     if (state.currentEvent) fetchCurrentEvent(dispatch, state.currentEvent);
   };
   const { user } = useAuth();
   const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
   const equipmentValues = makeEquipmentValues(equipment);
 
-  if (!state.currentEvent) return null;
-  const project = projects[0] || new Project();
-  const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-    ({ projectId }) => projectId === project.id
-  );
-  if (!group) return null;
+  const currentEvent = state.currentEvent || new Event();
   const categories = state.resources[ResourceKey.Categories] as Category[];
+
+  useEffect(() => {
+    const dispatchError = (error: Error): void =>
+      dispatch({ type: CalendarAction.Error, payload: { error } });
+    fetch(UserGroup.url)
+      .then((res) => res.json())
+      .then(({ error, data }) => {
+        if (error) throw error;
+        if (!data) throw new Error("No groups found");
+        const groups = (data as UserGroup[]).map((g) => new UserGroup(g));
+        setGroups(groups);
+      })
+      .catch(dispatchError);
+    fetch(Project.url)
+      .then((res) => res.json())
+      .then(({ error, data }) => {
+        if (error) throw error;
+        if (!data) throw new Error("No projects found");
+        const projects = (data as Project[]).map((p) => new Project(p));
+        setProjects(projects);
+      })
+      .catch(dispatchError);
+  }, [dispatch]);
+
+  const group = groups[0] || new UserGroup();
+  const project = projects[0] || new Project();
 
   return (
     <Dialog
       fullScreen
-      open={state.reservationFormIsOpen}
+      open={state.reservationFormAdminIsOpen}
       TransitionComponent={transition}
     >
       <Toolbar>
@@ -75,16 +94,14 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
           <CloseIcon />
         </IconButton>
         <Typography variant="h6">
-          {state.currentEvent.reservation
-            ? "Update Reservation"
-            : "Make Reservation"}
+          {currentEvent.reservation ? "Update Reservation" : "Make Reservation"}
         </Typography>
       </Toolbar>
 
       <DialogContent>
         <Formik
           initialValues={makeInitialValues(
-            state.currentEvent,
+            currentEvent,
             group,
             equipmentValues,
             project
@@ -93,7 +110,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
             closeForm,
             dispatch,
             user,
-            state.currentEvent,
+            currentEvent,
             state.resources[ResourceKey.Groups] as UserGroup[],
             state.resources[ResourceKey.Projects] as Project[]
           )}
@@ -110,11 +127,15 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                 ))}
               </Field>
               <FormLabel className={classes.item}>Group:</FormLabel>
-              {group.members.map(({ username, name }) => (
-                <Typography key={username}>
-                  {`${name.first} ${name.last}`}
-                </Typography>
-              ))}
+              <Field component={Select} name="groupId">
+                {groups
+                  .filter(({ projectId }) => projectId === values.project)
+                  .map((g) => (
+                    <MenuItem key={g.id} value={g.id}>
+                      {g.title}
+                    </MenuItem>
+                  ))}
+              </Field>
               <FormLabel className={classes.item}>Description</FormLabel>
               <Field
                 component={TextField}
@@ -195,17 +216,17 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                 style={{ backgroundColor: "Green", color: "white" }}
                 disabled={isSubmitting}
               >
-                {state.currentEvent?.reservation
+                {currentEvent.reservation
                   ? "Update Reservation"
                   : "Confirm Reservation"}
               </Button>
-              {values.hasEquipment === "yes" && state.currentEvent && (
+              {values.hasEquipment === "yes" && currentEvent && (
                 <EquipmentForm
                   open={equipmentFormIsOpen}
                   setOpen={setEquipmentFormIsOpen}
                   selectedEquipment={values.equipment}
                   setFieldValue={setFieldValue}
-                  event={state.currentEvent}
+                  event={currentEvent}
                   categories={categories}
                 />
               )}
