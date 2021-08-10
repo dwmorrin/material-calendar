@@ -49,6 +49,12 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   }
 
   const events = state.resources[ResourceKey.Events] as Event[];
+  const reservations = state.resources[
+    ResourceKey.Reservations
+  ] as Reservation[];
+  const myEvents = reservations.map(
+    ({ eventId }) => events.find(({ id }) => eventId === id) || new Event()
+  );
 
   const { end, location, reservable, start, title, reservation } =
     state.currentEvent;
@@ -75,10 +81,11 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   // returns true if there is no walk-in project
   const hasReachedTheWalkInLimit = (event: Event): boolean => {
     if (!currentUserWalkInProject) return true;
-    const myReservations = events.filter(
+    const now = nowInServerTimezone();
+    const myReservations = myEvents.filter(
       ({ location, reservation }) =>
         location.groupId === event.location.groupId &&
-        isSameDay(parseSQLDatetime(event.start), nowInServerTimezone()) &&
+        isSameDay(parseSQLDatetime(event.start), now) &&
         reservation &&
         reservation.groupId === currentUserWalkInProject.groupId
     ).length;

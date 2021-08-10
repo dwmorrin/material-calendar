@@ -25,6 +25,7 @@ import Event from "../resources/Event";
 import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
 import Category from "../resources/Category";
+import Reservation from "../resources/Reservation";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
   const { user } = useAuth();
@@ -58,7 +59,8 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `${UserGroup.url}/user/${user.id}/?context=${ResourceKey.Groups}`,
       `${User.url}/${user.id}/projects?context=${ResourceKey.Projects}`,
       `${Equipment.url}?context=${ResourceKey.Equipment}`,
-      `${Category.url}?context=${ResourceKey.Categories}`
+      `${Category.url}?context=${ResourceKey.Categories}`,
+      `${Reservation.url}/user/${user.id}?context=${ResourceKey.Reservations}`
     );
     fetch(`/api/invitations/user/${user?.id}/`)
       .then((response) => response.json())
