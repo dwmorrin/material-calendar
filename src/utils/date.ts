@@ -7,6 +7,7 @@ import {
   compareAsc,
   differenceInCalendarDays,
   differenceInCalendarMonths,
+  differenceInHours,
   format,
   formatISO9075,
   getDay,
@@ -293,3 +294,9 @@ export const getDayFromNumber = (
 
 export const daysInInterval = ({ start, end }: DateStringInterval): number =>
   differenceInCalendarDays(parseSQLDate(end), parseSQLDate(start)) + 1;
+
+export const differenceInHoursSQLDatetime = ({
+  start,
+  end,
+}: DateStringInterval): number =>
+  differenceInHours(parseSQLDatetime(end), parseSQLDatetime(start));
