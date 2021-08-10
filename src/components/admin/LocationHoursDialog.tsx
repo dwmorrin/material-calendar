@@ -8,6 +8,7 @@ import {
   FormLabel,
   List,
   ListItem,
+  Typography,
 } from "@material-ui/core";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
@@ -66,9 +67,11 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
         Daily Hours for {location.title}
+        <Typography variant="subtitle1">
+          Use the checkbox to use the default hours for that day
+        </Typography>
       </DialogTitle>
       <DialogContent>
-        Use the checkbox to use the default hours for that day.
         <List>
           <MuiPickersUtilsProvider utils={DateFnUtils}>
             <Formik initialValues={{ days }} onSubmit={onSubmit}>
