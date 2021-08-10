@@ -2,10 +2,11 @@
 // admin can freely assign project and group
 
 import React, { FC, useEffect, useState } from "react";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import { Action, CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
   Button,
   Dialog,
+  DialogActions,
   DialogContent,
   FormLabel,
   IconButton,
@@ -21,7 +22,8 @@ import EquipmentForm from "./EquipmentForm";
 import QuantityList from "./QuantityList";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
-import Event from "../resources/Event";
+import Event, { ReservationInfo } from "../resources/Event";
+import Reservation from "../resources/Reservation";
 import {
   validationSchema,
   makeInitialValues,
@@ -34,12 +36,60 @@ import { useAuth } from "./AuthProvider";
 import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
 import Equipment from "../resources/Equipment";
 import Category from "../resources/Category";
+import User from "../resources/User";
 import RadioYesNo from "./RadioYesNo";
+
+const cancelReservation = ({
+  dispatch,
+  refund,
+  reservation,
+  user,
+}: {
+  dispatch: (action: Action) => void;
+  refund: boolean;
+  reservation?: ReservationInfo;
+  user: User;
+}): void => {
+  if (!reservation) return;
+  const body = {
+    userId: user.id,
+    refundApproved: refund,
+  };
+  fetch(`${Reservation.url}/cancel/${reservation.id}`, {
+    method: "PUT",
+    headers: { "Content-type": "application/json" },
+    body: JSON.stringify(body),
+  })
+    .then((res) => res.json())
+    .then(({ error, data }) => {
+      if (error) throw error;
+      const { events, reservations } = data;
+      if (!Array.isArray(events) || !Array.isArray(reservations))
+        throw new Error(
+          "No update was returned from server after cancelation request"
+        );
+      dispatch({
+        type: CalendarAction.CanceledReservation,
+        payload: {
+          resources: {
+            [ResourceKey.Events]: (events as Event[]).map((e) => new Event(e)),
+            [ResourceKey.Reservations]: (reservations as Reservation[]).map(
+              (r) => new Reservation(r)
+            ),
+          },
+        },
+      });
+    })
+    .catch((error) =>
+      dispatch({ type: CalendarAction.Error, payload: { error } })
+    );
+};
 
 const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
   const [groups, setGroups] = useState<UserGroup[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [cancelDialogIsOpen, setCancelDialogIsOpen] = useState<boolean>(false);
   const classes = useStyles();
   const closeForm = (): void => {
     dispatch({ type: CalendarAction.CloseReservationFormAdmin });
@@ -208,18 +258,25 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
                 </section>
               )}
               <Button
+                color="primary"
                 className={classes.item}
                 type="submit"
-                size="small"
                 variant="contained"
-                disableElevation
-                style={{ backgroundColor: "Green", color: "white" }}
                 disabled={isSubmitting}
               >
                 {currentEvent.reservation
                   ? "Update Reservation"
                   : "Confirm Reservation"}
               </Button>
+              {currentEvent.reservation && (
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  onClick={(): void => setCancelDialogIsOpen(true)}
+                >
+                  Cancel Reservation
+                </Button>
+              )}
               {values.hasEquipment === "yes" && currentEvent && (
                 <EquipmentForm
                   open={equipmentFormIsOpen}
@@ -238,6 +295,45 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
           )}
         </Formik>
       </DialogContent>
+      <Dialog open={cancelDialogIsOpen}>
+        <DialogContent>Cancel this reservation?</DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={(): void => {
+              cancelReservation({
+                dispatch,
+                refund: false,
+                reservation: currentEvent.reservation,
+                user,
+              });
+              setCancelDialogIsOpen(false);
+            }}
+          >
+            Yes, Cancel without refund
+          </Button>
+          <Button
+            variant="contained"
+            onClick={(): void => {
+              cancelReservation({
+                dispatch,
+                refund: true,
+                reservation: currentEvent.reservation,
+                user,
+              });
+              setCancelDialogIsOpen(false);
+            }}
+          >
+            Yes, Cancel and refund hours
+          </Button>
+          <Button
+            variant="contained"
+            onClick={(): void => setCancelDialogIsOpen(false)}
+          >
+            No, go back
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };

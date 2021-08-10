@@ -132,9 +132,16 @@ function receivedResource(state: CalendarState, action: Action): CalendarState {
 
 //--------- NORMAL ACTION HANDLERS ----------
 
-const canceledReservation: StateHandler = (state) => {
+const canceledReservation: StateHandler = (state, { payload }) => {
   return displayMessage(
-    { ...state, detailIsOpen: false },
+    {
+      ...state,
+      resources: {
+        ...state.resources,
+        ...payload?.resources,
+      },
+      detailIsOpen: false,
+    },
     {
       type: CalendarAction.DisplayMessage,
       payload: {
