@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, FunctionComponent } from "react";
 import * as d3 from "d3";
 import { ProjectAllotment } from "../resources/Project";
+import { addDays, parseSQLDate } from "../utils/date";
 
 const height = 90; // height of the total bar chart area in px
 const width = 300; // width of the totla bar char area in px
@@ -24,8 +25,9 @@ const goodHourAmount = (extent: AllotmentExtent): number => {
 const getExtent = (allotments: ProjectAllotment[]): AllotmentExtent => {
   return {
     hours: d3.max(allotments, (a) => a.hours) || 0,
-    start: d3.min(allotments, (a) => new Date(a.start)) || new Date(),
-    end: d3.max(allotments, (a) => new Date(a.end)) || new Date(),
+    start: d3.min(allotments, (a) => parseSQLDate(a.start)) || new Date(),
+    end:
+      d3.max(allotments, (a) => addDays(parseSQLDate(a.end), 1)) || new Date(),
   };
 };
 
@@ -64,12 +66,12 @@ const bars = (
   scales: AllotmentScales
 ): AllotmentBar[] => {
   const b = allotments.map((a) => {
-    const x = scales.x(new Date(a.start)) as number;
+    const x = scales.x(parseSQLDate(a.start)) as number;
     const y = scales.y(a.hours) as number;
     return {
       x,
       y,
-      width: (scales.x(new Date(a.end)) as number) - x,
+      width: (scales.x(addDays(parseSQLDate(a.end), 1)) as number) - x,
       height: (scales.y(0) as number) - y,
       color: scales.color(a.hours) as string,
     };
