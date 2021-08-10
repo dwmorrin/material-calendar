@@ -11,13 +11,17 @@ import {
   AccordionDetails,
   List,
   ListItem,
+  ListItemText,
 } from "@material-ui/core";
 import { useAuth } from "./AuthProvider";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {
+  isAfter,
+  nowInServerTimezone,
   parseAndFormatSQLDateInterval,
   parseAndFormatSQLDatetimeInterval,
+  parseSQLDatetime,
 } from "../utils/date";
 import ProjectLocationHours from "./ProjectLocationHours";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
@@ -30,6 +34,26 @@ import {
   transition,
 } from "../calendar/projectDashboard";
 import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
+
+const SessionInfo: FunctionComponent<{
+  event: Event;
+  onClick: React.MouseEventHandler<HTMLUListElement>;
+}> = ({ event, onClick }) => {
+  return (
+    <List onClick={onClick}>
+      <ListItem>
+        <ListItemText
+          primary={
+            event.location.title +
+            " - " +
+            parseAndFormatSQLDatetimeInterval(event)
+          }
+          secondary={event.title}
+        />
+      </ListItem>
+    </List>
+  );
+};
 
 const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -54,9 +78,9 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
       event.reservation.groupId === currentGroup.id
   );
   groupEvents.sort(compareStartDates);
-  const now = Date.now();
-  const splitPoint = groupEvents.findIndex(
-    (event) => new Date(event.start).getTime() < now
+  const now = nowInServerTimezone();
+  const splitPoint = groupEvents.findIndex(({ start }) =>
+    isAfter(parseSQLDatetime(start), now)
   );
 
   const makeOpenEventDetail = (event: Event) => (): void => {
@@ -133,23 +157,19 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         </Accordion>
         <Typography>Upcoming Sessions</Typography>
         {groupEvents.slice(0, splitPoint).map((event) => (
-          <List
+          <SessionInfo
             key={`group_event_listing_${event.id}`}
+            event={event}
             onClick={makeOpenEventDetail(event)}
-          >
-            <ListItem>{event.title}</ListItem>
-            <ListItem>{parseAndFormatSQLDatetimeInterval(event)}</ListItem>
-          </List>
+          />
         ))}
         <Typography>Previous Sessions</Typography>
         {groupEvents.slice(splitPoint).map((event) => (
-          <List
+          <SessionInfo
             key={`group_event_listing_${event.id}`}
+            event={event}
             onClick={makeOpenEventDetail(event)}
-          >
-            <ListItem>{event.title}</ListItem>
-            <ListItem>{parseAndFormatSQLDatetimeInterval(event)}</ListItem>
-          </List>
+          />
         ))}
       </Paper>
     </Dialog>
