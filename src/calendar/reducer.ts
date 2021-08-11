@@ -267,10 +267,23 @@ const joinedGroup: StateHandler = (state, action) => {
   );
 };
 
-const leftGroup: StateHandler = (state) => {
+const leftGroup: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload?.invitations) {
+    return errorRedirect(
+      state,
+      action,
+      "missing new invitations after leaving group",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
   return displayMessage(
-    // This should probably not close the groupDashboard
-    { ...state, currentGroup: undefined },
+    {
+      ...state,
+      currentGroup: undefined,
+      invitations: payload?.invitations,
+      resources: { ...state.resources, ...payload?.resources },
+    },
     {
       type: CalendarAction.DisplayMessage,
       payload: {

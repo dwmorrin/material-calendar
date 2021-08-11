@@ -2,13 +2,16 @@ import React, { FC } from "react";
 import { Button, Box } from "@material-ui/core";
 import { CalendarAction } from "../../calendar/types";
 import UserGroup from "../../resources/UserGroup";
+import Invitation from "../../resources/Invitation";
 import { GroupInfoProps } from "./types";
 import { Mail, groupTo } from "../../utils/mail";
+import { ResourceKey } from "../../resources/types";
 
 const groupBox: FC<GroupInfoProps> = ({ dispatch, group, project, user }) => {
   const onLeave = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ): void => {
+    // TODO add a comment as to why we need to stop the event propagation
     event.stopPropagation();
     const name = [user.name.first, user.name.last].filter(String).join(" ");
     const mail: Mail = {
@@ -27,10 +30,22 @@ const groupBox: FC<GroupInfoProps> = ({ dispatch, group, project, user }) => {
       }),
     })
       .then((response) => response.json())
-      .then(({ error }) => {
+      .then(({ error, data }) => {
         if (error) throw error;
-        //! TODO we need to update groups and invitations
-        dispatch({ type: CalendarAction.LeftGroup });
+        const { invitations, groups } = data;
+        if (!Array.isArray(groups))
+          throw new Error("no updated groups received");
+        if (!Array.isArray(invitations))
+          throw new Error("no updated invitations received");
+        dispatch({
+          type: CalendarAction.LeftGroup,
+          payload: {
+            resources: {
+              [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
+            },
+            invitations: invitations.map((i) => new Invitation(i)),
+          },
+        });
       })
       .catch((error) =>
         dispatch({ type: CalendarAction.Error, payload: { error } })
