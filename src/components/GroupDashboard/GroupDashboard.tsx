@@ -122,7 +122,6 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
         <List>
           {invitations && currentProject && (
             <InvitationAccordion
-              state={state}
               dispatch={dispatch}
               invitations={invitations}
               currentProject={currentProject}

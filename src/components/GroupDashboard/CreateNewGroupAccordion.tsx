@@ -14,17 +14,15 @@ import User from "../../resources/User";
 import Project from "../../resources/Project";
 import { sendMail } from "../../utils/mail";
 import Invitation from "../../resources/Invitation";
+import { StateModifierProps } from "./types";
 
 const CreateNewGroupAccordion: FC<
-  Omit<CalendarUIProps, "state"> & {
-    defaultExpanded: boolean;
-    currentProject: Project;
-    openConfirmationDialog: (open: boolean) => void;
-    selectedUsers: User[];
-    setSelectedUsers: (u: User[]) => void;
-    user: User;
-    users: User[];
-  }
+  Omit<CalendarUIProps, "state"> &
+    StateModifierProps & {
+      defaultExpanded: boolean;
+      currentProject: Project;
+      users: User[];
+    }
 > = ({
   dispatch,
   defaultExpanded,

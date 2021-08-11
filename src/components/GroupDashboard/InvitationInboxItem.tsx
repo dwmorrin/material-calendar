@@ -1,23 +1,21 @@
 import React, { FC } from "react";
 import { Button, ListItem } from "@material-ui/core";
-import { CalendarUIProps, CalendarAction } from "../../calendar/types";
+import { CalendarAction } from "../../calendar/types";
 import UserGroup, { GroupMember } from "../../resources/UserGroup";
-import User from "../../resources/User";
-import Project from "../../resources/Project";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import { sendMail } from "../../utils/mail";
 import Invitation, {
   invitationIsUnanswered,
   invitationIsPendingApproval,
 } from "../../resources/Invitation";
+import { InvitationItemProps } from "./types";
 
-const InvitationInboxItem: FC<
-  Omit<CalendarUIProps, "state"> & {
-    currentProject: Project;
-    invitation: Invitation;
-    user: User;
-  }
-> = ({ dispatch, invitation, currentProject, user }) => {
+const InvitationInboxItem: FC<InvitationItemProps> = ({
+  dispatch,
+  invitation,
+  currentProject,
+  user,
+}) => {
   const isNotCurrentUser = ({ id }: { id: number }): boolean => id !== user.id;
   const dispatchError = (error: Error): void =>
     dispatch({ type: CalendarAction.Error, payload: { error } });

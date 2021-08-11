@@ -1,21 +1,19 @@
 import React, { FC } from "react";
 import { Button, ListItem } from "@material-ui/core";
-import { CalendarUIProps, CalendarAction } from "../../calendar/types";
-import User from "../../resources/User";
-import Project from "../../resources/Project";
+import { CalendarAction } from "../../calendar/types";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import ThumbsUpDownIcon from "@material-ui/icons/ThumbsUpDown";
 import { sendMail } from "../../utils/mail";
 import Invitation from "../../resources/Invitation";
+import { InvitationItemProps } from "./types";
 
-const InvitationSent: FC<
-  Omit<CalendarUIProps, "state"> & {
-    currentProject: Project;
-    invitation: Invitation;
-    user: User;
-  }
-> = ({ dispatch, currentProject, invitation, user }) => {
+const InvitationSent: FC<InvitationItemProps> = ({
+  dispatch,
+  currentProject,
+  invitation,
+  user,
+}) => {
   // TODO put this in the invitation class
   const invitationIsPendingApproval = (invitation: Invitation): boolean => {
     return !invitation.approvedId && !invitation.deniedId;

@@ -1,17 +1,16 @@
 import React, { FC } from "react";
 import { Button, Box } from "@material-ui/core";
-import { CalendarUIProps, CalendarAction } from "../../calendar/types";
+import { CalendarAction } from "../../calendar/types";
 import UserGroup from "../../resources/UserGroup";
-import User from "../../resources/User";
 import Invitation from "../../resources/Invitation";
+import { GroupInfoProps } from "./types";
 
-const CurrentGroupBox: FC<
-  CalendarUIProps & {
-    currentGroup: UserGroup;
-    user: User;
-    invitations: Invitation[];
-  }
-> = ({ dispatch, currentGroup, user, invitations }) => (
+const CurrentGroupBox: FC<GroupInfoProps> = ({
+  dispatch,
+  currentGroup,
+  user,
+  invitations,
+}) => (
   <Box
     style={{
       padding: "8px 16px",

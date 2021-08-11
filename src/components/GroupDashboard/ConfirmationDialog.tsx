@@ -4,17 +4,15 @@ import { CalendarUIProps, CalendarAction } from "../../calendar/types";
 import { makeTransition } from "../Transition";
 import User from "../../resources/User";
 import Invitation from "../../resources/Invitation";
+import { StateModifierProps } from "./types";
 
 const transition = makeTransition("right");
 
 const ConfirmationDialog: FC<
-  CalendarUIProps & {
-    open: boolean;
-    openConfirmationDialog: (open: boolean) => void;
-    user: User;
-    selectedUsers: User[];
-    setSelectedUsers: (u: User[]) => void;
-  }
+  CalendarUIProps &
+    StateModifierProps & {
+      open: boolean;
+    }
 > = ({
   state,
   dispatch,

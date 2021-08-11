@@ -1,23 +1,20 @@
 import React, { FC } from "react";
 import { Typography, Accordion, AccordionSummary } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { CalendarUIProps } from "../../calendar/types";
-import User from "../../resources/User";
-import Project from "../../resources/Project";
-import Invitation, {
+import {
   invitationIsPendingApproval,
   invitationIsUnanswered,
 } from "../../resources/Invitation";
 import InvitationSent from "./InvitationSent";
 import InvitationInboxItem from "./InvitationInboxItem";
+import { InvitationListProps } from "./types";
 
-const InvitationAccordion: FC<
-  CalendarUIProps & {
-    currentProject: Project;
-    invitations: Invitation[];
-    user: User;
-  }
-> = ({ dispatch, invitations, currentProject, user }) => {
+const InvitationAccordion: FC<InvitationListProps> = ({
+  dispatch,
+  invitations,
+  currentProject,
+  user,
+}) => {
   return (
     <Accordion defaultExpanded>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
