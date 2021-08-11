@@ -67,6 +67,8 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
       );
   }, [currentProject, dispatch, state.currentGroup, user]);
 
+  if (!currentProject) return null;
+
   return (
     <Dialog
       fullScreen
@@ -93,7 +95,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
         >
           <CloseIcon />
         </IconButton>
-        <Typography>{currentProject?.title}</Typography>
+        <Typography>{currentProject.title}</Typography>
       </Toolbar>
       <Paper
         style={{
@@ -104,7 +106,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
       >
         <section>
           <Typography variant="body2">
-            {currentProject && parseAndFormatSQLDateInterval(currentProject)}
+            {parseAndFormatSQLDateInterval(currentProject)}
           </Typography>
         </section>
         <Typography variant="body1" style={{ marginLeft: 20, marginTop: 20 }}>
@@ -120,7 +122,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
           />
         )}
         <List>
-          {invitations && currentProject && (
+          {invitations && (
             <InvitationAccordion
               dispatch={dispatch}
               invitations={invitations}
@@ -129,7 +131,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
             />
           )}
         </List>
-        {!currentGroup && currentProject && (
+        {!currentGroup && (
           <CreateNewGroupAccordion
             defaultExpanded={!invitations}
             currentProject={currentProject}
