@@ -21,6 +21,7 @@ import { parseAndFormatSQLDateInterval } from "../utils/date";
 import UserGroup, { GroupMember } from "../resources/UserGroup";
 import { useAuth } from "./AuthProvider";
 import User from "../resources/User";
+import Project from "../resources/Project";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
@@ -135,6 +136,108 @@ const ConfirmationDialog: FC<
   </Dialog>
 );
 
+const CurrentGroupBox: FC<
+  CalendarUIProps & {
+    currentGroup: UserGroup;
+    user: User;
+    invitations: Invitation[];
+  }
+> = ({ dispatch, currentGroup, user, invitations }) => (
+  <Box
+    style={{
+      padding: "8px 16px",
+      display: "flex",
+      justifyContent: "space-between",
+    }}
+  >
+    {currentGroup.title}
+    <Button
+      size="small"
+      variant="contained"
+      color="inherit"
+      onClick={(event): void => {
+        event.stopPropagation();
+        // remove user from group
+        fetch(`/api/groups/${currentGroup.id}/user/${user.id}`, {
+          method: "DELETE",
+          headers: {},
+          body: null,
+        })
+          .then((response) => response.json())
+          .then(({ error }) => {
+            if (error) throw error;
+            const invitation = invitations.find(
+              (invitation) => invitation.groupId === currentGroup.id
+            );
+            //Mark group Invitation Rejected so it doesn't show up again
+            if (invitation) {
+              fetch(`/api/invitations/${invitation.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  rejected: 1,
+                  userId: user.id,
+                }),
+              })
+                .then((response) => response.json())
+                .then(({ error }) => {
+                  if (error) throw error;
+                })
+                .catch((error) =>
+                  dispatch({ type: CalendarAction.Error, payload: { error } })
+                );
+            }
+            //If user was the last member of the group, delete the group
+            if (currentGroup.members.length <= 1) {
+              fetch(`/api/groups/${currentGroup.id}`, {
+                method: "DELETE",
+                headers: {},
+                body: null,
+              })
+                .then((response) => response.json())
+                .then(({ error }) => {
+                  if (error) throw error;
+                })
+                .catch((error) =>
+                  dispatch({ type: CalendarAction.Error, payload: { error } })
+                );
+            } else {
+              currentGroup.members.forEach((u) => {
+                if (!u.email)
+                  throw new Error(
+                    `${u.name.first} ${u.name.last} has no email`
+                  );
+                // TODO send email in previous fetch
+                // sendMail(
+                //   u.email,
+                //   user.name.first +
+                //     " " +
+                //     user.name.last +
+                //     " has left the group",
+                //   "Hello " +
+                //     u.name?.first +
+                //     ", " +
+                //     user.name.first +
+                //     " " +
+                //     user.name.last +
+                //     " has left your group for " +
+                //     currentProject?.title,
+                //   dispatchError
+                // );
+              });
+            }
+            dispatch({ type: CalendarAction.LeftGroup });
+          })
+          .catch((error) =>
+            dispatch({ type: CalendarAction.Error, payload: { error } })
+          );
+      }}
+    >
+      Leave Group
+    </Button>
+  </Box>
+);
+
 const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
   const { currentGroup, currentProject } = state;
   const [users, setUsers] = useState<User[]>([]);
@@ -247,98 +350,13 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
           {currentGroup ? "My Group" : "You are not in a Group"}
         </Typography>
         {currentGroup && (
-          <Box
-            style={{
-              padding: "8px 16px",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            {currentGroup?.title}
-            <Button
-              size="small"
-              variant="contained"
-              color="inherit"
-              onClick={(event): void => {
-                event.stopPropagation();
-                // remove user from group
-                fetch(`/api/groups/${currentGroup.id}/user/${user.id}`, {
-                  method: "DELETE",
-                  headers: {},
-                  body: null,
-                })
-                  .then((response) => response.json())
-                  .then(({ error, data }) => {
-                    if (error || !data) {
-                      return dispatchError(error);
-                    } else {
-                      const invitation = invitations.find(
-                        (invitation) => invitation.groupId === currentGroup.id
-                      );
-                      //Mark group Invitation Rejected so it doesn't show up again
-                      if (invitation !== undefined) {
-                        fetch(`/api/invitations/${invitation.id}`, {
-                          method: "PUT",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            rejected: 1,
-                            userId: user.id,
-                          }),
-                        })
-                          .then((response) => response.json())
-                          .then(({ error, data }) => {
-                            if (error || !data) return dispatchError(error);
-                          })
-                          .catch(dispatchError);
-                      }
-                      //If user was the last member of the group, delete the group
-                      if (currentGroup.members.length <= 1) {
-                        fetch(`/api/groups/${currentGroup.id}`, {
-                          method: "DELETE",
-                          headers: {},
-                          body: null,
-                        })
-                          .then((response) => response.json())
-                          .then(({ error, data }) => {
-                            if (error || !data) {
-                              return dispatchError(error);
-                            }
-                          })
-                          .catch(dispatchError);
-                      } else {
-                        currentGroup.members.forEach((u) => {
-                          if (!u.email)
-                            return dispatchError(
-                              new Error(
-                                `${u.name.first} ${u.name.last} has no email`
-                              )
-                            );
-                          sendMail(
-                            u.email,
-                            user.name.first +
-                              " " +
-                              user.name.last +
-                              " has left the group",
-                            "Hello " +
-                              u.name?.first +
-                              ", " +
-                              user.name.first +
-                              " " +
-                              user.name.last +
-                              " has left your group for " +
-                              currentProject?.title,
-                            dispatchError
-                          );
-                        });
-                      }
-                      dispatch({ type: CalendarAction.LeftGroup });
-                    }
-                  });
-              }}
-            >
-              Leave Group
-            </Button>
-          </Box>
+          <CurrentGroupBox
+            currentGroup={currentGroup}
+            dispatch={dispatch}
+            invitations={invitations}
+            state={state}
+            user={user}
+          />
         )}
         <List>
           {invitations && (
