@@ -34,6 +34,10 @@ class User implements User {
   ) {
     Object.assign(this, user);
   }
+
+  static formatName({ first, last }: { first: string; last: string }): string {
+    return [first, last].filter(String).join(" ") || "An anonymous user";
+  }
 }
 
 export default User;

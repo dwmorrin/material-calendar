@@ -54,8 +54,7 @@ const CreateNewGroupAccordion: FC<
     // TODO: add comment as to why we are stopping propogation here
     event.stopPropagation();
 
-    const name =
-      [user.name.first, user.name.last].join(" ") || "An anonymous user";
+    const name = User.formatName(user.name);
 
     const mail: Mail = {
       to: selectedUsers

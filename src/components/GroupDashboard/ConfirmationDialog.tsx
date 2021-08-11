@@ -11,6 +11,7 @@ import Invitation from "../../resources/Invitation";
 import { StateModifierProps } from "./types";
 import { Mail } from "../../utils/mail";
 import Project from "../../resources/Project";
+import User from "../../resources/User";
 
 const transition = makeTransition("right");
 
@@ -30,8 +31,7 @@ const ConfirmationDialog: FC<
   user,
 }) => {
   const onRequest = (): void => {
-    const name =
-      [user.name.first, user.name.last].join(" ") || "An anonymous user";
+    const name = User.formatName(user.name);
 
     const mail: Mail = {
       to: selectedUsers

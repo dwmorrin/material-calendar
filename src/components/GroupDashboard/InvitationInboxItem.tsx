@@ -1,6 +1,7 @@
 import React, { FC } from "react";
 import { Button, ListItem } from "@material-ui/core";
 import { Action, CalendarAction } from "../../calendar/types";
+import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import { Mail } from "../../utils/mail";
@@ -68,16 +69,8 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   project,
   user,
 }) => {
-  const formatName = ({
-    first,
-    last,
-  }: {
-    first: string;
-    last: string;
-  }): string => [first, last].filter(String).join(" ") || "An anonymous user";
-
   const onAcceptInvitation = (): void => {
-    const name = formatName(user.name);
+    const name = User.formatName(user.name);
     const mail: Mail = {
       to: invitation.invitor.email,
       subject: `${name} has joined your group`,
@@ -93,7 +86,7 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   };
 
   const onDeclineInvitation = (): void => {
-    const name = formatName(user.name);
+    const name = User.formatName(user.name);
     const mail: Mail = {
       to: invitation.invitor.email,
       subject: `${name} has declined your invitation`,
@@ -111,9 +104,9 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   const isNotCurrentUser = ({ id }: { id: number }): boolean => id !== user.id;
   const others = invitation.invitees
     .filter(isNotCurrentUser)
-    .map(({ name }) => formatName(name))
+    .map(({ name }) => User.formatName(name))
     .join(", ");
-  const invitorName = formatName(invitation.invitor.name);
+  const invitorName = User.formatName(invitation.invitor.name);
   const andUser = invitation.invitees.some(isNotCurrentUser);
   const header = [
     invitorName,
