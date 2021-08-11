@@ -4,9 +4,12 @@ import { CalendarAction } from "../../calendar/types";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import ThumbsUpDownIcon from "@material-ui/icons/ThumbsUpDown";
-import { sendMail } from "../../utils/mail";
-import Invitation from "../../resources/Invitation";
+import { Mail } from "../../utils/mail";
+import Invitation, {
+  invitationIsPendingApproval,
+} from "../../resources/Invitation";
 import { InvitationItemProps } from "./types";
+import User from "../../resources/User";
 
 const InvitationSent: FC<InvitationItemProps> = ({
   dispatch,
@@ -14,17 +17,45 @@ const InvitationSent: FC<InvitationItemProps> = ({
   invitation,
   user,
 }) => {
-  // TODO put this in the invitation class
-  const invitationIsPendingApproval = (invitation: Invitation): boolean => {
-    return !invitation.approvedId && !invitation.deniedId;
+  const onCancelInvitation = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void => {
+    const dispatchError = (error: Error): void =>
+      dispatch({ type: CalendarAction.Error, payload: { error } });
+    event.stopPropagation();
+    const name = User.formatName(user.name);
+    const mail: Mail = {
+      to: invitation.invitees
+        .map(({ email }) => email)
+        .filter(String)
+        .join(),
+      subject: `${name} has canceled the group invitation`,
+      text: `${name} has canceled the group invitation they sent you for ${project.title}.`,
+    };
+    // Delete invitation which will delete
+    // entries on invitee table via CASCADE
+    fetch(`${Invitation.url}/${invitation.id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mail }),
+    })
+      .then((response) => response.json())
+      .then(({ error, data }) => {
+        if (error) throw error;
+        if (!data) throw new Error("no invitations received");
+        dispatch({
+          type: CalendarAction.ReceivedInvitations,
+          payload: {
+            invitations: (data as Invitation[]).map((i) => new Invitation(i)),
+          },
+        });
+      })
+      .catch(dispatchError);
   };
-
-  const dispatchError = (error: Error): void =>
-    dispatch({ type: CalendarAction.Error, payload: { error } });
 
   return (
     <ListItem style={{ justifyContent: "space-between" }}>
-      {invitation.invitees.length == 0
+      {!invitation.invitees.length
         ? "You requested to group by self"
         : "You sent a Group Invitation"}
 
@@ -44,7 +75,7 @@ const InvitationSent: FC<InvitationItemProps> = ({
       >
         {invitation.invitees.map((invitee) => (
           <ListItem key={`invitation-${invitation.id}-invitee-${invitee.id}`}>
-            {invitee.name.first + " " + invitee.name.last + "  "}
+            {User.formatName(invitee.name)}
             {invitee.accepted ? (
               <ThumbUpIcon />
             ) : invitee.rejected ? (
@@ -56,63 +87,7 @@ const InvitationSent: FC<InvitationItemProps> = ({
         ))}
         <Button
           style={{ backgroundColor: "Red", color: "white" }}
-          onClick={(event): void => {
-            event.stopPropagation();
-            // Delete invitation which will delete
-            // entries on invitee table via CASCADE
-            fetch(`${Invitation.url}/${invitation.id}`, {
-              method: "DELETE",
-              headers: {},
-              body: null,
-            })
-              .then((response) => response.json())
-              .then(({ error }) => {
-                if (error) throw error;
-                invitation.invitees.forEach((u) => {
-                  if (!u.email)
-                    throw new Error(
-                      `${u.name.first} ${u.name.last} has no email`
-                    );
-                  sendMail(
-                    u.email,
-                    user.name.first +
-                      " " +
-                      user.name.last +
-                      " has canceled the group invitation",
-                    "Hello " +
-                      u.name?.first +
-                      ", " +
-                      user.name.first +
-                      " " +
-                      user.name.last +
-                      " has canceled the group invitation" +
-                      " they sent to you for " +
-                      project.title,
-                    dispatchError
-                  );
-                });
-                //Get updated invitations
-                fetch(`${Invitation.url}/user/${user?.id}`)
-                  .then((response) => response.json())
-                  .then(({ error, data }) => {
-                    if (error) throw error;
-                    if (!data) throw new Error("no invitations received");
-                    dispatch({
-                      type: CalendarAction.ReceivedInvitations,
-                      payload: {
-                        invitations: data,
-                      },
-                    });
-                  });
-                dispatch({
-                  type: CalendarAction.DisplayMessage,
-                  payload: {
-                    message: "Invitation Canceled",
-                  },
-                });
-              })
-              .catch(dispatchError);
-          }}
+          onClick={onCancelInvitation}
         >
           Cancel Invitation
         </Button>
