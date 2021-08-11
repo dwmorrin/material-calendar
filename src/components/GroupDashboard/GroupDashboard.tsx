@@ -23,41 +23,39 @@ import CreateNewGroupAccordion from "./CreateNewGroupAccordion";
 const transition = makeTransition("right");
 
 const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
-  const { currentGroup, currentProject } = state;
   const [projectMembers, setProjectMembers] = useState<User[]>([]);
   const [confirmationDialogIsOpen, openConfirmationDialog] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const { user } = useAuth();
+
+  const { currentGroup, currentProject } = state;
+
   const invitations = state.invitations.filter(
-    (invitation) => invitation.projectId === currentProject?.id
+    ({ projectId }) => projectId === currentProject?.id
   );
+
   useEffect(() => {
     setSelectedUsers([]);
     if (!currentProject?.id) return;
-    fetch(`${Project.url}/${currentProject.id}/users`)
+    fetch(`${Project.url}/${currentProject.id}/group-dashboard`)
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error) throw error;
-        if (!data) throw new Error("No project members received");
-        setProjectMembers(data.map((user: User) => new User(user)) as User[]);
-        fetch(`${Invitation.url}/user/${user?.id}`)
-          .then((response) => response.json())
-          .then(({ error, data }) => {
-            if (error) throw error;
-            if (!data) throw new Error("No invitations received");
-            dispatch({
-              type: CalendarAction.ReceivedInvitations,
-              payload: {
-                invitations: data,
-              },
-            });
-          })
-          .catch((error) =>
-            dispatch({
-              type: CalendarAction.Error,
-              payload: { error },
-            })
-          );
+        if (!data) throw new Error("No project info received");
+        const { users, invitations } = data;
+        if (!Array.isArray(users))
+          throw new Error("No project member info received");
+        if (!Array.isArray(invitations))
+          throw new Error("No invitation info received");
+        setProjectMembers(
+          (users as User[]).map((user: User) => new User(user))
+        );
+        dispatch({
+          type: CalendarAction.ReceivedInvitations,
+          payload: {
+            invitations: invitations.map((i) => new Invitation(i)),
+          },
+        });
       })
       .catch((error) =>
         dispatch({
