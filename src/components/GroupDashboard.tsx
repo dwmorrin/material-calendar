@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect } from "react";
+import React, { FC, useState, useEffect } from "react";
 import {
   Dialog,
   Toolbar,
@@ -30,14 +30,116 @@ import Invitation from "../resources/Invitation";
 
 const transition = makeTransition("right");
 
-const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
+const ConfirmationDialog: FC<
+  CalendarUIProps & {
+    open: boolean;
+    openConfirmationDialog: (open: boolean) => void;
+    user: User;
+    selectedUsers: User[];
+    setSelectedUsers: (u: User[]) => void;
+  }
+> = ({
   state,
   dispatch,
-}) => {
+  open,
+  openConfirmationDialog,
+  selectedUsers,
+  setSelectedUsers,
+  user,
+}) => (
+  <Dialog TransitionComponent={transition} open={open}>
+    The group size for {state.currentProject?.title} is{" "}
+    {state.currentProject?.groupSize}. <br />
+    You are attempting to create a group of size: {selectedUsers.length + 1}
+    . <br /> <br />
+    You can make a request for admin approval for an irregular sized group, or
+    you can create a group of the specified size
+    <Button
+      size="small"
+      variant="contained"
+      color="inherit"
+      style={{ backgroundColor: "Green", color: "white" }}
+      onClick={(): void => {
+        fetch(`/api/invitations/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            invitorId: user.id,
+            invitees: selectedUsers.map((u) => u.id),
+            projectId: state.currentProject?.id,
+            approved: 0,
+          }),
+        })
+          .then((response) => response.json())
+          .then(({ error }) => {
+            if (error) throw error;
+            selectedUsers.forEach((u: User) => {
+              if (!u.email)
+                throw new Error(`${u.name.first} ${u.name.last} has no email`);
+              // TODO send email in previous fetch
+              // sendMail(
+              //   u.email,
+              //   "You have been invited to a group",
+              //   "Hello " +
+              //     u.name?.first +
+              //     ", " +
+              //     user.name?.first +
+              //     " " +
+              //     user.name?.last +
+              //     " has invited you to join their group for " +
+              //     state.currentProject?.title,
+              //   dispatchError
+              // );
+            });
+            fetch(`${Invitation.url}/user/${user?.id}`)
+              .then((response) => response.json())
+              .then(({ error, data }) => {
+                if (error) throw error;
+                if (!data) throw new Error("no invitations received");
+                dispatch({
+                  type: CalendarAction.ReceivedInvitations,
+                  payload: {
+                    invitations: data,
+                  },
+                });
+              })
+              .catch((error) =>
+                dispatch({ type: CalendarAction.Error, payload: { error } })
+              );
+            dispatch({
+              type: CalendarAction.DisplayMessage,
+              payload: {
+                message: "Invitation Sent",
+              },
+            });
+            setSelectedUsers([]);
+            openConfirmationDialog(false);
+          })
+          .catch((error) =>
+            dispatch({ type: CalendarAction.Error, payload: { error } })
+          );
+      }}
+    >
+      Request Irregular Group Size Approval
+    </Button>
+    <Button
+      // setting disabled={selectedUsers.length == 0} does not
+      // seem to work, due to local state?
+      size="small"
+      variant="contained"
+      color="inherit"
+      onClick={(): void => openConfirmationDialog(false)}
+    >
+      Go Back
+    </Button>
+  </Dialog>
+);
+
+const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
   const { currentGroup, currentProject } = state;
-  const [users, setUsers] = useState([] as User[]);
+  const [users, setUsers] = useState<User[]>([]);
   const [confirmationDialogIsOpen, openConfirmationDialog] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState([] as User[]);
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const { user } = useAuth();
   const invitations = state.invitations.filter(
     (invitation) => invitation.projectId === currentProject?.id
@@ -107,92 +209,15 @@ const GroupDashboard: FunctionComponent<CalendarUIProps> = ({
       TransitionComponent={transition}
       open={state.groupDashboardIsOpen}
     >
-      <Dialog TransitionComponent={transition} open={confirmationDialogIsOpen}>
-        The group size for {state.currentProject?.title} is{" "}
-        {state.currentProject?.groupSize}. <br />
-        You are attempting to create a group of size: {selectedUsers.length + 1}
-        . <br /> <br />
-        You can make a request for admin approval for an irregular sized group,
-        or you can create a group of the specified size
-        <Button
-          size="small"
-          variant="contained"
-          color="inherit"
-          style={{ backgroundColor: "Green", color: "white" }}
-          onClick={(): void => {
-            fetch(`/api/invitations/`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                invitorId: user.id,
-                invitees: selectedUsers.map((u) => u.id),
-                projectId: currentProject?.id,
-                approved: 0,
-              }),
-            })
-              .then((response) => response.json())
-              .then(({ error, data }) => {
-                if (error || !data) {
-                  return dispatch({
-                    type: CalendarAction.Error,
-                    payload: { error },
-                  });
-                } else {
-                  selectedUsers.forEach((u: User) => {
-                    if (!u.email)
-                      return dispatchError(
-                        new Error(`${u.name.first} ${u.name.last} has no email`)
-                      );
-                    sendMail(
-                      u.email,
-                      "You have been invited to a group",
-                      "Hello " +
-                        u.name?.first +
-                        ", " +
-                        user.name?.first +
-                        " " +
-                        user.name?.last +
-                        " has invited you to join their group for " +
-                        currentProject?.title,
-                      dispatchError
-                    );
-                  });
-                  fetch(`/api/invitations/user/${user?.id}`)
-                    .then((response) => response.json())
-                    .then(({ error, data }) => {
-                      if (error || !data) return dispatchError(error);
-                      dispatch({
-                        type: CalendarAction.ReceivedInvitations,
-                        payload: {
-                          invitations: data,
-                        },
-                      });
-                    });
-                  dispatch({
-                    type: CalendarAction.DisplayMessage,
-                    payload: {
-                      message: "Invitation Sent",
-                    },
-                  });
-                  setSelectedUsers([]);
-                  openConfirmationDialog(false);
-                }
-              });
-          }}
-        >
-          Request Irregular Group Size Approval
-        </Button>
-        <Button
-          // setting disabled={selectedUsers.length == 0} does not
-          // seem to work, due to local state?
-          size="small"
-          variant="contained"
-          color="inherit"
-          onClick={(): void => openConfirmationDialog(false)}
-        >
-          Go Back
-        </Button>
-      </Dialog>
+      <ConfirmationDialog
+        state={state}
+        dispatch={dispatch}
+        open={confirmationDialogIsOpen}
+        openConfirmationDialog={openConfirmationDialog}
+        user={user}
+        selectedUsers={selectedUsers}
+        setSelectedUsers={setSelectedUsers}
+      />
       <Toolbar>
         <IconButton
           edge="start"
