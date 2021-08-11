@@ -24,65 +24,9 @@ import { sendMail } from "../../utils/mail";
 import Invitation from "../../resources/Invitation";
 import ConfirmationDialog from "./ConfirmationDialog";
 import CurrentGroupBox from "./CurrentGroupBox";
-import InvitationSent from "./InvitationSent";
-import InvitationInboxItem from "./InvitationInboxItem";
+import InvitationAccordion from "./InvitationAccordion";
 
 const transition = makeTransition("right");
-
-const InvitationAccordion: FC<
-  CalendarUIProps & {
-    currentProject: Project;
-    invitations: Invitation[];
-    user: User;
-  }
-> = ({ dispatch, invitations, currentProject, user }) => {
-  const invitationIsUnanswered = (invitation: Invitation): boolean =>
-    !invitation.invitees.some(function (invitee) {
-      // Get Invitations where user has yet to respond or are waiting for approval
-      if (invitee.id === user.id && (invitee.accepted || invitee.rejected)) {
-        return true;
-      } else return false;
-    });
-
-  const invitationIsPendingApproval = (invitation: Invitation): boolean => {
-    return !invitation.approvedId && !invitation.deniedId;
-  };
-
-  return (
-    <Accordion defaultExpanded>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="body1">Pending Invitations</Typography>
-      </AccordionSummary>
-      {invitations
-        .filter((invitation) => invitation.invitor.id === user.id)
-        .map((invitation) => (
-          <InvitationSent
-            key={`invitation${invitation.id}`}
-            dispatch={dispatch}
-            currentProject={currentProject}
-            invitation={invitation}
-            user={user}
-          />
-        ))}
-      {invitations
-        .filter(
-          (invitation) =>
-            invitation.invitor.id !== user.id &&
-            (invitationIsPendingApproval(invitation) ||
-              invitationIsUnanswered(invitation))
-        )
-        .map((invitation) => (
-          <InvitationInboxItem
-            key={`invitation${invitation.id}`}
-            invitation={invitation}
-            dispatch={dispatch}
-            user={user}
-            currentProject={currentProject}
-          />
-        ))}
-    </Accordion>
-  );
-};
 
 const CreateNewGroupAccordion: FC<
   Omit<CalendarUIProps, "state"> & {
