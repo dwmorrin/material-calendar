@@ -4,30 +4,29 @@ import Project from "../../resources/Project";
 import Invitation from "../../resources/Invitation";
 import UserGroup from "../../resources/UserGroup";
 
-type BaseInvitationListProps = {
-  invitations: Invitation[];
-  user: User;
-};
+type CalendarUIDispatcher = Omit<CalendarUIProps, "state">;
 
-export type InvitationItemProps = Omit<CalendarUIProps, "state"> & {
+export type InvitationItemProps = CalendarUIDispatcher & {
   currentProject: Project;
   invitation: Invitation;
   user: User;
 };
 
-export type InvitationListProps = Omit<CalendarUIProps, "state"> &
-  BaseInvitationListProps & {
-    currentProject: Project;
-  };
+export type InvitationListProps = CalendarUIDispatcher & {
+  currentProject: Project;
+  invitations: Invitation[];
+  user: User;
+};
 
-export type GroupInfoProps = CalendarUIProps &
-  BaseInvitationListProps & {
-    currentGroup: UserGroup;
-  };
+export type GroupInfoProps = CalendarUIDispatcher & {
+  group: UserGroup;
+  project: Project;
+  user: User;
+};
 
 export type StateModifierProps = {
   openConfirmationDialog: (open: boolean) => void;
-  user: User;
   selectedUsers: User[];
   setSelectedUsers: (u: User[]) => void;
+  user: User;
 };

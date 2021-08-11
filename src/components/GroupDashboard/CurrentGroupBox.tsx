@@ -2,108 +2,63 @@ import React, { FC } from "react";
 import { Button, Box } from "@material-ui/core";
 import { CalendarAction } from "../../calendar/types";
 import UserGroup from "../../resources/UserGroup";
-import Invitation from "../../resources/Invitation";
 import { GroupInfoProps } from "./types";
+import { Mail } from "../../utils/mail";
 
-const CurrentGroupBox: FC<GroupInfoProps> = ({
-  dispatch,
-  currentGroup,
-  user,
-  invitations,
-}) => (
-  <Box
-    style={{
-      padding: "8px 16px",
-      display: "flex",
-      justifyContent: "space-between",
-    }}
-  >
-    {currentGroup.title}
-    <Button
-      size="small"
-      variant="contained"
-      color="inherit"
-      onClick={(event): void => {
-        event.stopPropagation();
-        // remove user from group
-        fetch(`${UserGroup.url}/${currentGroup.id}/user/${user.id}`, {
-          method: "DELETE",
-          headers: {},
-          body: null,
-        })
-          .then((response) => response.json())
-          .then(({ error }) => {
-            if (error) throw error;
-            const invitation = invitations.find(
-              (invitation) => invitation.groupId === currentGroup.id
-            );
-            //Mark group Invitation Rejected so it doesn't show up again
-            if (invitation) {
-              fetch(`${Invitation.url}/${invitation.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  rejected: 1,
-                  userId: user.id,
-                }),
-              })
-                .then((response) => response.json())
-                .then(({ error }) => {
-                  if (error) throw error;
-                })
-                .catch((error) =>
-                  dispatch({ type: CalendarAction.Error, payload: { error } })
-                );
-            }
-            //If user was the last member of the group, delete the group
-            if (currentGroup.members.length <= 1) {
-              fetch(`${UserGroup.url}/${currentGroup.id}`, {
-                method: "DELETE",
-                headers: {},
-                body: null,
-              })
-                .then((response) => response.json())
-                .then(({ error }) => {
-                  if (error) throw error;
-                })
-                .catch((error) =>
-                  dispatch({ type: CalendarAction.Error, payload: { error } })
-                );
-            } else {
-              currentGroup.members.forEach((u) => {
-                if (!u.email)
-                  throw new Error(
-                    `${u.name.first} ${u.name.last} has no email`
-                  );
-                // TODO send email in previous fetch
-                // sendMail(
-                //   u.email,
-                //   user.name.first +
-                //     " " +
-                //     user.name.last +
-                //     " has left the group",
-                //   "Hello " +
-                //     u.name?.first +
-                //     ", " +
-                //     user.name.first +
-                //     " " +
-                //     user.name.last +
-                //     " has left your group for " +
-                //     currentProject?.title,
-                //   dispatchError
-                // );
-              });
-            }
-            dispatch({ type: CalendarAction.LeftGroup });
-          })
-          .catch((error) =>
-            dispatch({ type: CalendarAction.Error, payload: { error } })
-          );
+const groupBox: FC<GroupInfoProps> = ({ dispatch, group, project, user }) => {
+  const onLeave = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void => {
+    event.stopPropagation();
+    const name = [user.name.first, user.name.last].filter(String).join(" ");
+    const mail: Mail = {
+      to: group.members
+        .map(({ email }) => email)
+        .filter(String)
+        .join(),
+      subject: `${name} has left the group`,
+      text: `${name} has left the group for ${project.title}`,
+    };
+    // remove user from group
+    fetch(`${UserGroup.url}/${group.id}/user/${user.id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mail,
+        projectId: project.id,
+        groupIsEmpty: group.members.length === 1,
+      }),
+    })
+      .then((response) => response.json())
+      .then(({ error }) => {
+        if (error) throw error;
+        //! TODO we need to update groups and invitations
+        dispatch({ type: CalendarAction.LeftGroup });
+      })
+      .catch((error) =>
+        dispatch({ type: CalendarAction.Error, payload: { error } })
+      );
+  };
+
+  return (
+    <Box
+      style={{
+        padding: "8px 16px",
+        display: "flex",
+        justifyContent: "space-between",
       }}
     >
-      Leave Group
-    </Button>
-  </Box>
-);
+      {group.title}
+      <Button
+        size="small"
+        variant="contained"
+        color="inherit"
+        onClick={onLeave}
+      >
+        Leave Group
+      </Button>
+    </Box>
+  );
+};
 
-export default CurrentGroupBox;
+export default groupBox;

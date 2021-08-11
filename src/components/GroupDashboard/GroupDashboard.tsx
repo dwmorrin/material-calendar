@@ -112,10 +112,9 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
         </Typography>
         {currentGroup && (
           <CurrentGroupBox
-            currentGroup={currentGroup}
+            group={currentGroup}
+            project={currentProject}
             dispatch={dispatch}
-            invitations={invitations}
-            state={state}
             user={user}
           />
         )}
