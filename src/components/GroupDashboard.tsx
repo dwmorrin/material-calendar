@@ -670,6 +670,151 @@ const InvitationAccordion: FC<
   );
 };
 
+const CreateNewGroupAccordion: FC<
+  Omit<CalendarUIProps, "state"> & {
+    defaultExpanded: boolean;
+    currentProject: Project;
+    openConfirmationDialog: (open: boolean) => void;
+    selectedUsers: User[];
+    setSelectedUsers: (u: User[]) => void;
+    user: User;
+    users: User[];
+  }
+> = ({
+  dispatch,
+  defaultExpanded,
+  currentProject,
+  openConfirmationDialog,
+  selectedUsers,
+  setSelectedUsers,
+  user,
+  users,
+}) => {
+  const selectUser = (newUser: User): void => {
+    const existing = selectedUsers.findIndex(({ id }) => id === newUser.id);
+    setSelectedUsers(
+      existing >= 0
+        ? selectedUsers
+            .slice(0, existing)
+            .concat(selectedUsers.slice(existing + 1))
+        : [...selectedUsers, newUser]
+    );
+  };
+
+  const dispatchError = (error: Error, meta?: unknown): void =>
+    dispatch({ type: CalendarAction.Error, payload: { error }, meta });
+
+  const onCreateGroup = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void => {
+    // Because button disable does not work, prevent empty invitations here
+    const approved =
+      selectedUsers.length + 1 === (currentProject.groupSize || 0);
+
+    if (!approved) return openConfirmationDialog(true);
+    // TODO: add comment as to why we are stopping propogation here
+    event.stopPropagation();
+
+    // Create Invitation
+    fetch(`${Invitation.url}/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        invitorId: user.id,
+        invitees: selectedUsers.map((u) => u.id),
+        projectId: currentProject.id,
+        approved,
+      }),
+    })
+      .then((response) => response.json())
+      .then(({ error }) => {
+        if (error) throw error;
+        selectedUsers.forEach((u: User) => {
+          if (!u.email)
+            throw new Error(`${u.name.first} ${u.name.last} has no email`);
+          sendMail(
+            u.email,
+            "You have been invited to a group",
+            "Hello " +
+              u.name?.first +
+              ", " +
+              user.name?.first +
+              " " +
+              user.name?.last +
+              " has invited you to join their group for " +
+              currentProject?.title,
+            dispatchError
+          );
+        });
+        // Get list of invitations again (to get the new one)
+        fetch(`${Invitation.url}/user/${user?.id}`)
+          .then((response) => response.json())
+          .then(({ error, data }) => {
+            if (error) throw error;
+            if (!data) throw new Error("No invitations received");
+            dispatch({
+              type: CalendarAction.ReceivedInvitations,
+              payload: {
+                invitations: data,
+              },
+            });
+          })
+          .catch(dispatchError);
+        dispatch({
+          type: CalendarAction.DisplayMessage,
+          payload: {
+            message: "Invitation Sent",
+          },
+        });
+        setSelectedUsers([]);
+      })
+      .catch(dispatchError);
+  };
+
+  return (
+    <Accordion defaultExpanded={defaultExpanded}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Typography variant="body1">Create New Group</Typography>
+      </AccordionSummary>
+      <Typography variant="body1">
+        Project group size is: {currentProject.groupSize}
+      </Typography>
+      <List>
+        <Button
+          // setting disabled={selectedUsers.length == 0} does not
+          // seem to work, due to local state?
+          size="small"
+          variant="contained"
+          color="inherit"
+          onClick={onCreateGroup}
+        >
+          {selectedUsers.length == 0
+            ? "Create a group by yourself"
+            : "Create Group"}
+        </Button>
+        {users
+          ?.filter((individual) => individual.id !== user.id)
+          .map((individual) => (
+            <ListItem
+              key={`course${individual.id}`}
+              style={{ justifyContent: "space-between" }}
+            >
+              {individual.name?.first + " " + individual.name?.last}
+              <Checkbox
+                onChange={(): void => selectUser(individual)}
+                size="small"
+                inputProps={{
+                  "aria-label": individual.username + "Checkbox",
+                }}
+                checked={selectedUsers.includes(individual)}
+              />
+            </ListItem>
+          ))}
+      </List>
+    </Accordion>
+  );
+};
+
 const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
   const { currentGroup, currentProject } = state;
   const [users, setUsers] = useState<User[]>([]);
@@ -682,48 +827,38 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
   useEffect(() => {
     setSelectedUsers([]);
     if (!currentProject?.id) return;
-    fetch(`/api/projects/${currentProject.id}/users`)
+    fetch(`${Project.url}/${currentProject.id}/users`)
       .then((response) => response.json())
       .then(({ error, data }) => {
-        if (error || !data) {
-          return dispatch({
-            type: CalendarAction.Error,
-            payload: { error },
-          });
-        }
+        if (error) throw error;
+        if (!data) throw new Error("No project members received");
         setUsers(data.map((user: User) => new User(user)) as User[]);
         fetch(`${Invitation.url}/user/${user?.id}`)
           .then((response) => response.json())
           .then(({ error, data }) => {
-            if (error || !data) {
-              return dispatch({
-                type: CalendarAction.Error,
-                payload: { error },
-              });
-            }
+            if (error) throw error;
+            if (!data) throw new Error("No invitations received");
             dispatch({
               type: CalendarAction.ReceivedInvitations,
               payload: {
                 invitations: data,
               },
             });
-          });
-      });
+          })
+          .catch((error) =>
+            dispatch({
+              type: CalendarAction.Error,
+              payload: { error },
+            })
+          );
+      })
+      .catch((error) =>
+        dispatch({
+          type: CalendarAction.Error,
+          payload: { error },
+        })
+      );
   }, [currentProject, dispatch, state.currentGroup, user]);
-
-  const dispatchError = (error: Error, meta?: unknown): void =>
-    dispatch({ type: CalendarAction.Error, payload: { error }, meta });
-
-  const selectUser = (newUser: User): void => {
-    const newList: User[] = [...selectedUsers];
-    const valueExisting = newList.map((u: User) => u.id).indexOf(newUser.id);
-    if (valueExisting !== -1) {
-      newList.splice(valueExisting, 1);
-    } else {
-      newList.push(newUser);
-    }
-    setSelectedUsers(newList);
-  };
 
   return (
     <Dialog
@@ -788,118 +923,17 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
             />
           )}
         </List>
-        {!currentGroup && (
-          <Accordion defaultExpanded={!invitations}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="body1">Create New Group</Typography>
-            </AccordionSummary>
-            <Typography variant="body1">
-              Project group size is: {currentProject?.groupSize}
-            </Typography>
-            <List>
-              <Button
-                // setting disabled={selectedUsers.length == 0} does not
-                // seem to work, due to local state?
-                size="small"
-                variant="contained"
-                color="inherit"
-                onClick={(event): void => {
-                  // Because button disable does not work, prevent empty invitations here
-                  const approved =
-                    selectedUsers.length + 1 ===
-                    (currentProject?.groupSize || 0);
-                  if (!approved) {
-                    openConfirmationDialog(true);
-                  } else {
-                    event.stopPropagation();
-                    // Create Invitation
-                    fetch(`${Invitation.url}/`, {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        invitorId: user.id,
-                        invitees: selectedUsers.map((u) => u.id),
-                        projectId: currentProject?.id,
-                        approved: approved,
-                      }),
-                    })
-                      .then((response) => response.json())
-                      .then(({ error, data }) => {
-                        if (error || !data) {
-                          return dispatch({
-                            type: CalendarAction.Error,
-                            payload: { error },
-                          });
-                        } else {
-                          selectedUsers.forEach((u: User) => {
-                            if (!u.email)
-                              return dispatchError(
-                                new Error(
-                                  `${u.name.first} ${u.name.last} has no email`
-                                )
-                              );
-                            sendMail(
-                              u.email,
-                              "You have been invited to a group",
-                              "Hello " +
-                                u.name?.first +
-                                ", " +
-                                user.name?.first +
-                                " " +
-                                user.name?.last +
-                                " has invited you to join their group for " +
-                                currentProject?.title,
-                              dispatchError
-                            );
-                          });
-                          // Get list of invitations again (to get the new one)
-                          fetch(`${Invitation.url}/user/${user?.id}`)
-                            .then((response) => response.json())
-                            .then(({ error, data }) => {
-                              if (error || !data) return dispatchError(error);
-                              dispatch({
-                                type: CalendarAction.ReceivedInvitations,
-                                payload: {
-                                  invitations: data,
-                                },
-                              });
-                            });
-                          dispatch({
-                            type: CalendarAction.DisplayMessage,
-                            payload: {
-                              message: "Invitation Sent",
-                            },
-                          });
-                          setSelectedUsers([]);
-                        }
-                      });
-                  }
-                }}
-              >
-                {selectedUsers.length == 0
-                  ? "Create a group by yourself"
-                  : "Create Group"}
-              </Button>
-              {users
-                ?.filter((individual) => individual.id !== user.id)
-                .map((individual) => (
-                  <ListItem
-                    key={`course${individual.id}`}
-                    style={{ justifyContent: "space-between" }}
-                  >
-                    {individual.name?.first + " " + individual.name?.last}
-                    <Checkbox
-                      onChange={(): void => selectUser(individual)}
-                      size="small"
-                      inputProps={{
-                        "aria-label": individual.username + "Checkbox",
-                      }}
-                      checked={selectedUsers.includes(individual)}
-                    />
-                  </ListItem>
-                ))}
-            </List>
-          </Accordion>
+        {!currentGroup && currentProject && (
+          <CreateNewGroupAccordion
+            defaultExpanded={!invitations}
+            currentProject={currentProject}
+            openConfirmationDialog={openConfirmationDialog}
+            dispatch={dispatch}
+            selectedUsers={selectedUsers}
+            setSelectedUsers={setSelectedUsers}
+            user={user}
+            users={users}
+          />
         )}
       </Paper>
     </Dialog>
