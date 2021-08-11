@@ -317,7 +317,7 @@ export const processVirtualWeeksAsHoursRemaining = (
   virtualWeeks
     .filter((vw) => vw.locationId === locationId)
     .map((vw) => ({
-      ...vw,
+      start: vw.start,
       end: addADay(vw.end),
       id: `hr${vw.id}`,
       resourceId: VirtualWeek.hoursRemainingId,

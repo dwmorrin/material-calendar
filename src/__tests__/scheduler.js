@@ -60,7 +60,7 @@ test("makeAllotmentEventMap", () =>
     },
     hours: 0,
     id: Project.allotmentPrefix + "0-0",
-    resourceId: "Allotments0",
+    resourceId: Project.allotmentPrefix + "0",
     allDay: true,
     title: "0",
   }));
@@ -111,7 +111,7 @@ test("makeAllotments", () =>
       hours: 0,
       id: Project.allotmentPrefix + "0-0",
       locationId: 0,
-      resourceId: "Allotments0",
+      resourceId: Project.allotmentPrefix + "0",
       start: "2020-06-18",
       title: "0",
     },
@@ -186,6 +186,7 @@ test("processVirtualWeeksAsHoursRemaining adds a day", () =>
           locationId: 0,
           locationHours: 1,
           projectHours: 1,
+          totalHours: 1,
         },
       ],
       0
@@ -194,9 +195,6 @@ test("processVirtualWeeksAsHoursRemaining adds a day", () =>
     {
       start: "2020-12-31",
       end: "2021-01-01",
-      locationId: 0,
-      locationHours: 1,
-      projectHours: 1,
       id: "hr0",
       resourceId: VirtualWeek.hoursRemainingId,
       allDay: true,
