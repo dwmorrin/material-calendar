@@ -74,13 +74,13 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
       open={state.groupDashboardIsOpen}
     >
       <ConfirmationDialog
-        state={state}
         dispatch={dispatch}
         open={confirmationDialogIsOpen}
         openConfirmationDialog={openConfirmationDialog}
-        user={user}
+        project={currentProject}
         selectedUsers={selectedUsers}
         setSelectedUsers={setSelectedUsers}
+        user={user}
       />
       <Toolbar>
         <IconButton

@@ -34,8 +34,8 @@ class Invitation implements Invitation {
       invitor: { id: 0, name: { last: "", first: "" }, email: "" } as Invitor,
       invitees: [] as Invitee[],
       groupId: 0,
-      approved: false,
-      denied: false,
+      approvedId: false,
+      deniedId: false,
     }
   ) {
     Object.assign(this, inv);
