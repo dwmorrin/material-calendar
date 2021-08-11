@@ -25,7 +25,7 @@ import {
 } from "../utils/date";
 import ProjectLocationHours from "./ProjectLocationHours";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
-import GroupDashboard from "./GroupDashboard";
+import GroupDashboard from "./GroupDashboard/GroupDashboard";
 import { ResourceKey } from "../resources/types";
 import Event from "../resources/Event";
 import {
