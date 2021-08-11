@@ -12,28 +12,28 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { CalendarUIProps, CalendarAction } from "../../calendar/types";
 import User from "../../resources/User";
 import Project from "../../resources/Project";
-import { sendMail } from "../../utils/mail";
 import Invitation from "../../resources/Invitation";
 import { StateModifierProps } from "./types";
+import { Mail } from "../../utils/mail";
 
 const CreateNewGroupAccordion: FC<
   Omit<CalendarUIProps, "state"> &
     StateModifierProps & {
       defaultExpanded: boolean;
-      currentProject: Project;
+      project: Project;
       projectMembers: User[];
     }
 > = ({
   dispatch,
   defaultExpanded,
-  currentProject,
+  project,
   openConfirmationDialog,
   selectedUsers,
   setSelectedUsers,
   user,
   projectMembers,
 }) => {
-  const selectUser = (newUser: User): void => {
+  const toggleUser = (newUser: User): void => {
     const existing = selectedUsers.findIndex(({ id }) => id === newUser.id);
     setSelectedUsers(
       existing >= 0
@@ -44,19 +44,27 @@ const CreateNewGroupAccordion: FC<
     );
   };
 
-  const dispatchError = (error: Error, meta?: unknown): void =>
-    dispatch({ type: CalendarAction.Error, payload: { error }, meta });
-
   const onCreateGroup = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ): void => {
     // Because button disable does not work, prevent empty invitations here
-    const approved =
-      selectedUsers.length + 1 === (currentProject.groupSize || 0);
+    const approved = selectedUsers.length + 1 === (project.groupSize || 0);
 
     if (!approved) return openConfirmationDialog(true);
     // TODO: add comment as to why we are stopping propogation here
     event.stopPropagation();
+
+    const name =
+      [user.name.first, user.name.last].join(" ") || "An anonymous user";
+
+    const mail: Mail = {
+      to: selectedUsers
+        .map(({ email }) => email)
+        .filter(String)
+        .join(),
+      subject: "You have been invited to a group",
+      text: `${name} has invited you to join their group for ${project.title}`,
+    };
 
     // Create Invitation
     fetch(`${Invitation.url}/`, {
@@ -65,44 +73,22 @@ const CreateNewGroupAccordion: FC<
       body: JSON.stringify({
         invitorId: user.id,
         invitees: selectedUsers.map((u) => u.id),
-        projectId: currentProject.id,
+        projectId: project.id,
         approved,
+        mail,
       }),
     })
       .then((response) => response.json())
-      .then(({ error }) => {
+      .then(({ error, data }) => {
         if (error) throw error;
-        selectedUsers.forEach((u: User) => {
-          if (!u.email)
-            throw new Error(`${u.name.first} ${u.name.last} has no email`);
-          sendMail(
-            u.email,
-            "You have been invited to a group",
-            "Hello " +
-              u.name?.first +
-              ", " +
-              user.name?.first +
-              " " +
-              user.name?.last +
-              " has invited you to join their group for " +
-              currentProject?.title,
-            dispatchError
-          );
+        if (!Array.isArray(data))
+          throw new Error("No invitation info received");
+        dispatch({
+          type: CalendarAction.ReceivedInvitations,
+          payload: {
+            invitations: (data as Invitation[]).map((i) => new Invitation(i)),
+          },
         });
-        // Get list of invitations again (to get the new one)
-        fetch(`${Invitation.url}/user/${user?.id}`)
-          .then((response) => response.json())
-          .then(({ error, data }) => {
-            if (error) throw error;
-            if (!data) throw new Error("No invitations received");
-            dispatch({
-              type: CalendarAction.ReceivedInvitations,
-              payload: {
-                invitations: data,
-              },
-            });
-          })
-          .catch(dispatchError);
         dispatch({
           type: CalendarAction.DisplayMessage,
           payload: {
@@ -111,7 +97,9 @@ const CreateNewGroupAccordion: FC<
         });
         setSelectedUsers([]);
       })
-      .catch(dispatchError);
+      .catch((error) =>
+        dispatch({ type: CalendarAction.Error, payload: { error } })
+      );
   };
 
   return (
@@ -120,7 +108,7 @@ const CreateNewGroupAccordion: FC<
         <Typography variant="body1">Create New Group</Typography>
       </AccordionSummary>
       <Typography variant="body1">
-        Project group size is: {currentProject.groupSize}
+        Project group size is: {project.groupSize}
       </Typography>
       <List>
         <Button
@@ -144,7 +132,7 @@ const CreateNewGroupAccordion: FC<
             >
               {otherUser.name.first + " " + otherUser.name.last}
               <Checkbox
-                onChange={(): void => selectUser(otherUser)}
+                onChange={(): void => toggleUser(otherUser)}
                 size="small"
                 inputProps={{
                   "aria-label": otherUser.username + "Checkbox",

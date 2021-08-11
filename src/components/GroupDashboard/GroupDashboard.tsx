@@ -132,7 +132,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
         {!currentGroup && (
           <CreateNewGroupAccordion
             defaultExpanded={!invitations}
-            currentProject={currentProject}
+            project={currentProject}
             openConfirmationDialog={openConfirmationDialog}
             dispatch={dispatch}
             selectedUsers={selectedUsers}
