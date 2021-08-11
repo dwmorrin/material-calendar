@@ -14,7 +14,7 @@ import User from "../../resources/User";
 import Project from "../../resources/Project";
 import Invitation from "../../resources/Invitation";
 import { StateModifierProps } from "./types";
-import { Mail } from "../../utils/mail";
+import { Mail, groupTo } from "../../utils/mail";
 
 const CreateNewGroupAccordion: FC<
   Omit<CalendarUIProps, "state"> &
@@ -57,10 +57,7 @@ const CreateNewGroupAccordion: FC<
     const name = User.formatName(user.name);
 
     const mail: Mail = {
-      to: selectedUsers
-        .map(({ email }) => email)
-        .filter(String)
-        .join(),
+      to: groupTo(selectedUsers),
       subject: "You have been invited to a group",
       text: `${name} has invited you to join their group for ${project.title}`,
     };

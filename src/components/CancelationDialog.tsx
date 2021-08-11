@@ -14,7 +14,7 @@ import Project from "../resources/Project";
 import Reservation from "../resources/Reservation";
 import UserGroup from "../resources/UserGroup";
 import Event from "../resources/Event";
-import { Mail, adminEmail } from "../utils/mail";
+import { Mail, adminEmail, groupTo } from "../utils/mail";
 import { formatDatetime, isBefore, nowInServerTimezone } from "../utils/date";
 
 const transition = makeTransition("left");
@@ -59,7 +59,6 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   const autoApprove =
     isBefore(nowInServerTimezone(), cancelationApprovalCutoff) ||
     (isBefore(nowInServerTimezone(), gracePeriodCutoff) && !isWalkIn);
-  const groupEmail = group.members.map(({ email }) => email).join(", ");
   const subject = "canceled a reservation for your group";
   const location = currentEvent.location.title;
   const whatWhenWhere = `${project.title} on ${currentEvent.start} in ${location}`;
@@ -69,12 +68,12 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     cancelationApprovalCutoff
   );
   const onCancelationRequest = ({ refund = false } = {}): void => {
-    const mailbox = [] as Mail[];
+    const mailbox: Mail[] = [];
     const refundMessage = refund
       ? " They requested that project hours be refunded. The request has been sent to the administrator."
       : " They did not request that project hours be refunded, so the hours have been forfeited.";
     mailbox.push({
-      to: groupEmail,
+      to: groupTo(group.members),
       subject: `${myName} has ${subject}`,
       text: `You' re receiving this because you are a member of ${
         group.title

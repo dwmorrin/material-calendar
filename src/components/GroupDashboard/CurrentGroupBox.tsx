@@ -3,7 +3,7 @@ import { Button, Box } from "@material-ui/core";
 import { CalendarAction } from "../../calendar/types";
 import UserGroup from "../../resources/UserGroup";
 import { GroupInfoProps } from "./types";
-import { Mail } from "../../utils/mail";
+import { Mail, groupTo } from "../../utils/mail";
 
 const groupBox: FC<GroupInfoProps> = ({ dispatch, group, project, user }) => {
   const onLeave = (
@@ -12,10 +12,7 @@ const groupBox: FC<GroupInfoProps> = ({ dispatch, group, project, user }) => {
     event.stopPropagation();
     const name = [user.name.first, user.name.last].filter(String).join(" ");
     const mail: Mail = {
-      to: group.members
-        .map(({ email }) => email)
-        .filter(String)
-        .join(),
+      to: groupTo(group.members),
       subject: `${name} has left the group`,
       text: `${name} has left the group for ${project.title}`,
     };

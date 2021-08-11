@@ -4,7 +4,7 @@ import { CalendarAction } from "../../calendar/types";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import ThumbsUpDownIcon from "@material-ui/icons/ThumbsUpDown";
-import { Mail } from "../../utils/mail";
+import { Mail, groupTo } from "../../utils/mail";
 import Invitation, {
   invitationIsPendingApproval,
 } from "../../resources/Invitation";
@@ -20,15 +20,11 @@ const InvitationSent: FC<InvitationItemProps> = ({
   const onCancelInvitation = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ): void => {
-    const dispatchError = (error: Error): void =>
-      dispatch({ type: CalendarAction.Error, payload: { error } });
+    // TODO add comment as to why the stop propogation is needed
     event.stopPropagation();
     const name = User.formatName(user.name);
     const mail: Mail = {
-      to: invitation.invitees
-        .map(({ email }) => email)
-        .filter(String)
-        .join(),
+      to: groupTo(invitation.invitees),
       subject: `${name} has canceled the group invitation`,
       text: `${name} has canceled the group invitation they sent you for ${project.title}.`,
     };
@@ -50,7 +46,9 @@ const InvitationSent: FC<InvitationItemProps> = ({
           },
         });
       })
-      .catch(dispatchError);
+      .catch((error): void =>
+        dispatch({ type: CalendarAction.Error, payload: { error } })
+      );
   };
 
   return (
@@ -73,12 +71,12 @@ const InvitationSent: FC<InvitationItemProps> = ({
           justifyContent: "space-around",
         }}
       >
-        {invitation.invitees.map((invitee) => (
-          <ListItem key={`invitation-${invitation.id}-invitee-${invitee.id}`}>
-            {User.formatName(invitee.name)}
-            {invitee.accepted ? (
+        {invitation.invitees.map(({ id, name, accepted, rejected }) => (
+          <ListItem key={`invitation-${invitation.id}-invitee-${id}`}>
+            {User.formatName(name)}
+            {accepted ? (
               <ThumbUpIcon />
-            ) : invitee.rejected ? (
+            ) : rejected ? (
               <ThumbDownIcon />
             ) : (
               <ThumbsUpDownIcon />

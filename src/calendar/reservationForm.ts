@@ -8,7 +8,7 @@ import UserGroup from "../resources/UserGroup";
 import Reservation from "../resources/Reservation";
 import Equipment from "../resources/Equipment";
 import Event from "../resources/Event";
-import { Mail } from "../utils/mail";
+import { Mail, groupTo } from "../utils/mail";
 import User from "../resources/User";
 import { EquipmentValue } from "../equipmentForm/types";
 
@@ -76,7 +76,7 @@ const groupMail = (
 ): Mail => {
   const subject = `${first} ${last} has ${type} a reservation for your group`;
   return {
-    to: members.map(({ email }) => email).join(),
+    to: groupTo(members),
     subject,
     text: `${subject} for ${title} on ${start} in ${location.title}`,
   };

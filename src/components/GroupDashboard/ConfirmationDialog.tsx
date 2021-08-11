@@ -9,7 +9,7 @@ import { CalendarUIProps, CalendarAction } from "../../calendar/types";
 import { makeTransition } from "../Transition";
 import Invitation from "../../resources/Invitation";
 import { StateModifierProps } from "./types";
-import { Mail } from "../../utils/mail";
+import { Mail, groupTo } from "../../utils/mail";
 import Project from "../../resources/Project";
 import User from "../../resources/User";
 
@@ -34,10 +34,7 @@ const ConfirmationDialog: FC<
     const name = User.formatName(user.name);
 
     const mail: Mail = {
-      to: selectedUsers
-        .map(({ email }) => email)
-        .filter(String)
-        .join(),
+      to: groupTo(selectedUsers),
       subject: "You have been invited to a group",
       text: `${name} has invited you to join their group for ${project.title}`,
     };
