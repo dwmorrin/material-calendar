@@ -20,8 +20,8 @@ interface Invitation {
   invitor: Invitor;
   invitees: Invitee[];
   groupId: number;
-  approvedId: boolean;
-  deniedId: boolean;
+  approvedId: number;
+  deniedId: number;
 }
 
 class Invitation implements Invitation {
@@ -34,8 +34,8 @@ class Invitation implements Invitation {
       invitor: { id: 0, name: { last: "", first: "" }, email: "" } as Invitor,
       invitees: [] as Invitee[],
       groupId: 0,
-      approvedId: false,
-      deniedId: false,
+      approvedId: 0,
+      deniedId: 0,
     }
   ) {
     Object.assign(this, inv);
