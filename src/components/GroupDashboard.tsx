@@ -305,7 +305,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
     }
     setSelectedUsers(newList);
   };
-  if (!user) return null;
+
   return (
     <Dialog
       fullScreen
