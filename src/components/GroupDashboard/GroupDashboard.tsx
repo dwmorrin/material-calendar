@@ -24,7 +24,7 @@ const transition = makeTransition("right");
 
 const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
   const { currentGroup, currentProject } = state;
-  const [users, setUsers] = useState<User[]>([]);
+  const [projectMembers, setProjectMembers] = useState<User[]>([]);
   const [confirmationDialogIsOpen, openConfirmationDialog] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const { user } = useAuth();
@@ -39,7 +39,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
       .then(({ error, data }) => {
         if (error) throw error;
         if (!data) throw new Error("No project members received");
-        setUsers(data.map((user: User) => new User(user)) as User[]);
+        setProjectMembers(data.map((user: User) => new User(user)) as User[]);
         fetch(`${Invitation.url}/user/${user?.id}`)
           .then((response) => response.json())
           .then(({ error, data }) => {
@@ -138,7 +138,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
             selectedUsers={selectedUsers}
             setSelectedUsers={setSelectedUsers}
             user={user}
-            users={users}
+            projectMembers={projectMembers}
           />
         )}
       </Paper>

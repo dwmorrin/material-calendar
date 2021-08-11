@@ -21,7 +21,7 @@ const CreateNewGroupAccordion: FC<
     StateModifierProps & {
       defaultExpanded: boolean;
       currentProject: Project;
-      users: User[];
+      projectMembers: User[];
     }
 > = ({
   dispatch,
@@ -31,7 +31,7 @@ const CreateNewGroupAccordion: FC<
   selectedUsers,
   setSelectedUsers,
   user,
-  users,
+  projectMembers,
 }) => {
   const selectUser = (newUser: User): void => {
     const existing = selectedUsers.findIndex(({ id }) => id === newUser.id);
@@ -135,7 +135,7 @@ const CreateNewGroupAccordion: FC<
             ? "Create a group by yourself"
             : "Create Group"}
         </Button>
-        {users
+        {projectMembers
           .filter(({ id }) => id !== user.id)
           .map((otherUser) => (
             <ListItem
