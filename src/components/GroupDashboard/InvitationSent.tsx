@@ -10,7 +10,7 @@ import { InvitationItemProps } from "./types";
 
 const InvitationSent: FC<InvitationItemProps> = ({
   dispatch,
-  currentProject,
+  project,
   invitation,
   user,
 }) => {
@@ -87,7 +87,7 @@ const InvitationSent: FC<InvitationItemProps> = ({
                       user.name.last +
                       " has canceled the group invitation" +
                       " they sent to you for " +
-                      currentProject.title,
+                      project.title,
                     dispatchError
                   );
                 });

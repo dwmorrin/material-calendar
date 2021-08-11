@@ -7,7 +7,7 @@ import UserGroup from "../../resources/UserGroup";
 type CalendarUIDispatcher = Omit<CalendarUIProps, "state">;
 
 export type InvitationItemProps = CalendarUIDispatcher & {
-  currentProject: Project;
+  project: Project;
   invitation: Invitation;
   user: User;
 };

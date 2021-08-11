@@ -243,7 +243,7 @@ const foundStaleCurrentEvent: StateHandler = (state, { payload }) => {
 
 const joinedGroup: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.currentGroup) {
+  if (!payload?.currentGroup || !payload?.invitations) {
     return errorRedirect(
       state,
       action,
@@ -252,8 +252,12 @@ const joinedGroup: StateHandler = (state, action) => {
     );
   }
   return displayMessage(
-    // This should probably not close the groupDashboard
-    { ...state, currentGroup: payload.currentGroup },
+    {
+      ...state,
+      currentGroup: payload.currentGroup,
+      invitations: payload.invitations,
+      resources: { ...state.resources, ...payload.resources },
+    },
     {
       type: CalendarAction.DisplayMessage,
       payload: {
@@ -427,6 +431,32 @@ const receivedInvitations: StateHandler = (state, action) => {
   return { ...state, invitations: payload.invitations };
 };
 
+const rejectedGroupInvitation: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload?.currentGroup || !payload?.invitations) {
+    return errorRedirect(
+      state,
+      action,
+      "no data after rejecting group invitation",
+      ErrorType.MISSING_RESOURCE
+    );
+  }
+  return displayMessage(
+    {
+      ...state,
+      currentGroup: payload.currentGroup,
+      invitations: payload.invitations,
+      resources: { ...state.resources, ...payload.resources },
+    },
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: "You have declined the invitation",
+      },
+    }
+  );
+};
+
 const selectedEvent: StateHandler = (state, action) => {
   const { payload } = action;
   if (!payload?.currentEvent) {
@@ -559,6 +589,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.ReceivedReservationCancelation]:
       receivedReservationCancelation,
     [CalendarAction.ReceivedResource]: receivedResource,
+    [CalendarAction.RejectedGroupInvitation]: rejectedGroupInvitation,
     [CalendarAction.SelectedEvent]: selectedEvent,
     [CalendarAction.SelectedGroup]: selectedGroup,
     [CalendarAction.SelectedLocation]: selectedLocation,

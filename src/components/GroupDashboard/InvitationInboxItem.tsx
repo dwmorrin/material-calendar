@@ -1,236 +1,131 @@
 import React, { FC } from "react";
 import { Button, ListItem } from "@material-ui/core";
-import { CalendarAction } from "../../calendar/types";
-import UserGroup, { GroupMember } from "../../resources/UserGroup";
+import { Action, CalendarAction } from "../../calendar/types";
+import UserGroup from "../../resources/UserGroup";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
-import { sendMail } from "../../utils/mail";
+import { Mail } from "../../utils/mail";
 import Invitation, {
   invitationIsUnanswered,
   invitationIsPendingApproval,
 } from "../../resources/Invitation";
 import { InvitationItemProps } from "./types";
+import { ResourceKey } from "../../resources/types";
+
+interface InvitationUpdateProps {
+  invitation: Invitation;
+  userId: number;
+  mail: Mail;
+  dispatch: (a: Action) => void;
+  accepted: boolean;
+}
+
+const updateInvitation = ({
+  accepted,
+  invitation,
+  userId,
+  mail,
+  dispatch,
+}: InvitationUpdateProps): void => {
+  const body: Record<string, unknown> = { userId, mail };
+  if (accepted) body.accepted = 1;
+  else body.rejected = 1;
+  fetch(`${Invitation.url}/${invitation.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+    .then((response) => response.json())
+    .then(({ error, data }) => {
+      if (error) throw error;
+      if (!data) throw new Error("No updated group info returned");
+      const { invitations, groups, currentGroup } = data;
+      if (!Array.isArray(invitations))
+        throw new Error("No updated invitations info returned");
+      if (!Array.isArray(groups))
+        throw new Error("No updated group info returned");
+      if (!currentGroup) throw new Error("No updated group info returned");
+      dispatch({
+        type: accepted
+          ? CalendarAction.JoinedGroup
+          : CalendarAction.RejectedGroupInvitation,
+        payload: {
+          currentGroup,
+          invitations: invitations.map((i) => new Invitation(i)),
+          resources: {
+            [ResourceKey.Groups]: (groups as UserGroup[]).map(
+              (g) => new UserGroup(g)
+            ),
+          },
+        },
+      });
+    })
+    .catch((error) => dispatch({ type: CalendarAction.Error, payload: error }));
+};
 
 const InvitationInboxItem: FC<InvitationItemProps> = ({
   dispatch,
   invitation,
-  currentProject,
+  project,
   user,
 }) => {
-  const isNotCurrentUser = ({ id }: { id: number }): boolean => id !== user.id;
-  const dispatchError = (error: Error): void =>
-    dispatch({ type: CalendarAction.Error, payload: { error } });
+  const formatName = ({
+    first,
+    last,
+  }: {
+    first: string;
+    last: string;
+  }): string => [first, last].filter(String).join(" ") || "An anonymous user";
 
   const onAcceptInvitation = (): void => {
-    // Accept Invitation
-    fetch(`${Invitation.url}/${invitation.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        accepted: 1,
-        userId: user.id,
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ error }) => {
-        if (error) throw error;
-        if (!invitation.approvedId) {
-          fetch(`${Invitation.url}/user/${user?.id}`)
-            .then((response) => response.json())
-            .then(({ error, data }) => {
-              if (error) throw error;
-              if (!data) throw new Error("No invitations received");
-              dispatch({
-                type: CalendarAction.ReceivedInvitations,
-                payload: {
-                  invitations: data,
-                },
-              });
-            })
-            .catch(dispatchError);
-          return;
-        }
-        // If the group already exists, add user to it, otherwise form group with invitor and user
-        invitation.groupId
-          ? // Join Group
-            fetch(
-              `${UserGroup.url}/${invitation.groupId}/invitation/${invitation.id}`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: "",
-              }
-            )
-              .then((response) => response.json())
-              .then(({ error }) => {
-                if (error) throw error;
-                // Get new group info and set state.currentGroup to it
-                fetch(`${UserGroup.url}/${invitation.groupId}`)
-                  .then((response) => response.json())
-                  .then(({ error, data }) => {
-                    if (error) throw error;
-                    if (!data) throw new Error("no group received");
-                    dispatch({
-                      type: CalendarAction.JoinedGroup,
-                      payload: {
-                        currentGroup: new UserGroup(data),
-                      },
-                    });
-                  })
-                  .catch(dispatchError);
-              })
-              .catch(dispatchError)
-          : // Create group based on invitation id
-            fetch(`${UserGroup.url}/invitation/${invitation.id}`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: "",
-            })
-              .then((response) => response.json())
-              .then(({ error, data }) => {
-                if (error) throw error;
-                if (!data) throw new Error("no group received");
-                else {
-                  const insertId = data.id;
-                  // Join Group
-                  fetch(
-                    `${UserGroup.url}/${insertId}/invitation/${invitation.id}`,
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: "",
-                    }
-                  )
-                    .then((response) => response.json())
-                    .then(({ error }) => {
-                      if (error) throw error;
-                      // Get new group info and set state.currentGroup to it
-                      fetch(`${UserGroup.url}/${insertId}`)
-                        .then((response) => response.json())
-                        .then(({ error, data }) => {
-                          if (error || !data) throw error;
-                          if (!data) throw new Error("no group received");
-                          const newGroup = new UserGroup(data);
-                          newGroup.members
-                            .filter(
-                              (u: GroupMember) => u.username !== user.username
-                            )
-                            .forEach((u: GroupMember) => {
-                              if (!u.email)
-                                throw new Error(
-                                  `${u.name.first} ${u.name.last} has no email`
-                                );
-                              sendMail(
-                                u.email,
-                                user.name.first +
-                                  " " +
-                                  user.name.last +
-                                  " has joined your group",
-                                "Hello " +
-                                  u.name?.first +
-                                  ", " +
-                                  user.name.first +
-                                  " " +
-                                  user.name.last +
-                                  " has joined your group for " +
-                                  currentProject?.title,
-                                dispatchError
-                              );
-                            });
-                          dispatch({
-                            type: CalendarAction.JoinedGroup,
-                            payload: {
-                              currentGroup: new UserGroup(newGroup),
-                            },
-                          });
-                        })
-                        .catch(dispatchError);
-                    })
-                    .catch(dispatchError);
-                }
-              })
-              .catch(dispatchError);
-      })
-      .catch(dispatchError);
+    const name = formatName(user.name);
+    const mail: Mail = {
+      to: invitation.invitor.email,
+      subject: `${name} has joined your group`,
+      text: `${name} has joined your group for ${project.title}`,
+    };
+    updateInvitation({
+      accepted: true,
+      invitation,
+      userId: user.id,
+      mail,
+      dispatch,
+    });
   };
 
   const onDeclineInvitation = (): void => {
-    // set invitation to rejected for invitee
-    fetch(`${Invitation.url}/${invitation.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        rejected: 1,
-        userId: user.id,
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ error, data }) => {
-        if (error || !data) {
-          return dispatch({
-            type: CalendarAction.Error,
-            payload: { error },
-          });
-        } else {
-          fetch(`${Invitation.url}/user/${user?.id}`)
-            .then((response) => response.json())
-            .then(({ error, data }) => {
-              if (error || !data) {
-                return dispatch({
-                  type: CalendarAction.Error,
-                  payload: { error },
-                });
-              }
-              dispatch({
-                type: CalendarAction.ReceivedInvitations,
-                payload: {
-                  invitations: data,
-                },
-              });
-            });
-          sendMail(
-            invitation.invitor.email,
-            user.name.first +
-              " " +
-              user.name.last +
-              " has declined your group invitation",
-            "Hello " +
-              invitation.invitor.name.first +
-              ", " +
-              user.name.first +
-              " " +
-              user.name.last +
-              " has declined your group invitation for " +
-              currentProject?.title,
-            dispatchError
-          );
-          dispatch({
-            type: CalendarAction.DisplayMessage,
-            payload: {
-              message: "Invitation Declined",
-            },
-          });
-        }
-      });
+    const name = formatName(user.name);
+    const mail: Mail = {
+      to: invitation.invitor.email,
+      subject: `${name} has declined your invitation`,
+      text: `${name} has declined your invitation for ${project.title}`,
+    };
+    updateInvitation({
+      accepted: false,
+      invitation,
+      userId: user.id,
+      mail,
+      dispatch,
+    });
   };
+
+  const isNotCurrentUser = ({ id }: { id: number }): boolean => id !== user.id;
+  const others = invitation.invitees
+    .filter(isNotCurrentUser)
+    .map(({ name }) => formatName(name))
+    .join(", ");
+  const invitorName = formatName(invitation.invitor.name);
+  const andUser = invitation.invitees.some(isNotCurrentUser);
+  const header = [
+    invitorName,
+    " wants to form a group with ",
+    others,
+    andUser ? ", and " : "",
+    "you",
+  ].join("");
 
   return (
     <ListItem style={{ justifyContent: "space-between" }}>
-      {invitation.invitor.name.first +
-        " " +
-        invitation.invitor.name.last +
-        " wants to form a group with " +
-        invitation.invitees
-          .filter(isNotCurrentUser)
-          .map((invitee) => invitee.name.first + " " + invitee.name.last)
-          .join(", ") +
-        (invitation.invitees.some(isNotCurrentUser) ? ", and" : "") +
-        " you"}
+      {header}
       {invitationIsUnanswered(invitation, user) && (
         <ButtonGroup variant="contained" color="primary" size="small">
           <Button

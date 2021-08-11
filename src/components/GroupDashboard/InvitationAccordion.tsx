@@ -26,7 +26,7 @@ const InvitationAccordion: FC<InvitationListProps> = ({
           <InvitationSent
             key={`invitation${invitation.id}`}
             dispatch={dispatch}
-            currentProject={currentProject}
+            project={currentProject}
             invitation={invitation}
             user={user}
           />
@@ -44,7 +44,7 @@ const InvitationAccordion: FC<InvitationListProps> = ({
             invitation={invitation}
             dispatch={dispatch}
             user={user}
-            currentProject={currentProject}
+            project={currentProject}
           />
         ))}
     </Accordion>
