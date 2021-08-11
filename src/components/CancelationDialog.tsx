@@ -56,9 +56,10 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   );
   if (!project) return null;
 
+  const now = nowInServerTimezone();
   const autoApprove =
-    isBefore(nowInServerTimezone(), cancelationApprovalCutoff) ||
-    (isBefore(nowInServerTimezone(), gracePeriodCutoff) && !isWalkIn);
+    isBefore(now, cancelationApprovalCutoff) ||
+    (isBefore(now, gracePeriodCutoff) && !isWalkIn);
   const subject = "canceled a reservation for your group";
   const location = currentEvent.location.title;
   const whatWhenWhere = `${project.title} on ${currentEvent.start} in ${location}`;
