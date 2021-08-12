@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useState } from "react";
 import {
+  Box,
   Dialog,
   IconButton,
   Button,
@@ -143,6 +144,14 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     ? Object.entries(reservation.equipment)
     : [];
 
+  const [projectsWithHours, projectsWithoutHours] = projects.reduce(
+    (projectsByHours, p) => {
+      projectsByHours[projectHasHoursRemaining(p) ? 0 : 1].push(p);
+      return projectsByHours;
+    },
+    [[], []] as [Project[], Project[]]
+  );
+
   return (
     <Dialog
       fullScreen
@@ -254,19 +263,31 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         {open && !walkInValid && (
           <section>
             <Typography component="h3">
-              {projects.length
+              {projectsWithHours.length
                 ? "Available for"
                 : "Not available to any of your projects"}
             </Typography>
             <List>
-              {projects.map((project) => (
+              {projectsWithHours.map((project) => (
                 <ListItem key={`${project.title}_list_item`}>
-                  {projectHasHoursRemaining(project)
-                    ? project.title
-                    : project.title + ", NO Project Hours Remaining"}
+                  {project.title}
                 </ListItem>
               ))}
             </List>
+            {!!projectsWithoutHours.length && (
+              <>
+                <Typography component="h3">
+                  These projects have no hours remaining:
+                </Typography>
+                <List>
+                  {projectsWithoutHours.map((project) => (
+                    <ListItem key={`${project.title}_list_item`}>
+                      <Box fontStyle="oblique">{project.title}</Box>
+                    </ListItem>
+                  ))}
+                </List>
+              </>
+            )}
           </section>
         )}
         {isAdmin && (
