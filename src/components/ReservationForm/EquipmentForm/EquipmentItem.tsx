@@ -1,6 +1,6 @@
 import { ListItem, ListItemText, Button, ButtonGroup } from "@material-ui/core";
 import React, { FunctionComponent } from "react";
-import { EquipmentItemProps } from "../equipmentForm/types";
+import { EquipmentItemProps } from "./types";
 
 const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
   name,

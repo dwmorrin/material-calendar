@@ -1,8 +1,6 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Checkbox from "@material-ui/core/Checkbox";
+import { ListItem, ListItemText, Checkbox } from "@material-ui/core";
 import React, { FunctionComponent } from "react";
-import { EquipmentAction, EquipmentActionTypes } from "../equipmentForm/types";
+import { EquipmentAction, EquipmentActionTypes } from "./types";
 
 interface FilterItemProps {
   name: string;

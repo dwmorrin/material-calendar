@@ -1,7 +1,7 @@
-import Category from "../resources/Category";
-import Equipment from "../resources/Equipment";
-import Tag from "../resources/Tag";
-import Event from "../resources/Event";
+import Category from "../../../resources/Category";
+import Equipment from "../../../resources/Equipment";
+import Tag from "../../../resources/Tag";
+import Event from "../../../resources/Event";
 
 export type EquipmentValue = {
   quantity: number;

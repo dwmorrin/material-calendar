@@ -1,9 +1,8 @@
 import React, { FunctionComponent } from "react";
-import List from "@material-ui/core/List";
-import Box from "@material-ui/core/Box";
+import { Box, List } from "@material-ui/core";
 import FilterItem from "./FilterItem";
-import { EquipmentState, EquipmentAction } from "../equipmentForm/types";
-import Category from "../resources/Category";
+import { EquipmentState, EquipmentAction } from "./types";
+import Category from "../../../resources/Category";
 
 interface FilterListProps {
   state: EquipmentState;

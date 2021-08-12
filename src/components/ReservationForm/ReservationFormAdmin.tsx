@@ -2,7 +2,7 @@
 // admin can freely assign project and group
 
 import React, { FC, useEffect, useState } from "react";
-import { Action, CalendarUIProps, CalendarAction } from "../calendar/types";
+import { Action, CalendarUIProps, CalendarAction } from "../../calendar/types";
 import {
   Button,
   Dialog,
@@ -16,14 +16,14 @@ import {
 } from "@material-ui/core";
 import { Select, TextField } from "formik-material-ui";
 import CloseIcon from "@material-ui/icons/Close";
-import UserGroup from "../resources/UserGroup";
+import UserGroup from "../../resources/UserGroup";
 import { Field, Form, Formik } from "formik";
-import EquipmentForm from "./EquipmentForm";
-import QuantityList from "./QuantityList";
-import { ResourceKey } from "../resources/types";
-import Project from "../resources/Project";
-import Event, { ReservationInfo } from "../resources/Event";
-import Reservation from "../resources/Reservation";
+import EquipmentForm from "./EquipmentForm/EquipmentForm";
+import QuantityList from "./EquipmentForm/QuantityList";
+import { ResourceKey } from "../../resources/types";
+import Project from "../../resources/Project";
+import Event, { ReservationInfo } from "../../resources/Event";
+import Reservation from "../../resources/Reservation";
 import {
   validationSchema,
   makeInitialValues,
@@ -31,13 +31,13 @@ import {
   submitHandler,
   transition,
   makeEquipmentValues,
-} from "../calendar/reservationForm";
-import { useAuth } from "./AuthProvider";
-import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
-import Equipment from "../resources/Equipment";
-import Category from "../resources/Category";
-import User from "../resources/User";
-import RadioYesNo from "./RadioYesNo";
+} from "./lib";
+import { useAuth } from "../AuthProvider";
+import fetchCurrentEvent from "../../calendar/fetchCurrentEvent";
+import Equipment from "../../resources/Equipment";
+import Category from "../../resources/Category";
+import User from "../../resources/User";
+import RadioYesNo from "../RadioYesNo";
 
 const cancelReservation = ({
   dispatch,

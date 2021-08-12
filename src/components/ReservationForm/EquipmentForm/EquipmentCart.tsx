@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-import { EquipmentCartProps } from "../equipmentForm/types";
+import { EquipmentCartProps } from "./types";
 import MenuItem from "@material-ui/core/MenuItem";
 import { List, ListItem, ListItemText, Typography } from "@material-ui/core";
 import Select from "@material-ui/core/Select";

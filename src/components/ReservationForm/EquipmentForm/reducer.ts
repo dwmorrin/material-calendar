@@ -1,6 +1,6 @@
 import { EquipmentState, EquipmentAction, EquipmentActionTypes } from "./types";
-import Category from "../resources/Category";
-import Tag from "../resources/Tag";
+import Category from "../../../resources/Category";
+import Tag from "../../../resources/Tag";
 
 export const initialState = {
   filterDrawerIsOpen: false,

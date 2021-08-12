@@ -1,16 +1,16 @@
 import { makeStyles } from "@material-ui/core";
-import { makeTransition } from "../components/Transition";
+import { makeTransition } from "../Transition";
 import { object, string } from "yup";
 import { FormikValues } from "formik";
-import { CalendarAction, Action } from "./types";
-import Project from "../resources/Project";
-import UserGroup from "../resources/UserGroup";
-import Reservation from "../resources/Reservation";
-import Equipment from "../resources/Equipment";
-import Event from "../resources/Event";
-import { Mail, groupTo } from "../utils/mail";
-import User from "../resources/User";
-import { EquipmentValue } from "../equipmentForm/types";
+import { CalendarAction, Action } from "../../calendar/types";
+import Project from "../../resources/Project";
+import UserGroup from "../../resources/UserGroup";
+import Reservation from "../../resources/Reservation";
+import Equipment from "../../resources/Equipment";
+import Event from "../../resources/Event";
+import { Mail, groupTo } from "../../utils/mail";
+import User from "../../resources/User";
+import { EquipmentValue } from "./EquipmentForm/types";
 
 interface ReservationFormValues extends Record<string, unknown> {
   event?: number;

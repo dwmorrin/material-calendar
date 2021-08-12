@@ -1,14 +1,8 @@
 import React, { FunctionComponent } from "react";
+import { SwipeableDrawer, List, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-import List from "@material-ui/core/List";
-import TextField from "@material-ui/core/TextField";
+import { EquipmentAction, EquipmentActionTypes, EquipmentState } from "./types";
 import FilterList from "./FilterList";
-import {
-  EquipmentAction,
-  EquipmentState,
-  EquipmentActionTypes,
-} from "../equipmentForm/types";
 
 const useStyles = makeStyles({
   list: {

@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/core/styles";
-import { makeTransition } from "../components/Transition";
-import Equipment from "../resources/Equipment";
-import Category from "../resources/Category";
+import { makeTransition } from "../../Transition";
+import Equipment from "../../../resources/Equipment";
+import Category from "../../../resources/Category";
 
 export const useStyles = makeStyles((theme) => ({
   root: {

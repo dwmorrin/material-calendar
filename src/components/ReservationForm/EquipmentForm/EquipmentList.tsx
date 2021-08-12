@@ -1,13 +1,17 @@
 import React, { FunctionComponent } from "react";
 import EquipmentStandardList from "./EquipmentStandardList";
-import { EquipmentState, EquipmentAction } from "../equipmentForm/types";
+import {
+  EquipmentAction,
+  EquipmentActionTypes,
+  EquipmentState,
+  EquipmentValue,
+} from "./types";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import List from "@material-ui/core/List";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { EquipmentActionTypes, EquipmentValue } from "../equipmentForm/types";
-import Category from "../resources/Category";
+import Category from "../../../resources/Category";
 
 interface EquipmentListProps {
   state: EquipmentState;

@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import List from "@material-ui/core/List";
 import EquipmentItem from "./EquipmentItem";
-import { EquipmentStandardListProps } from "../equipmentForm/types";
+import { EquipmentStandardListProps } from "./types";
 
 const EquipmentStandardList: FunctionComponent<EquipmentStandardListProps> = ({
   // equipmentList,

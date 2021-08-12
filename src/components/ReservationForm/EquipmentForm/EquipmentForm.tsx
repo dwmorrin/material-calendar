@@ -8,25 +8,17 @@ import {
   Dialog,
   Button,
 } from "@material-ui/core";
-import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import FilterDrawer from "./FilterDrawer";
 import SearchIcon from "@material-ui/icons/Search";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import EquipmentList from "./EquipmentList";
-import {
-  filterItems,
-  transition,
-  useStyles,
-} from "../equipmentForm/equipmentForm";
-import {
-  EquipmentFormProps,
-  EquipmentActionTypes,
-} from "../equipmentForm/types";
-import reducer, { initialState } from "../equipmentForm/reducer";
+import { transition, useStyles } from "./lib";
+import { EquipmentFormProps, EquipmentActionTypes } from "./types";
+import reducer, { initialState } from "./reducer";
 import EquipmentViewToggleMenu from "./EquipmentViewToggleMenu";
 import EquipmentCart from "./EquipmentCart";
 import EquipmentStandardList from "./EquipmentStandardList";
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "../../AuthProvider";
 
 const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
   open,
