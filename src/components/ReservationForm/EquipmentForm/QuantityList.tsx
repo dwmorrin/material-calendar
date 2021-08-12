@@ -1,9 +1,9 @@
 import React, { FunctionComponent } from "react";
 import { List, ListItem, Typography } from "@material-ui/core";
-import { EquipmentValue } from "./types";
+import { EquipmentTable } from "./types";
 
 interface QuantityListProps {
-  selectedEquipment: Record<string, EquipmentValue>;
+  selectedEquipment: EquipmentTable;
 }
 const FilterList: FunctionComponent<QuantityListProps> = ({
   selectedEquipment,

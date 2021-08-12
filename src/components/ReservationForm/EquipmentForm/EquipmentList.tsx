@@ -1,43 +1,31 @@
 import React, { FunctionComponent } from "react";
 import EquipmentStandardList from "./EquipmentStandardList";
-import {
-  EquipmentAction,
-  EquipmentActionTypes,
-  EquipmentState,
-  EquipmentValue,
-} from "./types";
+import { EquipmentActionTypes, EquipmentTable } from "./types";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import List from "@material-ui/core/List";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Category from "../../../resources/Category";
+import { EquipmentListProps } from "./types";
 
-interface EquipmentListProps {
-  state: EquipmentState;
-  categories: Category[];
-  dispatch: (action: EquipmentAction) => void;
-  selectedEquipment: {
-    [k: string]: EquipmentValue;
-  };
-  userRestriction: number;
-}
 const EquipmentList: FunctionComponent<EquipmentListProps> = ({
-  state,
-  dispatch,
-  selectedEquipment,
-  userRestriction,
   categories,
+  dispatch,
+  equipment,
+  selectedEquipment,
+  state,
+  userRestriction,
 }) => {
   const tree = Category.tree(categories, null);
-  const itemsByCategory = Object.entries(selectedEquipment).reduce(
+  const itemsByCategory = Object.entries(equipment).reduce(
     (acc, [hash, info]) => {
       if (!(info.category.id in acc))
-        acc[info.category.id] = {} as Record<string, EquipmentValue>;
+        acc[info.category.id] = {} as EquipmentTable;
       acc[info.category.id][hash] = info;
       return acc;
     },
-    {} as Record<string, Record<string, EquipmentValue>>
+    {} as Record<string, EquipmentTable>
   );
   return (
     <div
@@ -101,7 +89,8 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
 
                 {!state.categoryDrawerView && expanded && (
                   <EquipmentStandardList
-                    selectedEquipment={contents}
+                    equipment={contents}
+                    selectedEquipment={selectedEquipment}
                     setFieldValue={state.setFieldValue}
                     userRestriction={userRestriction}
                   />

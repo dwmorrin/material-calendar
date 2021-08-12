@@ -21,6 +21,7 @@ import EquipmentStandardList from "./EquipmentStandardList";
 import { useAuth } from "../../AuthProvider";
 
 const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
+  equipment,
   open,
   setOpen,
   selectedEquipment,
@@ -114,6 +115,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
         {(!state.categoryDrawerView || !state.selectedCategory) && (
           <EquipmentList
             dispatch={dispatch}
+            equipment={equipment}
             state={state}
             selectedEquipment={selectedEquipment}
             userRestriction={user.restriction}
@@ -122,6 +124,7 @@ const EquipmentForm: FunctionComponent<EquipmentFormProps> = ({
         )}
         {state.categoryDrawerView && state.selectedCategory && (
           <EquipmentStandardList
+            equipment={equipment}
             setFieldValue={state.setFieldValue}
             selectedEquipment={selectedEquipment}
             userRestriction={user.restriction}

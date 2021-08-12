@@ -156,14 +156,14 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
             equipmentValues,
             project
           )}
-          onSubmit={submitHandler(
+          onSubmit={submitHandler({
             closeForm,
             dispatch,
             user,
-            currentEvent,
-            state.resources[ResourceKey.Groups] as UserGroup[],
-            state.resources[ResourceKey.Projects] as Project[]
-          )}
+            event: currentEvent,
+            groups: state.resources[ResourceKey.Groups] as UserGroup[],
+            projects: state.resources[ResourceKey.Projects] as Project[],
+          })}
           validationSchema={validationSchema}
         >
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
@@ -279,12 +279,13 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
               )}
               {values.hasEquipment === "yes" && currentEvent && (
                 <EquipmentForm
+                  categories={categories}
+                  equipment={values.__equipment__}
+                  event={currentEvent}
                   open={equipmentFormIsOpen}
-                  setOpen={setEquipmentFormIsOpen}
                   selectedEquipment={values.equipment}
                   setFieldValue={setFieldValue}
-                  event={currentEvent}
-                  categories={categories}
+                  setOpen={setEquipmentFormIsOpen}
                 />
               )}
               <pre>

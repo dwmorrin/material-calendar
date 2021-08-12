@@ -89,14 +89,14 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
             equipmentValues,
             project
           )}
-          onSubmit={submitHandler(
+          onSubmit={submitHandler({
             closeForm,
             dispatch,
             user,
-            state.currentEvent,
-            state.resources[ResourceKey.Groups] as UserGroup[],
-            state.resources[ResourceKey.Projects] as Project[]
-          )}
+            event: state.currentEvent,
+            groups: state.resources[ResourceKey.Groups] as UserGroup[],
+            projects: state.resources[ResourceKey.Projects] as Project[],
+          })}
           validationSchema={validationSchema}
         >
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
@@ -201,12 +201,13 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
               </Button>
               {values.hasEquipment === "yes" && state.currentEvent && (
                 <EquipmentForm
+                  categories={categories}
+                  equipment={values.__equipment__}
+                  event={state.currentEvent}
                   open={equipmentFormIsOpen}
-                  setOpen={setEquipmentFormIsOpen}
                   selectedEquipment={values.equipment}
                   setFieldValue={setFieldValue}
-                  event={state.currentEvent}
-                  categories={categories}
+                  setOpen={setEquipmentFormIsOpen}
                 />
               )}
               <pre>

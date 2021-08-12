@@ -10,7 +10,7 @@ const EquipmentItem: FunctionComponent<EquipmentItemProps> = ({
 }) => {
   const changeValue = (newValue: number): void => {
     if (newValue < 0 || newValue > item.maxQuantity) return;
-    setFieldValue(`equipment["${name}"].quantity`, newValue);
+    setFieldValue(`equipment["${name}"]`, { ...item, quantity: newValue });
   };
   const userCanUseEquipment = userRestriction >= item.restriction;
   const { quantity } = item;

@@ -1,5 +1,4 @@
 import Category from "../../../resources/Category";
-import Equipment from "../../../resources/Equipment";
 import Tag from "../../../resources/Tag";
 import Event from "../../../resources/Event";
 
@@ -8,12 +7,14 @@ export type EquipmentValue = {
   maxQuantity: number;
   category: { id: number };
   restriction: number;
-  items?:
+  items:
     | {
         id: number;
         quantity: number;
       }[];
 };
+
+export type EquipmentTable = Record<string, EquipmentValue>;
 
 type EquipmentFormValue = string | number | boolean | EquipmentValue;
 export interface EquipmentState {
@@ -47,19 +48,20 @@ export interface EquipmentAction {
 }
 
 export interface EquipmentFormProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  selectedEquipment: Record<string, EquipmentValue>;
-  setFieldValue: (field: string, value: EquipmentFormValue) => void;
-  event: Event;
   categories: Category[];
+  equipment: EquipmentTable;
+  event: Event;
+  open: boolean;
+  selectedEquipment: EquipmentTable;
+  setFieldValue: (field: string, value: EquipmentFormValue) => void;
+  setOpen: (open: boolean) => void;
 }
 
 export interface EquipmentCartProps {
   state: EquipmentState;
   onClose: () => void;
   onOpen: () => void;
-  selectedEquipment: Record<string, EquipmentValue>;
+  selectedEquipment: EquipmentTable;
   setFieldValue: (field: string, value: EquipmentFormValue) => void;
 }
 
@@ -71,8 +73,17 @@ export interface EquipmentItemProps {
 }
 
 export interface EquipmentStandardListProps {
-  equipmentList?: Equipment[];
-  selectedEquipment: Record<string, EquipmentValue>;
-  userRestriction: number;
+  equipment: EquipmentTable;
+  selectedEquipment: EquipmentTable;
   setFieldValue: (field: string, value: EquipmentFormValue) => void;
+  userRestriction: number;
+}
+
+export interface EquipmentListProps {
+  categories: Category[];
+  dispatch: (action: EquipmentAction) => void;
+  equipment: EquipmentTable;
+  selectedEquipment: EquipmentTable;
+  state: EquipmentState;
+  userRestriction: number;
 }

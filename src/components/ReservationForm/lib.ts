@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core";
 import { makeTransition } from "../Transition";
 import { object, string } from "yup";
 import { FormikValues } from "formik";
-import { CalendarAction, Action } from "../../calendar/types";
+import { CalendarAction } from "../../calendar/types";
 import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";
 import Reservation from "../../resources/Reservation";
@@ -10,21 +10,8 @@ import Equipment from "../../resources/Equipment";
 import Event from "../../resources/Event";
 import { Mail, groupTo } from "../../utils/mail";
 import User from "../../resources/User";
-import { EquipmentValue } from "./EquipmentForm/types";
-
-interface ReservationFormValues extends Record<string, unknown> {
-  event?: number;
-  groupId?: number;
-  project: number;
-  description: string;
-  phone: string;
-  liveRoom: string;
-  guests: string;
-  hasGuests: string;
-  hasNotes: string;
-  equipment: Record<string, EquipmentValue>;
-  hasEquipment: string;
-}
+import { ReservationFormValues, ReservationSubmitProps } from "./types";
+import { EquipmentTable } from "./EquipmentForm/types";
 
 export const useStyles = makeStyles({
   list: {
@@ -83,14 +70,14 @@ const groupMail = (
 };
 
 export const submitHandler =
-  (
-    closeForm: () => void,
-    dispatch: (action: Action) => void,
-    user: User,
-    event: Event | undefined,
-    groups: UserGroup[],
-    projects: Project[]
-  ) =>
+  ({
+    closeForm,
+    dispatch,
+    user,
+    event,
+    groups,
+    projects,
+  }: ReservationSubmitProps) =>
   (values: ReservationFormValues, actions: FormikValues): void => {
     actions.setSubmitting(true);
     const dispatchError = (error: Error): void =>
@@ -136,9 +123,7 @@ export const submitHandler =
       });
   };
 
-export const makeEquipmentValues = (
-  equipment: Equipment[]
-): { [hash: string]: EquipmentValue } =>
+export const makeEquipmentValues = (equipment: Equipment[]): EquipmentTable =>
   equipment.reduce((acc, item) => {
     const hash = Equipment.makeNameHash(item);
     if (!(hash in acc))
@@ -147,16 +132,17 @@ export const makeEquipmentValues = (
         maxQuantity: 0,
         restriction: item.restriction,
         category: { id: item.category.id },
-        items: [],
+        items: [{ id: item.id, quantity: item.quantity }],
       };
+    else acc[hash].items.push({ id: item.id, quantity: item.quantity });
     acc[hash].maxQuantity += item.quantity;
     return acc;
-  }, {} as { [hash: string]: EquipmentValue });
+  }, {} as EquipmentTable);
 
 export const makeInitialValues = (
   event: Event,
   group: UserGroup,
-  equipment: { [hash: string]: EquipmentValue },
+  equipment: EquipmentTable,
   project: Project
 ): ReservationFormValues => {
   const reservation = event.reservation;
@@ -171,7 +157,8 @@ export const makeInitialValues = (
     hasGuests: "no",
     hasNotes: "no",
     hasEquipment: "no",
-    equipment,
+    equipment: {},
+    __equipment__: equipment,
   };
   if (reservation) {
     // override defaults
@@ -189,6 +176,7 @@ export const makeInitialValues = (
       // TODO use reservation equipment
       //equipment: reservation.equipment || {},
       equipment: defaultValues.equipment,
+      __equipment__: defaultValues.__equipment__,
       hasEquipment: reservation.equipment ? "yes" : "no",
     };
   }
