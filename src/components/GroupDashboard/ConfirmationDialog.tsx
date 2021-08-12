@@ -28,7 +28,7 @@ const ConfirmationDialog: FC<
 }) => {
   const onRequest = (): void => {
     createInvitation({
-      approved: 0,
+      approved: false,
       dispatch,
       invitees: selectedUsers,
       invitor: user,
@@ -57,8 +57,6 @@ const ConfirmationDialog: FC<
           Request Irregular Group Size Approval
         </Button>
         <Button
-          // setting disabled={selectedUsers.length == 0} does not
-          // seem to work, due to local state?
           size="small"
           variant="contained"
           color="inherit"

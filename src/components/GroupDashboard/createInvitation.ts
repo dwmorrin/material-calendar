@@ -8,7 +8,7 @@ interface CreateInvitationProps {
   invitor: User;
   invitees: User[];
   project: Project;
-  approved: unknown;
+  approved: boolean;
   dispatch: (a: Action) => void;
   setSelectedUsers: (users: User[]) => void;
 }
