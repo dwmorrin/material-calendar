@@ -24,7 +24,7 @@ export type GroupInfoProps = CalendarUIDispatcher & {
   user: User;
 };
 
-export type StateModifierProps = {
+export type StateModifierProps = CalendarUIDispatcher & {
   openConfirmationDialog: (open: boolean) => void;
   selectedUsers: User[];
   setSelectedUsers: (u: User[]) => void;

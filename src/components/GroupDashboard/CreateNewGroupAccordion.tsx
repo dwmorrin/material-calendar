@@ -9,20 +9,17 @@ import {
   Checkbox,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { CalendarUIProps, CalendarAction } from "../../calendar/types";
 import User from "../../resources/User";
 import Project from "../../resources/Project";
-import Invitation from "../../resources/Invitation";
 import { StateModifierProps } from "./types";
-import { Mail, groupTo } from "../../utils/mail";
+import createInvitation from "./createInvitation";
 
 const CreateNewGroupAccordion: FC<
-  Omit<CalendarUIProps, "state"> &
-    StateModifierProps & {
-      defaultExpanded: boolean;
-      project: Project;
-      projectMembers: User[];
-    }
+  StateModifierProps & {
+    defaultExpanded: boolean;
+    project: Project;
+    projectMembers: User[];
+  }
 > = ({
   dispatch,
   defaultExpanded,
@@ -51,51 +48,17 @@ const CreateNewGroupAccordion: FC<
     const approved = selectedUsers.length + 1 === (project.groupSize || 0);
 
     if (!approved) return openConfirmationDialog(true);
-    // TODO: add comment as to why we are stopping propogation here
+    // TODO: add comment as to why we are stopping propagation here
     event.stopPropagation();
 
-    const name = User.formatName(user.name);
-
-    const mail: Mail = {
-      to: groupTo(selectedUsers),
-      subject: "You have been invited to a group",
-      text: `${name} has invited you to join their group for ${project.title}`,
-    };
-
-    // Create Invitation
-    fetch(`${Invitation.url}/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        invitorId: user.id,
-        invitees: selectedUsers.map((u) => u.id),
-        projectId: project.id,
-        approved,
-        mail,
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ error, data }) => {
-        if (error) throw error;
-        if (!Array.isArray(data))
-          throw new Error("No invitation info received");
-        dispatch({
-          type: CalendarAction.ReceivedInvitations,
-          payload: {
-            invitations: (data as Invitation[]).map((i) => new Invitation(i)),
-          },
-        });
-        dispatch({
-          type: CalendarAction.DisplayMessage,
-          payload: {
-            message: "Invitation Sent",
-          },
-        });
-        setSelectedUsers([]);
-      })
-      .catch((error) =>
-        dispatch({ type: CalendarAction.Error, payload: { error } })
-      );
+    createInvitation({
+      approved,
+      dispatch,
+      invitees: selectedUsers,
+      invitor: user,
+      project: project,
+      setSelectedUsers,
+    });
   };
 
   return (

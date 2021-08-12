@@ -87,9 +87,9 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
           edge="start"
           color="inherit"
           aria-label="close"
-          onClick={(): void => {
-            dispatch({ type: CalendarAction.CloseGroupDashboard });
-          }}
+          onClick={(): void =>
+            dispatch({ type: CalendarAction.CloseGroupDashboard })
+          }
         >
           <CloseIcon />
         </IconButton>

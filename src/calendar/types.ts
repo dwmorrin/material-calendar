@@ -40,6 +40,7 @@ export enum CalendarAction {
   SelectedGroup,
   SelectedLocation,
   SelectedProject,
+  SentInvitations,
   ToggleDrawer,
   TogglePicker,
   UpdatedEventReceived,

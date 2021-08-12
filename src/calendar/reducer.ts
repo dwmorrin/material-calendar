@@ -537,6 +537,29 @@ const selectedProject: StateHandler = (state, action) => {
   };
 };
 
+const sentInvitations: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload?.invitations)
+    return errorRedirect(
+      state,
+      action,
+      "no invitations received from server",
+      ErrorType.MISSING_RESOURCE
+    );
+  return displayMessage(
+    {
+      ...state,
+      invitations: payload?.invitations,
+    },
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: "Invitations sent",
+      },
+    }
+  );
+};
+
 const toggleDrawer: StateHandler = (state) => ({
   ...state,
   drawerIsOpen: !state.drawerIsOpen,
@@ -607,6 +630,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.SelectedGroup]: selectedGroup,
     [CalendarAction.SelectedLocation]: selectedLocation,
     [CalendarAction.SelectedProject]: selectedProject,
+    [CalendarAction.SentInvitations]: sentInvitations,
     [CalendarAction.ToggleDrawer]: toggleDrawer,
     [CalendarAction.TogglePicker]: togglePicker,
     [CalendarAction.UpdatedEventReceived]: updatedEventReceived,
