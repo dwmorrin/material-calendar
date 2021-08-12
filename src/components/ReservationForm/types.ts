@@ -1,30 +1,47 @@
-import { Action } from "../../calendar/types";
+import { CalendarUIProps } from "../../calendar/types";
 import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";
 import Event from "../../resources/Event";
 import User from "../../resources/User";
-import { EquipmentTable } from "./EquipmentForm/types";
+import {
+  EquipmentReservationValue,
+  EquipmentTable,
+} from "../../resources/Equipment";
 
-export interface ReservationFormValues extends Record<string, unknown> {
-  event?: number;
-  groupId?: number;
-  project: number;
+export interface ReservationSubmitValues {
+  id: number;
+  eventId: number;
+  groupId: number;
+  projectId: number;
+  description: string;
+  phone: string;
+  liveRoom: boolean;
+  guests: string;
+  notes: string;
+  equipment: EquipmentReservationValue[];
+}
+
+export interface ReservationFormValues {
+  id: number;
+  eventId: number;
+  groupId: number;
+  projectId: number;
   description: string;
   phone: string;
   liveRoom: string;
   guests: string;
   hasGuests: string;
   hasNotes: string;
+  notes: string;
   equipment: EquipmentTable;
   __equipment__: EquipmentTable;
   hasEquipment: string;
 }
 
-export interface ReservationSubmitProps {
+export type ReservationSubmitProps = Omit<CalendarUIProps, "state"> & {
   closeForm: () => void;
-  dispatch: (action: Action) => void;
   user: User;
-  event?: Event;
+  event: Event;
   groups: UserGroup[];
   projects: Project[];
-}
+};

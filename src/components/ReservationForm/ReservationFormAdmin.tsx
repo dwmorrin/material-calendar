@@ -179,7 +179,7 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
               <FormLabel className={classes.item}>Group:</FormLabel>
               <Field component={Select} name="groupId">
                 {groups
-                  .filter(({ projectId }) => projectId === values.project)
+                  .filter(({ projectId }) => projectId === values.projectId)
                   .map((g) => (
                     <MenuItem key={g.id} value={g.id}>
                       {g.title}

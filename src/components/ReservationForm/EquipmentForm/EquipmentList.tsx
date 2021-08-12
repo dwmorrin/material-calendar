@@ -1,12 +1,13 @@
 import React, { FunctionComponent } from "react";
 import EquipmentStandardList from "./EquipmentStandardList";
-import { EquipmentActionTypes, EquipmentTable } from "./types";
+import { EquipmentActionTypes } from "./types";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import List from "@material-ui/core/List";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Category from "../../../resources/Category";
+import { EquipmentTable } from "../../../resources/Equipment";
 import { EquipmentListProps } from "./types";
 
 const EquipmentList: FunctionComponent<EquipmentListProps> = ({

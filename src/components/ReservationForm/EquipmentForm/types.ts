@@ -1,20 +1,7 @@
 import Category from "../../../resources/Category";
 import Tag from "../../../resources/Tag";
 import Event from "../../../resources/Event";
-
-export type EquipmentValue = {
-  quantity: number;
-  maxQuantity: number;
-  category: { id: number };
-  restriction: number;
-  items:
-    | {
-        id: number;
-        quantity: number;
-      }[];
-};
-
-export type EquipmentTable = Record<string, EquipmentValue>;
+import { EquipmentTable, EquipmentValue } from "../../../resources/Equipment";
 
 type EquipmentFormValue = string | number | boolean | EquipmentValue;
 export interface EquipmentState {

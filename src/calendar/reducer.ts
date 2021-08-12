@@ -425,6 +425,41 @@ const receivedReservationCancelation: StateHandler = (state, { payload }) => {
   );
 };
 
+const receivedReservationUpdate: StateHandler = (state, { payload }) => {
+  const resources = payload?.resources;
+  if (!resources) throw new Error("missing resources");
+  const event = resources[ResourceKey.Events][0];
+  const reservation = resources[ResourceKey.Reservations][0];
+  if (!event || !reservation) throw new Error("missing event or reservation");
+  const events = state.resources[ResourceKey.Events];
+  const oldEventIndex = events.findIndex(({ id }) => id === event.id);
+  events[oldEventIndex] = event;
+  const reservations = state.resources[ResourceKey.Reservations];
+  const oldReservationIndex = reservations.findIndex(
+    ({ id }) => id === reservation.id
+  );
+  if (oldReservationIndex === -1) reservations.push(reservation);
+  else reservations[oldReservationIndex] = reservation;
+  return displayMessage(
+    {
+      ...state,
+      resources: {
+        ...state.resources,
+        [ResourceKey.Events]: events,
+        [ResourceKey.Reservations]: reservations,
+      },
+      detailIsOpen: false,
+      reservationFormIsOpen: false,
+    },
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: payload?.message,
+      },
+    }
+  );
+};
+
 const receivedAllResources: StateHandler = (state, { payload }) => ({
   ...state,
   resources: { ...state.resources, ...payload?.resources },
@@ -624,6 +659,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.ReceivedInvitations]: receivedInvitations,
     [CalendarAction.ReceivedReservationCancelation]:
       receivedReservationCancelation,
+    [CalendarAction.ReceivedReservationUpdate]: receivedReservationUpdate,
     [CalendarAction.ReceivedResource]: receivedResource,
     [CalendarAction.RejectedGroupInvitation]: rejectedGroupInvitation,
     [CalendarAction.SelectedEvent]: selectedEvent,

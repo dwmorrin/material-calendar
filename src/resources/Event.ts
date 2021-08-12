@@ -9,6 +9,8 @@ import {
   todayInServerTimezoneAtHour,
 } from "../utils/date";
 
+import { EquipmentTable } from "./Equipment";
+
 export interface ReservationInfo {
   id: number;
   projectId: number;
@@ -19,13 +21,7 @@ export interface ReservationInfo {
   notes: string;
   contact: string;
   created: string;
-  // this and the same in the EquipmentItem should be changed so that it is a dictionary of objects.
-  equipment?: {
-    [k: string]: {
-      quantity: number;
-      items: { id: number; quantity: number }[];
-    };
-  };
+  equipment?: EquipmentTable;
 }
 
 interface Event {

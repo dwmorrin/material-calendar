@@ -1,6 +1,21 @@
 import Category from "./Category";
 import Tag from "./Tag";
 
+export type EquipmentReservationValue = {
+  id: number;
+  quantity: number;
+};
+
+export type EquipmentValue = {
+  quantity: number;
+  maxQuantity: number;
+  category: { id: number };
+  restriction: number;
+  items: EquipmentReservationValue[];
+};
+
+export type EquipmentTable = Record<string, EquipmentValue>;
+
 interface Equipment {
   [k: string]: unknown;
   id: number;

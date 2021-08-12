@@ -51,8 +51,14 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
   const equipmentValues = makeEquipmentValues(equipment);
 
-  if (!state.currentEvent) return null;
-  const project = projects[0] || new Project();
+  const { currentEvent } = state;
+  if (!currentEvent) return null;
+  const { reservation } = currentEvent;
+  let project = projects[0] || new Project();
+  if (reservation) {
+    const foundProject = projects.find((p) => p.id === reservation.projectId);
+    if (foundProject) project = foundProject;
+  }
   const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
     ({ projectId }) => projectId === project.id
   );
@@ -75,16 +81,14 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
           <CloseIcon />
         </IconButton>
         <Typography variant="h6">
-          {state.currentEvent.reservation
-            ? "Update Reservation"
-            : "Make Reservation"}
+          {reservation ? "Update Reservation" : "Make Reservation"}
         </Typography>
       </Toolbar>
 
       <DialogContent>
         <Formik
           initialValues={makeInitialValues(
-            state.currentEvent,
+            currentEvent,
             group,
             equipmentValues,
             project
@@ -93,7 +97,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
             closeForm,
             dispatch,
             user,
-            event: state.currentEvent,
+            event: currentEvent,
             groups: state.resources[ResourceKey.Groups] as UserGroup[],
             projects: state.resources[ResourceKey.Projects] as Project[],
           })}
@@ -102,7 +106,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
             <Form className={classes.list} onSubmit={handleSubmit}>
               <FormLabel>Project:</FormLabel>
-              <Field component={Select} name="project">
+              <Field component={Select} name="projectId">
                 {projects.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
                     {p.title}
