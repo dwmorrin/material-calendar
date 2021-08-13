@@ -1,17 +1,24 @@
 export interface GroupMember {
+  id: number;
   username: string;
   name: {
     first: string;
-    middle?: string;
+    middle: string;
     last: string;
+  };
+  invitation: {
+    accepted: boolean;
+    rejected: boolean;
   };
   email: string;
 }
-interface UserGroup {
-  [k: string]: unknown;
+interface UserGroup extends Record<string, unknown> {
   id: number;
   title: string;
   projectId: number;
+  creatorId: number;
+  pending: boolean;
+  abandoned: boolean;
   members: GroupMember[];
   reservedHours: number;
 }
@@ -33,8 +40,11 @@ class UserGroup implements UserGroup {
   constructor(
     group = {
       id: 0,
-      projectId: 0,
       title: "",
+      projectId: 0,
+      creatorId: 0,
+      pending: true,
+      abandoned: false,
       members: [] as GroupMember[],
       reservedHours: 0,
     }

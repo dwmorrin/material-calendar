@@ -5,9 +5,12 @@ import { AdminState } from "../types";
 
 interface UserGroupValues extends Record<string, unknown> {
   id: number;
-  projectId: string;
-  members: string[];
   title: string;
+  projectId: string;
+  creatorId: string;
+  pending: boolean;
+  abandoned: boolean;
+  members: string[];
   reservedHours: number;
 }
 
@@ -15,9 +18,12 @@ export const values = (state: AdminState): Record<string, unknown> => {
   const group = state.resourceInstance as UserGroup;
   return {
     id: group.id,
-    projectId: String(group.projectId),
-    members: group.members.map(({ username }) => username),
     title: group.title,
+    projectId: String(group.projectId),
+    creatorId: String(group.creatorId),
+    pending: group.pending,
+    abandoned: group.abandoned,
+    members: group.members.map(({ username }) => username),
     reservedHours: group.reservedHours,
   } as UserGroupValues;
 };
@@ -26,19 +32,36 @@ export const update = (
   state: AdminState,
   values: Record<string, unknown>
 ): UserGroup => {
-  const { id, projectId, members, title, reservedHours } =
-    values as UserGroupValues;
+  const {
+    id,
+    projectId,
+    members,
+    title,
+    reservedHours,
+    pending,
+    abandoned,
+    creatorId,
+  } = values as UserGroupValues;
   const users = state.resources[ResourceKey.Users] as User[];
   const _members = members.map((_username) => {
-    const { username, name, email } =
+    const { id, username, name, email } =
       users.find((user) => user.username === _username) || new User();
-    return { username, name, email };
+    return {
+      id,
+      username,
+      name,
+      email,
+      invitation: { accepted: false, rejected: false },
+    };
   });
   return {
     id,
-    projectId: Number(projectId),
-    members: _members,
     title,
+    projectId: Number(projectId),
+    creatorId: Number(creatorId),
+    pending,
+    abandoned,
+    members: _members,
     reservedHours,
   };
 };

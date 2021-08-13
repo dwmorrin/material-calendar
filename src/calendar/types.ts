@@ -7,6 +7,7 @@ import { SnackbarState } from "../components/Snackbar";
 import Invitation from "../resources/Invitation";
 
 export enum CalendarAction {
+  CanceledInvitationReceived,
   CanceledReservation,
   CloseEquipmentForm,
   CloseEventDetail,

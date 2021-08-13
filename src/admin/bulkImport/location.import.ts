@@ -34,7 +34,7 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, records): void => {
   })
     .then((res) => res.json())
     .then(({ error, data }) => {
-      if (error) return dispatchError(error);
+      if (error) throw error;
       setSubmitting(false);
       dispatch({
         type: AdminAction.FileImportSuccess,

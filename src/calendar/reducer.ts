@@ -132,6 +132,41 @@ function receivedResource(state: CalendarState, action: Action): CalendarState {
 
 //--------- NORMAL ACTION HANDLERS ----------
 
+const canceledInvitationReceived: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload)
+    return errorRedirect(
+      state,
+      action,
+      "no updated groups or invitations",
+      ErrorType.MISSING_RESOURCE
+    );
+  const { invitations } = payload;
+  if (!invitations || !Array.isArray(invitations))
+    return errorRedirect(
+      state,
+      action,
+      "no updated invitations",
+      ErrorType.MISSING_RESOURCE
+    );
+  return displayMessage(
+    {
+      ...state,
+      resources: {
+        ...state.resources,
+        ...payload?.resources,
+      },
+      invitations,
+    },
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: "Your invitation has been canceled",
+      },
+    }
+  );
+};
+
 const canceledReservation: StateHandler = (state, { payload }) => {
   return displayMessage(
     {
@@ -145,7 +180,7 @@ const canceledReservation: StateHandler = (state, { payload }) => {
     {
       type: CalendarAction.DisplayMessage,
       payload: {
-        message: "Your Reservation has been Canceled",
+        message: "Your reservation has been canceled",
       },
     }
   );
@@ -666,6 +701,7 @@ const viewToday: StateHandler = (state, action) => {
 
 const calendarReducer: StateHandler = (state, action) =>
   ({
+    [CalendarAction.CanceledInvitationReceived]: canceledInvitationReceived,
     [CalendarAction.CanceledReservation]: canceledReservation,
     [CalendarAction.CloseEquipmentForm]: closeEquipmentForm,
     [CalendarAction.CloseEventDetail]: closeEventDetail,

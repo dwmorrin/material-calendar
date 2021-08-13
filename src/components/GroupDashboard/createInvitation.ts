@@ -25,9 +25,18 @@ const createInvitation = ({
 }: CreateInvitationProps): Promise<void> => {
   const group = new UserGroup({
     id: 0,
+    creatorId: invitor.id,
     projectId: project.id,
     title: "",
-    members: invitees,
+    pending: true,
+    abandoned: false,
+    members: invitees.map(({ id, username, name, email }) => ({
+      id,
+      username,
+      name,
+      email,
+      invitation: { accepted: false, rejected: false },
+    })),
     reservedHours: 0,
   });
 

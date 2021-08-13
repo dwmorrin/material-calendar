@@ -76,7 +76,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     Reservation.rules.refundGracePeriodMinutes
   );
 
-  const currentUserWalkInProject = user.projects.find(
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const currentUserWalkInProject = projects.find(
     (project) => project.title === Project.walkInTitle
   );
 
@@ -107,7 +108,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     Event.isAvailableForWalkIn(state.currentEvent) &&
     !hasReachedTheWalkInLimit(state.currentEvent);
 
-  const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
+  const projectsActiveNow = projects.filter(
     ({ title, allotments }) =>
       (title === Project.walkInTitle && state.currentEvent && walkInValid) ||
       allotments.some(
@@ -144,7 +145,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     ? Object.entries(reservation.equipment)
     : [];
 
-  const [projectsWithHours, projectsWithoutHours] = projects.reduce(
+  const [projectsWithHours, projectsWithoutHours] = projectsActiveNow.reduce(
     (projectsByHours, p) => {
       projectsByHours[projectHasHoursRemaining(p) ? 0 : 1].push(p);
       return projectsByHours;
@@ -222,7 +223,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         </section>
 
         {reservationCutoffHasNotPassed &&
-          (userOwns || (open && !!projects.length)) && (
+          (userOwns || (open && !!projectsActiveNow.length)) && (
             <Button
               key="MakeReservation"
               style={{
@@ -306,7 +307,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       <ReservationForm
         dispatch={dispatch}
         state={state}
-        projects={projects.filter(projectHasHoursRemaining)}
+        projects={projectsActiveNow.filter(projectHasHoursRemaining)}
       />
       {isAdmin && (
         <Button

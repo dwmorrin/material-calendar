@@ -10,6 +10,8 @@ import Invitation, {
 } from "../../resources/Invitation";
 import { InvitationItemProps } from "./types";
 import User from "../../resources/User";
+import UserGroup from "../../resources/UserGroup";
+import { ResourceKey } from "../../resources/types";
 
 const InvitationSent: FC<InvitationItemProps> = ({
   dispatch,
@@ -20,7 +22,7 @@ const InvitationSent: FC<InvitationItemProps> = ({
   const onCancelInvitation = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ): void => {
-    // TODO add comment as to why the stop propogation is needed
+    // TODO add comment as to why the stop propagation is needed
     event.stopPropagation();
     const name = User.formatName(user.name);
     const mail: Mail = {
@@ -28,8 +30,6 @@ const InvitationSent: FC<InvitationItemProps> = ({
       subject: `${name} has canceled the group invitation`,
       text: `${name} has canceled the group invitation they sent you for ${project.title}.`,
     };
-    // Delete invitation which will delete
-    // entries on invitee table via CASCADE
     fetch(`${Invitation.url}/${invitation.id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -38,11 +38,18 @@ const InvitationSent: FC<InvitationItemProps> = ({
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error) throw error;
-        if (!data) throw new Error("no invitations received");
+        const invitations: Invitation[] = data.invitations;
+        const groups: UserGroup[] = data.groups;
+        if (!Array.isArray(invitations))
+          throw new Error("no invitations received");
+        if (!Array.isArray(groups)) throw new Error("no groups received");
         dispatch({
-          type: CalendarAction.ReceivedInvitations,
+          type: CalendarAction.CanceledInvitationReceived,
           payload: {
-            invitations: (data as Invitation[]).map((i) => new Invitation(i)),
+            resources: {
+              [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
+            },
+            invitations: invitations.map((i) => new Invitation(i)),
           },
         });
       })

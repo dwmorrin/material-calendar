@@ -10,7 +10,7 @@ interface User {
   };
   email: string;
   phone: string;
-  projects: { id: number; title: string; groupId: number }[];
+  projects: { id: number; title: string }[];
   restriction: number;
 }
 
@@ -28,7 +28,7 @@ class User implements User {
         middle: "",
         last: "",
       },
-      projects: [] as { id: number; title: string; groupId: number }[],
+      projects: [] as { id: number; title: string }[],
       restriction: 0,
     }
   ) {
