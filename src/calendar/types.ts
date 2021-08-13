@@ -18,6 +18,7 @@ export enum CalendarAction {
   CloseReservationFormAdmin,
   CloseSnackbar,
   CreatedEventsReceived,
+  CreatedInvitationReceived,
   DisplayMessage,
   Error,
   FoundStaleCurrentEvent,

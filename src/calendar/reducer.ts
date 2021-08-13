@@ -219,6 +219,41 @@ const createdEventsReceived: StateHandler = (state, action) => {
   return closeEventEditor(receivedResource(state, action));
 };
 
+const createdInvitationReceived: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload)
+    return errorRedirect(
+      state,
+      action,
+      "no group in payload",
+      ErrorType.MISSING_RESOURCE
+    );
+  const invitations = payload.invitations;
+  if (!invitations)
+    return errorRedirect(
+      state,
+      action,
+      "no invitations in payload",
+      ErrorType.MISSING_RESOURCE
+    );
+  return displayMessage(
+    {
+      ...state,
+      resources: {
+        ...state.resources,
+        ...action.payload?.resources,
+      },
+      invitations,
+    },
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: "Invitations sent",
+      },
+    }
+  );
+};
+
 const foundStaleCurrentEvent: StateHandler = (state, { payload }) => {
   if (payload?.currentEvent instanceof Event) {
     const event = payload?.currentEvent as Event;
@@ -642,6 +677,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CloseReservationFormAdmin]: closeReservationFormAdmin,
     [CalendarAction.CloseSnackbar]: closeSnackbar,
     [CalendarAction.CreatedEventsReceived]: createdEventsReceived,
+    [CalendarAction.CreatedInvitationReceived]: createdInvitationReceived,
     [CalendarAction.DisplayMessage]: displayMessage,
     [CalendarAction.Error]: errorHandler,
     [CalendarAction.FoundStaleCurrentEvent]: foundStaleCurrentEvent,
