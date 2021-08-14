@@ -4,6 +4,7 @@ import RosterRecord from "../../resources/RosterRecord";
 import Course from "../../resources/Course";
 import Project from "../../resources/Project";
 import User from "../../resources/User";
+import UserGroup from "../../resources/UserGroup";
 import { BulkImporter } from "./router";
 
 const headings = [
@@ -37,24 +38,28 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, records) => {
   })
     .then((res) => res.json())
     .then(({ error, data }) => {
-      if (error) return dispatchError(error);
+      if (error) throw error;
+      const courses: Course[] = data.courses;
+      const projects: Project[] = data.projects;
+      const users: User[] = data.users;
+      const rosterRecords: RosterRecord[] = data.rosterRecords;
+      const groups: UserGroup[] = data.groups;
+      if (
+        ![courses, projects, users, rosterRecords, groups].every(Array.isArray)
+      )
+        throw new Error("Missing resources after roster import");
       setSubmitting(false);
       dispatch({
         type: AdminAction.FileImportSuccess,
         payload: {
           resources: {
-            [ResourceKey.Courses]: (data.courses as Course[]).map(
-              (course) => new Course(course)
+            [ResourceKey.Courses]: courses.map((c) => new Course(c)),
+            [ResourceKey.Projects]: projects.map((p) => new Project(p)),
+            [ResourceKey.Users]: users.map((u) => new User(u)),
+            [ResourceKey.RosterRecords]: rosterRecords.map(
+              (r) => new RosterRecord(r)
             ),
-            [ResourceKey.Projects]: (data.projects as Project[]).map(
-              (project) => new Project(project)
-            ),
-            [ResourceKey.Users]: (data.users as User[]).map(
-              (user) => new User(user)
-            ),
-            [ResourceKey.RosterRecords]: (
-              data.rosterRecords as RosterRecord[]
-            ).map((rosterRecord) => new RosterRecord(rosterRecord)),
+            [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
           },
         },
       });
