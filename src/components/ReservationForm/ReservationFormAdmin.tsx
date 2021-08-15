@@ -161,8 +161,8 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
             dispatch,
             user,
             event: currentEvent,
-            groups: state.resources[ResourceKey.Groups] as UserGroup[],
-            projects: state.resources[ResourceKey.Projects] as Project[],
+            groups,
+            projects,
           })}
           validationSchema={validationSchema}
         >

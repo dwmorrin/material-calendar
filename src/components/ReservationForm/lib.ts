@@ -76,13 +76,15 @@ export const submitHandler =
     actions.setSubmitting(true);
     const group = groups.find((group) => group.id === values.groupId);
     const project = projects.find((project) => project.id === values.projectId);
-    if (!group || !project)
+    if (!group || !project) {
+      actions.setSubmitting(false);
       return dispatch({
         type: CalendarAction.Error,
         payload: {
           error: new Error("Invalid project/group in reservation form."),
         },
       });
+    }
 
     // sends mail to anyone in this group
     const subject = `${User.formatName(user.name)} has ${
