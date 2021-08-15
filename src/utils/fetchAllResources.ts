@@ -54,14 +54,25 @@ const fetchAllResources = (
   onRejectedType: number,
   ...endpoints: string[]
 ): Promise<void> =>
-  Promise.all(endpoints.map((url) => fetch(url)))
-    .then((responses) =>
-      Promise.all(responses.map((response) => response.json()))
-        .then((dataArray) =>
-          dispatchAllResources(dispatch, onFulfilledType, dataArray)
-        )
-        .catch((error) => dispatchError(dispatch, onRejectedType, error))
+  Promise.all(
+    endpoints.map((url) =>
+      fetch(url, { headers: { "Content-Type": "application/json" } })
     )
+  )
+    .then((responses) => {
+      if (responses.some(({ ok }) => !ok)) {
+        dispatchError(
+          dispatch,
+          onRejectedType,
+          new Error("Server had a problem. Try again later.")
+        );
+      } else
+        Promise.all(responses.map((response) => response.json()))
+          .then((dataArray) =>
+            dispatchAllResources(dispatch, onFulfilledType, dataArray)
+          )
+          .catch((error) => dispatchError(dispatch, onRejectedType, error));
+    })
     .catch((error) => dispatchError(dispatch, onRejectedType, error));
 
 export default fetchAllResources;
