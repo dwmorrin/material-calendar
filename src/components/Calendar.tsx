@@ -40,13 +40,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
     calendarView: "resourceTimeGridWeek",
   } as CalendarSelections);
 
-  const dispatchError = (error: Error, context = ""): void =>
-    dispatch({
-      type: CalendarAction.Error,
-      payload: { error },
-      meta: context,
-    });
-
   useEffect(() => {
     if (!user.username) return;
     fetchAllResources(
@@ -62,18 +55,6 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `${Category.url}?context=${ResourceKey.Categories}`,
       `${Reservation.url}/user/${user.id}?context=${ResourceKey.Reservations}`
     );
-    fetch(`/api/invitations/user/${user?.id}/`)
-      .then((response) => response.json())
-      .then(({ error, data, context }) => {
-        if (error || !data) return dispatchError(error, context);
-        dispatch({
-          type: CalendarAction.ReceivedInvitations,
-          payload: {
-            invitations: data,
-          },
-        });
-      })
-      .catch(dispatchError);
   }, [user]);
 
   return (
