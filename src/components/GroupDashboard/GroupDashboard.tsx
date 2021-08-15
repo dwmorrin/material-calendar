@@ -38,7 +38,10 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
     setSelectedUsers([]);
     if (!currentProject?.id) return;
     fetch(`${Project.url}/${currentProject.id}/group-dashboard`)
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) return response.json();
+        throw new Error(response.statusText);
+      })
       .then(({ error, data }) => {
         if (error) throw error;
         if (!data) throw new Error("No project info received");

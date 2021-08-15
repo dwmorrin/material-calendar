@@ -30,7 +30,8 @@ const InvitationSent: FC<InvitationItemProps> = ({
       subject: `${name} has canceled the group invitation`,
       text: `${name} has canceled the group invitation they sent you for ${project.title}.`,
     };
-    fetch(`${Invitation.url}/${invitation.id}`, {
+    fetch(`${UserGroup.url}`, {
+      //!todo fix url: probably :id/invitations/reject or something
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mail }),
@@ -78,8 +79,8 @@ const InvitationSent: FC<InvitationItemProps> = ({
           justifyContent: "space-around",
         }}
       >
-        {invitation.invitees.map(({ id, name, accepted, rejected }) => (
-          <ListItem key={`invitation-${invitation.id}-invitee-${id}`}>
+        {invitation.invitees.map(({ id, name, accepted, rejected }, i) => (
+          <ListItem key={`invitation-${i}-invitee-${id}`}>
             {User.formatName(name)}
             {accepted ? (
               <ThumbUpIcon />
