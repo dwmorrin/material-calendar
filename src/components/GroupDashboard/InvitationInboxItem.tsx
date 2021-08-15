@@ -22,7 +22,6 @@ interface InvitationUpdateProps {
 
 const updateInvitation = ({
   accepted,
-  invitation,
   userId,
   mail,
   dispatch,
@@ -30,7 +29,8 @@ const updateInvitation = ({
   const body: Record<string, unknown> = { userId, mail };
   if (accepted) body.accepted = 1;
   else body.rejected = 1;
-  fetch(`${Invitation.url}/${invitation.id}`, {
+  // todo: switch to UserGroup url
+  fetch(`${Invitation.url}/`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -72,7 +72,7 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   const onAcceptInvitation = (): void => {
     const name = User.formatName(user.name);
     const mail: Mail = {
-      to: invitation.invitor.email,
+      to: "TODO - FIX THIS", // TODO
       subject: `${name} has joined your group`,
       text: `${name} has joined your group for ${project.title}`,
     };
@@ -88,7 +88,7 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   const onDeclineInvitation = (): void => {
     const name = User.formatName(user.name);
     const mail: Mail = {
-      to: invitation.invitor.email,
+      to: "TODO - FIX THIS",
       subject: `${name} has declined your invitation`,
       text: `${name} has declined your invitation for ${project.title}`,
     };
@@ -106,7 +106,7 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
     .filter(isNotCurrentUser)
     .map(({ name }) => User.formatName(name))
     .join(", ");
-  const invitorName = User.formatName(invitation.invitor.name);
+  const invitorName = "NAME"; // TODO User.formatName(invitation.invitor.name);
   const andUser = invitation.invitees.some(isNotCurrentUser);
   const header = [
     invitorName,

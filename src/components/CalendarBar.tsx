@@ -53,7 +53,7 @@ const CalendarBar: FunctionComponent<
             color="secondary"
             badgeContent={
               unansweredInvitations.filter(
-                (invitation) => invitation.invitor.id !== user?.id
+                (invitation) => invitation.invitorId !== user.id
               ).length
             }
           >

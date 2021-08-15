@@ -58,7 +58,7 @@ const CalendarDrawer: FunctionComponent<
           {process.env.REACT_APP_DRAWER_TITLE}
         </Typography>
         {unansweredInvitations.filter(
-          (invitation) => invitation.invitor.id !== user?.id
+          (invitation) => invitation.invitorId !== user.id
         ).length > 0 && (
           <Typography variant="h6">
             {"You have unanswered invitations"}

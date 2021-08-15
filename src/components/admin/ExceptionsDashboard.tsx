@@ -95,9 +95,9 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
           <CircularProgress />
         ) : invitations && invitations.length > 0 ? (
           <List>
-            {invitations.map((invitation) => (
+            {invitations.map((invitation, i) => (
               <ListItem
-                key={`invitation${invitation.id}`}
+                key={`invitation${i}`}
                 style={{ justifyContent: "space-between" }}
               >
                 <Paper
@@ -117,16 +117,12 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                   >
                     <b>Group Members</b>
                     <ListItem
-                      key={`invitation-${invitation.id}-invitor-${invitation.invitor.id}`}
+                      key={`invitation-${i}-invitor-${invitation.invitorId}`}
                     >
-                      {invitation.invitor.name.first +
-                        " " +
-                        invitation.invitor.name.last}
+                      TODO: lookup this user by this ID: {invitation.invitorId}
                     </ListItem>
                     {invitation.invitees.map((invitee) => (
-                      <ListItem
-                        key={`invitation-${invitation.id}-invitee-${invitee.id}`}
-                      >
+                      <ListItem key={`invitation-${i}-invitee-${invitee.id}`}>
                         {invitee.name.first + " " + invitee.name.last}
                       </ListItem>
                     ))}
@@ -139,17 +135,13 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                     }}
                   >
                     <b>Details</b>
-                    <ListItem key={`invitation-${invitation.id}-projectTitle}`}>
+                    <ListItem key={`invitation-${i}-projectTitle}`}>
                       {"Project: " + invitation.projectTitle}
                     </ListItem>
-                    <ListItem
-                      key={`invitation-${invitation.id}-defaultGroupSize}`}
-                    >
+                    <ListItem key={`invitation-${i}-defaultGroupSize}`}>
                       {"Default Group Size: " + invitation.projectGroupSize}
                     </ListItem>
-                    <ListItem
-                      key={`invitation-${invitation.id}-requestedGroupSize}`}
-                    >
+                    <ListItem key={`invitation-${i}-requestedGroupSize}`}>
                       {"Requested Group Size: " +
                         (Number(invitation.invitees.length) + 1)}
                     </ListItem>
@@ -166,17 +158,14 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                       <Button
                         style={{ backgroundColor: "Green", color: "white" }}
                         onClick={(): void => {
-                          fetch(
-                            `/api/invitations/exceptions/${invitation.id}`,
-                            {
-                              method: "PUT",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({
-                                approved: 1,
-                                adminId: user.id,
-                              }),
-                            }
-                          )
+                          fetch(`/api/invitations/exceptions/${i}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              approved: 1,
+                              adminId: user.id,
+                            }),
+                          })
                             .then((response) => response.json())
                             .then(({ error, data }) => {
                               if (error || !data) {
@@ -186,16 +175,13 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                                 });
                               } else {
                                 //Create group from invitation
-                                fetch(
-                                  `/api/groups/invitation/${invitation.id}`,
-                                  {
-                                    method: "POST",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                    },
-                                    body: "",
-                                  }
-                                )
+                                fetch(`/api/groups/invitation/${i}`, {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                  },
+                                  body: "",
+                                })
                                   .then((response) => response.json())
                                   .then(({ error, data }) => {
                                     if (error || !data) {
@@ -208,7 +194,7 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
 
                                       const insertId = data.id;
                                       fetch(
-                                        `/api/groups/${insertId}/invitation/${invitation.id}`,
+                                        `/api/groups/${insertId}/invitation/${i}`,
                                         {
                                           method: "POST",
                                           headers: {
@@ -232,25 +218,25 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                                                     `${u.name.first} ${u.name.last} has no email`
                                                   )
                                                 );
-                                              sendMail(
-                                                u.email,
-                                                "Your group exception has been approved",
-                                                "Hello " +
-                                                  u.name?.first +
-                                                  ", your group exception request limit has been approved for " +
-                                                  invitation.projectTitle,
-                                                dispatchError
-                                              );
+                                              //   sendMail(
+                                              //     u.email,
+                                              //     "Your group exception has been approved",
+                                              //     "Hello " +
+                                              //       u.name?.first +
+                                              //       ", your group exception request limit has been approved for " +
+                                              //       invitation.projectTitle,
+                                              //     dispatchError
+                                              //   );
                                             });
-                                            sendMail(
-                                              invitation.invitor.email,
-                                              "Your group exception has been approved",
-                                              "Hello " +
-                                                invitation.invitor.name?.first +
-                                                ", your group exception request limit has been approved for " +
-                                                invitation.projectTitle,
-                                              dispatchError
-                                            );
+                                            // sendMail(
+                                            //   invitation.invitor.email,
+                                            //   "Your group exception has been approved",
+                                            //   "Hello " +
+                                            //     invitation.invitor.name?.first +
+                                            //     ", your group exception request limit has been approved for " +
+                                            //     invitation.projectTitle,
+                                            //   dispatchError
+                                            // );
                                             fetch("/api/invitations/exceptions")
                                               .then((response) =>
                                                 response.json()
@@ -272,17 +258,14 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                       <Button
                         style={{ backgroundColor: "Red", color: "white" }}
                         onClick={(): void => {
-                          fetch(
-                            `/api/invitations/exceptions/${invitation.id}`,
-                            {
-                              method: "PUT",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({
-                                denied: 1,
-                                adminId: user.id,
-                              }),
-                            }
-                          )
+                          fetch(`/api/invitations/exceptions/${i}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              denied: 1,
+                              adminId: user.id,
+                            }),
+                          })
                             .then((response) => response.json())
                             .then(({ error, data }) => {
                               if (error || !data) {
@@ -298,25 +281,25 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                                       `${u.name.first} ${u.name.last} has no email`
                                     )
                                   );
-                                sendMail(
-                                  u.email,
-                                  "Your group exception has been denied",
-                                  "Hello " +
-                                    u.name?.first +
-                                    ", your group exception request limit has been denied for " +
-                                    invitation.projectTitle,
-                                  dispatchError
-                                );
+                                // sendMail(
+                                //   u.email,
+                                //   "Your group exception has been denied",
+                                //   "Hello " +
+                                //     u.name?.first +
+                                //     ", your group exception request limit has been denied for " +
+                                //     invitation.projectTitle,
+                                //   dispatchError
+                                // );
                               });
-                              sendMail(
-                                invitation.invitor.email,
-                                "Your group exception has been denied",
-                                "Hello " +
-                                  invitation.invitor.name?.first +
-                                  ", your group exception request limit has been denied for " +
-                                  invitation.projectTitle,
-                                dispatchError
-                              );
+                              // sendMail(
+                              //   invitation.invitor.email,
+                              //   "Your group exception has been denied",
+                              //   "Hello " +
+                              //     invitation.invitor.name?.first +
+                              //     ", your group exception request limit has been denied for " +
+                              //     invitation.projectTitle,
+                              //   dispatchError
+                              // );
                               fetch("/api/invitations/exceptions")
                                 .then((response) => response.json())
                                 .then(({ data }) => setInvitations(data))

@@ -1,11 +1,5 @@
 import User from "./User";
 
-interface Invitor {
-  id: number;
-  name: { last: string; first: string };
-  email: string;
-}
-
 interface Invitee {
   id: number;
   accepted: boolean;
@@ -14,10 +8,9 @@ interface Invitee {
   email: string;
 }
 interface Invitation {
-  id: number;
   confirmed: boolean;
   projectId: number;
-  invitor: Invitor;
+  invitorId: number;
   invitees: Invitee[];
   groupId: number;
   approvedId: number;
@@ -28,10 +21,9 @@ class Invitation implements Invitation {
   static url = "/api/invitations";
   constructor(
     inv = {
-      id: 0,
       confirmed: false,
       projectId: 0,
-      invitor: { id: 0, name: { last: "", first: "" }, email: "" } as Invitor,
+      invitorId: 0,
       invitees: [] as Invitee[],
       groupId: 0,
       approvedId: 0,

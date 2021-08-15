@@ -21,10 +21,10 @@ const InvitationAccordion: FC<InvitationListProps> = ({
         <Typography variant="body1">Pending Invitations</Typography>
       </AccordionSummary>
       {invitations
-        .filter((invitation) => invitation.invitor.id === user.id)
-        .map((invitation) => (
+        .filter((invitation) => invitation.invitorId === user.id)
+        .map((invitation, i) => (
           <InvitationSent
-            key={`invitation${invitation.id}`}
+            key={`invitation${i}`}
             dispatch={dispatch}
             project={currentProject}
             invitation={invitation}
@@ -34,13 +34,13 @@ const InvitationAccordion: FC<InvitationListProps> = ({
       {invitations
         .filter(
           (invitation) =>
-            invitation.invitor.id !== user.id &&
+            invitation.invitorId !== user.id &&
             (invitationIsPendingApproval(invitation) ||
               invitationIsUnanswered(invitation, user))
         )
-        .map((invitation) => (
+        .map((invitation, i) => (
           <InvitationInboxItem
-            key={`invitation${invitation.id}`}
+            key={`invitation${i}`}
             invitation={invitation}
             dispatch={dispatch}
             user={user}
