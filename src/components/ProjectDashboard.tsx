@@ -1,19 +1,18 @@
 import React, { FunctionComponent } from "react";
 import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import {
-  IconButton,
-  Dialog,
-  Toolbar,
-  Typography,
-  Paper,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
+  AccordionSummary,
+  Dialog,
+  IconButton,
   List,
   ListItem,
   ListItemText,
+  Paper,
+  Toolbar,
+  Typography,
 } from "@material-ui/core";
-import { useAuth } from "./AuthProvider";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {
@@ -34,6 +33,7 @@ import {
   transition,
 } from "../calendar/projectDashboard";
 import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
+import Location from "../resources/Location";
 
 const SessionInfo: FunctionComponent<{
   event: Event;
@@ -59,16 +59,16 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { user } = useAuth();
   const classes = useStyles();
   const { currentProject, currentGroup, projectDashboardIsOpen, resources } =
     state;
 
-  if (!user || !currentProject) return null;
+  if (!currentProject) return null;
 
   const events = resources[ResourceKey.Events] as Event[];
-  const locations = resources[ResourceKey.Locations].filter((location) =>
-    currentProject?.allotments.find((a) => a.locationId === location.id)
+  const locations = (resources[ResourceKey.Locations] as Location[]).filter(
+    (location) =>
+      currentProject?.allotments.find((a) => a.locationId === location.id)
   );
 
   const groupEvents = events.filter(
@@ -134,9 +134,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
               key={`${location.id}`}
               style={{ display: "flex", flexDirection: "column" }}
             >
-              <Typography variant="body2">
-                {location.title as string}
-              </Typography>
+              <Typography variant="body2">{location.title}</Typography>
               <ProjectLocationHours
                 allotments={
                   currentProject?.allotments.filter(
