@@ -6,6 +6,7 @@ import Project from "../../resources/Project";
 import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
 import { BulkImporter } from "./router";
+import Section from "../../resources/Section";
 
 const headings = [
   "Course",
@@ -43,9 +44,12 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, records) => {
       const projects: Project[] = data.projects;
       const users: User[] = data.users;
       const rosterRecords: RosterRecord[] = data.rosterRecords;
+      const sections: Section[] = data.sections;
       const groups: UserGroup[] = data.groups;
       if (
-        ![courses, projects, users, rosterRecords, groups].every(Array.isArray)
+        ![courses, projects, users, rosterRecords, sections, groups].every(
+          Array.isArray
+        )
       )
         throw new Error("Missing resources after roster import");
       setSubmitting(false);
@@ -54,12 +58,13 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, records) => {
         payload: {
           resources: {
             [ResourceKey.Courses]: courses.map((c) => new Course(c)),
+            [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
             [ResourceKey.Projects]: projects.map((p) => new Project(p)),
-            [ResourceKey.Users]: users.map((u) => new User(u)),
             [ResourceKey.RosterRecords]: rosterRecords.map(
               (r) => new RosterRecord(r)
             ),
-            [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
+            [ResourceKey.Sections]: sections.map((s) => new Section(s)),
+            [ResourceKey.Users]: users.map((u) => new User(u)),
           },
         },
       });
