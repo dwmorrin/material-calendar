@@ -21,6 +21,13 @@ const InvitationAccordion: FC<InvitationListProps> = ({
   pendingGroups,
   user,
 }) => {
+  const inbox = pendingGroups.filter(({ members }) => {
+    const myself = members.find((member) => member.id === user.id);
+    if (!myself) throw new Error("can't find you in your own group");
+    const { accepted, rejected } = myself.invitation;
+    return !accepted && !rejected;
+  });
+
   return (
     <Accordion defaultExpanded>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -36,38 +43,30 @@ const InvitationAccordion: FC<InvitationListProps> = ({
         </Grid>
       </AccordionSummary>
       <Divider />
+      <ListItem>
+        <Typography>Sent</Typography>
+      </ListItem>
       {myInvitation && (
-        <>
-          <ListItem>
-            <Typography>Sent</Typography>
-          </ListItem>
-          <InvitationSent
-            dispatch={dispatch}
-            project={currentProject}
-            pendingGroup={myInvitation}
-            user={user}
-          />
-          <Divider />
-        </>
+        <InvitationSent
+          dispatch={dispatch}
+          project={currentProject}
+          pendingGroup={myInvitation}
+          user={user}
+        />
       )}
+      <Divider />
       <ListItem>
         <Typography>Inbox</Typography>
       </ListItem>
-      {pendingGroups
-        .filter(({ members }) => {
-          const me = members.find((member) => member.id === user.id);
-          if (!me) throw new Error("can't find you in your own group");
-          return !me.invitation.accepted && !me.invitation.rejected;
-        })
-        .map((pendingGroup, i) => (
-          <InvitationInboxItem
-            key={`invitation-inbox-${i}`}
-            pendingGroup={pendingGroup}
-            dispatch={dispatch}
-            user={user}
-            project={currentProject}
-          />
-        ))}
+      {inbox.map((pendingGroup, i) => (
+        <InvitationInboxItem
+          key={`invitation-inbox-${i}`}
+          pendingGroup={pendingGroup}
+          dispatch={dispatch}
+          user={user}
+          project={currentProject}
+        />
+      ))}
     </Accordion>
   );
 };
