@@ -8,6 +8,8 @@ import { groupTo, Mail } from "../../utils/mail";
 import { InvitationItemProps } from "./types";
 import { ResourceKey } from "../../resources/types";
 import InvitationMember from "./InvitationMember";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 
 interface InvitationUpdateProps {
   pendingGroup: UserGroup;
@@ -116,11 +118,19 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
               />
             )
           )}
-          <ButtonGroup variant="contained" color="primary" size="small">
-            <Button color="primary" onClick={onAcceptInvitation}>
+          <ButtonGroup variant="contained" color="primary">
+            <Button
+              color="primary"
+              onClick={onAcceptInvitation}
+              startIcon={<ThumbUpIcon />}
+            >
               Accept Invitation
             </Button>
-            <Button color="secondary" onClick={onDeclineInvitation}>
+            <Button
+              color="secondary"
+              onClick={onDeclineInvitation}
+              endIcon={<ThumbDownIcon />}
+            >
               Decline Invitation
             </Button>
           </ButtonGroup>

@@ -40,29 +40,24 @@ const ConfirmationDialog: FC<
   return (
     <Dialog TransitionComponent={transition} open={open}>
       <DialogContent>
-        The group size for {project.title} is {project.groupSize}. <br />
-        You are attempting to create a group of size: {selectedUsers.length + 1}
-        . <br /> <br />
-        You can make a request for admin approval for an irregular sized group,
-        or you can create a group of the specified size.
+        {project.title} requires a group size of {project.groupSize}. <br />
+        You are attempting to create a group size of {selectedUsers.length + 1}.
       </DialogContent>
       <DialogActions>
         <Button
           size="small"
           variant="contained"
-          color="inherit"
-          style={{ backgroundColor: "Green", color: "white" }}
+          color="secondary"
           onClick={onRequest}
         >
-          Request Irregular Group Size Approval
+          Request Irregular Group Size and wait for approval
         </Button>
         <Button
           size="small"
           variant="contained"
-          color="inherit"
           onClick={(): void => openConfirmationDialog(false)}
         >
-          Go Back
+          Go Back and change group size
         </Button>
       </DialogActions>
     </Dialog>
