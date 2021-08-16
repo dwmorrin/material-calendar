@@ -17,60 +17,118 @@ import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AdminAction, AdminUIProps } from "../../admin/types";
 import Invitation from "../../resources/Invitation";
+import UserGroup from "../../resources/UserGroup";
 import Reservation from "../../resources/Reservation";
 import { formatDatetimeSeconds, parseSQLDatetime } from "../../utils/date";
-import { sendMail } from "../../utils/mail";
-import { useAuth } from "../AuthProvider";
+import { Mail, groupTo } from "../../utils/mail";
+
+interface HagenReservation extends Reservation {
+  event: {
+    start: string;
+    end: string;
+    location: string;
+  };
+  projectTitle: string;
+  members: {
+    id: number;
+    name: { first: string; last: string };
+    email: string;
+    username: string;
+  }[];
+}
+
+interface HagenInvitation extends Invitation {
+  projectTitle: string;
+  projectGroupSize: number;
+}
 
 const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { user } = useAuth();
-  const [invitations, setInvitations] = useState(
-    [] as (Invitation & { projectTitle: string; projectGroupSize: number })[]
-  );
-  const [reservations, setReservations] = useState(
-    [] as (Reservation & {
-      event: {
-        start: string;
-        end: string;
-        location: string;
-      };
-      projectTitle: string;
-      members: {
-        id: number;
-        name: { first: string; last: string };
-        email: string;
-        username: string;
-      }[];
-    })[]
-  );
+  const [invitations, setInvitations] = useState<HagenInvitation[]>([]);
+  const [reservations, setReservations] = useState<HagenReservation[]>([]);
 
-  const [invitationsAreLoading, setInvitationsAreLoading] = useState(false);
-  const [reservationsAreLoading, setReservationsAreLoading] = useState(false);
+  const [invitationsAreLoading, setInvitationsAreLoading] = useState(true);
+  const [reservationsAreLoading, setReservationsAreLoading] = useState(true);
 
   useEffect(() => {
-    setInvitationsAreLoading(true);
-    fetch("/api/invitations/exceptions")
+    const dispatchError = (error: Error): void =>
+      dispatch({ type: AdminAction.Error, payload: { error } });
+    fetch(`${UserGroup.url}/admin/exceptions`)
       .then((response) => response.json())
-      .then(({ data }) => {
+      .then(({ error, data }) => {
+        if (error) throw error;
         setInvitations(data);
         setInvitationsAreLoading(false);
       })
-      .catch(console.error);
-    setReservationsAreLoading(true);
-    fetch("/api/reservations/exceptions")
+      .catch(dispatchError);
+    fetch(`${Reservation.url}/admin/exceptions`)
       .then((response) => response.json())
-      .then(({ data }) => {
+      .then(({ error, data }) => {
+        if (error) throw error;
         setReservations(data);
         setReservationsAreLoading(false);
       })
-      .catch(console.error);
-  }, []);
+      .catch(dispatchError);
+  }, [dispatch]);
 
-  const dispatchError = (error: Error, meta?: unknown): void =>
-    dispatch({ type: AdminAction.Error, payload: { error }, meta });
+  const dispatchError = (error: Error): void =>
+    dispatch({ type: AdminAction.Error, payload: { error } });
+
+  const approveGroupSize = (
+    invitation: HagenInvitation,
+    approve: boolean
+  ): void => {
+    const approved = approve ? "approved" : "denied";
+    const mail: Mail = {
+      to: groupTo(invitation.invitees),
+      subject: `Your group has been ${approved}`,
+      text: `You requested an irregular group size for ${invitation.projectTitle} and it has been ${approved}.`,
+    };
+    fetch(`${UserGroup.url}/${invitation.groupId}/admin/irregular-size`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ approve, mail }),
+    })
+      .then((response) => response.json())
+      .then(({ error }) => {
+        if (error) throw error;
+        // TODO update client data
+      })
+      .catch(dispatchError);
+  };
+
+  const approveReservationCancelation = (
+    reservation: HagenReservation,
+    approve: boolean
+  ): void => {
+    const approved = approve ? "approved" : "denied";
+    const mail: Mail = {
+      to: groupTo(reservation.members),
+      subject: `Your booking cancelation exception has been ${approved}`,
+      text: [
+        `Your booking cancelation exception has been ${approved} for`,
+        `${reservation.event.location} on ${reservation.event.start}.`,
+        `Your hours for ${reservation.projectTitle} have`,
+        approved ? "" : "NOT",
+        "been refunded.",
+      ].join(" "),
+    };
+    fetch(`${Reservation.url}/${reservation.id}/admin/cancel`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        approve,
+        mail,
+      }),
+    })
+      .then((response) => response.json())
+      .then(({ error }) => {
+        if (error) throw error;
+      })
+      .catch(dispatchError);
+  };
 
   return (
     <Dialog fullScreen={true} open={state.exceptionsDashboardIsOpen}>
@@ -157,155 +215,15 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                     <ButtonGroup orientation="vertical" color="primary">
                       <Button
                         style={{ backgroundColor: "Green", color: "white" }}
-                        onClick={(): void => {
-                          fetch(`/api/invitations/exceptions/${i}`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              approved: 1,
-                              adminId: user.id,
-                            }),
-                          })
-                            .then((response) => response.json())
-                            .then(({ error, data }) => {
-                              if (error || !data) {
-                                return dispatch({
-                                  type: AdminAction.Error,
-                                  payload: { error },
-                                });
-                              } else {
-                                //Create group from invitation
-                                fetch(`/api/groups/invitation/${i}`, {
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                  },
-                                  body: "",
-                                })
-                                  .then((response) => response.json())
-                                  .then(({ error, data }) => {
-                                    if (error || !data) {
-                                      return dispatch({
-                                        type: AdminAction.Error,
-                                        payload: { error },
-                                      });
-                                    } else {
-                                      //Join users into group
-
-                                      const insertId = data.id;
-                                      fetch(
-                                        `/api/groups/${insertId}/invitation/${i}`,
-                                        {
-                                          method: "POST",
-                                          headers: {
-                                            "Content-Type": "application/json",
-                                          },
-                                          body: "",
-                                        }
-                                      )
-                                        .then((response) => response.json())
-                                        .then(({ error, data }) => {
-                                          if (error || !data) {
-                                            return dispatch({
-                                              type: AdminAction.Error,
-                                              payload: { error },
-                                            });
-                                          } else {
-                                            invitation.invitees.forEach((u) => {
-                                              if (!u.email)
-                                                return dispatchError(
-                                                  new Error(
-                                                    `${u.name.first} ${u.name.last} has no email`
-                                                  )
-                                                );
-                                              //   sendMail(
-                                              //     u.email,
-                                              //     "Your group exception has been approved",
-                                              //     "Hello " +
-                                              //       u.name?.first +
-                                              //       ", your group exception request limit has been approved for " +
-                                              //       invitation.projectTitle,
-                                              //     dispatchError
-                                              //   );
-                                            });
-                                            // sendMail(
-                                            //   invitation.invitor.email,
-                                            //   "Your group exception has been approved",
-                                            //   "Hello " +
-                                            //     invitation.invitor.name?.first +
-                                            //     ", your group exception request limit has been approved for " +
-                                            //     invitation.projectTitle,
-                                            //   dispatchError
-                                            // );
-                                            fetch("/api/invitations/exceptions")
-                                              .then((response) =>
-                                                response.json()
-                                              )
-                                              .then(({ data }) =>
-                                                setInvitations(data)
-                                              )
-                                              .catch(console.error);
-                                          }
-                                        });
-                                    }
-                                  });
-                              }
-                            });
-                        }}
+                        onClick={(): void => approveGroupSize(invitation, true)}
                       >
                         Approve Exception
                       </Button>
                       <Button
                         style={{ backgroundColor: "Red", color: "white" }}
-                        onClick={(): void => {
-                          fetch(`/api/invitations/exceptions/${i}`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              denied: 1,
-                              adminId: user.id,
-                            }),
-                          })
-                            .then((response) => response.json())
-                            .then(({ error, data }) => {
-                              if (error || !data) {
-                                return dispatch({
-                                  type: AdminAction.Error,
-                                  payload: { error },
-                                });
-                              }
-                              invitation.invitees.forEach((u) => {
-                                if (!u.email)
-                                  return dispatchError(
-                                    new Error(
-                                      `${u.name.first} ${u.name.last} has no email`
-                                    )
-                                  );
-                                // sendMail(
-                                //   u.email,
-                                //   "Your group exception has been denied",
-                                //   "Hello " +
-                                //     u.name?.first +
-                                //     ", your group exception request limit has been denied for " +
-                                //     invitation.projectTitle,
-                                //   dispatchError
-                                // );
-                              });
-                              // sendMail(
-                              //   invitation.invitor.email,
-                              //   "Your group exception has been denied",
-                              //   "Hello " +
-                              //     invitation.invitor.name?.first +
-                              //     ", your group exception request limit has been denied for " +
-                              //     invitation.projectTitle,
-                              //   dispatchError
-                              // );
-                              fetch("/api/invitations/exceptions")
-                                .then((response) => response.json())
-                                .then(({ data }) => setInvitations(data))
-                                .catch(console.error);
-                            });
-                        }}
+                        onClick={(): void =>
+                          approveGroupSize(invitation, false)
+                        }
                       >
                         Deny Exception
                       </Button>
@@ -418,107 +336,17 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                     <ButtonGroup orientation="vertical" color="primary">
                       <Button
                         style={{ backgroundColor: "Green", color: "white" }}
-                        onClick={(): void => {
-                          fetch(
-                            `/api/reservations/exceptions/${reservation.id}`,
-                            {
-                              method: "PUT",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({
-                                approved: 1,
-                                adminId: user.id,
-                              }),
-                            }
-                          )
-                            .then((response) => response.json())
-                            .then(({ error, data }) => {
-                              if (error || !data) {
-                                return dispatch({
-                                  type: AdminAction.Error,
-                                  payload: { error },
-                                });
-                              }
-                              reservation.members.forEach((u) => {
-                                if (!u.email)
-                                  return dispatchError(
-                                    new Error(
-                                      `${u.name.first} ${u.name.last} has no email`
-                                    )
-                                  );
-                                sendMail(
-                                  u.email,
-                                  "Your booking cancelation exception has been approved",
-                                  "Hello " +
-                                    u.name?.first +
-                                    ", your booking cancelation exception has been approved for your session in " +
-                                    reservation.event.location +
-                                    " on " +
-                                    reservation.event.start +
-                                    ". Your hours for " +
-                                    reservation.projectTitle +
-                                    " have been refunded.",
-                                  dispatchError
-                                );
-                              });
-                              fetch("/api/reservations/exceptions")
-                                .then((response) => response.json())
-                                .then(({ data }) => setReservations(data))
-                                .catch(console.error);
-                            });
-                        }}
+                        onClick={(): void =>
+                          approveReservationCancelation(reservation, true)
+                        }
                       >
                         Approve Exception
                       </Button>
                       <Button
                         style={{ backgroundColor: "Red", color: "white" }}
-                        onClick={(): void => {
-                          fetch(
-                            `/api/reservations/exceptions/${reservation.id}`,
-                            {
-                              method: "PUT",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({
-                                denied: 1,
-                                adminId: user.id,
-                              }),
-                            }
-                          )
-                            .then((response) => response.json())
-                            .then(({ error, data }) => {
-                              if (error || !data) {
-                                return dispatch({
-                                  type: AdminAction.Error,
-                                  payload: { error },
-                                });
-                              }
-                              reservation.members.forEach((u) => {
-                                if (!u.email)
-                                  return dispatchError(
-                                    new Error(
-                                      `${u.name.first} ${u.name.last} has no email`
-                                    )
-                                  );
-                                sendMail(
-                                  u.email,
-                                  "Your booking cancelation exception has been denied",
-                                  "Hello " +
-                                    u.name?.first +
-                                    ", your booking cancelation exception has been denied for your session in " +
-                                    reservation.event.location +
-                                    " on " +
-                                    reservation.event.start +
-                                    ". Your hours for " +
-                                    reservation.projectTitle +
-                                    " have NOT been refunded.",
-                                  dispatchError
-                                );
-                              });
-                              fetch("/api/reservations/exceptions")
-                                .then((response) => response.json())
-                                .then(({ data }) => setReservations(data))
-                                .catch(console.error);
-                            });
-                        }}
+                        onClick={(): void =>
+                          approveReservationCancelation(reservation, false)
+                        }
                       >
                         Deny Exception
                       </Button>
