@@ -5,10 +5,6 @@ import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import { Mail } from "../../utils/mail";
-import Invitation, {
-  invitationIsUnanswered,
-  invitationIsPendingApproval,
-} from "../../resources/Invitation";
 import { InvitationItemProps } from "./types";
 import { ResourceKey } from "../../resources/types";
 
@@ -22,15 +18,15 @@ interface InvitationUpdateProps {
 
 const updateInvitation = ({
   accepted,
-  userId,
-  mail,
   dispatch,
+  mail,
+  pendingGroup,
+  userId,
 }: InvitationUpdateProps): void => {
   const body: Record<string, unknown> = { userId, mail };
   if (accepted) body.accepted = 1;
   else body.rejected = 1;
-  // todo: switch to UserGroup url
-  fetch(`${Invitation.url}/`, {
+  fetch(`${UserGroup.url}/${pendingGroup.id}/invite`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -39,9 +35,9 @@ const updateInvitation = ({
     .then(({ error, data }) => {
       if (error) throw error;
       if (!data) throw new Error("No updated group info returned");
-      const { invitations, groups, currentGroup } = data;
-      if (!Array.isArray(invitations))
-        throw new Error("No updated invitations info returned");
+      const { groups, currentGroup } = data;
+      // if (!Array.isArray(invitations))
+      //   throw new Error("No updated invitations info returned");
       if (!Array.isArray(groups))
         throw new Error("No updated group info returned");
       if (!currentGroup) throw new Error("No updated group info returned");
@@ -51,7 +47,7 @@ const updateInvitation = ({
           : CalendarAction.RejectedGroupInvitation,
         payload: {
           currentGroup,
-          invitations: invitations.map((i) => new Invitation(i)),
+          // invitations: invitations.map((i) => new Invitation(i)),
           resources: {
             [ResourceKey.Groups]: (groups as UserGroup[]).map(
               (g) => new UserGroup(g)
@@ -139,8 +135,8 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
           </Button>
         </ButtonGroup>
       )}
-      {!unanswered && invitationIsPendingApproval && (
-        <b>Invitation is pending admin approval</b>
+      {!unanswered && pendingGroup.exceptionalSize && (
+        <b>Group is an exceptional size and requires admin approval.</b>
       )}
     </ListItem>
   );

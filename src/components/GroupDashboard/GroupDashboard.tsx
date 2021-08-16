@@ -73,6 +73,11 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
     ({ projectId, pending }) => pending && projectId === currentProject.id
   );
 
+  // rule: can only send 1 invite at a time
+  const myInvitation = invitations.find(
+    ({ creatorId }) => creatorId === user.id
+  );
+
   return (
     <Dialog
       fullScreen
@@ -127,14 +132,15 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
         <List>
           {invitations && (
             <InvitationAccordion
-              dispatch={dispatch}
-              pendingGroups={invitations}
               currentProject={currentProject}
+              dispatch={dispatch}
+              myInvitation={myInvitation}
+              pendingGroups={invitations}
               user={user}
             />
           )}
         </List>
-        {!currentGroup && (
+        {!currentGroup && !myInvitation && (
           <CreateNewGroupAccordion
             defaultExpanded={!invitations}
             project={currentProject}

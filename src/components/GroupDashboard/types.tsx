@@ -12,6 +12,7 @@ export type InvitationItemProps = CalendarUIDispatcher & {
 };
 
 export type InvitationListProps = CalendarUIDispatcher & {
+  myInvitation?: UserGroup;
   currentProject: Project;
   pendingGroups: UserGroup[];
   user: User;

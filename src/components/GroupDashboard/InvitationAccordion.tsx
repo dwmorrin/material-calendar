@@ -6,9 +6,10 @@ import InvitationInboxItem from "./InvitationInboxItem";
 import { InvitationListProps } from "./types";
 
 const InvitationAccordion: FC<InvitationListProps> = ({
-  dispatch,
-  pendingGroups,
   currentProject,
+  dispatch,
+  myInvitation,
+  pendingGroups,
   user,
 }) => {
   return (
@@ -16,17 +17,14 @@ const InvitationAccordion: FC<InvitationListProps> = ({
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="body1">Pending Invitations</Typography>
       </AccordionSummary>
-      {pendingGroups
-        .filter(({ creatorId }) => creatorId === user.id)
-        .map((pendingGroup, i) => (
-          <InvitationSent
-            key={`invitation-sent-${i}`}
-            dispatch={dispatch}
-            project={currentProject}
-            pendingGroup={pendingGroup}
-            user={user}
-          />
-        ))}
+      {myInvitation && (
+        <InvitationSent
+          dispatch={dispatch}
+          project={currentProject}
+          pendingGroup={myInvitation}
+          user={user}
+        />
+      )}
       {pendingGroups
         .filter(({ members }) => {
           const me = members.find((member) => member.id === user.id);
