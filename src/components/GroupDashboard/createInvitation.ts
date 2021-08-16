@@ -1,3 +1,4 @@
+import { id } from "date-fns/locale";
 import { Action, CalendarAction } from "../../calendar/types";
 import Invitation from "../../resources/Invitation";
 import Project from "../../resources/Project";
@@ -6,7 +7,7 @@ import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
 import { Mail, groupTo } from "../../utils/mail";
 
-interface CreateInvitationProps {
+interface CreateGroupProps {
   invitor: User;
   invitees: User[];
   project: Project;
@@ -15,51 +16,40 @@ interface CreateInvitationProps {
   setSelectedUsers: (users: User[]) => void;
 }
 
-const createInvitation = ({
+type CreateGroupRequest = {
+  title: string;
+  projectId: number;
+  members: number[];
+  approved: boolean;
+  mail: Mail;
+};
+
+const createGroup = ({
   invitor,
   invitees,
   project,
   approved,
   dispatch,
   setSelectedUsers,
-}: CreateInvitationProps): Promise<void> => {
-  const group = new UserGroup({
-    id: 0,
-    creatorId: invitor.id,
-    projectId: project.id,
-    title: "",
-    pending: true,
-    abandoned: false,
-    members: invitees.map(({ id, username, name, email }) => ({
-      id,
-      username,
-      name,
-      email,
-      invitation: { accepted: false, rejected: false },
-    })),
-    reservedHours: 0,
-  });
-
+}: CreateGroupProps): Promise<void> => {
+  invitees.push(invitor);
   const name = User.formatName(invitor.name);
-
   const mail: Mail = {
     to: groupTo(invitees),
     subject: "You have been invited to a group",
     text: `${name} has invited you to join their group for ${project.title}`,
   };
+  const request: CreateGroupRequest = {
+    title: UserGroup.makeTitle(invitees),
+    projectId: project.id,
+    members: invitees.map(({ id }) => id),
+    approved,
+    mail,
+  };
   return fetch(UserGroup.url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      invitation: {
-        invitorId: invitor.id,
-        invitees: invitees.map(({ id }) => id),
-        projectId: project.id,
-        approved,
-        mail,
-      },
-      group,
-    }),
+    body: JSON.stringify(request),
   })
     .then((response) => response.json())
     .then(({ error, data }) => {
@@ -85,4 +75,4 @@ const createInvitation = ({
     );
 };
 
-export default createInvitation;
+export default createGroup;

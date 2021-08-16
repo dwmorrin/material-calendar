@@ -6,13 +6,12 @@ import {
   ListItem,
   Accordion,
   AccordionSummary,
-  Checkbox,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import User from "../../resources/User";
 import Project from "../../resources/Project";
 import { StateModifierProps } from "./types";
-import createInvitation from "./createInvitation";
+import createGroup from "./createInvitation";
 
 const CreateNewGroupAccordion: FC<
   StateModifierProps & {
@@ -51,7 +50,7 @@ const CreateNewGroupAccordion: FC<
     // TODO: add comment as to why we are stopping propagation here
     event.stopPropagation();
 
-    createInvitation({
+    createGroup({
       approved,
       dispatch,
       invitees: selectedUsers,
@@ -71,8 +70,6 @@ const CreateNewGroupAccordion: FC<
       </Typography>
       <List>
         <Button
-          // setting disabled={selectedUsers.length == 0} does not
-          // seem to work, due to local state?
           size="small"
           variant="contained"
           color="inherit"
@@ -89,15 +86,16 @@ const CreateNewGroupAccordion: FC<
               key={`course${otherUser.id}`}
               style={{ justifyContent: "space-between" }}
             >
-              {otherUser.name.first + " " + otherUser.name.last}
-              <Checkbox
-                onChange={(): void => toggleUser(otherUser)}
-                size="small"
-                inputProps={{
-                  "aria-label": otherUser.username + "Checkbox",
-                }}
-                checked={selectedUsers.includes(otherUser)}
-              />
+              <Button
+                onClick={(): void => toggleUser(otherUser)}
+                variant="contained"
+                disableElevation={selectedUsers.includes(otherUser)}
+                color={
+                  selectedUsers.includes(otherUser) ? "primary" : "default"
+                }
+              >
+                {otherUser.name.first + " " + otherUser.name.last}
+              </Button>
             </ListItem>
           ))}
       </List>

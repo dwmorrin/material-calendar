@@ -435,7 +435,9 @@ const openProjectDashboard: StateHandler = (state, action) => {
   const groups = resources[ResourceKey.Groups] as UserGroup[];
   const group =
     currentGroup ||
-    groups.find((group) => group.projectId === currentProject.id);
+    groups
+      .filter(({ pending }) => !pending)
+      .find((group) => group.projectId === currentProject.id);
   if (!group) {
     return openGroupDashboard(
       {

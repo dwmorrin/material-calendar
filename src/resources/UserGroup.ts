@@ -1,3 +1,5 @@
+import User from "./User";
+
 export interface GroupMember {
   id: number;
   username: string;
@@ -18,22 +20,9 @@ interface UserGroup extends Record<string, unknown> {
   projectId: number;
   creatorId: number;
   pending: boolean;
-  abandoned: boolean;
   members: GroupMember[];
   reservedHours: number;
 }
-
-// private helper function to dynamically generate group titles if none exist
-const makeTitle = (members: GroupMember[]): string => {
-  if (members.length === 1) {
-    return members[0].name.first + " " + members[0].name.last;
-  }
-  const lastNames = members.map((member) => member.name.last);
-  if (lastNames.length < 3) {
-    return lastNames.join(" and ");
-  }
-  return lastNames.slice(0, -1).join(", ") + ", and " + lastNames.slice(-1);
-};
 
 class UserGroup implements UserGroup {
   static url = "/api/groups";
@@ -44,16 +33,28 @@ class UserGroup implements UserGroup {
       projectId: 0,
       creatorId: 0,
       pending: true,
-      abandoned: false,
       members: [] as GroupMember[],
       reservedHours: 0,
     }
   ) {
     Object.assign(this, group);
     if (!this.title) {
-      this.title = makeTitle(this.members);
+      this.title = UserGroup.makeTitle(this.members);
     }
   }
+
+  static makeTitle = (
+    members: { name: { first: string; last: string } }[]
+  ): string => {
+    if (members.length === 1) {
+      return User.formatName(members[0].name);
+    }
+    const names = members.map(({ name }) => User.formatName(name));
+    if (members.length === 2) {
+      return names.join(" and ");
+    }
+    return [names.slice(0, -1).join(", "), names.slice(-1)].join(", and ");
+  };
 }
 
 export default UserGroup;
