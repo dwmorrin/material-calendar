@@ -13,7 +13,7 @@ import { InvitationItemProps } from "./types";
 import { ResourceKey } from "../../resources/types";
 
 interface InvitationUpdateProps {
-  invitation: Invitation;
+  pendingGroup: UserGroup;
   userId: number;
   mail: Mail;
   dispatch: (a: Action) => void;
@@ -65,7 +65,7 @@ const updateInvitation = ({
 
 const InvitationInboxItem: FC<InvitationItemProps> = ({
   dispatch,
-  invitation,
+  pendingGroup,
   project,
   user,
 }) => {
@@ -78,7 +78,7 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
     };
     updateInvitation({
       accepted: true,
-      invitation,
+      pendingGroup,
       userId: user.id,
       mail,
       dispatch,
@@ -94,7 +94,7 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
     };
     updateInvitation({
       accepted: false,
-      invitation,
+      pendingGroup,
       userId: user.id,
       mail,
       dispatch,
@@ -102,12 +102,12 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   };
 
   const isNotCurrentUser = ({ id }: { id: number }): boolean => id !== user.id;
-  const others = invitation.invitees
+  const others = pendingGroup.members
     .filter(isNotCurrentUser)
     .map(({ name }) => User.formatName(name))
     .join(", ");
   const invitorName = "NAME"; // TODO User.formatName(invitation.invitor.name);
-  const andUser = invitation.invitees.some(isNotCurrentUser);
+  const andUser = pendingGroup.members.some(isNotCurrentUser);
   const header = [
     invitorName,
     " wants to form a group with ",
@@ -116,10 +116,14 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
     "you",
   ].join("");
 
+  const me = pendingGroup.members.find(({ id }) => id === user.id);
+  if (!me) throw new Error("can't find you in your own group");
+  const unanswered = !me.invitation.accepted && !me.invitation.rejected;
+
   return (
     <ListItem style={{ justifyContent: "space-between" }}>
       {header}
-      {invitationIsUnanswered(invitation, user) && (
+      {unanswered && (
         <ButtonGroup variant="contained" color="primary" size="small">
           <Button
             style={{ backgroundColor: "Green", color: "white" }}
@@ -135,10 +139,9 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
           </Button>
         </ButtonGroup>
       )}
-      {!invitationIsUnanswered(invitation, user) &&
-        invitationIsPendingApproval && (
-          <b>Invitation is pending admin approval</b>
-        )}
+      {!unanswered && invitationIsPendingApproval && (
+        <b>Invitation is pending admin approval</b>
+      )}
     </ListItem>
   );
 };

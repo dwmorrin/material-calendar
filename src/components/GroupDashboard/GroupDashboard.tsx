@@ -13,12 +13,14 @@ import { makeTransition } from "../Transition";
 import { parseAndFormatSQLDateInterval } from "../../utils/date";
 import { useAuth } from "../AuthProvider";
 import User from "../../resources/User";
+import UserGroup from "../../resources/UserGroup";
 import Project from "../../resources/Project";
 import Invitation from "../../resources/Invitation";
 import ConfirmationDialog from "./ConfirmationDialog";
 import CurrentGroupBox from "./CurrentGroupBox";
 import InvitationAccordion from "./InvitationAccordion";
 import CreateNewGroupAccordion from "./CreateNewGroupAccordion";
+import { ResourceKey } from "../../resources/types";
 
 const transition = makeTransition("right");
 
@@ -29,10 +31,6 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
   const { user } = useAuth();
 
   const { currentGroup, currentProject } = state;
-
-  const invitations = state.invitations.filter(
-    ({ projectId }) => projectId === currentProject?.id
-  );
 
   useEffect(() => {
     setSelectedUsers([]);
@@ -69,6 +67,11 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
   }, [currentProject, dispatch, state.currentGroup, user]);
 
   if (!currentProject) return null;
+
+  const groups = state.resources[ResourceKey.Groups] as UserGroup[];
+  const invitations = groups.filter(
+    ({ projectId, pending }) => pending && projectId === currentProject.id
+  );
 
   return (
     <Dialog
@@ -125,7 +128,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
           {invitations && (
             <InvitationAccordion
               dispatch={dispatch}
-              invitations={invitations}
+              pendingGroups={invitations}
               currentProject={currentProject}
               user={user}
             />

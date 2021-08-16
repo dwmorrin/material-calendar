@@ -8,7 +8,7 @@ import {
 import { makeTransition } from "../Transition";
 import { StateModifierProps } from "./types";
 import Project from "../../resources/Project";
-import createInvitation from "./createInvitation";
+import createGroup from "./createInvitation";
 
 const transition = makeTransition("right");
 
@@ -27,7 +27,7 @@ const ConfirmationDialog: FC<
   user,
 }) => {
   const onRequest = (): void => {
-    createInvitation({
+    createGroup({
       approved: false,
       dispatch,
       invitees: selectedUsers,

@@ -1,20 +1,19 @@
 import { CalendarUIProps } from "../../calendar/types";
 import User from "../../resources/User";
 import Project from "../../resources/Project";
-import Invitation from "../../resources/Invitation";
 import UserGroup from "../../resources/UserGroup";
 
 type CalendarUIDispatcher = Omit<CalendarUIProps, "state">;
 
 export type InvitationItemProps = CalendarUIDispatcher & {
   project: Project;
-  invitation: Invitation;
+  pendingGroup: UserGroup;
   user: User;
 };
 
 export type InvitationListProps = CalendarUIDispatcher & {
   currentProject: Project;
-  invitations: Invitation[];
+  pendingGroups: UserGroup[];
   user: User;
 };
 

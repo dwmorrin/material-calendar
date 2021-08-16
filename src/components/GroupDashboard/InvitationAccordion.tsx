@@ -1,17 +1,13 @@
 import React, { FC } from "react";
 import { Typography, Accordion, AccordionSummary } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import {
-  invitationIsPendingApproval,
-  invitationIsUnanswered,
-} from "../../resources/Invitation";
 import InvitationSent from "./InvitationSent";
 import InvitationInboxItem from "./InvitationInboxItem";
 import { InvitationListProps } from "./types";
 
 const InvitationAccordion: FC<InvitationListProps> = ({
   dispatch,
-  invitations,
+  pendingGroups,
   currentProject,
   user,
 }) => {
@@ -20,28 +16,27 @@ const InvitationAccordion: FC<InvitationListProps> = ({
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="body1">Pending Invitations</Typography>
       </AccordionSummary>
-      {invitations
-        .filter((invitation) => invitation.invitorId === user.id)
-        .map((invitation, i) => (
+      {pendingGroups
+        .filter(({ creatorId }) => creatorId === user.id)
+        .map((pendingGroup, i) => (
           <InvitationSent
             key={`invitation${i}`}
             dispatch={dispatch}
             project={currentProject}
-            invitation={invitation}
+            pendingGroup={pendingGroup}
             user={user}
           />
         ))}
-      {invitations
-        .filter(
-          (invitation) =>
-            invitation.invitorId !== user.id &&
-            (invitationIsPendingApproval(invitation) ||
-              invitationIsUnanswered(invitation, user))
-        )
-        .map((invitation, i) => (
+      {pendingGroups
+        .filter(({ members }) => {
+          const me = members.find((member) => member.id === user.id);
+          if (!me) throw new Error("can't find you in your own group");
+          return !me.invitation.accepted && !me.invitation.rejected;
+        })
+        .map((pendingGroup, i) => (
           <InvitationInboxItem
             key={`invitation${i}`}
-            invitation={invitation}
+            pendingGroup={pendingGroup}
             dispatch={dispatch}
             user={user}
             project={currentProject}

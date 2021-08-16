@@ -16,7 +16,7 @@ import { ResourceKey } from "../../resources/types";
 const InvitationSent: FC<InvitationItemProps> = ({
   dispatch,
   project,
-  invitation,
+  pendingGroup: invitation,
   user,
 }) => {
   const onCancelInvitation = (
@@ -26,7 +26,7 @@ const InvitationSent: FC<InvitationItemProps> = ({
     event.stopPropagation();
     const name = User.formatName(user.name);
     const mail: Mail = {
-      to: groupTo(invitation.invitees),
+      to: groupTo(invitation.members),
       subject: `${name} has canceled the group invitation`,
       text: `${name} has canceled the group invitation they sent you for ${project.title}.`,
     };
@@ -61,17 +61,19 @@ const InvitationSent: FC<InvitationItemProps> = ({
 
   return (
     <ListItem style={{ justifyContent: "space-between" }}>
-      {!invitation.invitees.length
+      {!invitation.members.length
         ? "You requested to group by self"
         : "You sent a Group Invitation"}
 
-      {invitationIsPendingApproval(invitation) && (
-        <b>
-          <br />
-          <br />
-          Pending Admin Approval
-        </b>
-      )}
+      {
+        /* TODO just temporarily using `pending` here */ invitation.pending && (
+          <b>
+            <br />
+            <br />
+            Pending Admin Approval
+          </b>
+        )
+      }
       <section
         style={{
           textAlign: "center",
@@ -79,18 +81,20 @@ const InvitationSent: FC<InvitationItemProps> = ({
           justifyContent: "space-around",
         }}
       >
-        {invitation.invitees.map(({ id, name, accepted, rejected }, i) => (
-          <ListItem key={`invitation-${i}-invitee-${id}`}>
-            {User.formatName(name)}
-            {accepted ? (
-              <ThumbUpIcon />
-            ) : rejected ? (
-              <ThumbDownIcon />
-            ) : (
-              <ThumbsUpDownIcon />
-            )}
-          </ListItem>
-        ))}
+        {invitation.members.map(
+          ({ id, name, invitation: { accepted, rejected } }, i) => (
+            <ListItem key={`invitation-${i}-invitee-${id}`}>
+              {User.formatName(name)}
+              {accepted ? (
+                <ThumbUpIcon />
+              ) : rejected ? (
+                <ThumbDownIcon />
+              ) : (
+                <ThumbsUpDownIcon />
+              )}
+            </ListItem>
+          )
+        )}
         <Button
           style={{ backgroundColor: "Red", color: "white" }}
           onClick={onCancelInvitation}
