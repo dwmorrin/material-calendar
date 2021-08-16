@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Button, ListItem } from "@material-ui/core";
+import { Button, List, ListItem } from "@material-ui/core";
 import { Action, CalendarAction } from "../../calendar/types";
 import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
@@ -7,6 +7,7 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import { groupTo, Mail } from "../../utils/mail";
 import { InvitationItemProps } from "./types";
 import { ResourceKey } from "../../resources/types";
+import InvitationMember from "./InvitationMember";
 
 interface InvitationUpdateProps {
   pendingGroup: UserGroup;
@@ -97,48 +98,33 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
     });
   };
 
-  const isNotCurrentUser = ({ id }: { id: number }): boolean => id !== user.id;
-  const others = pendingGroup.members
-    .filter(isNotCurrentUser)
-    .map(({ name }) => User.formatName(name))
-    .join(", ");
-  const invitor = pendingGroup.members.find(
-    ({ id }) => id === pendingGroup.creatorId
-  );
-  if (!invitor)
-    throw new Error("Invalid group invitation: group creator not found");
-  const invitorName = User.formatName(invitor.name);
-  const andUser = pendingGroup.members.some(isNotCurrentUser);
-  const header = [
-    invitorName,
-    " wants to form a group with ",
-    others,
-    andUser ? ", and " : "",
-    "you",
-  ].join("");
-
   const myself = pendingGroup.members.find(({ id }) => id === user.id);
   if (!myself) throw new Error("can't find you in your own group");
   const unanswered = !myself.invitation.accepted && !myself.invitation.rejected;
 
   return (
-    <ListItem style={{ justifyContent: "space-between" }}>
-      {header}
+    <ListItem>
       {unanswered && (
-        <ButtonGroup variant="contained" color="primary" size="small">
-          <Button
-            style={{ backgroundColor: "Green", color: "white" }}
-            onClick={onAcceptInvitation}
-          >
-            Accept Invitation
-          </Button>
-          <Button
-            style={{ backgroundColor: "Red", color: "white" }}
-            onClick={onDeclineInvitation}
-          >
-            Decline Invitation
-          </Button>
-        </ButtonGroup>
+        <List>
+          {pendingGroup.members.map(
+            ({ id, name, invitation: { accepted, rejected } }, i) => (
+              <InvitationMember
+                key={`invitation-${i}-invitee-${id}`}
+                name={name}
+                accepted={accepted}
+                rejected={rejected}
+              />
+            )
+          )}
+          <ButtonGroup variant="contained" color="primary" size="small">
+            <Button color="primary" onClick={onAcceptInvitation}>
+              Accept Invitation
+            </Button>
+            <Button color="secondary" onClick={onDeclineInvitation}>
+              Decline Invitation
+            </Button>
+          </ButtonGroup>
+        </List>
       )}
       {!unanswered && pendingGroup.exceptionalSize && (
         <b>Group is an exceptional size and requires admin approval.</b>

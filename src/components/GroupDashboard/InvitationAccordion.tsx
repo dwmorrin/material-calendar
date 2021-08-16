@@ -18,12 +18,15 @@ const InvitationAccordion: FC<InvitationListProps> = ({
         <Typography variant="body1">Pending Invitations</Typography>
       </AccordionSummary>
       {myInvitation && (
-        <InvitationSent
-          dispatch={dispatch}
-          project={currentProject}
-          pendingGroup={myInvitation}
-          user={user}
-        />
+        <>
+          <Typography variant="body2">{"Sent invitation:"}</Typography>
+          <InvitationSent
+            dispatch={dispatch}
+            project={currentProject}
+            pendingGroup={myInvitation}
+            user={user}
+          />
+        </>
       )}
       {pendingGroups
         .filter(({ members }) => {

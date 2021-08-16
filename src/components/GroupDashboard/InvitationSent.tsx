@@ -1,34 +1,27 @@
 import React, { FC } from "react";
-import { Button, ListItem } from "@material-ui/core";
+import { Button, List, ListItem } from "@material-ui/core";
 import { CalendarAction } from "../../calendar/types";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import ThumbDownIcon from "@material-ui/icons/ThumbDown";
-import ThumbsUpDownIcon from "@material-ui/icons/ThumbsUpDown";
 import { Mail, groupTo } from "../../utils/mail";
 import { InvitationItemProps } from "./types";
 import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
 import { ResourceKey } from "../../resources/types";
+import InvitationMember from "./InvitationMember";
 
 const InvitationSent: FC<InvitationItemProps> = ({
   dispatch,
   project,
-  pendingGroup: invitation,
+  pendingGroup,
   user,
 }) => {
-  const onCancelInvitation = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void => {
-    // TODO add comment as to why the stop propagation is needed
-    event.stopPropagation();
+  const onCancelInvitation = (): void => {
     const name = User.formatName(user.name);
     const mail: Mail = {
-      to: groupTo(invitation.members),
+      to: groupTo(pendingGroup.members),
       subject: `${name} has canceled the group invitation`,
       text: `${name} has canceled the group invitation they sent you for ${project.title}.`,
     };
-    fetch(`${UserGroup.url}`, {
-      //!todo fix url: probably :id/invitations/reject or something
+    fetch(`${UserGroup.url}/${pendingGroup.id}/invite`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mail }),
@@ -57,46 +50,31 @@ const InvitationSent: FC<InvitationItemProps> = ({
   };
 
   return (
-    <ListItem style={{ justifyContent: "space-between" }}>
-      {!invitation.members.length
-        ? "You requested to group by self"
-        : "You sent a Group Invitation"}
-
-      {invitation.exceptionalSize && invitation.pending && (
-        <b>
-          <br />
-          <br />
-          Pending Admin Approval
-        </b>
+    <ListItem>
+      {pendingGroup.pending && pendingGroup.exceptionalSize && (
+        <>Exceptional size: waiting on admin approval</>
       )}
-      <section
-        style={{
-          textAlign: "center",
-          flexDirection: "column",
-          justifyContent: "space-around",
-        }}
-      >
-        {invitation.members.map(
+      <List>
+        {pendingGroup.members.map(
           ({ id, name, invitation: { accepted, rejected } }, i) => (
-            <ListItem key={`invitation-${i}-invitee-${id}`}>
-              {User.formatName(name)}
-              {accepted ? (
-                <ThumbUpIcon />
-              ) : rejected ? (
-                <ThumbDownIcon />
-              ) : (
-                <ThumbsUpDownIcon />
-              )}
-            </ListItem>
+            <InvitationMember
+              key={`invitation-${i}-invitee-${id}`}
+              name={name}
+              accepted={accepted}
+              rejected={rejected}
+            />
           )
         )}
-        <Button
-          style={{ backgroundColor: "Red", color: "white" }}
-          onClick={onCancelInvitation}
-        >
-          Cancel Invitation
-        </Button>
-      </section>
+        <ListItem>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={onCancelInvitation}
+          >
+            Cancel Invitation
+          </Button>
+        </ListItem>
+      </List>
     </ListItem>
   );
 };
