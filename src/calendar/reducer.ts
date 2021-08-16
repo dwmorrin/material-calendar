@@ -138,15 +138,7 @@ const canceledInvitationReceived: StateHandler = (state, action) => {
     return errorRedirect(
       state,
       action,
-      "no updated groups or invitations",
-      ErrorType.MISSING_RESOURCE
-    );
-  const { invitations } = payload;
-  if (!invitations || !Array.isArray(invitations))
-    return errorRedirect(
-      state,
-      action,
-      "no updated invitations",
+      "no updated groups",
       ErrorType.MISSING_RESOURCE
     );
   return displayMessage(
@@ -156,7 +148,6 @@ const canceledInvitationReceived: StateHandler = (state, action) => {
         ...state.resources,
         ...payload?.resources,
       },
-      invitations,
     },
     {
       type: CalendarAction.DisplayMessage,
@@ -263,14 +254,6 @@ const createdInvitationReceived: StateHandler = (state, action) => {
       "no group in payload",
       ErrorType.MISSING_RESOURCE
     );
-  const invitations = payload.invitations;
-  if (!invitations)
-    return errorRedirect(
-      state,
-      action,
-      "no invitations in payload",
-      ErrorType.MISSING_RESOURCE
-    );
   return displayMessage(
     {
       ...state,
@@ -278,7 +261,6 @@ const createdInvitationReceived: StateHandler = (state, action) => {
         ...state.resources,
         ...action.payload?.resources,
       },
-      invitations,
     },
     {
       type: CalendarAction.DisplayMessage,
@@ -313,7 +295,7 @@ const foundStaleCurrentEvent: StateHandler = (state, { payload }) => {
 
 const joinedGroup: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.currentGroup || !payload?.invitations) {
+  if (!payload?.currentGroup) {
     return errorRedirect(
       state,
       action,
@@ -325,7 +307,6 @@ const joinedGroup: StateHandler = (state, action) => {
     {
       ...state,
       currentGroup: payload.currentGroup,
-      invitations: payload.invitations,
       resources: { ...state.resources, ...payload.resources },
     },
     {
@@ -339,7 +320,7 @@ const joinedGroup: StateHandler = (state, action) => {
 
 const leftGroup: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.invitations) {
+  if (!payload) {
     return errorRedirect(
       state,
       action,
@@ -351,7 +332,6 @@ const leftGroup: StateHandler = (state, action) => {
     {
       ...state,
       currentGroup: undefined,
-      invitations: payload?.invitations,
       resources: { ...state.resources, ...payload?.resources },
     },
     {
@@ -540,7 +520,7 @@ const receivedAllResources: StateHandler = (state, { payload }) => ({
 
 const receivedInvitations: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.invitations) {
+  if (!payload) {
     return errorRedirect(
       state,
       action,
@@ -548,12 +528,12 @@ const receivedInvitations: StateHandler = (state, action) => {
       ErrorType.MISSING_RESOURCE
     );
   }
-  return { ...state, invitations: payload.invitations };
+  return { ...state, resources: { ...state.resources, ...payload.resources } };
 };
 
 const rejectedGroupInvitation: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.currentGroup || !payload?.invitations) {
+  if (!payload?.currentGroup) {
     return errorRedirect(
       state,
       action,
@@ -565,7 +545,6 @@ const rejectedGroupInvitation: StateHandler = (state, action) => {
     {
       ...state,
       currentGroup: payload.currentGroup,
-      invitations: payload.invitations,
       resources: { ...state.resources, ...payload.resources },
     },
     {
@@ -646,7 +625,7 @@ const selectedProject: StateHandler = (state, action) => {
 
 const sentInvitations: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.invitations)
+  if (!payload)
     return errorRedirect(
       state,
       action,
@@ -654,10 +633,7 @@ const sentInvitations: StateHandler = (state, action) => {
       ErrorType.MISSING_RESOURCE
     );
   return displayMessage(
-    {
-      ...state,
-      invitations: payload?.invitations,
-    },
+    { ...state },
     {
       type: CalendarAction.DisplayMessage,
       payload: {

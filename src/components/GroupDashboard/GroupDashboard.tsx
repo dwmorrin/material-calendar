@@ -15,7 +15,6 @@ import { useAuth } from "../AuthProvider";
 import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
 import Project from "../../resources/Project";
-import Invitation from "../../resources/Invitation";
 import ConfirmationDialog from "./ConfirmationDialog";
 import CurrentGroupBox from "./CurrentGroupBox";
 import InvitationAccordion from "./InvitationAccordion";
@@ -42,21 +41,10 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
       })
       .then(({ error, data }) => {
         if (error) throw error;
-        if (!data) throw new Error("No project info received");
-        const { users, invitations } = data;
+        const users: User[] = data.users;
         if (!Array.isArray(users))
           throw new Error("No project member info received");
-        if (!Array.isArray(invitations))
-          throw new Error("No invitation info received");
-        setProjectMembers(
-          (users as User[]).map((user: User) => new User(user))
-        );
-        dispatch({
-          type: CalendarAction.ReceivedInvitations,
-          payload: {
-            invitations: invitations.map((i) => new Invitation(i)),
-          },
-        });
+        setProjectMembers(users.map((u: User) => new User(u)));
       })
       .catch((error) =>
         dispatch({

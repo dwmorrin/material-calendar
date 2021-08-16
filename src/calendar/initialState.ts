@@ -18,7 +18,6 @@ export const initialCalendarState: CalendarState = {
   eventEditorIsOpen: false,
   groupDashboardIsOpen: false,
   initialResourcesPending: true,
-  invitations: [],
   message: "",
   pickerShowing: false,
   projectDashboardIsOpen: false,

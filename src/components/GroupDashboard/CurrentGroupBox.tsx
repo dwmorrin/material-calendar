@@ -2,7 +2,6 @@ import React, { FC } from "react";
 import { Button, Box } from "@material-ui/core";
 import { CalendarAction } from "../../calendar/types";
 import UserGroup from "../../resources/UserGroup";
-import Invitation from "../../resources/Invitation";
 import { GroupInfoProps } from "./types";
 import { Mail, groupTo } from "../../utils/mail";
 import { ResourceKey } from "../../resources/types";
@@ -32,18 +31,15 @@ const groupBox: FC<GroupInfoProps> = ({ dispatch, group, project, user }) => {
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error) throw error;
-        const { invitations, groups } = data;
+        const groups: UserGroup[] = data.groups;
         if (!Array.isArray(groups))
           throw new Error("no updated groups received");
-        if (!Array.isArray(invitations))
-          throw new Error("no updated invitations received");
         dispatch({
           type: CalendarAction.LeftGroup,
           payload: {
             resources: {
               [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
             },
-            invitations: invitations.map((i) => new Invitation(i)),
           },
         });
       })

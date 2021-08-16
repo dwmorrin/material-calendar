@@ -3,7 +3,9 @@ import {
   Accordion,
   AccordionSummary,
   Badge,
+  Divider,
   Grid,
+  ListItem,
   Typography,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -33,17 +35,24 @@ const InvitationAccordion: FC<InvitationListProps> = ({
           </Grid>
         </Grid>
       </AccordionSummary>
+      <Divider />
       {myInvitation && (
         <>
-          <Typography variant="body2">{"Sent invitation:"}</Typography>
+          <ListItem>
+            <Typography>Sent</Typography>
+          </ListItem>
           <InvitationSent
             dispatch={dispatch}
             project={currentProject}
             pendingGroup={myInvitation}
             user={user}
           />
+          <Divider />
         </>
       )}
+      <ListItem>
+        <Typography>Inbox</Typography>
+      </ListItem>
       {pendingGroups
         .filter(({ members }) => {
           const me = members.find((member) => member.id === user.id);

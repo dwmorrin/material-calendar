@@ -4,7 +4,6 @@ import FullCalendar from "@fullcalendar/react";
 import UserGroup from "../resources/UserGroup";
 import { ResourceKey, ResourceInstance } from "../resources/types";
 import { SnackbarState } from "../components/Snackbar";
-import Invitation from "../resources/Invitation";
 
 export enum CalendarAction {
   CanceledInvitationReceived,
@@ -67,7 +66,6 @@ export interface CalendarState {
   message: string;
   groupDashboardIsOpen: boolean;
   initialResourcesPending: boolean;
-  invitations: Invitation[];
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
   reservationFormIsOpen: boolean;

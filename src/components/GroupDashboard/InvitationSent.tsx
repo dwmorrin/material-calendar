@@ -29,18 +29,15 @@ const InvitationSent: FC<InvitationItemProps> = ({
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error) throw error;
-        // const invitations: Invitation[] = data.invitations;
         const groups: UserGroup[] = data.groups;
-        // if (!Array.isArray(invitations))
-        // throw new Error("no invitations received");
-        if (!Array.isArray(groups)) throw new Error("no groups received");
+        if (!Array.isArray(groups))
+          throw new Error("no updated groups received");
         dispatch({
           type: CalendarAction.CanceledInvitationReceived,
           payload: {
             resources: {
               [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
             },
-            // invitations: invitations.map((i) => new Invitation(i)),
           },
         });
       })

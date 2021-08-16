@@ -16,11 +16,27 @@ import {
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AdminAction, AdminUIProps } from "../../admin/types";
-import Invitation from "../../resources/Invitation";
 import UserGroup from "../../resources/UserGroup";
 import Reservation from "../../resources/Reservation";
 import { formatDatetimeSeconds, parseSQLDatetime } from "../../utils/date";
 import { Mail, groupTo } from "../../utils/mail";
+
+interface Invitee {
+  id: number;
+  accepted: boolean;
+  rejected: boolean;
+  name: { last: string; first: string };
+  email: string;
+}
+interface Invitation {
+  confirmed: boolean;
+  projectId: number;
+  invitorId: number;
+  invitees: Invitee[];
+  groupId: number;
+  approvedId: number;
+  deniedId: number;
+}
 
 interface HagenReservation extends Reservation {
   event: {

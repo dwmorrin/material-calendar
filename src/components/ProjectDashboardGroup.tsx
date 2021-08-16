@@ -10,8 +10,6 @@ import {
 } from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import UserGroup from "../resources/UserGroup";
-import { useAuth } from "./AuthProvider";
-import { getUnansweredInvitations } from "../resources/Invitation";
 import { makeStyles } from "@material-ui/core/styles";
 import { deepPurple } from "@material-ui/core/colors";
 
@@ -31,18 +29,14 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
 }) => {
   const classes = useStyles();
   const { currentProject, resources } = state;
+  const groups = resources[ResourceKey.Groups] as UserGroup[];
+  // TODO double check this logic: are we filtering pending and abandonded projects?
   const currentGroup =
-    (resources[ResourceKey.Groups] as UserGroup[]).find(
-      (g) => g.projectId === currentProject?.id
-    ) || new UserGroup();
+    groups.find((g) => g.projectId === currentProject?.id) || new UserGroup();
 
-  const { user } = useAuth();
+  const invitations = groups.filter(({ pending }) => pending);
+
   if (!currentProject || isNaN(currentProject.groupAllottedHours)) return null;
-
-  const unansweredInvitations = getUnansweredInvitations(
-    user,
-    state.invitations
-  );
 
   return (
     <Grid container direction="column" spacing={3}>
@@ -73,7 +67,7 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
         <Badge
           color="secondary"
           badgeContent={
-            unansweredInvitations.filter(
+            invitations.filter(
               ({ projectId }) => projectId === currentProject.id
             ).length
           }

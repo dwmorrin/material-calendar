@@ -1,6 +1,4 @@
-import { id } from "date-fns/locale";
 import { Action, CalendarAction } from "../../calendar/types";
-import Invitation from "../../resources/Invitation";
 import Project from "../../resources/Project";
 import { ResourceKey } from "../../resources/types";
 import User from "../../resources/User";
@@ -55,17 +53,13 @@ const createGroup = ({
     .then(({ error, data }) => {
       if (error) throw error;
       const groups: UserGroup[] = data.groups;
-      const invitations: Invitation[] = data.invitations;
       if (!Array.isArray(groups)) throw new Error("No group info received");
-      if (!Array.isArray(invitations))
-        throw new Error("No invitation info received");
       dispatch({
         type: CalendarAction.CreatedInvitationReceived,
         payload: {
           resources: {
             [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
           },
-          invitations: invitations.map((i) => new Invitation(i)),
         },
       });
       setSelectedUsers([]);
