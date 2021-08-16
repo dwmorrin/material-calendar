@@ -4,7 +4,7 @@ import { Action, CalendarAction } from "../../calendar/types";
 import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
-import { Mail } from "../../utils/mail";
+import { groupTo, Mail } from "../../utils/mail";
 import { InvitationItemProps } from "./types";
 import { ResourceKey } from "../../resources/types";
 
@@ -68,7 +68,7 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   const onAcceptInvitation = (): void => {
     const name = User.formatName(user.name);
     const mail: Mail = {
-      to: "TODO - FIX THIS", // TODO
+      to: groupTo(pendingGroup.members),
       subject: `${name} has joined your group`,
       text: `${name} has joined your group for ${project.title}`,
     };
@@ -84,7 +84,7 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   const onDeclineInvitation = (): void => {
     const name = User.formatName(user.name);
     const mail: Mail = {
-      to: "TODO - FIX THIS",
+      to: groupTo(pendingGroup.members),
       subject: `${name} has declined your invitation`,
       text: `${name} has declined your invitation for ${project.title}`,
     };
@@ -102,7 +102,12 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
     .filter(isNotCurrentUser)
     .map(({ name }) => User.formatName(name))
     .join(", ");
-  const invitorName = "NAME"; // TODO User.formatName(invitation.invitor.name);
+  const invitor = pendingGroup.members.find(
+    ({ id }) => id === pendingGroup.creatorId
+  );
+  if (!invitor)
+    throw new Error("Invalid group invitation: group creator not found");
+  const invitorName = User.formatName(invitor.name);
   const andUser = pendingGroup.members.some(isNotCurrentUser);
   const header = [
     invitorName,
@@ -112,9 +117,9 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
     "you",
   ].join("");
 
-  const me = pendingGroup.members.find(({ id }) => id === user.id);
-  if (!me) throw new Error("can't find you in your own group");
-  const unanswered = !me.invitation.accepted && !me.invitation.rejected;
+  const myself = pendingGroup.members.find(({ id }) => id === user.id);
+  if (!myself) throw new Error("can't find you in your own group");
+  const unanswered = !myself.invitation.accepted && !myself.invitation.rejected;
 
   return (
     <ListItem style={{ justifyContent: "space-between" }}>
