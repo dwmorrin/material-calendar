@@ -63,7 +63,7 @@ const CalendarDrawer: FunctionComponent<
               {process.env.REACT_APP_DRAWER_TITLE}
             </Typography>
           </Grid>
-          {invitations.length && (
+          {!!invitations.length && (
             <Grid item xs={2}>
               <Badge color="secondary" badgeContent={invitations.length}>
                 <MailIcon />

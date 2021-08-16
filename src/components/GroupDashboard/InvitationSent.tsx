@@ -21,7 +21,7 @@ const InvitationSent: FC<InvitationItemProps> = ({
       subject: `${name} has canceled the group invitation`,
       text: `${name} has canceled the group invitation they sent you for ${project.title}.`,
     };
-    fetch(`${UserGroup.url}/${pendingGroup.id}/invite`, {
+    fetch(UserGroup.invitationUrls.cancel(pendingGroup), {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mail }),

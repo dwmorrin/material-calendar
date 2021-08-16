@@ -27,6 +27,12 @@ interface UserGroup extends Record<string, unknown> {
 
 class UserGroup implements UserGroup {
   static url = "/api/groups";
+  static invitationUrls = {
+    cancel(group: UserGroup): string {
+      return `${UserGroup.url}/${group.id}/invitation`;
+    },
+  };
+
   constructor(
     group = {
       id: 0,

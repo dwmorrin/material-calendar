@@ -120,7 +120,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
           />
         )}
         <List>
-          {invitations && (
+          {!!invitations.length && (
             <InvitationAccordion
               currentProject={currentProject}
               dispatch={dispatch}
