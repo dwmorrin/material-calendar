@@ -5,10 +5,11 @@ import { Typography } from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import Course from "../resources/Course";
+import UserGroup from "../resources/UserGroup";
 
 const ProjectList: FunctionComponent<
-  CalendarUIProps & CalendarUISelectionProps
-> = ({ dispatch, state, selections, setSelections }) => {
+  CalendarUIProps & CalendarUISelectionProps & { invitations: UserGroup[] }
+> = ({ dispatch, invitations, state, selections, setSelections }) => {
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const courses = state.resources[ResourceKey.Courses] as Course[];
   return (
@@ -19,6 +20,7 @@ const ProjectList: FunctionComponent<
           <ProjectAccordionList
             key={`${index}_exp_list`}
             dispatch={dispatch}
+            invitations={invitations}
             state={state}
             course={course}
             selections={selections}

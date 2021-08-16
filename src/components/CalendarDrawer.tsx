@@ -1,5 +1,11 @@
 import React, { FunctionComponent } from "react";
-import { SwipeableDrawer, Typography } from "@material-ui/core";
+import {
+  Badge,
+  Grid,
+  List,
+  SwipeableDrawer,
+  Typography,
+} from "@material-ui/core";
 import {
   CalendarAction,
   CalendarUIProps,
@@ -7,10 +13,10 @@ import {
 } from "../calendar/types";
 import LocationList from "./LocationList";
 import ProjectList from "./ProjectList";
-import { useAuth } from "./AuthProvider";
 import Location from "../resources/Location";
+import UserGroup from "../resources/UserGroup";
 import { ResourceKey } from "../resources/types";
-import { getUnansweredInvitations } from "../resources/Invitation";
+import MailIcon from "@material-ui/icons/Mail";
 
 const CalendarDrawer: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
@@ -33,11 +39,8 @@ const CalendarDrawer: FunctionComponent<
     }
     dispatch({ type: CalendarAction.ToggleDrawer });
   };
-  const { user } = useAuth();
-  const unansweredInvitations = getUnansweredInvitations(
-    user,
-    state.invitations
-  );
+  const groups = state.resources[ResourceKey.Groups] as UserGroup[];
+  const invitations = groups.filter(({ pending }) => pending);
   const locations = state.resources[ResourceKey.Locations] as Location[];
 
   return (
@@ -53,19 +56,24 @@ const CalendarDrawer: FunctionComponent<
       onClick={toggleDrawer}
       onKeyDown={toggleDrawer}
     >
-      <div role="navigation">
-        <Typography variant="h5">
-          {process.env.REACT_APP_DRAWER_TITLE}
-        </Typography>
-        {unansweredInvitations.filter(
-          (invitation) => invitation.invitorId !== user.id
-        ).length > 0 && (
-          <Typography variant="h6">
-            {"You have unanswered invitations"}
-          </Typography>
-        )}
+      <List role="navigation">
+        <Grid container justify="space-between">
+          <Grid item xs={10}>
+            <Typography variant="h5">
+              {process.env.REACT_APP_DRAWER_TITLE}
+            </Typography>
+          </Grid>
+          {invitations.length && (
+            <Grid item xs={2}>
+              <Badge color="secondary" badgeContent={invitations.length}>
+                <MailIcon />
+              </Badge>
+            </Grid>
+          )}
+        </Grid>
         <ProjectList
           dispatch={dispatch}
+          invitations={invitations}
           state={state}
           selections={selections}
           setSelections={setSelections}
@@ -77,7 +85,7 @@ const CalendarDrawer: FunctionComponent<
           selections={selections}
           setSelections={setSelections}
         />
-      </div>
+      </List>
     </SwipeableDrawer>
   );
 };

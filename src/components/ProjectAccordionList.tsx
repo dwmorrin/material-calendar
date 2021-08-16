@@ -13,17 +13,17 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ProjectListItem from "./ProjectListItem";
 import Project from "../resources/Project";
+import UserGroup from "../resources/UserGroup";
 import { ResourceKey } from "../resources/types";
-import { useAuth } from "./AuthProvider";
-import { getUnansweredInvitations } from "../resources/Invitation";
 
 interface ProjectAccordionListProps extends CalendarUIProps {
+  invitations: UserGroup[];
   course: { id: number; title: string };
 }
 
 const ProjectAccordionList: FunctionComponent<
   ProjectAccordionListProps & CalendarUISelectionProps
-> = ({ dispatch, state, course, selections, setSelections }) => {
+> = ({ dispatch, invitations, state, course, selections, setSelections }) => {
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const courseProjects = projects.filter(
     (p) => p.course.title === course.title
@@ -35,29 +35,23 @@ const ProjectAccordionList: FunctionComponent<
     !checked &&
     courseProjects.some(({ id }) => selections.projectIds.includes(id));
 
-  const { user } = useAuth();
-  const unansweredInvitations = getUnansweredInvitations(
-    user,
-    state.invitations
-  );
-
   return (
     <Accordion defaultExpanded={courseProjects.length === 1}>
-      <Badge
-        color="secondary"
-        badgeContent={
-          unansweredInvitations.filter(({ projectId }) =>
-            courseProjects.some(({ id }) => id === projectId)
-          ).length
-        }
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-label="Expand"
+        aria-controls="additional-actions1-content"
+        id="additional-actions1-header"
+        onClick={(event): void => event.stopPropagation()}
+        onFocus={(event): void => event.stopPropagation()}
       >
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-label="Expand"
-          aria-controls="additional-actions1-content"
-          id="additional-actions1-header"
-          onClick={(event): void => event.stopPropagation()}
-          onFocus={(event): void => event.stopPropagation()}
+        <Badge
+          color="secondary"
+          badgeContent={
+            invitations.filter(({ projectId }) =>
+              courseProjects.some(({ id }) => id === projectId)
+            ).length
+          }
         >
           <FormControlLabel
             aria-label="Acknowledge"
@@ -86,8 +80,8 @@ const ProjectAccordionList: FunctionComponent<
               });
             }}
           />
-        </AccordionSummary>
-      </Badge>
+        </Badge>
+      </AccordionSummary>
       <AccordionDetails>
         <List>
           {courseProjects.map((project) => (
@@ -99,9 +93,8 @@ const ProjectAccordionList: FunctionComponent<
               selections={selections}
               setSelections={setSelections}
               invitations={
-                unansweredInvitations.filter(
-                  ({ projectId }) => projectId === project.id
-                ).length
+                invitations.filter(({ projectId }) => projectId === project.id)
+                  .length
               }
             />
           ))}

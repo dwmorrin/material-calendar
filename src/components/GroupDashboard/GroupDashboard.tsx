@@ -118,9 +118,11 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
             {parseAndFormatSQLDateInterval(currentProject)}
           </Typography>
         </section>
-        <Typography variant="body1" style={{ marginLeft: 20, marginTop: 20 }}>
-          {currentGroup ? "My Group" : "You are not in a Group"}
-        </Typography>
+        {currentGroup && (
+          <Typography variant="body1" style={{ marginLeft: 20, marginTop: 20 }}>
+            {currentGroup.title}
+          </Typography>
+        )}
         {currentGroup && (
           <CurrentGroupBox
             group={currentGroup}
