@@ -5,9 +5,6 @@ import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import ThumbsUpDownIcon from "@material-ui/icons/ThumbsUpDown";
 import { Mail, groupTo } from "../../utils/mail";
-import Invitation, {
-  invitationIsPendingApproval,
-} from "../../resources/Invitation";
 import { InvitationItemProps } from "./types";
 import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
@@ -39,10 +36,10 @@ const InvitationSent: FC<InvitationItemProps> = ({
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error) throw error;
-        const invitations: Invitation[] = data.invitations;
+        // const invitations: Invitation[] = data.invitations;
         const groups: UserGroup[] = data.groups;
-        if (!Array.isArray(invitations))
-          throw new Error("no invitations received");
+        // if (!Array.isArray(invitations))
+        // throw new Error("no invitations received");
         if (!Array.isArray(groups)) throw new Error("no groups received");
         dispatch({
           type: CalendarAction.CanceledInvitationReceived,
@@ -50,7 +47,7 @@ const InvitationSent: FC<InvitationItemProps> = ({
             resources: {
               [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
             },
-            invitations: invitations.map((i) => new Invitation(i)),
+            // invitations: invitations.map((i) => new Invitation(i)),
           },
         });
       })
@@ -65,15 +62,13 @@ const InvitationSent: FC<InvitationItemProps> = ({
         ? "You requested to group by self"
         : "You sent a Group Invitation"}
 
-      {
-        /* TODO just temporarily using `pending` here */ invitation.pending && (
-          <b>
-            <br />
-            <br />
-            Pending Admin Approval
-          </b>
-        )
-      }
+      {invitation.exceptionalSize && invitation.pending && (
+        <b>
+          <br />
+          <br />
+          Pending Admin Approval
+        </b>
+      )}
       <section
         style={{
           textAlign: "center",

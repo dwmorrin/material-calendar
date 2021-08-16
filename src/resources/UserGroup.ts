@@ -21,6 +21,7 @@ interface UserGroup extends Record<string, unknown> {
   creatorId: number;
   pending: boolean;
   members: GroupMember[];
+  exceptionalSize: boolean;
   reservedHours: number;
 }
 
@@ -34,6 +35,7 @@ class UserGroup implements UserGroup {
       creatorId: 0,
       pending: true,
       members: [] as GroupMember[],
+      exceptionalSize: false,
       reservedHours: 0,
     }
   ) {

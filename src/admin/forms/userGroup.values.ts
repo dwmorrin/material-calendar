@@ -11,6 +11,7 @@ interface UserGroupValues extends Record<string, unknown> {
   pending: boolean;
   abandoned: boolean;
   members: string[];
+  exceptionalSize: boolean;
   reservedHours: number;
 }
 
@@ -40,6 +41,7 @@ export const update = (
     reservedHours,
     pending,
     abandoned,
+    exceptionalSize,
     creatorId,
   } = values as UserGroupValues;
   const users = state.resources[ResourceKey.Users] as User[];
@@ -62,6 +64,7 @@ export const update = (
     pending,
     abandoned,
     members: _members,
+    exceptionalSize,
     reservedHours,
   };
 };

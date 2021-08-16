@@ -20,7 +20,7 @@ const InvitationAccordion: FC<InvitationListProps> = ({
         .filter(({ creatorId }) => creatorId === user.id)
         .map((pendingGroup, i) => (
           <InvitationSent
-            key={`invitation${i}`}
+            key={`invitation-sent-${i}`}
             dispatch={dispatch}
             project={currentProject}
             pendingGroup={pendingGroup}
@@ -35,7 +35,7 @@ const InvitationAccordion: FC<InvitationListProps> = ({
         })
         .map((pendingGroup, i) => (
           <InvitationInboxItem
-            key={`invitation${i}`}
+            key={`invitation-inbox-${i}`}
             pendingGroup={pendingGroup}
             dispatch={dispatch}
             user={user}
