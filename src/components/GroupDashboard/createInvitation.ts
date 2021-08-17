@@ -62,11 +62,11 @@ const createGroup = ({
           },
         },
       });
-      setSelectedUsers([]);
     })
     .catch((error) =>
       dispatch({ type: CalendarAction.Error, payload: { error } })
-    );
+    )
+    .finally(() => setSelectedUsers([]));
 };
 
 export default createGroup;
