@@ -64,13 +64,6 @@ const CalendarDrawer: FunctionComponent<
               {process.env.REACT_APP_DRAWER_TITLE}
             </Typography>
           </Grid>
-          {!!invitations.length && (
-            <Grid item xs={2}>
-              <Badge color="secondary" badgeContent={invitations.length}>
-                <MailIcon />
-              </Badge>
-            </Grid>
-          )}
         </Grid>
         <ProjectList
           dispatch={dispatch}
