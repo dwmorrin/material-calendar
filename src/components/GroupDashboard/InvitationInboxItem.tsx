@@ -13,7 +13,6 @@ import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 
 interface InvitationUpdateProps {
   pendingGroup: UserGroup;
-  userId: number;
   mail: Mail;
   dispatch: (a: Action) => void;
   accepted: boolean;
@@ -24,11 +23,10 @@ const updateInvitation = ({
   dispatch,
   mail,
   pendingGroup,
-  userId,
 }: InvitationUpdateProps): void => {
-  const body: Record<string, unknown> = { userId, mail };
-  if (accepted) body.accepted = 1;
-  else body.rejected = 1;
+  const body: { accepted?: boolean; rejected?: boolean; mail: Mail } = { mail };
+  if (accepted) body.accepted = true;
+  else body.rejected = true;
   fetch(`${UserGroup.url}/${pendingGroup.id}/invite`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -38,23 +36,19 @@ const updateInvitation = ({
     .then(({ error, data }) => {
       if (error) throw error;
       if (!data) throw new Error("No updated group info returned");
-      const { groups, currentGroup } = data;
-      // if (!Array.isArray(invitations))
-      //   throw new Error("No updated invitations info returned");
+      const groups: UserGroup[] = data.groups;
       if (!Array.isArray(groups))
         throw new Error("No updated group info returned");
-      if (!currentGroup) throw new Error("No updated group info returned");
+      // OK if currentGroup is undefined as rejecting invite destroys group
+      const currentGroup = groups.find(({ id }) => id === pendingGroup.id);
       dispatch({
         type: accepted
           ? CalendarAction.JoinedGroup
           : CalendarAction.RejectedGroupInvitation,
         payload: {
           currentGroup,
-          // invitations: invitations.map((i) => new Invitation(i)),
           resources: {
-            [ResourceKey.Groups]: (groups as UserGroup[]).map(
-              (g) => new UserGroup(g)
-            ),
+            [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
           },
         },
       });
@@ -68,33 +62,19 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   project,
   user,
 }) => {
-  const onAcceptInvitation = (): void => {
+  const onAcceptInvitation = (accepted: boolean): void => {
     const name = User.formatName(user.name);
+    const subject = `${name} has ${
+      accepted ? "joined" : "declined"
+    } your group invitation`;
     const mail: Mail = {
       to: groupTo(pendingGroup.members),
-      subject: `${name} has joined your group`,
-      text: `${name} has joined your group for ${project.title}`,
+      subject,
+      text: `${subject} for ${project.title}`,
     };
     updateInvitation({
-      accepted: true,
+      accepted,
       pendingGroup,
-      userId: user.id,
-      mail,
-      dispatch,
-    });
-  };
-
-  const onDeclineInvitation = (): void => {
-    const name = User.formatName(user.name);
-    const mail: Mail = {
-      to: groupTo(pendingGroup.members),
-      subject: `${name} has declined your invitation`,
-      text: `${name} has declined your invitation for ${project.title}`,
-    };
-    updateInvitation({
-      accepted: false,
-      pendingGroup,
-      userId: user.id,
       mail,
       dispatch,
     });
@@ -121,14 +101,14 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
           <ButtonGroup variant="contained" color="primary">
             <Button
               color="primary"
-              onClick={onAcceptInvitation}
+              onClick={(): void => onAcceptInvitation(true)}
               startIcon={<ThumbUpIcon />}
             >
               Accept Invitation
             </Button>
             <Button
               color="secondary"
-              onClick={onDeclineInvitation}
+              onClick={(): void => onAcceptInvitation(false)}
               endIcon={<ThumbDownIcon />}
             >
               Decline Invitation
