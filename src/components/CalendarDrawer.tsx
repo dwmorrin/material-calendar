@@ -3,6 +3,7 @@ import {
   Badge,
   Grid,
   List,
+  ListItem,
   SwipeableDrawer,
   Typography,
 } from "@material-ui/core";
@@ -78,7 +79,9 @@ const CalendarDrawer: FunctionComponent<
           selections={selections}
           setSelections={setSelections}
         />
-        <Typography variant="body1">Rooms</Typography>
+        <ListItem>
+          <Typography variant="body1">Rooms</Typography>
+        </ListItem>
         <LocationList
           dispatch={dispatch}
           state={state}

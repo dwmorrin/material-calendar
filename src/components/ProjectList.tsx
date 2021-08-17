@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
 import ProjectAccordionList from "./ProjectAccordionList";
-import { Typography } from "@material-ui/core";
+import { ListItem, Typography } from "@material-ui/core";
 import { ResourceKey } from "../resources/types";
 import Project from "../resources/Project";
 import Course from "../resources/Course";
@@ -14,7 +14,13 @@ const ProjectList: FunctionComponent<
   const courses = state.resources[ResourceKey.Courses] as Course[];
   return (
     <div>
-      {projects.length ? <Typography variant="body1">Courses</Typography> : ""}
+      {projects.length ? (
+        <ListItem>
+          <Typography variant="body1">Courses</Typography>
+        </ListItem>
+      ) : (
+        ""
+      )}
       {courses &&
         courses.map((course, index) => (
           <ProjectAccordionList
