@@ -4,6 +4,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Grid,
   List,
   ListItemText,
   FormControlLabel,
@@ -45,42 +46,47 @@ const ProjectAccordionList: FunctionComponent<
         onClick={(event): void => event.stopPropagation()}
         onFocus={(event): void => event.stopPropagation()}
       >
-        <Badge
-          color="secondary"
-          badgeContent={
-            invitations.filter(({ projectId }) =>
-              courseProjects.some(({ id }) => id === projectId)
-            ).length
-          }
-        >
-          <FormControlLabel
-            aria-label="Acknowledge"
-            checked={checked}
-            control={<Checkbox indeterminate={indeterminate} />}
-            label={<ListItemText primary={course.title} />}
-            onClick={(event): void => event.stopPropagation()}
-            onChange={(event: React.ChangeEvent<unknown>, checked): void => {
-              event.stopPropagation();
-              let { projectIds } = selections;
-              // checked: make sure all course projects are in selections
-              if (checked) {
-                courseProjects.forEach((p) => {
-                  if (!projectIds.includes(p.id))
-                    projectIds = [...projectIds, p.id];
+        <Grid container justify="space-between">
+          <Grid item>
+            <FormControlLabel
+              aria-label="Acknowledge"
+              checked={checked}
+              control={<Checkbox indeterminate={indeterminate} />}
+              label={<ListItemText primary={course.title} />}
+              onClick={(event): void => event.stopPropagation()}
+              onChange={(event: React.ChangeEvent<unknown>, checked): void => {
+                event.stopPropagation();
+                let { projectIds } = selections;
+                // checked: make sure all course projects are in selections
+                if (checked) {
+                  courseProjects.forEach((p) => {
+                    if (!projectIds.includes(p.id))
+                      projectIds = [...projectIds, p.id];
+                  });
+                }
+                // not checked: filter out all course projects
+                if (!checked)
+                  projectIds = projectIds.filter(
+                    (id) => !courseProjects.find((p) => id === p.id)
+                  );
+                setSelections({
+                  ...selections,
+                  projectIds,
                 });
+              }}
+            />
+          </Grid>
+          <Grid item>
+            <Badge
+              color="secondary"
+              badgeContent={
+                invitations.filter(({ projectId }) =>
+                  courseProjects.some(({ id }) => id === projectId)
+                ).length
               }
-              // not checked: filter out all course projects
-              if (!checked)
-                projectIds = projectIds.filter(
-                  (id) => !courseProjects.find((p) => id === p.id)
-                );
-              setSelections({
-                ...selections,
-                projectIds,
-              });
-            }}
-          />
-        </Badge>
+            />
+          </Grid>
+        </Grid>
       </AccordionSummary>
       <AccordionDetails>
         <List>
