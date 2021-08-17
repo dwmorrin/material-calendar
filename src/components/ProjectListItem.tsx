@@ -6,10 +6,10 @@ import {
 } from "../calendar/types";
 import {
   Checkbox,
+  Grid,
   IconButton,
   ListItem,
   ListItemText,
-  Divider,
   FormControlLabel,
   Badge,
 } from "@material-ui/core";
@@ -24,49 +24,58 @@ interface ProjectListItemProps extends CalendarUIProps {
 const ProjectListItem: FunctionComponent<
   ProjectListItemProps & CalendarUISelectionProps
 > = ({ dispatch, state, project, selections, setSelections, invitations }) => {
+  const toggleProjectSelected = (
+    event: React.ChangeEvent<unknown>,
+    checked: boolean
+  ): void => {
+    event.stopPropagation();
+    let { projectIds } = selections;
+    // checked and not in selections - add
+    if (checked && !projectIds.includes(project.id))
+      projectIds = [...projectIds, project.id];
+    // checked and in selections - do nothing
+    // not checked and not in selections - do nothing
+    // not checked and in selections - remove
+    else if (!checked && projectIds.includes(project.id))
+      projectIds = projectIds.filter((id) => id !== project.id);
+    setSelections({
+      ...selections,
+      projectIds,
+    });
+  };
+
+  const openProjectDashboard = (event: React.MouseEvent): void => {
+    event.stopPropagation();
+    dispatch({
+      type: CalendarAction.OpenProjectDashboard,
+      payload: { ...state, currentProject: project },
+    });
+  };
+
   return (
     <ListItem
       button
       key={project.id}
       onClick={(event): void => event.stopPropagation()}
     >
-      <FormControlLabel
-        checked={selections.projectIds.includes(project.id)}
-        control={<Checkbox />}
-        label={<ListItemText primary={project.title} />}
-        onClick={(event): void => event.stopPropagation()}
-        onChange={(event: React.ChangeEvent<unknown>, checked): void => {
-          event.stopPropagation();
-          let { projectIds } = selections;
-          // checked and not in selections - add
-          if (checked && !projectIds.includes(project.id))
-            projectIds = [...projectIds, project.id];
-          // checked and in selections - do nothing
-          // not checked and not in selections - do nothing
-          // not checked and in selections - remove
-          else if (!checked && projectIds.includes(project.id))
-            projectIds = projectIds.filter((id) => id !== project.id);
-          setSelections({
-            ...selections,
-            projectIds,
-          });
-        }}
-      />
-      <Divider orientation="vertical" flexItem />
-      <IconButton
-        key={project.id}
-        onClick={(event): void => {
-          event.stopPropagation();
-          dispatch({
-            type: CalendarAction.OpenProjectDashboard,
-            payload: { ...state, currentProject: project },
-          });
-        }}
-      >
-        <Badge color="secondary" badgeContent={invitations}>
-          <InfoIcon />
-        </Badge>
-      </IconButton>
+      <Grid container justify="space-between">
+        <Grid item>
+          <FormControlLabel
+            checked={selections.projectIds.includes(project.id)}
+            control={<Checkbox />}
+            label={<ListItemText primary={project.title} />}
+            onClick={(event): void => event.stopPropagation()}
+            onChange={toggleProjectSelected}
+          />
+        </Grid>
+        <Grid item>
+          <IconButton key={project.id} onClick={openProjectDashboard}>
+            <Badge color="secondary" badgeContent={invitations}>
+              <InfoIcon color="primary" />
+            </Badge>
+          </IconButton>
+        </Grid>
+      </Grid>
     </ListItem>
   );
 };

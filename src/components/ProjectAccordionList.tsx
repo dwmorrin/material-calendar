@@ -36,7 +36,7 @@ const ProjectAccordionList: FunctionComponent<
     courseProjects.some(({ id }) => selections.projectIds.includes(id));
 
   return (
-    <Accordion defaultExpanded={courseProjects.length === 1}>
+    <Accordion>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-label="Expand"
