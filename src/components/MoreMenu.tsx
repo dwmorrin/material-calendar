@@ -54,7 +54,7 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
         <MenuItem onClick={logout}>
           <Typography>Logout</Typography>
         </MenuItem>
-        {(process.env.NODE_ENV === "development" || isAdmin) && (
+        {isAdmin && (
           <MenuItem
             onClick={(): Promise<void> =>
               navigate(inAdminApp ? "/calendar" : "/admin")
