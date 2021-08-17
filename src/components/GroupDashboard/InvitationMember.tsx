@@ -4,14 +4,18 @@ import User from "../../resources/User";
 import InvitationThumbs from "./InvitationThumbs";
 
 const InvitationMember: FC<{
-  name: { first: string; last: string };
+  name: string | { first: string; last: string };
   accepted: boolean;
   rejected: boolean;
 }> = ({ name, accepted, rejected }) => (
   <ListItem>
     <Grid container justify="space-between">
-      <Grid item>{User.formatName(name)}</Grid>
-      <InvitationThumbs accepted={accepted} rejected={rejected} />
+      <Grid item xs={10}>
+        {typeof name === "string" ? name : User.formatName(name)}
+      </Grid>
+      <Grid item xs={2}>
+        <InvitationThumbs accepted={accepted} rejected={rejected} />
+      </Grid>
     </Grid>
   </ListItem>
 );

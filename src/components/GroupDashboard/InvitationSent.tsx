@@ -48,9 +48,6 @@ const InvitationSent: FC<InvitationItemProps> = ({
 
   return (
     <ListItem>
-      {pendingGroup.pending && pendingGroup.exceptionalSize && (
-        <>Exceptional size: waiting on admin approval</>
-      )}
       <List>
         {pendingGroup.members.map(
           ({ id, name, invitation: { accepted, rejected } }, i) => (
@@ -61,6 +58,13 @@ const InvitationSent: FC<InvitationItemProps> = ({
               rejected={rejected}
             />
           )
+        )}
+        {pendingGroup.pending && pendingGroup.exceptionalSize && (
+          <InvitationMember
+            name={"Exceptional size: waiting on admin approval"}
+            accepted={false}
+            rejected={false}
+          />
         )}
         <ListItem>
           <Button

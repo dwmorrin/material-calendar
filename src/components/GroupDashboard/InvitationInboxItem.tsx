@@ -27,7 +27,7 @@ const updateInvitation = ({
   const body: { accepted?: boolean; rejected?: boolean; mail: Mail } = { mail };
   if (accepted) body.accepted = true;
   else body.rejected = true;
-  fetch(`${UserGroup.url}/${pendingGroup.id}/invite`, {
+  fetch(UserGroup.invitationUrls.update(pendingGroup), {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
