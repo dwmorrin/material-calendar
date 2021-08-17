@@ -1,11 +1,11 @@
 import React, { FC, useState, useEffect } from "react";
 import {
   Dialog,
-  Toolbar,
   IconButton,
-  Typography,
-  Paper,
   List,
+  Paper,
+  Toolbar,
+  Typography,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { CalendarUIProps, CalendarAction } from "../../calendar/types";
@@ -106,41 +106,37 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
             {parseAndFormatSQLDateInterval(currentProject)}
           </Typography>
         </section>
-        {currentGroup && (
-          <Typography variant="body1" style={{ marginLeft: 20, marginTop: 20 }}>
-            {currentGroup.title}
-          </Typography>
-        )}
-        {currentGroup && (
+        {currentGroup ? (
           <CurrentGroupBox
             group={currentGroup}
             project={currentProject}
             dispatch={dispatch}
             user={user}
           />
-        )}
-        <List>
-          {!!invitations.length && (
-            <InvitationAccordion
-              currentProject={currentProject}
-              dispatch={dispatch}
-              myInvitation={myInvitation}
-              pendingGroups={invitations}
-              user={user}
-            />
-          )}
-        </List>
-        {!currentGroup && !myInvitation && (
-          <CreateNewGroupAccordion
-            defaultExpanded={!invitations}
-            project={currentProject}
-            openConfirmationDialog={openConfirmationDialog}
-            dispatch={dispatch}
-            selectedUsers={selectedUsers}
-            setSelectedUsers={setSelectedUsers}
-            user={user}
-            projectMembers={projectMembers}
-          />
+        ) : (
+          <List>
+            {!!invitations.length && (
+              <InvitationAccordion
+                currentProject={currentProject}
+                dispatch={dispatch}
+                myInvitation={myInvitation}
+                pendingGroups={invitations}
+                user={user}
+              />
+            )}
+            {!myInvitation && (
+              <CreateNewGroupAccordion
+                defaultExpanded={!invitations}
+                project={currentProject}
+                openConfirmationDialog={openConfirmationDialog}
+                dispatch={dispatch}
+                selectedUsers={selectedUsers}
+                setSelectedUsers={setSelectedUsers}
+                user={user}
+                projectMembers={projectMembers}
+              />
+            )}
+          </List>
         )}
       </Paper>
     </Dialog>
