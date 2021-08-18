@@ -19,6 +19,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import CurrentGroupBox from "./CurrentGroupBox";
 import InvitationAccordion from "./InvitationAccordion";
 import CreateNewGroupAccordion from "./CreateNewGroupAccordion";
+import ProjectMembers from "./ProjectMembers";
 import { ResourceKey } from "../../resources/types";
 
 const transition = makeTransition("right");
@@ -41,7 +42,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
       })
       .then(({ error, data }) => {
         if (error) throw error;
-        const users: User[] = data.users;
+        const users: User[] = data;
         if (!Array.isArray(users))
           throw new Error("No project member info received");
         setProjectMembers(users.map((u: User) => new User(u)));
@@ -72,15 +73,6 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
       TransitionComponent={transition}
       open={state.groupDashboardIsOpen}
     >
-      <ConfirmationDialog
-        dispatch={dispatch}
-        open={confirmationDialogIsOpen}
-        openConfirmationDialog={openConfirmationDialog}
-        project={currentProject}
-        selectedUsers={selectedUsers}
-        setSelectedUsers={setSelectedUsers}
-        user={user}
-      />
       <Toolbar>
         <IconButton
           edge="start"
@@ -114,29 +106,41 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
             user={user}
           />
         ) : (
-          <List>
-            {!!invitations.length && (
-              <InvitationAccordion
-                currentProject={currentProject}
-                dispatch={dispatch}
-                myInvitation={myInvitation}
-                pendingGroups={invitations}
-                user={user}
-              />
-            )}
-            {!myInvitation && (
-              <CreateNewGroupAccordion
-                defaultExpanded={!invitations}
-                project={currentProject}
-                openConfirmationDialog={openConfirmationDialog}
-                dispatch={dispatch}
-                selectedUsers={selectedUsers}
-                setSelectedUsers={setSelectedUsers}
-                user={user}
-                projectMembers={projectMembers}
-              />
-            )}
-          </List>
+          <>
+            <List>
+              {!!invitations.length && (
+                <InvitationAccordion
+                  currentProject={currentProject}
+                  dispatch={dispatch}
+                  myInvitation={myInvitation}
+                  pendingGroups={invitations}
+                  user={user}
+                />
+              )}
+              {!myInvitation && (
+                <CreateNewGroupAccordion
+                  defaultExpanded={!invitations}
+                  project={currentProject}
+                  openConfirmationDialog={openConfirmationDialog}
+                  dispatch={dispatch}
+                  selectedUsers={selectedUsers}
+                  setSelectedUsers={setSelectedUsers}
+                  user={user}
+                  projectMembers={projectMembers}
+                />
+              )}
+              <ProjectMembers projectMembers={projectMembers} />
+            </List>
+            <ConfirmationDialog
+              dispatch={dispatch}
+              open={confirmationDialogIsOpen}
+              openConfirmationDialog={openConfirmationDialog}
+              project={currentProject}
+              selectedUsers={selectedUsers}
+              setSelectedUsers={setSelectedUsers}
+              user={user}
+            />
+          </>
         )}
       </Paper>
     </Dialog>
