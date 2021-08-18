@@ -11,7 +11,7 @@ interface VirtualWeek {
 }
 
 class VirtualWeek implements VirtualWeek {
-  static url = "/api/virtualweeks";
+  static url = "/api/virtual-weeks";
   static resourceId = "001";
   static hoursRemainingId = "ZZZ";
   static eventPrefix = "vw-";
