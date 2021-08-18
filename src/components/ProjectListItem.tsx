@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FC } from "react";
 import {
   CalendarAction,
   CalendarUIProps,
@@ -21,27 +21,27 @@ interface ProjectListItemProps extends CalendarUIProps {
   invitations: number;
 }
 
-const ProjectListItem: FunctionComponent<
-  ProjectListItemProps & CalendarUISelectionProps
-> = ({ dispatch, state, project, selections, setSelections, invitations }) => {
+const ProjectListItem: FC<ProjectListItemProps & CalendarUISelectionProps> = ({
+  dispatch,
+  state,
+  project,
+  selections,
+  setSelections,
+  invitations,
+}) => {
   const toggleProjectSelected = (
     event: React.ChangeEvent<unknown>,
     checked: boolean
   ): void => {
     event.stopPropagation();
-    let { projectIds } = selections;
-    // checked and not in selections - add
+    const { projectIds } = selections;
     if (checked && !projectIds.includes(project.id))
-      projectIds = [...projectIds, project.id];
-    // checked and in selections - do nothing
-    // not checked and not in selections - do nothing
-    // not checked and in selections - remove
+      setSelections({ ...selections, projectIds: [...projectIds, project.id] });
     else if (!checked && projectIds.includes(project.id))
-      projectIds = projectIds.filter((id) => id !== project.id);
-    setSelections({
-      ...selections,
-      projectIds,
-    });
+      setSelections({
+        ...selections,
+        projectIds: projectIds.filter((id) => id !== project.id),
+      });
   };
 
   const openProjectDashboard = (event: React.MouseEvent): void => {
@@ -59,7 +59,7 @@ const ProjectListItem: FunctionComponent<
       onClick={(event): void => event.stopPropagation()}
     >
       <Grid container justify="space-between">
-        <Grid item>
+        <Grid item xs={9}>
           <FormControlLabel
             checked={selections.projectIds.includes(project.id)}
             control={<Checkbox />}
