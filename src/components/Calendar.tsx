@@ -49,7 +49,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       `${Event.url}?context=${ResourceKey.Events}`,
       `${Location.url}?context=${ResourceKey.Locations}`,
       `${User.url}/${user.id}/courses?context=${ResourceKey.Courses}`,
-      `${UserGroup.url}/user/${user.id}/?context=${ResourceKey.Groups}`,
+      `${UserGroup.url}/user?context=${ResourceKey.Groups}`,
       `${User.url}/${user.id}/projects?context=${ResourceKey.Projects}`,
       `${Equipment.url}?context=${ResourceKey.Equipment}`,
       `${Category.url}?context=${ResourceKey.Categories}`,
