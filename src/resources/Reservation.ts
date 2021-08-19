@@ -3,15 +3,15 @@ import { formatSQLDatetime } from "../utils/date";
 
 interface ActionDetails {
   on: string;
-  by: string;
+  by: number | null;
   comment?: string;
 }
 
 export interface ReservationCancelation {
-  canceled: ActionDetails;
-  refund?: {
+  canceled: ActionDetails & { requestsRefund: boolean };
+  refund: {
     approved: ActionDetails;
-    rejected: ActionDetails;
+    rejected: ActionDetails; // TODO: add comment in database for this
   };
 }
 
@@ -30,6 +30,11 @@ interface Reservation {
 
 class Reservation implements Reservation {
   static url = "/api/reservations";
+  static exceptionUrl = {
+    size(res: Reservation): string {
+      return `${Reservation.url}/admin/exceptions/size/${res.id}`;
+    },
+  };
   static rules = {
     inProgressCutoffMinutes: Number(
       process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF_MINUTES || "30"
