@@ -25,7 +25,7 @@ import Snackbar from "../Snackbar";
 import FullCalendar from "@fullcalendar/react";
 import ErrorPage from "../ErrorPage";
 import { CircularProgress } from "@material-ui/core";
-import ExceptionsDashboard from "./ExceptionsDashboard";
+import ExceptionsDashboard from "./ExceptionsDashboard/ExceptionsDashboard";
 import { ResourceKey } from "../../resources/types";
 import Reservation from "../../resources/Reservation";
 import Semester from "../../resources/Semester";
