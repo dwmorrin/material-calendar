@@ -9,8 +9,8 @@ interface ActionDetails {
 export interface ReservationCancelation {
   canceled: ActionDetails;
   refund?: {
-    approvedId: ActionDetails;
-    deniedId: ActionDetails;
+    approved: ActionDetails;
+    rejected: ActionDetails;
   };
 }
 
@@ -23,7 +23,7 @@ interface Reservation {
   groupId: number;
   guests: string;
   created: string;
-  cancellation: ReservationCancelation | null;
+  cancelation: ReservationCancelation | null;
   equipment: Equipment[];
 }
 

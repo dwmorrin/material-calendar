@@ -8,7 +8,7 @@ const template = (res: unknown): string[][] =>
         ["Guests", res.guests],
         [
           "Cancellation",
-          res.cancellation ? JSON.stringify(res.cancellation) : "No",
+          res.cancelation ? JSON.stringify(res.cancelation) : "No",
         ],
       ]
     : [["", JSON.stringify(res)]];

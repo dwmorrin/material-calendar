@@ -328,16 +328,16 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
                       {"Refund Requested: " +
                         formatDatetimeSeconds(
                           parseSQLDatetime(
-                            reservation.cancellation?.canceled.on || ""
+                            reservation.cancelation?.canceled.on || ""
                           )
                         )}
                     </ListItem>
                     <ListItem
                       key={`reservation-${reservation.id}-cancelationMessage}`}
                     >
-                      {reservation.cancellation?.canceled.comment
+                      {reservation.cancelation?.canceled.comment
                         ? "Message: " +
-                          reservation.cancellation?.canceled.comment
+                          reservation.cancelation?.canceled.comment
                         : "User did not provide a message"}
                     </ListItem>
                   </section>

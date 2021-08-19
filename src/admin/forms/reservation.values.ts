@@ -21,7 +21,7 @@ export const values = (state: AdminState): Record<string, unknown> => {
     eventId: String(reservation.eventId),
     projectId: String(reservation.projectId),
     groupId: String(reservation.groupId),
-    cancellation: reservation.cancellation || {},
+    cancellation: reservation.cancelation || {},
   } as ReservationFormValues;
 };
 
@@ -39,6 +39,6 @@ export const update = (
     projectId: Number(projectId),
     groupId: Number(groupId),
     guests,
-    cancellation,
+    cancelation: cancellation,
   };
 };
