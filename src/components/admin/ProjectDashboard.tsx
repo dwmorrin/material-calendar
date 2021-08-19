@@ -35,6 +35,7 @@ import {
 import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
+import User from "../../resources/User";
 
 const SessionInfo: FunctionComponent<{ event: Event }> = ({ event }) => {
   return (
@@ -163,6 +164,29 @@ const ProjectDashboard: FunctionComponent<AdminUIProps> = ({
         <Typography variant="body2">
           {parseAndFormatSQLDateInterval(currentProject)}
         </Typography>
+        {currentGroup.pending && (
+          <>
+            <p>This group is pending and cannot make reservations.</p>
+            {currentGroup.exceptionalSize && (
+              <p>There is an exceptional size request.</p>
+            )}
+            {currentGroup.members.map(
+              ({ id, username, name, invitation: { accepted, rejected } }) => (
+                <p key={`${currentGroup.id}-${username}-info`}>
+                  {username} {User.formatName(name)} has{" "}
+                  {currentGroup.creatorId === id
+                    ? "created"
+                    : rejected
+                    ? "rejected"
+                    : accepted
+                    ? "accepted"
+                    : "not answered"}{" "}
+                  the invitation.
+                </p>
+              )
+            )}
+          </>
+        )}
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="body1">Location Hours</Typography>
