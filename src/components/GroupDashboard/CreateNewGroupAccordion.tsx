@@ -18,6 +18,7 @@ const CreateNewGroupAccordion: FC<
     defaultExpanded: boolean;
     project: Project;
     projectMembers: User[];
+    setProjectMembers: (u: User[]) => void;
   }
 > = ({
   dispatch,
@@ -28,6 +29,7 @@ const CreateNewGroupAccordion: FC<
   setSelectedUsers,
   user,
   projectMembers,
+  setProjectMembers,
 }) => {
   const toggleUser = (newUser: User): void => {
     const existing = selectedUsers.findIndex(({ id }) => id === newUser.id);
@@ -57,6 +59,7 @@ const CreateNewGroupAccordion: FC<
       invitor: user,
       project: project,
       setSelectedUsers,
+      setProjectMembers,
     });
   };
 

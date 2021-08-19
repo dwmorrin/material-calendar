@@ -12,6 +12,7 @@ interface CreateGroupProps {
   approved: boolean;
   dispatch: (a: Action) => void;
   setSelectedUsers: (users: User[]) => void;
+  setProjectMembers: (users: User[]) => void;
 }
 
 type CreateGroupRequest = {
@@ -29,6 +30,7 @@ const createGroup = ({
   approved,
   dispatch,
   setSelectedUsers,
+  setProjectMembers,
 }: CreateGroupProps): Promise<void> => {
   invitees.push(invitor);
   const name = User.formatName(invitor.name);
@@ -53,7 +55,11 @@ const createGroup = ({
     .then(({ error, data }) => {
       if (error) throw error;
       const groups: UserGroup[] = data.groups;
+      const members: User[] = data.members;
       if (!Array.isArray(groups)) throw new Error("No group info received");
+      if (!Array.isArray(members))
+        throw new Error("No project member info received");
+      setProjectMembers(members.map((m) => new User(m)));
       dispatch({
         type: CalendarAction.CreatedInvitationReceived,
         payload: {

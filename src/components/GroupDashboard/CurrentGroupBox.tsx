@@ -1,17 +1,20 @@
 import React, { FC } from "react";
 import { Button, Box } from "@material-ui/core";
 import { CalendarAction } from "../../calendar/types";
+import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
 import { GroupInfoProps } from "./types";
 import { Mail, groupTo } from "../../utils/mail";
 import { ResourceKey } from "../../resources/types";
 
-const groupBox: FC<GroupInfoProps> = ({ dispatch, group, project, user }) => {
-  const onLeave = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void => {
-    // TODO add a comment as to why we need to stop the event propagation
-    event.stopPropagation();
+const groupBox: FC<GroupInfoProps> = ({
+  dispatch,
+  group,
+  project,
+  user,
+  setProjectMembers,
+}) => {
+  const onLeave = (): void => {
     const name = [user.name.first, user.name.last].filter(String).join(" ");
     const mail: Mail = {
       to: groupTo(group.members),
@@ -32,8 +35,12 @@ const groupBox: FC<GroupInfoProps> = ({ dispatch, group, project, user }) => {
       .then(({ error, data }) => {
         if (error) throw error;
         const groups: UserGroup[] = data.groups;
+        const members: User[] = data.members;
         if (!Array.isArray(groups))
           throw new Error("no updated groups received");
+        if (!Array.isArray(groups))
+          throw new Error("no updated project members received");
+        setProjectMembers(members.map((m) => new User(m)));
         dispatch({
           type: CalendarAction.LeftGroup,
           payload: {

@@ -20,6 +20,7 @@ const InvitationAccordion: FC<InvitationListProps> = ({
   myInvitation,
   pendingGroups,
   user,
+  setProjectMembers,
 }) => {
   const inbox = pendingGroups.filter(({ members }) => {
     const myself = members.find((member) => member.id === user.id);
@@ -52,6 +53,7 @@ const InvitationAccordion: FC<InvitationListProps> = ({
           project={currentProject}
           pendingGroup={myInvitation}
           user={user}
+          setProjectMembers={setProjectMembers}
         />
       )}
       <Divider />
@@ -65,6 +67,7 @@ const InvitationAccordion: FC<InvitationListProps> = ({
           dispatch={dispatch}
           user={user}
           project={currentProject}
+          setProjectMembers={setProjectMembers}
         />
       ))}
     </Accordion>

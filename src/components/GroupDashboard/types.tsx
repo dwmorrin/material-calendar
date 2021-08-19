@@ -9,6 +9,7 @@ export type InvitationItemProps = CalendarUIDispatcher & {
   project: Project;
   pendingGroup: UserGroup;
   user: User;
+  setProjectMembers: (u: User[]) => void;
 };
 
 export type InvitationListProps = CalendarUIDispatcher & {
@@ -16,12 +17,14 @@ export type InvitationListProps = CalendarUIDispatcher & {
   currentProject: Project;
   pendingGroups: UserGroup[];
   user: User;
+  setProjectMembers: (u: User[]) => void;
 };
 
 export type GroupInfoProps = CalendarUIDispatcher & {
   group: UserGroup;
   project: Project;
   user: User;
+  setProjectMembers: (u: User[]) => void;
 };
 
 export type StateModifierProps = CalendarUIDispatcher & {

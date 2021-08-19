@@ -533,7 +533,7 @@ const receivedInvitations: StateHandler = (state, action) => {
 
 const rejectedGroupInvitation: StateHandler = (state, action) => {
   const { payload } = action;
-  if (!payload?.currentGroup) {
+  if (!payload) {
     return errorRedirect(
       state,
       action,

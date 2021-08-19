@@ -16,6 +16,8 @@ interface InvitationUpdateProps {
   mail: Mail;
   dispatch: (a: Action) => void;
   accepted: boolean;
+  projectId: number;
+  setProjectMembers: (u: User[]) => void;
 }
 
 const updateInvitation = ({
@@ -23,8 +25,15 @@ const updateInvitation = ({
   dispatch,
   mail,
   pendingGroup,
+  projectId,
+  setProjectMembers,
 }: InvitationUpdateProps): void => {
-  const body: { accepted?: boolean; rejected?: boolean; mail: Mail } = { mail };
+  const body: {
+    accepted?: boolean;
+    rejected?: boolean;
+    mail: Mail;
+    projectId: number;
+  } = { mail, projectId };
   if (accepted) body.accepted = true;
   else body.rejected = true;
   fetch(UserGroup.invitationUrls.update(pendingGroup), {
@@ -37,8 +46,12 @@ const updateInvitation = ({
       if (error) throw error;
       if (!data) throw new Error("No updated group info returned");
       const groups: UserGroup[] = data.groups;
+      const members: User[] = data.members;
       if (!Array.isArray(groups))
         throw new Error("No updated group info returned");
+      if (!Array.isArray(members))
+        throw new Error("No updated project member info returned");
+      setProjectMembers(members.map((m) => new User(m)));
       // OK if currentGroup is undefined as rejecting invite destroys group
       const currentGroup = groups.find(({ id }) => id === pendingGroup.id);
       dispatch({
@@ -61,6 +74,7 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   pendingGroup,
   project,
   user,
+  setProjectMembers,
 }) => {
   const onAcceptInvitation = (accepted: boolean): void => {
     const name = User.formatName(user.name);
@@ -77,6 +91,8 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
       pendingGroup,
       mail,
       dispatch,
+      projectId: project.id,
+      setProjectMembers,
     });
   };
 

@@ -104,6 +104,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
             project={currentProject}
             dispatch={dispatch}
             user={user}
+            setProjectMembers={setProjectMembers}
           />
         ) : (
           <>
@@ -115,6 +116,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
                   myInvitation={myInvitation}
                   pendingGroups={invitations}
                   user={user}
+                  setProjectMembers={setProjectMembers}
                 />
               )}
               {!myInvitation && (
@@ -127,6 +129,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
                   setSelectedUsers={setSelectedUsers}
                   user={user}
                   projectMembers={projectMembers}
+                  setProjectMembers={setProjectMembers}
                 />
               )}
               <ProjectMembers projectMembers={projectMembers} />
@@ -136,6 +139,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
               open={confirmationDialogIsOpen}
               openConfirmationDialog={openConfirmationDialog}
               project={currentProject}
+              setProjectMembers={setProjectMembers}
               selectedUsers={selectedUsers}
               setSelectedUsers={setSelectedUsers}
               user={user}

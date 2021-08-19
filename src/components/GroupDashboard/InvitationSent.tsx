@@ -13,6 +13,7 @@ const InvitationSent: FC<InvitationItemProps> = ({
   project,
   pendingGroup,
   user,
+  setProjectMembers,
 }) => {
   const onCancelInvitation = (): void => {
     const name = User.formatName(user.name);
@@ -24,14 +25,18 @@ const InvitationSent: FC<InvitationItemProps> = ({
     fetch(UserGroup.invitationUrls.cancel(pendingGroup), {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mail }),
+      body: JSON.stringify({ mail, projectId: project.id }),
     })
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error) throw error;
         const groups: UserGroup[] = data.groups;
+        const members: User[] = data.members;
         if (!Array.isArray(groups))
           throw new Error("no updated groups received");
+        if (!Array.isArray(members))
+          throw new Error("no project members received");
+        setProjectMembers(members.map((m) => new User(m)));
         dispatch({
           type: CalendarAction.CanceledInvitationReceived,
           payload: {

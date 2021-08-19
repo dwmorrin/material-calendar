@@ -9,6 +9,7 @@ import { makeTransition } from "../Transition";
 import { StateModifierProps } from "./types";
 import Project from "../../resources/Project";
 import createGroup from "./createInvitation";
+import User from "../../resources/User";
 
 const transition = makeTransition("right");
 
@@ -16,6 +17,7 @@ const ConfirmationDialog: FC<
   StateModifierProps & {
     open: boolean;
     project: Project;
+    setProjectMembers: (u: User[]) => void;
   }
 > = ({
   dispatch,
@@ -25,6 +27,7 @@ const ConfirmationDialog: FC<
   selectedUsers,
   setSelectedUsers,
   user,
+  setProjectMembers,
 }) => {
   const onRequest = (): void => {
     createGroup({
@@ -34,6 +37,7 @@ const ConfirmationDialog: FC<
       invitor: user,
       project,
       setSelectedUsers,
+      setProjectMembers,
     }).then(() => openConfirmationDialog(false));
   };
 
