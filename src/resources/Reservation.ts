@@ -49,6 +49,15 @@ class Reservation implements Reservation {
       process.env.REACT_APP_CANCELATION_REFUND_GRACE_PERIOD_MINUTES || "15"
     ),
   };
+  static hasPendingRefundRequest({ cancelation }: Reservation) {
+    if (!cancelation) return false;
+    const {
+      canceled,
+      refund: { approved, rejected },
+    } = cancelation;
+    const unanswered = !approved.by && !rejected.by;
+    return canceled.requestsRefund && unanswered;
+  }
   constructor(
     res = {
       id: 0,

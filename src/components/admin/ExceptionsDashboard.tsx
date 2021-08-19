@@ -22,26 +22,12 @@ import { Mail, groupTo } from "../../utils/mail";
 import { ResourceKey } from "../../resources/types";
 import Event from "../../resources/Event";
 
-const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
-  dispatch,
-  state,
-}) => {
+const ExceptionsDashboard: FunctionComponent<
+  AdminUIProps & {
+    exceptions: { groupSize: UserGroup[]; refunds: Reservation[] };
+  }
+> = ({ dispatch, state, exceptions: { groupSize, refunds } }) => {
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
-  const invitations = groups.filter(
-    ({ pending, exceptionalSize }) => pending && exceptionalSize
-  );
-  const reservations = state.resources[
-    ResourceKey.Reservations
-  ] as Reservation[];
-  const refunds = reservations.filter(({ cancelation }) => {
-    if (!cancelation) return false;
-    const {
-      canceled,
-      refund: { approved, rejected },
-    } = cancelation;
-    const unanswered = !approved.by && !rejected.by;
-    return canceled.requestsRefund && unanswered;
-  });
   const events = state.resources[ResourceKey.Events] as Event[];
 
   const dispatchError = (error: Error): void =>
@@ -117,11 +103,11 @@ const ExceptionsDashboard: FunctionComponent<AdminUIProps> = ({
       </Toolbar>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Group size exception requests</Typography>
+          <Typography variant="h6">Group size</Typography>
         </AccordionSummary>
-        {invitations && !!invitations.length ? (
+        {groupSize && !!groupSize.length ? (
           <List>
-            {invitations.map((invitation, i) => (
+            {groupSize.map((invitation, i) => (
               <ListItem
                 key={`invitation${i}`}
                 style={{ justifyContent: "space-between" }}

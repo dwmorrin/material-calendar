@@ -1,11 +1,13 @@
 import React, { FunctionComponent, Fragment } from "react";
 import {
-  Drawer,
-  Typography,
-  List,
-  ListItem,
   Accordion,
   AccordionSummary,
+  Badge,
+  Drawer,
+  Grid,
+  List,
+  ListItem,
+  Typography,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {
@@ -19,8 +21,8 @@ import { enumKeys } from "../../utils/enumKeys";
 import splitCamelCase from "../../utils/splitCamelCase";
 
 const AdminNavigationDrawer: FunctionComponent<
-  AdminUIProps & AdminSelectionProps
-> = ({ dispatch, state, selections, setSelections }) => {
+  AdminUIProps & AdminSelectionProps & { exceptionCount: number }
+> = ({ dispatch, state, selections, setSelections, exceptionCount }) => {
   const onClose = (): void => {
     // TODO clean up after drawer closes
   };
@@ -156,7 +158,15 @@ const AdminNavigationDrawer: FunctionComponent<
               expandIcon={<ExpandMoreIcon />}
               onClick={(event): void => event.stopPropagation()}
             >
-              Utilities
+              <Grid container justify="space-between">
+                <Grid item>Utilities</Grid>
+                <Grid item>
+                  <Badge
+                    color="secondary"
+                    badgeContent={exceptionCount}
+                  ></Badge>
+                </Grid>
+              </Grid>
             </AccordionSummary>
             <ListItem
               button
@@ -178,7 +188,15 @@ const AdminNavigationDrawer: FunctionComponent<
                 dispatch({ type: AdminAction.OpenExceptionsDashboard })
               }
             >
-              Exception Requests
+              <Grid container justify="space-between">
+                <Grid item>Exception Requests</Grid>
+                <Grid item xs={2}>
+                  <Badge
+                    color="secondary"
+                    badgeContent={exceptionCount}
+                  ></Badge>
+                </Grid>
+              </Grid>
             </ListItem>
           </Accordion>
         </List>

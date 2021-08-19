@@ -27,7 +27,9 @@ import ErrorPage from "../ErrorPage";
 import { CircularProgress } from "@material-ui/core";
 import ExceptionsDashboard from "./ExceptionsDashboard";
 import { ResourceKey } from "../../resources/types";
+import Reservation from "../../resources/Reservation";
 import Semester from "../../resources/Semester";
+import UserGroup from "../../resources/UserGroup";
 import ProjectDashboard from "./ProjectDashboard";
 
 const makeUrlsForAllResources = (): string[] =>
@@ -89,15 +91,30 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   if (!isAdmin) {
     return <Redirect to="/" replace={true} noThrow={true} />;
   }
+
+  const groups = state.resources[ResourceKey.Groups] as UserGroup[];
+  const reservations = state.resources[
+    ResourceKey.Reservations
+  ] as Reservation[];
+  const exceptions = {
+    groupSize: groups.filter(
+      ({ pending, exceptionalSize }) => pending && exceptionalSize
+    ),
+    refunds: reservations.filter(Reservation.hasPendingRefundRequest),
+  };
+  const exceptionCount =
+    exceptions.groupSize.length + exceptions.refunds.length;
+
   if (state.initialResourcesPending) return <CircularProgress />;
   return (
     <div>
-      <Bar dispatch={dispatch} state={state} />
+      <Bar dispatch={dispatch} state={state} exceptionCount={exceptionCount} />
       <NavigationDrawer
         dispatch={dispatch}
         state={state}
         selections={selections}
         setSelections={setSelections}
+        exceptionCount={exceptionCount}
       />
       {state.schedulerIsOpen ? (
         <Scheduler
@@ -126,7 +143,11 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
         setSelections={setSelections}
       />
       {state.exceptionsDashboardIsOpen && (
-        <ExceptionsDashboard dispatch={dispatch} state={state} />
+        <ExceptionsDashboard
+          dispatch={dispatch}
+          state={state}
+          exceptions={exceptions}
+        />
       )}
       <ProjectLocationHoursDialog dispatch={dispatch} state={state} />
       <ProjectLocationHoursSummaryDialog
