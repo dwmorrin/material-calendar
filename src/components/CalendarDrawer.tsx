@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from "react";
 import {
-  Badge,
   Grid,
   List,
   ListItem,
@@ -17,7 +16,6 @@ import ProjectList from "./ProjectList";
 import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
 import { ResourceKey } from "../resources/types";
-import MailIcon from "@material-ui/icons/Mail";
 
 const CalendarDrawer: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps

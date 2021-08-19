@@ -68,7 +68,7 @@ const ProjectListItem: FC<ProjectListItemProps & CalendarUISelectionProps> = ({
             onChange={toggleProjectSelected}
           />
         </Grid>
-        <Grid item>
+        <Grid item xs={2}>
           <IconButton key={project.id} onClick={openProjectDashboard}>
             <Badge color="secondary" badgeContent={invitations}>
               <InfoIcon color="primary" />
