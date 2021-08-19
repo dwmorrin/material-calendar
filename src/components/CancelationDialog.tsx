@@ -76,7 +76,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     mailbox.push({
       to: groupTo(group.members),
       subject: `${myName} has ${subject}`,
-      text: `You' re receiving this because you are a member of ${
+      text: `You are receiving this because you are a member of ${
         group.title
       }. ${myName} has ${body}.${autoApprove ? "" : refundMessage}`,
     });
@@ -93,7 +93,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         autoApprove
           ? {
               userId,
-              refundApproved: 1,
+              refundApproved: true,
               mailbox,
             }
           : refund
