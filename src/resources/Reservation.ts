@@ -31,8 +31,8 @@ interface Reservation {
 class Reservation implements Reservation {
   static url = "/api/reservations";
   static exceptionUrl = {
-    size(res: Reservation): string {
-      return `${Reservation.url}/admin/exceptions/size/${res.id}`;
+    refund(res: Reservation): string {
+      return `${Reservation.url}/admin/exceptions/refund/${res.id}`;
     },
   };
   static rules = {
@@ -49,7 +49,7 @@ class Reservation implements Reservation {
       process.env.REACT_APP_CANCELATION_REFUND_GRACE_PERIOD_MINUTES || "15"
     ),
   };
-  static hasPendingRefundRequest({ cancelation }: Reservation) {
+  static hasPendingRefundRequest({ cancelation }: Reservation): boolean {
     if (!cancelation) return false;
     const {
       canceled,

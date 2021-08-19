@@ -35,6 +35,11 @@ class UserGroup implements UserGroup {
       return `${UserGroup.url}/${group.id}/invitation`;
     },
   };
+  static exceptionUrl = {
+    size(g: UserGroup): string {
+      return `${UserGroup.url}/admin/exceptions/size/${g.id}`;
+    },
+  };
 
   constructor(
     group = {

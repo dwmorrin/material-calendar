@@ -45,15 +45,27 @@ const ExceptionsDashboard: FunctionComponent<
       subject: `Your group has been ${approved}`,
       text: `You requested an irregular group size for ${invitation.projectTitle} and it has been ${approved}.`,
     };
-    fetch(`${UserGroup.url}/${invitation.groupId}/admin/irregular-size`, {
+    fetch(UserGroup.exceptionUrl.size(invitation), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ approve, mail }),
     })
       .then((response) => response.json())
-      .then(({ error }) => {
+      .then(({ error, data }) => {
         if (error) throw error;
-        // TODO update client data
+        const groups: UserGroup[] = data.groups;
+        if (!Array.isArray(groups))
+          throw new Error("no updated groups sent back");
+        dispatch({
+          type: AdminAction.ReceivedResource,
+          payload: {
+            resources: {
+              ...state.resources,
+              [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
+            },
+          },
+          meta: ResourceKey.Groups,
+        });
       })
       .catch(dispatchError);
   };
@@ -76,7 +88,7 @@ const ExceptionsDashboard: FunctionComponent<
         "been refunded.",
       ].join(" "),
     };
-    fetch(Reservation.exceptionUrl.size(reservation), {
+    fetch(Reservation.exceptionUrl.refund(reservation), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
