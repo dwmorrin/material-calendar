@@ -1,26 +1,30 @@
 import React, { FunctionComponent } from "react";
 import {
-  Dialog,
-  Toolbar,
-  IconButton,
-  Typography,
-  List,
-  ListItem,
-  Button,
-  ButtonGroup,
   Accordion,
   AccordionSummary,
+  Button,
+  ButtonGroup,
+  Dialog,
+  Divider,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
   Paper,
+  Toolbar,
+  Typography,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AdminAction, AdminUIProps } from "../../admin/types";
-import UserGroup from "../../resources/UserGroup";
+import Event from "../../resources/Event";
+import Project from "../../resources/Project";
 import Reservation from "../../resources/Reservation";
+import UserGroup from "../../resources/UserGroup";
 import { formatDatetimeSeconds, parseSQLDatetime } from "../../utils/date";
 import { Mail, groupTo } from "../../utils/mail";
 import { ResourceKey } from "../../resources/types";
-import Event from "../../resources/Event";
 
 const ExceptionsDashboard: FunctionComponent<
   AdminUIProps & {
@@ -29,6 +33,7 @@ const ExceptionsDashboard: FunctionComponent<
 > = ({ dispatch, state, exceptions: { groupSize, refunds } }) => {
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const events = state.resources[ResourceKey.Events] as Event[];
+  const projects = state.resources[ResourceKey.Projects] as Project[];
 
   const dispatchError = (error: Error): void =>
     dispatch({ type: AdminAction.Error, payload: { error } });
@@ -107,84 +112,71 @@ const ExceptionsDashboard: FunctionComponent<
         </AccordionSummary>
         {groupSize && !!groupSize.length ? (
           <List>
-            {groupSize.map((invitation, i) => (
-              <ListItem
-                key={`invitation${i}`}
-                style={{ justifyContent: "space-between" }}
-              >
-                <Paper
-                  style={{
-                    display: "flex",
-                    flexGrow: 1,
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <section
-                    style={{
-                      textAlign: "center",
-                      flexDirection: "column",
-                      justifyContent: "space-evenly",
-                    }}
-                  >
-                    <b>Group Members</b>
-                    <ListItem
-                      key={`invitation-${i}-invitor-${invitation.invitorId}`}
-                    >
-                      TODO: lookup this user by this ID: {invitation.invitorId}
-                    </ListItem>
-                    {invitation.members.map((invitee) => (
+            {groupSize.map((group, i) => {
+              const project = projects.find(({ id }) => id === group.projectId);
+              if (!project)
+                return <ListItem>Error: project not found.</ListItem>;
+              return (
+                <List key={`invitation${i}`}>
+                  <List>
+                    <ListItem>Members</ListItem>
+                    {group.members.map((invitee) => (
                       <ListItem key={`invitation-${i}-invitee-${invitee.id}`}>
-                        {invitee.name.first + " " + invitee.name.last}
+                        <Button
+                          onClick={(): void =>
+                            window.alert("TODO: this will provide user info")
+                          }
+                        >
+                          {invitee.name.first + " " + invitee.name.last}
+                        </Button>
                       </ListItem>
                     ))}
-                  </section>
-                  <section
-                    style={{
-                      textAlign: "center",
-                      flexDirection: "column",
-                      justifyContent: "space-evenly",
-                    }}
-                  >
-                    <b>Details</b>
-                    <ListItem key={`invitation-${i}-projectTitle}`}>
-                      {"Project: " + invitation.projectTitle}
-                    </ListItem>
-                    <ListItem key={`invitation-${i}-defaultGroupSize}`}>
-                      {"Default Group Size: " + invitation.projectGroupSize}
-                    </ListItem>
-                    <ListItem key={`invitation-${i}-requestedGroupSize}`}>
-                      {"Requested Group Size: " + invitation.members.length}
-                    </ListItem>
-                  </section>
-                  <section
-                    style={{
-                      textAlign: "center",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-around",
-                    }}
-                  >
-                    <ButtonGroup orientation="vertical" color="primary">
+                  </List>
+                  <Divider variant="middle" />
+                  <ListItem>
+                    <ListItemText>{project.title}</ListItemText>
+                  </ListItem>
+                  <ListItem>
+                    <Grid container>
+                      <Grid item xs={10} sm={3}>
+                        <ListItemText>Project group size</ListItemText>
+                      </Grid>
+                      <Grid item xs={2}>
+                        <ListItemText>{project.groupSize}</ListItemText>
+                      </Grid>
+                    </Grid>
+                  </ListItem>
+                  <ListItem>
+                    <Grid container>
+                      <Grid item xs={10} sm={3}>
+                        <ListItemText>Requested group size</ListItemText>
+                      </Grid>
+                      <Grid item xs={2}>
+                        <ListItemText>{group.members.length}</ListItemText>
+                      </Grid>
+                    </Grid>
+                  </ListItem>
+                  <ListItem>
+                    <ButtonGroup>
                       <Button
-                        style={{ backgroundColor: "Green", color: "white" }}
-                        onClick={(): void => approveGroupSize(invitation, true)}
+                        variant="contained"
+                        color="primary"
+                        onClick={(): void => approveGroupSize(group, true)}
                       >
                         Approve Exception
                       </Button>
                       <Button
-                        style={{ backgroundColor: "Red", color: "white" }}
-                        onClick={(): void =>
-                          approveGroupSize(invitation, false)
-                        }
+                        variant="contained"
+                        color="secondary"
+                        onClick={(): void => approveGroupSize(group, false)}
                       >
                         Deny Exception
                       </Button>
                     </ButtonGroup>
-                  </section>
-                </Paper>
-              </ListItem>
-            ))}
+                  </ListItem>
+                </List>
+              );
+            })}
           </List>
         ) : (
           "no pending group size exception requests"
