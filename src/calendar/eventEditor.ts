@@ -102,43 +102,34 @@ export const makeOnSubmit =
 
     const cleanup = (): void => actions.setSubmitting(false);
 
-    const getCreatedEvents = ({ error }: ApiResponse): void => {
-      if (error) return dispatchError(error);
-      fetch(Event.url)
-        .then((response) => response.json())
-        .then(({ error, data }) => {
-          if (error) return dispatchError(error);
-          dispatch({
-            type: CalendarAction.CreatedEventsReceived,
-            payload: {
-              resources: {
-                [ResourceKey.Events]: data.map((e: Event) => new Event(e)),
-              },
-            },
-            meta: ResourceKey.Events,
-          });
-        });
+    const getCreatedEvents = ({ error, data }: ApiResponse): void => {
+      if (error) throw error;
+      if (!data) throw new Error("no data after creating events");
+      const { events } = data as { events: Event[] };
+      if (!Array.isArray(events))
+        throw new Error("no events after creating events");
+      dispatch({
+        type: CalendarAction.CreatedEventsReceived,
+        payload: {
+          resources: {
+            [ResourceKey.Events]: events.map((e: Event) => new Event(e)),
+          },
+        },
+        meta: ResourceKey.Events,
+      });
     };
 
-    const getUpdatedEvent = ({ error }: ApiResponse): void => {
-      if (error) return dispatchError(error);
-      fetch(Event.url)
-        .then((response) => response.json())
-        .then(({ error, data }) => {
-          if (error) return dispatchError(error);
-          const events = data.map((e: Event) => new Event(e)) as Event[];
-          const currentEvent = events.find(({ id }) => id === values.id);
-          dispatch({
-            type: CalendarAction.UpdatedEventReceived,
-            payload: {
-              resources: {
-                [ResourceKey.Events]: events,
-              },
-              currentEvent,
-            },
-            meta: ResourceKey.Events,
-          });
-        });
+    const getUpdatedEvent = ({ error, data }: ApiResponse): void => {
+      if (error) throw error;
+      if (!data) throw new Error("no data after updating event");
+      const { event } = data as { event: Event };
+      dispatch({
+        type: CalendarAction.UpdatedEventReceived,
+        payload: {
+          currentEvent: new Event(event),
+        },
+        meta: ResourceKey.Events,
+      });
     };
 
     const headers = { "Content-Type": "application/json" };

@@ -653,16 +653,53 @@ const togglePicker: StateHandler = (state) => ({
   pickerShowing: !state.pickerShowing,
 });
 
-const updatedEventReceived: StateHandler = (state, action) =>
-  closeEventEditor(
+const updatedEventReceived: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload)
+    return errorRedirect(
+      state,
+      action,
+      "no payload",
+      ErrorType.MISSING_RESOURCE
+    );
+  const { currentEvent } = payload;
+  if (!currentEvent)
+    return errorRedirect(
+      state,
+      action,
+      "no event after update",
+      ErrorType.MISSING_RESOURCE
+    );
+  const events = state.resources[ResourceKey.Events] as Event[];
+  const index = events.findIndex(({ id }) => id === currentEvent.id);
+  if (index < 0)
+    return errorRedirect(
+      state,
+      action,
+      "non-existent event",
+      ErrorType.IMPOSSIBLE_STATE
+    );
+  return closeEventEditor(
     selectedEvent(
       {
-        ...receivedResource(state, action),
+        ...receivedResource(state, {
+          ...action,
+          payload: {
+            resources: {
+              [ResourceKey.Events]: [
+                ...events.slice(0, index),
+                currentEvent,
+                ...events.slice(index + 1),
+              ],
+            },
+          },
+        }),
         currentEvent: action.payload?.currentEvent,
       },
       action
     )
   );
+};
 
 const viewToday: StateHandler = (state, action) => {
   if (!state.ref?.current) {
