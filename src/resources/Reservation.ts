@@ -1,4 +1,5 @@
 import Equipment from "./Equipment";
+import { formatSQLDatetime } from "../utils/date";
 
 interface ActionDetails {
   on: string;
@@ -51,6 +52,8 @@ class Reservation implements Reservation {
       projectId: 0,
       groupId: 0,
       guests: "",
+      created: formatSQLDatetime(),
+      cancelation: null as ReservationCancelation | null,
       equipment: [] as Equipment[],
     }
   ) {
