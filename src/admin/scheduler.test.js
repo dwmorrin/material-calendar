@@ -7,7 +7,7 @@ import {
   makeDailyHours,
   processVirtualWeeks,
   processVirtualWeeksAsHoursRemaining,
-} from "../admin/scheduler";
+} from "./scheduler";
 import VirtualWeek from "../resources/VirtualWeek";
 import Location from "../resources/Location";
 import Project from "../resources/Project";
@@ -133,17 +133,20 @@ test("makeDailyHours", () =>
       { start: "2020-06-18", end: "2020-06-18" }
     )
   ).toEqual([
-    {
-      allDay: true,
-      id: `${Location.locationHoursId}-0`,
-      resourceId: Location.locationHoursId,
-      start: "2020-06-18",
-      title: "0",
-    },
+    [
+      {
+        allDay: true,
+        id: `${Location.locationHoursId}-0`,
+        resourceId: Location.locationHoursId,
+        start: "2020-06-18",
+        title: "0",
+      },
+    ],
+    [{ date: "2020-06-18", hours: 0 }],
   ]));
 
 test("processVirtualWeeks empty", () =>
-  expect(processVirtualWeeks([], 0)).toEqual([]));
+  expect(processVirtualWeeks([], 0, [])).toEqual([[], []]));
 
 test("processVirtualWeeks adds a day", () =>
   expect(
@@ -157,19 +160,32 @@ test("processVirtualWeeks adds a day", () =>
           locationHours: 0,
         },
       ],
-      0
+      0,
+      [{ date: "2020-12-31", hours: 0 }]
     )
   ).toEqual([
-    {
-      start: "2020-12-31",
-      end: "2021-01-01",
-      locationId: 0,
-      locationHours: 0,
-      id: VirtualWeek.eventPrefix + "0",
-      resourceId: VirtualWeek.resourceId,
-      allDay: true,
-      title: "0",
-    },
+    [
+      {
+        start: "2020-12-31",
+        end: "2021-01-01",
+        locationId: 0,
+        locationHours: 0,
+        id: VirtualWeek.eventPrefix + "0",
+        resourceId: VirtualWeek.resourceId,
+        allDay: true,
+        title: "0",
+      },
+    ],
+    [
+      {
+        id: 0,
+        start: "2020-12-31",
+        end: "2020-12-31",
+        locationId: 0,
+        locationHours: 0,
+        totalHours: 0,
+      },
+    ],
   ]));
 
 test("processVirtualWeeksAsHoursRemaining empty", () =>
@@ -189,7 +205,8 @@ test("processVirtualWeeksAsHoursRemaining adds a day", () =>
           totalHours: 1,
         },
       ],
-      0
+      0,
+      [{ date: "2020-12-31", hours: 0 }]
     )
   ).toEqual([
     {

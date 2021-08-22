@@ -1,4 +1,4 @@
-import Category from "../resources/Category";
+import Category from "./Category";
 
 const categories = [
   { id: 1, title: "drums", parentId: 18 },

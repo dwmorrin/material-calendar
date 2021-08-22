@@ -1,4 +1,4 @@
-import User from "../resources/User";
+import User from "./User";
 
 const defaultUser = new User();
 

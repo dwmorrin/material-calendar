@@ -2,7 +2,7 @@ import {
   filterItems,
   makeQueryRegExp,
   makeQueryTest,
-} from "../equipmentForm/equipmentForm";
+} from "./lib";
 
 //------ TEST FIXTURES ---------//
 //--- Categories
