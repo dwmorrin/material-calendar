@@ -54,9 +54,6 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const reservations = state.resources[
     ResourceKey.Reservations
   ] as Reservation[];
-  const myEvents = reservations.map(
-    ({ eventId }) => events.find(({ id }) => eventId === id) || new Event()
-  );
 
   const { end, location, reservable, start, title, reservation } =
     state.currentEvent;
@@ -81,18 +78,30 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     (project) => project.title === Project.walkInTitle
   );
 
+  const groups = state.resources[ResourceKey.Groups] as UserGroup[];
+  const currentUserWalkInProjectGroup = groups.find(
+    (group) => group.projectId === currentUserWalkInProject?.id
+  );
+
   // returns true if there is no walk-in project
   const hasReachedTheWalkInLimit = (event: Event): boolean => {
-    if (!currentUserWalkInProject) return true;
+    if (!currentUserWalkInProjectGroup) return true;
     const now = nowInServerTimezone();
-    const myReservations = myEvents.filter(
-      ({ location, reservation }) =>
-        location.groupId === event.location.groupId &&
-        isSameDay(parseSQLDatetime(event.start), now) &&
-        reservation &&
-        reservation.groupId === currentUserWalkInProject.groupId
-    ).length;
-    return Reservation.rules.maxWalkInsPerLocation <= myReservations;
+    const myReservations = reservations.filter(
+      (reservation) =>
+        !reservation.cancelation?.refund.approved.by &&
+        reservation.groupId === currentUserWalkInProjectGroup.id &&
+        events.find((e) => e.id === reservation.eventId)?.location.groupId ===
+          event.location.groupId &&
+        isSameDay(
+          parseSQLDatetime(
+            events.find((event) => event.id === reservation.eventId)?.start ||
+              ""
+          ),
+          now
+        )
+    );
+    return Reservation.rules.maxWalkInsPerLocation <= myReservations.length;
   };
 
   const projectHasHoursRemaining = (project: Project): boolean => {
