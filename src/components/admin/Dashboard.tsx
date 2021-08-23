@@ -56,7 +56,10 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       // try to use the user's selected semesterId, or the most recent semester
       const selectedSemester =
         selections.semesterId > 0
-          ? semesters.find(({ id }) => id === selections.semesterId)
+          ? semesters.find(({ id }) => id === selections.semesterId) ||
+            semesters.length
+            ? semesters.reduce(mostRecent)
+            : null
           : semesters.length
           ? semesters.reduce(mostRecent)
           : null;
