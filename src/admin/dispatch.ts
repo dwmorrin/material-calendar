@@ -30,6 +30,10 @@ export const dispatchFile =
     event.target.value = ""; // resets file picker button
   };
 
+  /**
+   * TODO updating one resource may need to update other resources,
+   * e.g. projects affect virtual week allotment visualization
+   */
 export const dispatchOneResource =
   (
     dispatch: (action: Action) => void,

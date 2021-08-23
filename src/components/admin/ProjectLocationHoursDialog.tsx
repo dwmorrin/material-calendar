@@ -106,7 +106,11 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   if (!selectedWeek)
     return (
       <DialogWrapper dispatch={dispatch} state={state} onClose={close}>
-        Allotments cannot be created outside of a virtual week.
+        <DialogTitle>Invalid allotment selection</DialogTitle>
+        <DialogContent>
+          Project start/end not aligned with a virtual week. Adjust project
+          start/end or virtual week size.
+        </DialogContent>
       </DialogWrapper>
     );
 
