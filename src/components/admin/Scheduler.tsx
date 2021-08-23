@@ -23,7 +23,7 @@ import {
   AdminAction,
 } from "../../admin/types";
 import { ResourceKey } from "../../resources/types";
-import { Fab } from "@material-ui/core";
+import { Button, Fab } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 
 const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
@@ -45,13 +45,27 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
     }
   }, [state.ref, state.selectedSemester]);
 
+  const dispatchEditResource = (resourceKey: ResourceKey): void =>
+    dispatch({
+      type: AdminAction.SelectedResource,
+      payload: { resourceKey },
+    });
+
   const semester = state.selectedSemester;
-  if (!semester) {
-    return <div>Create a semester first.</div>;
-  }
-  if (!locations.length) {
-    return <div>Create some locations first.</div>;
-  }
+  if (!semester)
+    return (
+      <Button onClick={(): void => dispatchEditResource(ResourceKey.Semesters)}>
+        Create a semester first.
+      </Button>
+    );
+
+  if (!locations.length)
+    return (
+      <Button onClick={(): void => dispatchEditResource(ResourceKey.Locations)}>
+        Create some locations first.
+      </Button>
+    );
+
   const location =
     selections.locationId > 0
       ? locations.find((location) => location.id === selections.locationId)

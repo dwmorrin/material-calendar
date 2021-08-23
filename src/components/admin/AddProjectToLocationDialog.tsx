@@ -104,31 +104,44 @@ const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
       </Toolbar>
       <DialogTitle>Add Project to Location</DialogTitle>
       <DialogContent>
-        <Formik
-          initialValues={projectsNotInLocation.reduce(
-            (titles, { title }) => ({ ...titles, [title]: false }),
-            {}
-          )}
-          onSubmit={onSubmit}
-        >
-          {({ handleSubmit }): unknown => (
-            <List>
-              {projectsNotInLocation.map(({ id, title }) => (
-                <ListItem key={`project-location-checkbox-${id}`}>
-                  <Field
-                    Label={{ label: title }}
-                    type="checkbox"
-                    name={title}
-                    component={CheckboxWithLabel}
-                  />
-                </ListItem>
-              ))}
-              <DialogActions>
-                <Button onClick={(): void => handleSubmit()}>OK</Button>
-              </DialogActions>
-            </List>
-          )}
-        </Formik>
+        {projectsNotInLocation.length ? (
+          <Formik
+            initialValues={projectsNotInLocation.reduce(
+              (titles, { title }) => ({ ...titles, [title]: false }),
+              {}
+            )}
+            onSubmit={onSubmit}
+          >
+            {({ handleSubmit }): unknown => (
+              <List>
+                {projectsNotInLocation.map(({ id, title }) => (
+                  <ListItem key={`project-location-checkbox-${id}`}>
+                    <Field
+                      Label={{ label: title }}
+                      type="checkbox"
+                      name={title}
+                      component={CheckboxWithLabel}
+                    />
+                  </ListItem>
+                ))}
+                <DialogActions>
+                  <Button onClick={(): void => handleSubmit()}>OK</Button>
+                </DialogActions>
+              </List>
+            )}
+          </Formik>
+        ) : (
+          <>
+          <p>(No available projects found.)</p>
+          <DialogActions><Button
+            onClick={(): void =>
+              dispatch({
+                type: AdminAction.SelectedResource,
+                payload: { resourceKey: ResourceKey.Projects },
+              })
+            }
+          >Create a new project</Button></DialogActions></>
+        )}
       </DialogContent>
     </Dialog>
   );
