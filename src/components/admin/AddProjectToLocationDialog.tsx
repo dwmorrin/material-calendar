@@ -21,6 +21,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import Location from "../../resources/Location";
+import VirtualWeek from "../../resources/VirtualWeek";
 
 const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
   state,
@@ -50,7 +51,7 @@ const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
 
   const onSubmit = (values: Record<string, unknown>): void => {
     const selectedProjects = Object.entries(
-      values as { [title: string]: boolean }
+      values as Record<string, boolean>
     ).reduce(
       (locationHours, [title, selected]) =>
         selected
@@ -68,25 +69,28 @@ const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
     })
       .then((res) => res.json())
       .then(({ error, data }) => {
-        if (error)
-          return dispatch({ type: AdminAction.Error, payload: { error } });
+        if (error) throw error;
+        const projects: Project[] = data.projects;
+        const locations: Location[] = data.locations;
+        const weeks: VirtualWeek[] = data.weeks;
+        if (![projects, locations, weeks].every((a) => Array.isArray(a)))
+          throw new Error(
+            "missing updated project, location, or week after adding project"
+          );
         dispatch({
           type: AdminAction.AddProjectToLocationSuccess,
           payload: {
             resources: {
               ...state.resources,
-              [ResourceKey.Projects]: (data.projects as Project[]).map(
-                (p) => new Project(p)
-              ),
-              [ResourceKey.Locations]: (data.locations as Location[]).map(
-                (l) => new Location(l)
-              ),
+              [ResourceKey.Projects]: projects.map((p) => new Project(p)),
+              [ResourceKey.Locations]: locations.map((l) => new Location(l)),
+              [ResourceKey.VirtualWeeks]: weeks.map((w) => new VirtualWeek(w)),
             },
           },
         });
       })
-      .catch((err) => {
-        dispatch({ type: AdminAction.Error, payload: { error: err } });
+      .catch((error) => {
+        dispatch({ type: AdminAction.Error, payload: { error } });
       });
   };
 
