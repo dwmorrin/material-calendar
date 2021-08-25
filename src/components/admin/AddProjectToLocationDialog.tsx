@@ -102,7 +102,7 @@ const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
           <CloseIcon />
         </IconButton>
       </Toolbar>
-      <DialogTitle>Add Project to Location</DialogTitle>
+      <DialogTitle>Add Projects to Location</DialogTitle>
       <DialogContent>
         {projectsNotInLocation.length ? (
           <Formik
@@ -125,22 +125,36 @@ const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
                   </ListItem>
                 ))}
                 <DialogActions>
-                  <Button onClick={(): void => handleSubmit()}>OK</Button>
+                  <Button variant="contained" color="secondary" onClick={close}>
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={(): void => handleSubmit()}
+                  >
+                    Add projects
+                  </Button>
                 </DialogActions>
               </List>
             )}
           </Formik>
         ) : (
           <>
-          <p>(No available projects found.)</p>
-          <DialogActions><Button
-            onClick={(): void =>
-              dispatch({
-                type: AdminAction.SelectedResource,
-                payload: { resourceKey: ResourceKey.Projects },
-              })
-            }
-          >Create a new project</Button></DialogActions></>
+            <p>(No available projects found.)</p>
+            <DialogActions>
+              <Button
+                onClick={(): void =>
+                  dispatch({
+                    type: AdminAction.SelectedResource,
+                    payload: { resourceKey: ResourceKey.Projects },
+                  })
+                }
+              >
+                Create a new project
+              </Button>
+            </DialogActions>
+          </>
         )}
       </DialogContent>
     </Dialog>
