@@ -1,20 +1,8 @@
-import { makeStyles } from "@material-ui/core";
-import { Action, ApiResponse, CalendarAction } from "../calendar/types";
-import Event from "../resources/Event";
+import { Action, ApiResponse, CalendarAction } from "../../calendar/types";
+import Event from "../../resources/Event";
 import { FormikValues } from "formik";
-import { eventGenerator, formatSQLDatetime } from "../utils/date";
-import { ResourceKey } from "../resources/types";
-
-export const useStyles = makeStyles({
-  list: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-  item: {
-    marginTop: 30,
-  },
-});
+import { eventGenerator, formatSQLDatetime } from "../../utils/date";
+import { ResourceKey } from "../../resources/types";
 
 export const initialEventOptions = {
   repeats: false,

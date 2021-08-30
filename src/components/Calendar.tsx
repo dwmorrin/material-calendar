@@ -15,7 +15,7 @@ import { ResourceKey } from "../resources/types";
 import fetchAllResources from "../utils/fetchAllResources";
 import { CalendarAction, CalendarSelections } from "../calendar/types";
 import { Box } from "@material-ui/core";
-import EventEditor from "./EventEditor";
+import EventEditor from "./EventEditor/EventEditor";
 import ProjectForm from "./ProjectForm";
 import Snackbar from "./Snackbar";
 import ErrorPage from "./ErrorPage";
