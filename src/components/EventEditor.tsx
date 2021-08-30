@@ -22,6 +22,14 @@ import {
 } from "../calendar/eventEditor";
 import DateFnsUtils from "@date-io/date-fns";
 import { parseSQLDatetime } from "../utils/date";
+import * as Yup from "yup";
+
+//! TODO this correctly disables submit with invalid dates, but shows no info to user
+const schema = Yup.object().shape({
+  title: Yup.string().required("Title is required"),
+  start: Yup.date(),
+  end: Yup.date().min(Yup.ref("start"), "End date must be after start date"),
+});
 
 const EventEditor: FunctionComponent<EventEditorProps> = ({
   dispatch,
@@ -53,7 +61,11 @@ const EventEditor: FunctionComponent<EventEditorProps> = ({
         <Typography variant="h6">Edit {event.location.title} event</Typography>
       </Toolbar>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <Formik initialValues={initialValues} onSubmit={onSubmit}>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={onSubmit}
+          validationSchema={schema}
+        >
           {({ values }): unknown => (
             <Form className={classes.list}>
               <Field
