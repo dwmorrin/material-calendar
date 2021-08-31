@@ -69,11 +69,7 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
       />
       <EventDetail dispatch={dispatch} state={state} />
       <ProjectForm dispatch={dispatch} state={state} />
-      <EventEditor
-        dispatch={dispatch}
-        open={state.eventEditorIsOpen}
-        event={state.currentEvent}
-      />
+      <EventEditor dispatch={dispatch} state={state} />
       <CalendarBar
         dispatch={dispatch}
         state={state}

@@ -1,7 +1,21 @@
 import { Action, ApiResponse, CalendarAction } from "../../calendar/types";
 import Event from "../../resources/Event";
+import Location from "../../resources/Location";
 import { FormikValues } from "formik";
-import { eventGenerator, formatSQLDatetime } from "../../utils/date";
+import {
+  DateInterval,
+  addDays,
+  castSQLDatetimeToSQLDate,
+  compareAscSQLDate,
+  differenceInHoursSQLDatetime,
+  endOfDay,
+  eventGenerator,
+  formatSQLDate,
+  formatSQLDatetime,
+  isWithinIntervalFP,
+  parseSQLDatetime,
+  startOfDay,
+} from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 
 export const initialEventOptions = {
@@ -46,25 +60,32 @@ const getRepeats = (repeats: Record<string, unknown>): number[] =>
     [] as number[]
   );
 
+interface EventValues {
+  id: number;
+  start: Date;
+  end: Date;
+  title: string;
+  reservable: boolean;
+  location: { id: number; title: string };
+  __options__: typeof initialEventOptions;
+}
+
+/**
+ * locationEvents are not guaranteed to be in order
+ */
 export const makeOnSubmit =
-  (dispatch: (action: Action) => void) =>
-  (
-    values: {
-      id: number;
-      start: Date;
-      end: Date;
-      title: string;
-      reservable: boolean;
-      location: { id: number; title: string };
-      __options__: typeof initialEventOptions;
-    },
-    actions: FormikValues
-  ): void => {
+  (dispatch: (action: Action) => void, location: Location, events: Event[]) =>
+  (values: EventValues, actions: FormikValues): void => {
     const { repeats, on } = values.__options__;
     const days = getRepeats(on);
     const start = values.start;
     const end = values.end;
     const until = repeats ? values.__options__.until : start;
+
+    const hours = Location.getHours(location, {
+      start: formatSQLDate(start),
+      end: formatSQLDate(until),
+    });
 
     // adapts for API interface
     const eventAdapter = ({
@@ -81,9 +102,48 @@ export const makeOnSubmit =
       title: values.title,
     });
 
-    const events = [...eventGenerator({ start, end, days, until })].map(
-      eventAdapter
+    const isWithinGenerator = isWithinIntervalFP({
+      start: startOfDay(start),
+      end: endOfDay(until),
+    });
+
+    const locationEvents = events.filter(
+      ({ start, location: { id } }) =>
+        id === location.id && isWithinGenerator(parseSQLDatetime(start))
     );
+
+    locationEvents.sort(({ start: a }, { start: b }) =>
+      compareAscSQLDate({ start: a, end: b })
+    );
+
+    const dailyUsage = locationEvents.reduce((acc, event) => {
+      const key = event.start.split(" ")[0];
+      acc[key] = acc[key] || 0;
+      acc[key] += differenceInHoursSQLDatetime(event);
+      return acc;
+    }, {} as Record<string, number>);
+
+    // TODO refactor so the user can be alerted when this returns false ("skipping...")
+    const hasHoursAvailable = (
+      { start }: DateInterval,
+      hoursToBeCreated: number
+    ): boolean => {
+      const dateString = formatSQLDate(start);
+      const existingTotal = dailyUsage[dateString] || 0;
+      const hoursAvailable =
+        hours.find(({ date }) => date === dateString)?.hours || 0;
+      return existingTotal + hoursToBeCreated <= hoursAvailable;
+    };
+
+    const generatedEvents = [
+      ...eventGenerator({
+        start,
+        end,
+        days,
+        until,
+        predicateFn: hasHoursAvailable,
+      }),
+    ].map(eventAdapter);
 
     const dispatchError = (error: Error): void =>
       dispatch({ type: CalendarAction.Error, payload: { error } });
@@ -126,7 +186,7 @@ export const makeOnSubmit =
       // creating
       fetch(`${Event.url}/bulk`, {
         method: "POST",
-        body: JSON.stringify(events),
+        body: JSON.stringify(generatedEvents),
         headers,
       })
         .then((response) => response.json())
@@ -151,9 +211,3 @@ export const makeOnSubmit =
         .catch(dispatchError)
         .finally(cleanup);
   };
-
-export interface EventEditorProps {
-  dispatch: (action: Action) => void;
-  open: boolean;
-  event?: Event;
-}

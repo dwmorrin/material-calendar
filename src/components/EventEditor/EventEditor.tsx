@@ -10,16 +10,18 @@ import {
   Typography,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { CalendarAction } from "../../calendar/types";
+import { CalendarAction, CalendarUIProps } from "../../calendar/types";
 import Event from "../../resources/Event";
+import Location from "../../resources/Location";
 import { Field, Formik, Form } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker, DateTimePicker } from "formik-material-ui-pickers";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import { initialEventOptions, makeOnSubmit, EventEditorProps } from "./lib";
+import { initialEventOptions, makeOnSubmit } from "./lib";
 import DateFnsUtils from "@date-io/date-fns";
 import { parseSQLDatetime } from "../../utils/date";
 import * as Yup from "yup";
+import { ResourceKey } from "../../resources/types";
 
 //! TODO this correctly disables submit with invalid dates, but shows no info to user
 const schema = Yup.object().shape({
@@ -28,21 +30,25 @@ const schema = Yup.object().shape({
   end: Yup.date().min(Yup.ref("start"), "End date must be after start date"),
 });
 
-const EventEditor: FC<EventEditorProps> = ({
-  dispatch,
-  open,
-  event = new Event(),
-}) => {
+const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
+  const event = state.currentEvent || new Event();
+  const location = (state.resources[ResourceKey.Locations] as Location[]).find(
+    ({ id }) => id === event.location.id
+  );
+  if (!location) return null; // should be impossible to get here
+
+  const events = state.resources[ResourceKey.Events] as Event[];
+
   const initialValues = {
     ...event,
     start: parseSQLDatetime(event.start),
     end: parseSQLDatetime(event.end),
     __options__: initialEventOptions,
   };
-  const onSubmit = makeOnSubmit(dispatch);
+  const onSubmit = makeOnSubmit(dispatch, location, events);
 
   return (
-    <Dialog open={open}>
+    <Dialog open={state.eventEditorIsOpen}>
       <Toolbar>
         <IconButton
           edge="start"

@@ -20,10 +20,12 @@ import {
 export {
   addDays,
   eachDayOfInterval,
+  endOfDay,
   format,
   isAfter,
   isBefore,
   isWithinInterval,
+  startOfDay,
   subDays,
   subHours,
   subMinutes,
@@ -166,13 +168,14 @@ export function parseAndFormatSQLDatetimeInterval({
   });
 }
 
-interface DateInterval {
+export interface DateInterval {
   start: Date;
   end: Date;
 }
 interface EventGeneratorProps extends DateInterval {
   until: Date;
   days: number[];
+  predicateFn?: (di: DateInterval, hours: number) => boolean;
 }
 
 export const eventGenerator = ({
@@ -180,6 +183,7 @@ export const eventGenerator = ({
   end,
   until,
   days,
+  predicateFn,
 }: EventGeneratorProps): {
   [Symbol.iterator](): Generator<{ start: string; end: string }>;
 } => ({
@@ -188,7 +192,11 @@ export const eventGenerator = ({
     const add1Day = add({ days: 1 });
     const untilValue = until.valueOf();
     while (untilValue >= start.valueOf()) {
-      if (!days.length || days.includes(start.getUTCDay())) {
+      if (
+        (!days.length || days.includes(start.getUTCDay())) &&
+        (!predicateFn ||
+          predicateFn({ start, end }, differenceInHours(end, start)))
+      ) {
         yield {
           start: formatJSON(start),
           end: formatJSON(end),
@@ -252,6 +260,9 @@ export const isValidSQLDatetimeInterval = ({
 
 export const castSQLDateToSQLDatetime = (date: string): string =>
   `${date} 00:00:00`;
+
+export const castSQLDatetimeToSQLDate = (datetime: string): string =>
+  datetime.split(" ")[0];
 
 export const isIntervalWithinInterval =
   (inner: DateInterval) =>
