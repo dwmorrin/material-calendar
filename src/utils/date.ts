@@ -234,9 +234,7 @@ export const isIntervalWithinInterval =
 export const getDayNumberFromSQLDate = (date: string): number =>
   getDay(parseSQLDate(date));
 
-export const getDayFromNumber = (
-  dayNumber: number
-):
+type WeekdayString =
   | "sunday"
   | "monday"
   | "tuesday"
@@ -244,25 +242,20 @@ export const getDayFromNumber = (
   | "thursday"
   | "friday"
   | "saturday"
-  | "sunday" => {
-  const days = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-  ] as [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday"
-  ];
-  return days[Math.floor(dayNumber) % 7];
+  | "sunday";
+
+const orderedWeekdayStrings: WeekdayString[] = [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+];
+
+export const getDayFromNumber = (dayNumber: number): WeekdayString => {
+  return orderedWeekdayStrings[Math.floor(dayNumber) % 7];
 };
 
 export const daysInInterval = ({ start, end }: DateStringInterval): number =>

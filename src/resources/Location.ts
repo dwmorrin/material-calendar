@@ -79,9 +79,10 @@ class Location implements Location {
         res.push({ date: nextHours.date, hours: nextHours.hours });
         nextHours = hours.shift();
       } else {
-        const day = getDayFromNumber(dayPointer);
-        const hours = location.defaultHours[day];
-        res.push({ date: currentDate, hours });
+        res.push({
+          date: currentDate,
+          hours: location.defaultHours[getDayFromNumber(dayPointer)],
+        });
       }
       currentDate = addADay(currentDate);
       dayPointer = (dayPointer + 1) % 7;
