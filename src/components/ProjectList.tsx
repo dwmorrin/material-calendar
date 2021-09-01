@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FC } from "react";
 import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
 import ProjectAccordionList from "./ProjectAccordionList";
 import ProjectListItem from "./ProjectListItem";
@@ -10,11 +10,15 @@ import UserGroup from "../resources/UserGroup";
 
 type CourseProjects = Record<number, Project[]>;
 
-const ProjectList: FunctionComponent<
+const ProjectList: FC<
   CalendarUIProps & CalendarUISelectionProps & { invitations: UserGroup[] }
 > = ({ dispatch, invitations, state, selections, setSelections }) => {
-  const projects = state.resources[ResourceKey.Projects] as Project[];
-  const courses = state.resources[ResourceKey.Courses] as Course[];
+  const projects = (state.resources[ResourceKey.Projects] as Project[]).filter(
+    ({ title }) => title !== Project.walkInTitle
+  );
+  const courses = (state.resources[ResourceKey.Courses] as Course[]).filter(
+    ({ title }) => title !== Project.walkInTitle
+  );
   const courseProjects = projects.reduce((acc, p) => {
     const {
       course: { id },
