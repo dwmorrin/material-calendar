@@ -8,11 +8,15 @@ import Dashboard from "./admin/Dashboard";
  * Redirect user to the appropriate page
  */
 const Landing: FC = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, lastLocation, setLastLocation } = useAuth();
 
   useEffect(() => {
-    navigate(isAdmin ? "/admin" : "/calendar");
-  }, [isAdmin]);
+    if (lastLocation === "/") {
+      const destination = isAdmin ? "/admin" : "/calendar";
+      setLastLocation(destination);
+      navigate(destination);
+    } else navigate(lastLocation);
+  }, [isAdmin, lastLocation, setLastLocation]);
 
   return (
     <Router>

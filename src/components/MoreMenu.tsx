@@ -8,7 +8,7 @@ import User from "../resources/User";
 const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   inAdminApp,
 }) => {
-  const { isAdmin, setUser, setStatus } = useAuth();
+  const { isAdmin, setUser, setStatus, setLastLocation } = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = !!anchorEl;
 
@@ -29,6 +29,7 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
       .finally(() => {
         setStatus(AuthStatus.loggedOut);
         setUser(new User());
+        setLastLocation("/");
         navigate("/");
       });
   };
@@ -56,12 +57,14 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
         </MenuItem>
         {isAdmin && (
           <MenuItem
-            onClick={(): Promise<void> =>
-              navigate(inAdminApp ? "/calendar" : "/admin")
-            }
+            onClick={(): void => {
+              const destination = inAdminApp ? "/calendar" : "/admin";
+              setLastLocation(destination);
+              navigate(destination);
+            }}
           >
             <Typography>
-              {inAdminApp ? "Switch to calendar" : "Switch to admin app"}
+              Switch to {inAdminApp ? "calendar" : "scheduler"}
             </Typography>
           </MenuItem>
         )}

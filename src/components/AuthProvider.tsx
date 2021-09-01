@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import useLocalStorage from "../utils/useLocalStorage";
 import User from "../resources/User";
 import { CircularProgress } from "@material-ui/core";
 import Login from "./Login";
@@ -25,6 +26,8 @@ interface AuthContext {
   setUser: React.Dispatch<SetStateAction<User>>;
   status: AuthStatus;
   setStatus: React.Dispatch<SetStateAction<AuthStatus>>;
+  lastLocation: string;
+  setLastLocation: React.Dispatch<SetStateAction<string>>;
   isAdmin: boolean;
   isPending: boolean;
   isAuthenticated: boolean;
@@ -52,11 +55,14 @@ export const useAuth = (): AuthContext => {
 const AuthProvider: FunctionComponent = ({ children }) => {
   const [status, setStatus] = useState<AuthStatus>(AuthStatus.pending);
   const [user, setUser] = useState<User>(new User());
+  const [lastLocation, setLastLocation] = useLocalStorage("lastLocation", "/");
   const value = {
     user,
     setUser,
     status,
     setStatus,
+    lastLocation,
+    setLastLocation,
     isAdmin: false,
     isPending: status === AuthStatus.pending,
     isAuthenticated: status === AuthStatus.authenticated,
