@@ -3,13 +3,11 @@ import Event from "../../resources/Event";
 import Location from "../../resources/Location";
 import { FormikValues } from "formik";
 import {
-  DateInterval,
   addDays,
-  castSQLDatetimeToSQLDate,
   compareAscSQLDate,
+  differenceInHours,
   differenceInHoursSQLDatetime,
   endOfDay,
-  eventGenerator,
   formatSQLDate,
   formatSQLDatetime,
   isWithinIntervalFP,
@@ -17,6 +15,50 @@ import {
   startOfDay,
 } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
+
+interface DateInterval {
+  start: Date;
+  end: Date;
+}
+interface EventGeneratorProps extends DateInterval {
+  until: Date;
+  days: number[];
+  hasHoursAvailable: (di: DateInterval, hours: number) => boolean;
+}
+
+interface GeneratedIntervals {
+  start: string;
+  end: string;
+  hoursAvailable: boolean;
+}
+
+const eventGenerator = ({
+  start,
+  end,
+  until,
+  days,
+  hasHoursAvailable,
+}: EventGeneratorProps): {
+  [Symbol.iterator](): Generator<GeneratedIntervals>;
+} => ({
+  *[Symbol.iterator](): Generator<GeneratedIntervals> {
+    const untilValue = until.valueOf();
+    while (untilValue >= start.valueOf()) {
+      if (!days.length || days.includes(start.getUTCDay())) {
+        yield {
+          start: formatSQLDatetime(start),
+          end: formatSQLDatetime(end),
+          hoursAvailable: hasHoursAvailable(
+            { start, end },
+            differenceInHours(end, start)
+          ),
+        };
+      }
+      start = addDays(start, 1);
+      end = addDays(end, 1);
+    }
+  },
+});
 
 export const initialEventOptions = {
   repeats: false,
@@ -87,21 +129,6 @@ export const makeOnSubmit =
       end: formatSQLDate(until),
     });
 
-    // adapts for API interface
-    const eventAdapter = ({
-      start,
-      end,
-    }: {
-      start: string;
-      end: string;
-    }): Omit<Event, "id"> => ({
-      start,
-      end,
-      locationId: values.location.id,
-      reservable: values.reservable,
-      title: values.title,
-    });
-
     const isWithinGenerator = isWithinIntervalFP({
       start: startOfDay(start),
       end: endOfDay(until),
@@ -123,7 +150,6 @@ export const makeOnSubmit =
       return acc;
     }, {} as Record<string, number>);
 
-    // TODO refactor so the user can be alerted when this returns false ("skipping...")
     const hasHoursAvailable = (
       { start }: DateInterval,
       hoursToBeCreated: number
@@ -135,15 +161,33 @@ export const makeOnSubmit =
       return existingTotal + hoursToBeCreated <= hoursAvailable;
     };
 
-    const generatedEvents = [
+    const generatedIntervals = [
       ...eventGenerator({
         start,
         end,
         days,
         until,
-        predicateFn: hasHoursAvailable,
+        hasHoursAvailable,
       }),
-    ].map(eventAdapter);
+    ];
+
+    const skippedEvents = generatedIntervals.filter(
+      ({ hoursAvailable }) => !hoursAvailable
+    );
+    // TODO - show skipped events in a modal
+    console.log({ skippedEvents });
+
+    const generatedEvents = generatedIntervals
+      .filter(({ hoursAvailable }) => hoursAvailable)
+      .map(
+        ({ start, end }): Omit<Event, "id"> => ({
+          start,
+          end,
+          locationId: values.location.id,
+          reservable: values.reservable,
+          title: values.title,
+        })
+      );
 
     const dispatchError = (error: Error): void =>
       dispatch({ type: CalendarAction.Error, payload: { error } });

@@ -1,8 +1,4 @@
-import {
-  add,
-  areIntervalsOverlappingWithOptions,
-  lightFormat,
-} from "date-fns/fp";
+import { areIntervalsOverlappingWithOptions, lightFormat } from "date-fns/fp";
 import {
   compareAsc,
   differenceInCalendarDays,
@@ -19,6 +15,7 @@ import {
 
 export {
   addDays,
+  differenceInHours,
   eachDayOfInterval,
   endOfDay,
   format,
@@ -168,45 +165,10 @@ export function parseAndFormatSQLDatetimeInterval({
   });
 }
 
-export interface DateInterval {
+interface DateInterval {
   start: Date;
   end: Date;
 }
-interface EventGeneratorProps extends DateInterval {
-  until: Date;
-  days: number[];
-  predicateFn?: (di: DateInterval, hours: number) => boolean;
-}
-
-export const eventGenerator = ({
-  start,
-  end,
-  until,
-  days,
-  predicateFn,
-}: EventGeneratorProps): {
-  [Symbol.iterator](): Generator<{ start: string; end: string }>;
-} => ({
-  *[Symbol.iterator](): Generator<{ start: string; end: string }> {
-    const formatJSON = lightFormat("yyyy-MM-dd'T'HH:mm:ss");
-    const add1Day = add({ days: 1 });
-    const untilValue = until.valueOf();
-    while (untilValue >= start.valueOf()) {
-      if (
-        (!days.length || days.includes(start.getUTCDay())) &&
-        (!predicateFn ||
-          predicateFn({ start, end }, differenceInHours(end, start)))
-      ) {
-        yield {
-          start: formatJSON(start),
-          end: formatJSON(end),
-        };
-      }
-      start = add1Day(start);
-      end = add1Day(end);
-    }
-  },
-});
 
 export const compareAscSQLDate = ({
   start,
