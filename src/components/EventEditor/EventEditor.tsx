@@ -95,17 +95,28 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
             <Form>
               <List>
                 <ListItem>
-                  <Field component={TextField} label="Title" name="title" />
+                  <Field
+                    fullWidth
+                    component={TextField}
+                    label="Title"
+                    name="title"
+                  />
                 </ListItem>
                 <ListItem>
                   <Field
+                    fullWidth
                     component={DateTimePicker}
                     label="Start"
                     name="start"
                   />
                 </ListItem>
                 <ListItem>
-                  <Field component={DateTimePicker} label="End" name="end" />
+                  <Field
+                    fullWidth
+                    component={DateTimePicker}
+                    label="End"
+                    name="end"
+                  />
                 </ListItem>
                 <ListItem>
                   <Field
