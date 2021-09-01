@@ -5,7 +5,7 @@ import { FormikValues } from "formik";
 import {
   addDays,
   compareAscSQLDate,
-  differenceInHours,
+  differenceInMinutes,
   differenceInHoursSQLDatetime,
   endOfDay,
   formatSQLDate,
@@ -52,7 +52,7 @@ const eventGenerator = ({
           end: formatSQLDatetime(end),
           hoursAvailable: hasHoursAvailable(
             { start, end },
-            differenceInHours(end, start)
+            differenceInMinutes(end, start) / 60
           ),
         };
       }

@@ -3,7 +3,7 @@ import {
   compareAsc,
   differenceInCalendarDays,
   differenceInCalendarMonths,
-  differenceInHours,
+  differenceInMinutes,
   format,
   formatISO9075,
   getDay,
@@ -15,7 +15,7 @@ import {
 
 export {
   addDays,
-  differenceInHours,
+  differenceInMinutes,
   eachDayOfInterval,
   endOfDay,
   format,
@@ -272,4 +272,4 @@ export const differenceInHoursSQLDatetime = ({
   start,
   end,
 }: DateStringInterval): number =>
-  differenceInHours(parseSQLDatetime(end), parseSQLDatetime(start));
+  differenceInMinutes(parseSQLDatetime(end), parseSQLDatetime(start)) / 60;
