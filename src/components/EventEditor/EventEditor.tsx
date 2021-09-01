@@ -1,7 +1,10 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import {
   Button,
   Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormLabel,
   IconButton,
   List,
@@ -17,9 +20,18 @@ import { Field, Formik, Form } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker, DateTimePicker } from "formik-material-ui-pickers";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import { initialEventOptions, makeOnSubmit } from "./lib";
+import {
+  GeneratedInterval,
+  NewEvent,
+  afterConfirmed,
+  initialEventOptions,
+  makeConfirmation,
+} from "./lib";
 import DateFnsUtils from "@date-io/date-fns";
-import { parseSQLDatetime } from "../../utils/date";
+import {
+  parseAndFormatSQLDatetimeInterval,
+  parseSQLDatetime,
+} from "../../utils/date";
 import * as Yup from "yup";
 import { ResourceKey } from "../../resources/types";
 
@@ -31,6 +43,10 @@ const schema = Yup.object().shape({
 });
 
 const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
+  const [confirmationDialogOpen, setConfirmationDialogIsOpen] = useState(false);
+  const [skipped, setSkipped] = useState<GeneratedInterval[]>([]);
+  const [generated, setGenerated] = useState<NewEvent[]>([]);
+
   const event = state.currentEvent || new Event();
   const location = (state.resources[ResourceKey.Locations] as Location[]).find(
     ({ id }) => id === event.location.id
@@ -45,7 +61,14 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
     end: parseSQLDatetime(event.end),
     __options__: initialEventOptions,
   };
-  const onSubmit = makeOnSubmit(dispatch, location, events);
+  const onSubmit = makeConfirmation({
+    dispatch,
+    location,
+    events,
+    setConfirmationDialogIsOpen,
+    setSkipped,
+    setGenerated,
+  });
 
   return (
     <Dialog open={state.eventEditorIsOpen}>
@@ -185,6 +208,53 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
           )}
         </Formik>
       </MuiPickersUtilsProvider>
+      <Dialog open={confirmationDialogOpen}>
+        <DialogTitle>Skip these events?</DialogTitle>
+        <DialogContent>
+          <p>
+            The maximum number of daily hours would be exceeded if the following
+            events were created.
+          </p>
+          <p>
+            You can proceed by skipping these events now, or cancel and adjust
+            the daily hours as needed.
+          </p>
+          <List>
+            {skipped.map((event, index) => (
+              <ListItem key={`skipped-list-${index}`}>
+                {parseAndFormatSQLDatetimeInterval(event)}
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={(): void => {
+              setSkipped([]);
+              setGenerated([]);
+              setConfirmationDialogIsOpen(false);
+            }}
+          >
+            Cancel, something is not right
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={(): void => {
+              setConfirmationDialogIsOpen(false);
+              afterConfirmed({
+                eventId: event.id,
+                dispatch,
+                generatedEvents: generated,
+              });
+            }}
+          >
+            Yes, skip these events
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };

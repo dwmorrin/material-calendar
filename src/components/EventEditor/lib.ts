@@ -16,6 +16,8 @@ import {
 } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 
+export type NewEvent = Omit<Event, "id">;
+
 interface DateInterval {
   start: Date;
   end: Date;
@@ -26,7 +28,7 @@ interface EventGeneratorProps extends DateInterval {
   hasHoursAvailable: (di: DateInterval, hours: number) => boolean;
 }
 
-interface GeneratedIntervals {
+export interface GeneratedInterval {
   start: string;
   end: string;
   hoursAvailable: boolean;
@@ -39,9 +41,9 @@ const eventGenerator = ({
   days,
   hasHoursAvailable,
 }: EventGeneratorProps): {
-  [Symbol.iterator](): Generator<GeneratedIntervals>;
+  [Symbol.iterator](): Generator<GeneratedInterval>;
 } => ({
-  *[Symbol.iterator](): Generator<GeneratedIntervals> {
+  *[Symbol.iterator](): Generator<GeneratedInterval> {
     const untilValue = until.valueOf();
     while (untilValue >= start.valueOf()) {
       if (!days.length || days.includes(start.getUTCDay())) {
@@ -112,12 +114,98 @@ interface EventValues {
   __options__: typeof initialEventOptions;
 }
 
+interface SubmitProps {
+  eventId: number;
+  dispatch: (action: Action) => void;
+  generatedEvents: NewEvent[];
+}
+
+export const afterConfirmed = ({
+  eventId,
+  dispatch,
+  generatedEvents,
+}: SubmitProps): void => {
+  if (!generatedEvents.length) return;
+  const dispatchError = (error: Error): void =>
+    dispatch({ type: CalendarAction.Error, payload: { error } });
+
+  const getCreatedEvents = ({ error, data }: ApiResponse): void => {
+    if (error) throw error;
+    if (!data) throw new Error("no data after creating events");
+    const { events } = data as { events: Event[] };
+    if (!Array.isArray(events))
+      throw new Error("no events after creating events");
+    dispatch({
+      type: CalendarAction.CreatedEventsReceived,
+      payload: {
+        resources: {
+          [ResourceKey.Events]: events.map((e: Event) => new Event(e)),
+        },
+      },
+      meta: ResourceKey.Events,
+    });
+  };
+
+  const getUpdatedEvent = ({ error, data }: ApiResponse): void => {
+    if (error) throw error;
+    if (!data) throw new Error("no data after updating event");
+    const { event } = data as { event: Event };
+    dispatch({
+      type: CalendarAction.UpdatedEventReceived,
+      payload: {
+        currentEvent: new Event(event),
+      },
+      meta: ResourceKey.Events,
+    });
+  };
+
+  const headers = { "Content-Type": "application/json" };
+
+  if (eventId < 1)
+    // creating
+    fetch(`${Event.url}/bulk`, {
+      method: "POST",
+      body: JSON.stringify(generatedEvents),
+      headers,
+    })
+      .then((response) => response.json())
+      .then(getCreatedEvents)
+      .catch(dispatchError);
+  // updating
+  else
+    fetch(`${Event.url}/${eventId}`, {
+      method: "PUT",
+      body: JSON.stringify(generatedEvents[0]),
+      headers,
+    })
+      .then((response) => response.json())
+      .then(getUpdatedEvent)
+      .catch(dispatchError);
+};
+
+interface ConfirmationProps {
+  dispatch: (action: Action) => void;
+  location: Location;
+  events: Event[];
+  setSkipped: (skipped: GeneratedInterval[]) => void;
+  setGenerated: (generated: NewEvent[]) => void;
+  setConfirmationDialogIsOpen: (open: boolean) => void;
+}
+
 /**
  * locationEvents are not guaranteed to be in order
  */
-export const makeOnSubmit =
-  (dispatch: (action: Action) => void, location: Location, events: Event[]) =>
+export const makeConfirmation =
+  ({
+    dispatch,
+    location,
+    events,
+    setSkipped,
+    setGenerated,
+    setConfirmationDialogIsOpen,
+  }: ConfirmationProps) =>
   (values: EventValues, actions: FormikValues): void => {
+    actions.setSubmitting(false);
     const { repeats, on } = values.__options__;
     const days = getRepeats(on);
     const start = values.start;
@@ -170,17 +258,10 @@ export const makeOnSubmit =
         hasHoursAvailable,
       }),
     ];
-
-    const skippedEvents = generatedIntervals.filter(
-      ({ hoursAvailable }) => !hoursAvailable
-    );
-    // TODO - show skipped events in a modal
-    console.log({ skippedEvents });
-
-    const generatedEvents = generatedIntervals
+    const newEvents = generatedIntervals
       .filter(({ hoursAvailable }) => hoursAvailable)
       .map(
-        ({ start, end }): Omit<Event, "id"> => ({
+        ({ start, end }): NewEvent => ({
           start,
           end,
           locationId: values.location.id,
@@ -188,70 +269,21 @@ export const makeOnSubmit =
           title: values.title,
         })
       );
+    setGenerated(newEvents);
 
-    const dispatchError = (error: Error): void =>
-      dispatch({ type: CalendarAction.Error, payload: { error } });
+    const skippedEvents = generatedIntervals.filter(
+      ({ hoursAvailable }) => !hoursAvailable
+    );
+    if (skippedEvents.length) {
+      setSkipped(skippedEvents);
+      setConfirmationDialogIsOpen(true);
+    }
 
-    const cleanup = (): void => actions.setSubmitting(false);
-
-    const getCreatedEvents = ({ error, data }: ApiResponse): void => {
-      if (error) throw error;
-      if (!data) throw new Error("no data after creating events");
-      const { events } = data as { events: Event[] };
-      if (!Array.isArray(events))
-        throw new Error("no events after creating events");
-      dispatch({
-        type: CalendarAction.CreatedEventsReceived,
-        payload: {
-          resources: {
-            [ResourceKey.Events]: events.map((e: Event) => new Event(e)),
-          },
-        },
-        meta: ResourceKey.Events,
+    if (newEvents.length && !skippedEvents.length) {
+      afterConfirmed({
+        generatedEvents: newEvents,
+        eventId: values.id,
+        dispatch,
       });
-    };
-
-    const getUpdatedEvent = ({ error, data }: ApiResponse): void => {
-      if (error) throw error;
-      if (!data) throw new Error("no data after updating event");
-      const { event } = data as { event: Event };
-      dispatch({
-        type: CalendarAction.UpdatedEventReceived,
-        payload: {
-          currentEvent: new Event(event),
-        },
-        meta: ResourceKey.Events,
-      });
-    };
-
-    const headers = { "Content-Type": "application/json" };
-
-    if (values.id < 1)
-      // creating
-      fetch(`${Event.url}/bulk`, {
-        method: "POST",
-        body: JSON.stringify(generatedEvents),
-        headers,
-      })
-        .then((response) => response.json())
-        .then(getCreatedEvents)
-        .catch(dispatchError)
-        .finally(cleanup);
-    // updating
-    else
-      fetch(`${Event.url}/${values.id}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          start: formatSQLDatetime(start),
-          end: formatSQLDatetime(end),
-          locationId: values.location.id,
-          reservable: values.reservable,
-          title: values.title,
-        }),
-        headers,
-      })
-        .then((response) => response.json())
-        .then(getUpdatedEvent)
-        .catch(dispatchError)
-        .finally(cleanup);
+    }
   };
