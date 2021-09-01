@@ -25,13 +25,19 @@ interface DateInterval {
 interface EventGeneratorProps extends DateInterval {
   until: Date;
   days: number[];
-  hasHoursAvailable: (di: DateInterval, hours: number) => boolean;
+  hasHoursAvailable: (di: DateInterval) => InvervalHoursInfo;
+}
+
+interface InvervalHoursInfo {
+  max: number;
+  existing: number;
 }
 
 export interface GeneratedInterval {
   start: string;
   end: string;
-  hoursAvailable: boolean;
+  skipped: boolean;
+  hours: InvervalHoursInfo & { requested: number };
 }
 
 const eventGenerator = ({
@@ -47,13 +53,17 @@ const eventGenerator = ({
     const untilValue = until.valueOf();
     while (untilValue >= start.valueOf()) {
       if (!days.length || days.includes(start.getUTCDay())) {
+        const { max, existing } = hasHoursAvailable({ start, end });
+        const requested = differenceInMinutes(end, start) / 60;
         yield {
           start: formatSQLDatetime(start),
           end: formatSQLDatetime(end),
-          hoursAvailable: hasHoursAvailable(
-            { start, end },
-            differenceInMinutes(end, start) / 60
-          ),
+          skipped: existing + requested >= max,
+          hours: {
+            max,
+            existing,
+            requested,
+          },
         };
       }
       start = addDays(start, 1);
@@ -238,15 +248,12 @@ export const makeConfirmation =
       return acc;
     }, {} as Record<string, number>);
 
-    const hasHoursAvailable = (
-      { start }: DateInterval,
-      hoursToBeCreated: number
-    ): boolean => {
+    const hasHoursAvailable = ({ start }: DateInterval): InvervalHoursInfo => {
       const dateString = formatSQLDate(start);
-      const existingTotal = dailyUsage[dateString] || 0;
-      const hoursAvailable =
-        hours.find(({ date }) => date === dateString)?.hours || 0;
-      return existingTotal + hoursToBeCreated <= hoursAvailable;
+      return {
+        existing: dailyUsage[dateString] || 0,
+        max: hours.find(({ date }) => date === dateString)?.hours || 0,
+      };
     };
 
     const generatedIntervals = [
@@ -259,7 +266,7 @@ export const makeConfirmation =
       }),
     ];
     const newEvents = generatedIntervals
-      .filter(({ hoursAvailable }) => hoursAvailable)
+      .filter(({ skipped }) => !skipped)
       .map(
         ({ start, end }): NewEvent => ({
           start,
@@ -271,9 +278,7 @@ export const makeConfirmation =
       );
     setGenerated(newEvents);
 
-    const skippedEvents = generatedIntervals.filter(
-      ({ hoursAvailable }) => !hoursAvailable
-    );
+    const skippedEvents = generatedIntervals.filter(({ skipped }) => skipped);
     if (skippedEvents.length) {
       setSkipped(skippedEvents);
       setConfirmationDialogIsOpen(true);

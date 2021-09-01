@@ -222,7 +222,9 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
           <List>
             {skipped.map((event, index) => (
               <ListItem key={`skipped-list-${index}`}>
-                {parseAndFormatSQLDatetimeInterval(event)}
+                {parseAndFormatSQLDatetimeInterval(event)} (Max:{" "}
+                {event.hours.max}, Existing: {event.hours.existing}, Requested:{" "}
+                {event.hours.requested})
               </ListItem>
             ))}
           </List>
