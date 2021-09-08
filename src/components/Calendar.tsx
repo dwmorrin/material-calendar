@@ -14,10 +14,10 @@ import ProjectDashboard from "./ProjectDashboard";
 import { ResourceKey } from "../resources/types";
 import fetchAllResources from "../utils/fetchAllResources";
 import { CalendarAction, CalendarSelections } from "../calendar/types";
-import { Box } from "@material-ui/core";
+import { Box, Snackbar, SnackbarContent } from "@material-ui/core";
 import EventEditor from "./EventEditor/EventEditor";
 import ProjectForm from "./ProjectForm";
-import Snackbar from "./Snackbar";
+import MessageSnackbar from "./Snackbar";
 import ErrorPage from "./ErrorPage";
 import User from "../resources/User";
 import Equipment from "../resources/Equipment";
@@ -26,8 +26,10 @@ import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
 import Category from "../resources/Category";
 import Reservation from "../resources/Reservation";
+import { useSocket } from "./SocketProvider";
 
 const Calendar: FunctionComponent<RouteComponentProps> = () => {
+  const { refreshRequested } = useSocket();
   const { user } = useAuth();
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(reducer, {
@@ -85,11 +87,18 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
         selections={selections}
         setSelections={setSelections}
       />
-      <Snackbar
+      <MessageSnackbar
         dispatch={dispatch}
         state={state}
         action={{ type: CalendarAction.CloseSnackbar }}
       />
+      <Snackbar
+        open={refreshRequested}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={(): void => undefined}
+      >
+        <SnackbarContent message="Please refresh the page to continue." />
+      </Snackbar>
     </Box>
   );
 };

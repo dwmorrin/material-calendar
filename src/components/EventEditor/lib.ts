@@ -128,12 +128,14 @@ interface SubmitProps {
   eventId: number;
   dispatch: (action: Action) => void;
   generatedEvents: NewEvent[];
+  broadcast: (message: string) => void;
 }
 
 export const afterConfirmed = ({
   eventId,
   dispatch,
   generatedEvents,
+  broadcast,
 }: SubmitProps): void => {
   if (!generatedEvents.length) return;
   const dispatchError = (error: Error): void =>
@@ -154,6 +156,7 @@ export const afterConfirmed = ({
       },
       meta: ResourceKey.Events,
     });
+    broadcast("Events created");
   };
 
   const getUpdatedEvent = ({ error, data }: ApiResponse): void => {
@@ -167,6 +170,7 @@ export const afterConfirmed = ({
       },
       meta: ResourceKey.Events,
     });
+    broadcast("Events created");
   };
 
   const headers = { "Content-Type": "application/json" };
@@ -200,6 +204,7 @@ interface ConfirmationProps {
   setSkipped: (skipped: GeneratedInterval[]) => void;
   setGenerated: (generated: NewEvent[]) => void;
   setConfirmationDialogIsOpen: (open: boolean) => void;
+  broadcast: (message: string) => void;
 }
 
 /**
@@ -213,6 +218,7 @@ export const makeConfirmation =
     setSkipped,
     setGenerated,
     setConfirmationDialogIsOpen,
+    broadcast,
   }: ConfirmationProps) =>
   (values: EventValues, actions: FormikValues): void => {
     actions.setSubmitting(false);
@@ -289,6 +295,7 @@ export const makeConfirmation =
         generatedEvents: newEvents,
         eventId: values.id,
         dispatch,
+        broadcast,
       });
     }
   };

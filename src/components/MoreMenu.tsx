@@ -4,10 +4,12 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { navigate } from "@reach/router";
 import { useAuth, AuthStatus } from "./AuthProvider";
 import User from "../resources/User";
+import { useSocket } from "./SocketProvider";
 
 const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   inAdminApp,
 }) => {
+  const { broadcast } = useSocket();
   const { isAdmin, setUser, setStatus, setLastLocation } = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = !!anchorEl;
@@ -54,6 +56,13 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
       >
         <MenuItem onClick={logout}>
           <Typography>Logout</Typography>
+        </MenuItem>
+        <MenuItem
+          onClick={(): void => {
+            broadcast("hello");
+          }}
+        >
+          <Typography>Test Sockets</Typography>
         </MenuItem>
         {isAdmin && (
           <MenuItem

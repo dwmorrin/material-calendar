@@ -34,6 +34,7 @@ import {
 } from "../../utils/date";
 import * as Yup from "yup";
 import { ResourceKey } from "../../resources/types";
+import { useSocket } from "../SocketProvider";
 
 //! TODO this correctly disables submit with invalid dates, but shows no info to user
 const schema = Yup.object().shape({
@@ -46,6 +47,7 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
   const [confirmationDialogOpen, setConfirmationDialogIsOpen] = useState(false);
   const [skipped, setSkipped] = useState<GeneratedInterval[]>([]);
   const [generated, setGenerated] = useState<NewEvent[]>([]);
+  const { broadcast } = useSocket();
 
   const event = state.currentEvent || new Event();
   const location = (state.resources[ResourceKey.Locations] as Location[]).find(
@@ -68,6 +70,7 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
     setConfirmationDialogIsOpen,
     setSkipped,
     setGenerated,
+    broadcast,
   });
 
   return (
@@ -261,6 +264,7 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
                 eventId: event.id,
                 dispatch,
                 generatedEvents: generated,
+                broadcast,
               });
             }}
           >

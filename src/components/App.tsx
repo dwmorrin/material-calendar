@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import AuthProvider from "./AuthProvider";
+import SocketProvider from "./SocketProvider";
 import ErrorBoundary from "./ErrorBoundary";
 import Landing from "./Landing";
 import "typeface-roboto";
@@ -7,9 +8,11 @@ import "typeface-roboto";
 const App: FC = () => {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <Landing />
-      </AuthProvider>
+      <SocketProvider>
+        <AuthProvider>
+          <Landing />
+        </AuthProvider>
+      </SocketProvider>
     </ErrorBoundary>
   );
 };
