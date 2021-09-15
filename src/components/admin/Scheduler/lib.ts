@@ -5,10 +5,10 @@ import {
   AdminState,
   CalendarSelectionState,
   AdminSelectionProps,
-} from "./types";
-import VirtualWeek from "../resources/VirtualWeek";
-import Project from "../resources/Project";
-import Location from "../resources/Location";
+} from "../../../admin/types";
+import VirtualWeek from "../../../resources/VirtualWeek";
+import Project from "../../../resources/Project";
+import Location from "../../../resources/Location";
 import {
   addDays,
   areIntervalsOverlappingInclusive,
@@ -21,12 +21,12 @@ import {
   parseFCString,
   parseSQLDate,
   subDays,
-} from "../utils/date";
+} from "../../../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
-import Semester from "../resources/Semester";
+import Semester from "../../../resources/Semester";
 import { deepEqual } from "fast-equals";
-import { ResourceKey } from "../resources/types";
-import { createVirtualWeek } from "./virtualWeeksDialog";
+import { ResourceKey } from "../../../resources/types";
+import { createVirtualWeek } from "../../../admin/virtualWeeksDialog";
 
 //--- TYPES ---
 

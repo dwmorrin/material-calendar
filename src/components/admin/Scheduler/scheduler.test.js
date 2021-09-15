@@ -7,10 +7,10 @@ import {
   makeDailyHours,
   processVirtualWeeks,
   processVirtualWeeksAsHoursRemaining,
-} from "./scheduler";
-import VirtualWeek from "../resources/VirtualWeek";
-import Location from "../resources/Location";
-import Project from "../resources/Project";
+} from "./lib";
+import VirtualWeek from "../../../resources/VirtualWeek";
+import Location from "../../../resources/Location";
+import Project from "../../../resources/Project";
 
 test("makeResources", () =>
   expect(
