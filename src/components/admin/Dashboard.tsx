@@ -19,7 +19,7 @@ import SemesterDialog from "./SemesterDialog";
 import AddProjectToLocationDialog from "./AddProjectToLocationDialog";
 import ProjectLocationHoursDialog from "./ProjectLocationHoursDialog";
 import ProjectLocationHoursSummaryDialog from "./ProjectLocationHoursSummaryDialog";
-import LocationHoursDialog from "./LocationHoursDialog";
+import LocationHoursDialog from "./LocationHoursDialog/LocationHoursDialog";
 import VirtualWeekModifyDialog from "./VirtualWeekModifyDialog";
 import Snackbar from "../Snackbar";
 import FullCalendar from "@fullcalendar/react";

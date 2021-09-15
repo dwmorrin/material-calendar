@@ -17,15 +17,12 @@ import {
   format,
   formatSQLDate,
   parseSQLDate,
-} from "../../utils/date";
-import DraggablePaper from "../../components/DraggablePaper";
+} from "../../../utils/date";
+import DraggablePaper from "../../DraggablePaper";
 import { Field, Formik, Form, FieldArray } from "formik";
 import { TextField, Checkbox } from "formik-material-ui";
-import { AdminUIProps, AdminAction } from "../../admin/types";
-import {
-  makeOnSubmit,
-  LocationHoursValues,
-} from "../../admin/locationHoursDialog";
+import { AdminUIProps, AdminAction } from "../../../admin/types";
+import { makeOnSubmit, LocationHoursValues } from "./lib";
 
 // how the date appears in the input: 2021-06-01 [Tue]
 const dateLabelFormat = "yyyy-MM-dd [ccc]";
@@ -47,14 +44,12 @@ const LocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
     start: parseSQLDate(semester.start),
     end: parseSQLDate(semester.end),
   }).map((date) => {
-    const hours = String(
-      location.hours.find((h) => h.date === formatSQLDate(date))?.hours || ""
-    );
-    const useDefault = hours === "";
+    const dateStr = formatSQLDate(date);
+    const existingOverride = location.hours.find((h) => h.date === dateStr);
     return {
       date,
-      hours,
-      useDefault,
+      hours: existingOverride ? String(existingOverride.hours) : "",
+      useDefault: !existingOverride,
     };
   });
 

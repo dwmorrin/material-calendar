@@ -1,8 +1,13 @@
 import { FormikValues } from "formik";
-import { Action, AdminAction, AdminState, ApiResponse } from "./types";
-import Location from "../resources/Location";
-import { ResourceKey } from "../resources/types";
-import { formatSQLDate } from "../utils/date";
+import {
+  Action,
+  AdminAction,
+  AdminState,
+  ApiResponse,
+} from "../../../admin/types";
+import Location from "../../../resources/Location";
+import { ResourceKey } from "../../../resources/types";
+import { formatSQLDate } from "../../../utils/date";
 
 export interface LocationHoursValues {
   date: Date;
