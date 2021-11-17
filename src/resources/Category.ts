@@ -21,7 +21,7 @@ class Category implements Category {
   static url = "/api/categories";
   constructor(
     category = {
-      id: -1,
+      id: 0,
       title: "",
       parentId: null as number | null,
     }
