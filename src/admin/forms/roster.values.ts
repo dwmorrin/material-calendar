@@ -3,6 +3,7 @@ import User from "../../resources/User";
 import Course from "../../resources/Course";
 import { ResourceKey } from "../../resources/types";
 import { AdminState } from "../types";
+import Section from "../../resources/Section";
 
 interface RosterValues extends Record<string, unknown> {
   username: string;
@@ -12,10 +13,13 @@ interface RosterValues extends Record<string, unknown> {
 
 export const values = (state: AdminState): Record<string, unknown> => {
   const rosterRecord = state.resourceInstance as RosterRecord;
+  const courses = state.resources[ResourceKey.Courses] as Course[];
+  const course =
+    courses.find((c) => c.id === rosterRecord.section.courseId) || new Course();
   return {
     username: rosterRecord.student.username,
-    course: rosterRecord.course.title,
-    section: rosterRecord.course.section,
+    course: course.title,
+    section: rosterRecord.section.title,
   } as RosterValues;
 };
 
@@ -24,21 +28,15 @@ export const update = (
   values: Record<string, unknown>
 ): RosterRecord => {
   const rosterRecord = state.resourceInstance as RosterRecord;
-  const {
-    username,
-    course: courseTitle,
-    section: sectionTitle,
-  } = values as RosterValues;
+  const { username, course: courseTitle } = values as RosterValues;
   const users = state.resources[ResourceKey.Users] as User[];
-  const sections = state.resources[ResourceKey.Courses] as Course[];
+  const sections = state.resources[ResourceKey.Sections] as Section[];
   const student = users.find((u) => u.username === username) || new User();
-  const course =
-    sections.find(
-      ({ title, section }) => title === courseTitle && section === sectionTitle
-    ) || new Course();
+  const section =
+    sections.find(({ id }) => id === rosterRecord.section.id) || new Section();
   return {
     id: rosterRecord.id,
     student,
-    course,
+    section,
   };
 };

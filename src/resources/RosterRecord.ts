@@ -1,19 +1,4 @@
-export enum RosterFields {
-  COURSE_TITLE,
-  COURSE_CATALOG_ID,
-  COURSE_SECTION,
-  COURSE_INSTRUCTOR,
-  STUDENT_NAME,
-  STUDENT_ID,
-  PROJECT_TITLE,
-}
-
-export interface Course {
-  title: string;
-  catalogId: string;
-  section: string;
-  instructor: string;
-}
+import Section from "./Section";
 
 export interface Student {
   name: {
@@ -28,7 +13,7 @@ export interface Student {
 export interface RosterRecord {
   [k: string]: unknown;
   id: number;
-  course: Course;
+  section: Section;
   student: Student;
 }
 
@@ -37,12 +22,7 @@ export class RosterRecord implements RosterRecord {
 
   constructor(
     rosterRecord = {
-      course: {
-        title: "",
-        catalogId: "",
-        section: "",
-        instructor: "",
-      },
+      section: new Section(),
       student: {
         name: { first: "", middle: "", last: "" },
         id: -1,

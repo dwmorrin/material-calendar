@@ -47,9 +47,6 @@ export const values = (state: AdminState): Record<string, unknown> => {
         ...sections,
         [course.id]: {
           ...sections[course.id],
-          [course.section]:
-            course.id === project.course.id &&
-            project.course.sections.includes(course.section),
         },
       }),
       {} as Record<string, Record<string, boolean>>

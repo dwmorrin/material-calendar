@@ -3,8 +3,6 @@ export interface Course {
   id: number;
   title: string;
   catalogId: string;
-  section: string;
-  instructor: string;
 }
 
 export class Course implements Course {
@@ -14,22 +12,12 @@ export class Course implements Course {
       id: 0,
       title: "",
       catalogId: "",
-      section: "",
-      instructor: "",
     }
   ) {
-    const {
-      id = 0,
-      title = "",
-      catalogId = "",
-      section = "",
-      instructor = "",
-    } = course;
+    const { id = 0, title = "", catalogId = "" } = course;
     this.id = id;
     this.title = String(title);
     this.catalogId = String(catalogId);
-    this.instructor = String(instructor);
-    this.section = String(section); // database bug: can send title "1" as 1
   }
 }
 

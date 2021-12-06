@@ -9,8 +9,6 @@ const template = (course: unknown): string[][] =>
     ? [
         ["Title", course.title],
         ["Catalog ID", course.catalogId],
-        ["Section", course.section],
-        ["Instructor", course.instructor],
       ]
     : [["", JSON.stringify(course)]];
 
