@@ -19,6 +19,10 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
     courses.reduce((titles, { title }) => titles.add(title), new Set<string>())
   );
   const locations = state.resources[ResourceKey.Locations] as Location[];
+  const sections = Object.entries(
+    values.sections as Record<string, Record<string, boolean>>
+  );
+  const sectionOptions = sections.filter(([title]) => title === values.course);
   return values.title === Project.walkInTitle ? (
     <div>You cannot edit the {values.title} project</div>
   ) : (
@@ -58,18 +62,18 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
       </Field>
       <FormLabel>Sections</FormLabel>
       <br />
-      {courses.map((course) => (
-        <>
-          {values.course === course.title && (
-            <Field
-              component={CheckboxWithLabel}
-              type="checkbox"
-              name={`sections.${course.id}.${course.section}`}
-              Label={{ label: course.section }}
-            />
-          )}
-        </>
-      ))}
+      {sectionOptions.map(([title, section]) =>
+        Object.entries(section).map(([sectionTitle, checked], index) => (
+          <Field
+            checked={checked}
+            key={`${sectionTitle}${index}`}
+            component={CheckboxWithLabel}
+            type="checkbox"
+            name={`sections.${title}.${sectionTitle}`}
+            Label={{ label: sectionTitle }}
+          />
+        ))
+      )}
       <br />
       <Field
         type="checkbox"

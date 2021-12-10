@@ -1,5 +1,6 @@
 import Project, { ProjectLocationHours } from "../../resources/Project";
 import Course from "../../resources/Course";
+import Section from "../../resources/Section";
 import Location from "../../resources/Location";
 import { AdminState } from "../types";
 import { formatSQLDate, parseSQLDate } from "../../utils/date";
@@ -20,8 +21,26 @@ export interface ProjectValues extends Record<string, unknown> {
 }
 
 export const values = (state: AdminState): Record<string, unknown> => {
-  const courses = state.resources[ResourceKey.Courses] as Course[];
   const project = state.resourceInstance as Project;
+  const courses = state.resources[ResourceKey.Courses] as Course[];
+  const sections = state.resources[ResourceKey.Sections] as Section[];
+  const courseSections = sections.reduce((dict, section) => {
+    if (!section.title) return dict;
+    const title =
+      courses.find((course) => course.id === section.courseId)?.title || "";
+    if (!title) return dict;
+    if (!dict[title]) {
+      dict[title] = {};
+    }
+    if (project.course.id === section.courseId) {
+      dict[title][section.title] = project.course.sections.includes(
+        section.title
+      );
+    } else {
+      dict[title][section.title] = false;
+    }
+    return dict;
+  }, {} as Record<string, { [sectionTitle: string]: boolean }>);
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const allLocations = locations.reduce(
     (res, { id }) => ({
@@ -42,15 +61,7 @@ export const values = (state: AdminState): Record<string, unknown> => {
     id: project.id,
     title: project.title,
     course: project.course.title,
-    sections: courses.reduce(
-      (sections, course) => ({
-        ...sections,
-        [course.id]: {
-          ...sections[course.id],
-        },
-      }),
-      {} as Record<string, Record<string, boolean>>
-    ),
+    sections: courseSections,
     start: parseSQLDate(project.start),
     end: parseSQLDate(project.end),
     reservationStart: parseSQLDate(project.reservationStart),
@@ -76,14 +87,12 @@ export const update = (
     start,
     title,
   } = values as ProjectValues;
-  const courseTitle =
-    typeof course === "object" ? (course as { title: string }).title : "";
   const courses = state.resources[ResourceKey.Courses] as Course[];
-  const selectedCourse = courses.find(({ title }) => title === courseTitle) || {
+  const selectedCourse = courses.find(({ title }) => title === course) || {
     title: "",
     id: -1,
   };
-  const selectedSections = _sections[selectedCourse.id] || {};
+  const selectedSections = _sections[course] || {};
   const sections = Object.entries(selectedSections).reduce(
     (res, [section, selected]) => (selected ? [...res, section] : res),
     [] as string[]
