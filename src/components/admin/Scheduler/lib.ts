@@ -296,7 +296,8 @@ export const processVirtualWeeks = (
       const start = hoursForCalc.findIndex(({ date }) => date === vw.start);
       const end = hoursForCalc.findIndex(({ date }) => date === vw.end);
       let totalHours = 0;
-      for (let i = start; i <= end; i++) totalHours += hoursForCalc[i].hours;
+      if (start >= 0)
+        for (let i = start; i <= end; i++) totalHours += hoursForCalc[i].hours;
       res.push({ ...vw, totalHours });
       return {
         ...vw,
