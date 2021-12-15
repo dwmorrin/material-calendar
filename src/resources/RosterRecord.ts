@@ -1,5 +1,3 @@
-import Section from "./Section";
-
 export interface Student {
   name: {
     first: string;
@@ -13,7 +11,12 @@ export interface Student {
 export interface RosterRecord {
   [k: string]: unknown;
   id: number;
-  section: Section;
+  course: {
+    title: string;
+    section: string;
+    catalogId: string;
+    instructor: string;
+  };
   student: Student;
 }
 
@@ -22,7 +25,7 @@ export class RosterRecord implements RosterRecord {
 
   constructor(
     rosterRecord = {
-      section: new Section(),
+      course: { title: "", section: "", catalogId: "", instructor: "" },
       student: {
         name: { first: "", middle: "", last: "" },
         id: -1,

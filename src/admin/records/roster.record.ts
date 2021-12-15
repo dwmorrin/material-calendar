@@ -4,13 +4,13 @@ const template = (rosterRecord: unknown): string[][] => {
   if (!(rosterRecord instanceof RosterRecord)) {
     return [["", JSON.stringify(rosterRecord)]];
   }
-  const { section, student } = rosterRecord;
+  const { course, student } = rosterRecord;
   return [
     [
       "Course",
-      `${section.title} (Course ID:${section.courseId}-${section.title})`,
+      `${course.title} (Course ID:${course.catalogId}-${course.section})`,
     ],
-    ["Instructor", section.instructor],
+    ["Instructor", course.instructor],
     [
       "Student",
       `${[student.name.first, student.name.middle, student.name.last].join(
