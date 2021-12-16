@@ -36,9 +36,7 @@ export const update = (
   } = values as RosterValues;
   const users = state.resources[ResourceKey.Users] as User[];
   const courses = state.resources[ResourceKey.Courses] as Course[];
-  const course =
-    courses.find((c) => c.catalogId === rosterRecord.course.catalogId) ||
-    new Course();
+  const course = courses.find((c) => c.title === courseTitle) || new Course();
   const sections = state.resources[ResourceKey.Sections] as Section[];
   const student = users.find((u) => u.username === username) || new User();
   const section =
