@@ -1,20 +1,24 @@
-import React, { Fragment, FunctionComponent } from "react";
+import React, { FunctionComponent } from "react";
 import { Field } from "formik";
-import { CheckboxWithLabel, TextField, RadioGroup } from "formik-material-ui";
+import { TextField, RadioGroup } from "formik-material-ui";
 import { FormTemplateProps } from "../../../admin/types";
 import { FormControlLabel, FormLabel, List, Radio } from "@material-ui/core";
 import { ResourceKey } from "../../../resources/types";
 import Course from "../../../resources/Course";
+import Section from "../../../resources/Section";
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = ({
   state,
   values,
 }) => {
-  const sections = state.resources[ResourceKey.Courses] as Course[];
+  const courses = state.resources[ResourceKey.Courses] as Course[];
+  const sections = state.resources[ResourceKey.Sections] as Section[];
   const courseTitles = Array.from(
-    sections.reduce((titles, { title }) => titles.add(title), new Set<string>())
+    courses.reduce((titles, { title }) => titles.add(title), new Set<string>())
   );
-  const selectedCourse = values.course as string;
+  const selectedCourseTitle = values.course as string;
+  const selectedCourse =
+    courses.find(({ title }) => title === selectedCourseTitle) || new Course();
 
   return (
     <List>
@@ -33,11 +37,11 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
       <FormLabel>Section</FormLabel>
       <Field component={RadioGroup} name="section">
         {sections.map((section) =>
-          selectedCourse === section.title ? (
+          selectedCourse.id === section.courseId ? (
             <FormControlLabel
-              key={`${section.title}${section.section}`}
-              label={`${section.section} - ${section.instructor}`}
-              value={section.section}
+              key={section.id}
+              label={`${section.title} - ${section.instructor}`}
+              value={section.title}
               control={<Radio />}
             />
           ) : null
