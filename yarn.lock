@@ -1273,7 +1273,7 @@
   dependencies:
     tslib "^2.1.0"
 
-"@fullcalendar/core@^5.1.0":
+"@fullcalendar/core@^5.10.1":
   version "5.10.1"
   resolved "https://registry.yarnpkg.com/@fullcalendar/core/-/core-5.10.1.tgz#05c7653e5004149a63bcb03e9dc8b049186ca50b"
   integrity sha512-8sVuC6ywXV+cxqsqTZaR1hgUqeyjVed20NyZ7lGW9AY0kma1GIEwLgqPS5Q6uVhHyin68lmgecKfJCwhxENE8w==
@@ -1290,7 +1290,7 @@
     "@fullcalendar/common" "~5.10.1"
     tslib "^2.1.0"
 
-"@fullcalendar/interaction@^5.1.0":
+"@fullcalendar/interaction@^5.10.1":
   version "5.10.1"
   resolved "https://registry.yarnpkg.com/@fullcalendar/interaction/-/interaction-5.10.1.tgz#dfa74b5c50bbd5608eb50aeab6e579c8d20cb367"
   integrity sha512-H1g1QeXg7yXtUcKmVtfg7uzm5R5ElFTvYniiXU+8kJda69IDg7Lee+Y7UDv5dvLb5/HxO86RhPVxRtcOQ8XdXw==
@@ -1298,7 +1298,7 @@
     "@fullcalendar/common" "~5.10.1"
     tslib "^2.1.0"
 
-"@fullcalendar/list@^5.1.0":
+"@fullcalendar/list@^5.10.1":
   version "5.10.1"
   resolved "https://registry.yarnpkg.com/@fullcalendar/list/-/list-5.10.1.tgz#8505aae09845b82f5bdb6251bda0f9d6342ef9d9"
   integrity sha512-sB+AzM9P1nzGIzwVFNN8Zbocg5lkVQftyuJAZtULgu9o9e1rH/Aqsxt9Itf00N3WmMOh8H1LlnRpZF5kGu/j2w==
@@ -1314,7 +1314,7 @@
     "@fullcalendar/common" "~5.10.1"
     tslib "^2.1.0"
 
-"@fullcalendar/react@^5.1.0":
+"@fullcalendar/react@^5.10.1":
   version "5.10.1"
   resolved "https://registry.yarnpkg.com/@fullcalendar/react/-/react-5.10.1.tgz#bb1652357f98b7dc01894a41e7204f1391999791"
   integrity sha512-+kV5+o9qGjkoO5j0r3oawhig+hP3inE68bHKBl6dtGQ8mi3GkEGsTL12MY2n5N0hXon6+2psIQLnAjMyRYZbmg==
@@ -1342,7 +1342,7 @@
     "@fullcalendar/resource-common" "~5.10.1"
     tslib "^2.1.0"
 
-"@fullcalendar/resource-timegrid@^5.1.0":
+"@fullcalendar/resource-timegrid@^5.10.1":
   version "5.10.1"
   resolved "https://registry.yarnpkg.com/@fullcalendar/resource-timegrid/-/resource-timegrid-5.10.1.tgz#b46eba1933f4c3ee68ee6bfd96a2960500afd32a"
   integrity sha512-aaEbA5lrTH1C3xjWssqguHnfJvi0C3ZOHICeH/5Mc2W5eWsGWCilCJs532rP/0qtOYP78whkHlcsB3QDlMSHsQ==
@@ -1354,7 +1354,7 @@
     "@fullcalendar/timegrid" "~5.10.1"
     tslib "^2.1.0"
 
-"@fullcalendar/resource-timeline@^5.1.0":
+"@fullcalendar/resource-timeline@^5.10.1":
   version "5.10.1"
   resolved "https://registry.yarnpkg.com/@fullcalendar/resource-timeline/-/resource-timeline-5.10.1.tgz#a16839b4f09fb85441e6b074cbc7038622da808f"
   integrity sha512-gsqjr6Z+LQcNbQlHgaTtg/kF8l6yDRtIuMQbhFlTy71RJI//x2mHhLXgV40FJeEE+srp48xJPd89+rIhlyJ5Tw==
