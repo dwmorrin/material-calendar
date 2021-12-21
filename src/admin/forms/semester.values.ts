@@ -2,6 +2,14 @@ import Semester from "../../resources/Semester";
 import { AdminState } from "../types";
 import { formatSQLDate, parseSQLDate } from "../../utils/date";
 
+interface SemesterValues extends Record<string, unknown> {
+  id: number;
+  title: string;
+  start: Date;
+  end: Date;
+  active: boolean;
+}
+
 export const values = (state: AdminState): Record<string, unknown> => {
   const semester = state.resourceInstance as Semester;
   return {
@@ -16,10 +24,12 @@ export const update = (
   values: Record<string, unknown>
 ): Semester => {
   const semester = new Semester(state.resourceInstance as Semester);
+  const { start, end, title, active } = values as SemesterValues;
   return {
     ...semester,
-    title: values.title as string,
-    start: formatSQLDate(values.start as Date),
-    end: formatSQLDate(values.end as Date),
+    title,
+    start: formatSQLDate(start),
+    end: formatSQLDate(end),
+    active,
   };
 };
