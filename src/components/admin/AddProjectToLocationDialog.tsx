@@ -159,12 +159,19 @@ const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
             <p>(No available projects found.)</p>
             <DialogActions>
               <Button
-                onClick={(): void =>
+                onClick={(): void => {
+                  close();
+                  // set the document browser to projects
                   dispatch({
                     type: AdminAction.SelectedResource,
                     payload: { resourceKey: ResourceKey.Projects },
-                  })
-                }
+                  });
+                  // open the new document dialog
+                  dispatch({
+                    type: AdminAction.SelectedDocument,
+                    payload: { resourceInstance: new Project() },
+                  });
+                }}
               >
                 Create a new project
               </Button>
