@@ -30,10 +30,10 @@ export const dispatchFile =
     event.target.value = ""; // resets file picker button
   };
 
-  /**
-   * TODO updating one resource may need to update other resources,
-   * e.g. projects affect virtual week allotment visualization
-   */
+/**
+ * TODO updating one resource may need to update other resources,
+ * e.g. projects affect virtual week allotment visualization
+ */
 export const dispatchOneResource =
   (
     dispatch: (action: Action) => void,
@@ -59,24 +59,43 @@ export const dispatchOneResource =
       body: deleting ? null : JSON.stringify(updater(state, values)),
     })
       .then((response) => response.json())
-      .then(({ error, data }) => {
+      .then(({ error, data, kind }) => {
         if (error || !data)
           return dispatch({ type: AdminAction.Error, payload: { error } });
-        dispatch({
-          type: AdminAction.ReceivedResource,
-          payload: {
-            resourceInstance: deleting ? undefined : new resource(data),
-            resources: {
-              ...state.resources,
-              [state.resourceKey]: deleting
-                ? resources.filter((d) => d.id !== id)
-                : id
-                ? resources.map((d) => (d.id !== id ? d : new resource(data)))
-                : resources.concat([new resource(data)]),
+        if (!kind)
+          dispatch({
+            type: AdminAction.ReceivedResource,
+            payload: {
+              resourceInstance: deleting ? undefined : new resource(data),
+              resources: {
+                ...state.resources,
+                [state.resourceKey]: deleting
+                  ? resources.filter((d) => d.id !== id)
+                  : id
+                  ? resources.map((d) => (d.id !== id ? d : new resource(data)))
+                  : resources.concat([new resource(data)]),
+              },
             },
-          },
-          meta: state.resourceKey,
-        });
+            meta: state.resourceKey,
+          });
+        else if (kind === "UPDATE_ALL") {
+          // update all resources (when one resource affects others)
+          if (!Array.isArray(data))
+            throw new Error(`Expected array with kind ${kind}`);
+          const newResources = data.map((d) => new resource(d));
+          const instance = newResources.find((d) => d.id === id);
+          dispatch({
+            type: AdminAction.ReceivedResource,
+            payload: {
+              resourceInstance: deleting ? undefined : instance,
+              resources: {
+                ...state.resources,
+                [state.resourceKey]: newResources,
+              },
+            },
+            meta: state.resourceKey,
+          });
+        }
       })
       .catch((error) =>
         dispatch({
