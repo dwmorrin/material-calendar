@@ -22,19 +22,30 @@ import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import Location from "../../resources/Location";
 import VirtualWeek from "../../resources/VirtualWeek";
+import { isWithinInterval, parseSQLDate } from "../../utils/date";
 
 const AddProjectToLocation: FC<AdminUIProps & AdminSelectionProps> = ({
   state,
   dispatch,
   selections,
 }) => {
-  const { resources } = state;
+  const { selectedSemester, resources } = state;
   const { locationId } = selections;
-  if (!locationId) return null;
+  if (!locationId || !selectedSemester) return null;
 
-  const projectsNotInLocation = (
-    resources[ResourceKey.Projects] as Project[]
-  ).filter(
+  // only show projects that are running this semester
+  const { start, end } = selectedSemester;
+  const semesterInterval = {
+    start: parseSQLDate(start),
+    end: parseSQLDate(end),
+  };
+  const projects = resources[ResourceKey.Projects] as Project[];
+  const semesterProjects = projects.filter(({ start }) =>
+    isWithinInterval(parseSQLDate(start), semesterInterval)
+  );
+
+  // only show projects that are NOT already in this location
+  const projectsNotInLocation = semesterProjects.filter(
     ({ title, locationHours }) =>
       title !== Project.walkInTitle &&
       !locationHours.some(({ locationId: id }) => id === locationId)
