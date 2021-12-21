@@ -23,21 +23,21 @@ export interface ProjectValues extends Record<string, unknown> {
 export const values = (state: AdminState): Record<string, unknown> => {
   const project = state.resourceInstance as Project;
   const courses = state.resources[ResourceKey.Courses] as Course[];
+  const course = courses.find((c) => c.id === project.course.id);
   const sections = state.resources[ResourceKey.Sections] as Section[];
   const courseSections = sections.reduce((dict, section) => {
     if (!section.title) return dict;
-    const title =
-      courses.find((course) => course.id === section.courseId)?.title || "";
-    if (!title) return dict;
-    if (!dict[title]) {
-      dict[title] = {};
+    const course = courses.find((course) => course.id === section.courseId);
+    if (!course) return dict;
+    if (!dict[course.id]) {
+      dict[course.id] = {};
     }
     if (project.course.id === section.courseId) {
-      dict[title][section.title] = project.course.sections.includes(
+      dict[course.id][section.title] = project.course.sections.includes(
         section.title
       );
     } else {
-      dict[title][section.title] = false;
+      dict[course.id][section.title] = false;
     }
     return dict;
   }, {} as Record<string, { [sectionTitle: string]: boolean }>);
@@ -60,7 +60,7 @@ export const values = (state: AdminState): Record<string, unknown> => {
   return {
     id: project.id,
     title: project.title,
-    course: project.course.title,
+    course: course?.title || "",
     sections: courseSections,
     start: parseSQLDate(project.start),
     end: parseSQLDate(project.end),
@@ -92,7 +92,7 @@ export const update = (
     title: "",
     id: -1,
   };
-  const selectedSections = _sections[course] || {};
+  const selectedSections = _sections[selectedCourse.id] || {};
   const sections = Object.entries(selectedSections).reduce(
     (res, [section, selected]) => (selected ? [...res, section] : res),
     [] as string[]

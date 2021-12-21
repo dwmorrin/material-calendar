@@ -15,14 +15,16 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
   values,
 }) => {
   const courses = state.resources[ResourceKey.Courses] as Course[];
-  const courseTitles = Array.from(
-    courses.reduce((titles, { title }) => titles.add(title), new Set<string>())
-  );
+  const course = (values as ProjectValues).course;
+  const selectedCourse =
+    courses.find((c) => c.title === course) || new Course();
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const sections = Object.entries(
-    values.sections as Record<string, Record<string, boolean>>
+    values.sections as Record<number, Record<string, boolean>>
   );
-  const sectionOptions = sections.filter(([title]) => title === values.course);
+  const sectionOptions = sections.filter(
+    ([courseId]) => +courseId === selectedCourse.id
+  );
   return values.title === Project.walkInTitle ? (
     <div>You cannot edit the {values.title} project</div>
   ) : (
@@ -50,11 +52,11 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
       />
       <FormLabel>Course</FormLabel>
       <Field component={RadioGroup} name="course">
-        {courseTitles.map((course, index) => (
+        {courses.map((course) => (
           <FormControlLabel
-            key={`${course}${index}`}
-            label={course}
-            value={course}
+            key={`Course-${course.id}`}
+            label={course.title}
+            value={course.title}
             control={<Radio />}
           />
         ))}
@@ -69,7 +71,7 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
             key={`${sectionTitle}${index}`}
             component={CheckboxWithLabel}
             type="checkbox"
-            name={`sections.${title}.${sectionTitle}`}
+            name={`sections[${title}][${sectionTitle}]`}
             Label={{ label: sectionTitle }}
           />
         ))
