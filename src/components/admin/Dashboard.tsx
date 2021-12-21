@@ -54,15 +54,15 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
     if (!state.initialResourcesPending && !state.selectedSemester) {
       const semesters = state.resources[ResourceKey.Semesters] as Semester[];
       // try to use the user's selected semesterId, or the most recent semester
-      const selectedSemester =
-        selections.semesterId > 0
-          ? semesters.find(({ id }) => id === selections.semesterId) ||
-            semesters.length
-            ? semesters.reduce(mostRecent)
-            : null
-          : semesters.length
-          ? semesters.reduce(mostRecent)
-          : null;
+      let selectedSemester: Semester | undefined;
+      // check selections
+      if (selections.semesterId > 0)
+        selectedSemester = semesters.find(
+          ({ id }) => id === selections.semesterId
+        );
+      // check most recent
+      if (!selectedSemester && semesters.length)
+        selectedSemester = semesters.reduce(mostRecent);
       if (selectedSemester) {
         if (selectedSemester.id !== selections.semesterId)
           setSelections({ ...selections, semesterId: selectedSemester.id });
@@ -71,6 +71,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
           payload: { selectedSemester },
         });
       }
+      // else there are no semesters to choose from
     }
   }, [
     dispatch,
