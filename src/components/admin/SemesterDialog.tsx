@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import {
+  Badge,
   Button,
   ButtonBase,
   Dialog,
@@ -73,10 +74,17 @@ const SemesterDialog: FC<AdminUIProps & AdminSelectionProps> = ({
         Create new semester
       </Button>
       <List>
-        {semesters.map(({ id, title, start, end }) => (
+        {semesters.map(({ id, title, start, end, active }) => (
           <ListItem key={`semester-${id}`} className={classes.semesterListItem}>
             <ButtonBase onClick={setSemester(id)}>
-              <Typography variant="h6">{title}</Typography>
+              <Badge
+                anchorOrigin={{ vertical: "top", horizontal: "left" }}
+                color="secondary"
+                invisible={!active}
+                variant="dot"
+              >
+                <Typography variant="h6">{title}</Typography>
+              </Badge>
               <Typography variant="subtitle1" style={{ marginLeft: 20 }}>
                 {parseAndFormatSQLDateInterval({ start, end })}
               </Typography>
