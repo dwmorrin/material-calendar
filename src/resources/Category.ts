@@ -4,7 +4,7 @@
  * Specific subcategories are leafs.
  * example: electric guitar
  *   name: electric guitar; path: ,guitar,electric,
- * Use TAGS for properties that are not hierchial.
+ * Use TAGS for properties that are not hierarchial.
  * Continuing the guitar example, tag the type of pickups, color, etc.
  */
 import Equipment from "../resources/Equipment";
