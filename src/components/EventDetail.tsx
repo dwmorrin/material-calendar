@@ -104,6 +104,21 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     return Reservation.rules.maxWalkInsPerLocation <= myReservations.length;
   };
 
+  const getProjectGroup = (project: Project): UserGroup | undefined => {
+    return (state.resources[ResourceKey.Groups] as UserGroup[]).find(
+      (group) => group.projectId === project.id
+    );
+  };
+
+  const projectGroupHasHoursRemaining = (
+    project: Project,
+    group: UserGroup
+  ): boolean => {
+    if (!group) return false;
+    const thisEventHours = sqlIntervalInHours(start, end);
+    return project.groupAllottedHours > group.reservedHours + thisEventHours;
+  };
+
   const projectHasHoursRemaining = (project: Project): boolean => {
     const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
       (group) => group.projectId === project.id
@@ -154,13 +169,18 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     ? Object.entries(reservation.equipment)
     : [];
 
-  const [projectsWithHours, projectsWithoutHours] = projectsActiveNow.reduce(
-    (projectsByHours, p) => {
-      projectsByHours[projectHasHoursRemaining(p) ? 0 : 1].push(p);
-      return projectsByHours;
-    },
-    [[], []] as [Project[], Project[]]
-  );
+  const [projectsWithHours, projectsWithoutHours, projectsWithoutGroups] =
+    projectsActiveNow.reduce(
+      (projectsByHours, p) => {
+        const group = getProjectGroup(p);
+        if (!group) projectsByHours[2].push(p);
+        else if (projectGroupHasHoursRemaining(p, group))
+          projectsByHours[0].push(p);
+        else projectsByHours[1].push(p);
+        return projectsByHours;
+      },
+      [[], [], []] as [Project[], Project[], Project[]]
+    );
 
   return (
     <Dialog
@@ -292,7 +312,45 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 <List>
                   {projectsWithoutHours.map((project) => (
                     <ListItem key={`${project.title}_list_item`}>
-                      <Box fontStyle="oblique">{project.title}</Box>
+                      <Button
+                        onClick={(): void => {
+                          dispatch({
+                            type: CalendarAction.OpenProjectDashboard,
+                            payload: {
+                              ...state,
+                              currentProject: project,
+                            },
+                          });
+                        }}
+                      >
+                        {project.title}
+                      </Button>
+                    </ListItem>
+                  ))}
+                </List>
+              </>
+            )}
+            {!!projectsWithoutGroups.length && (
+              <>
+                <Typography component="h3">
+                  Please create a group for these projects:
+                </Typography>
+                <List>
+                  {projectsWithoutGroups.map((project) => (
+                    <ListItem key={`${project.title}_list_item`}>
+                      <Button
+                        onClick={(): void => {
+                          dispatch({
+                            type: CalendarAction.OpenProjectDashboard,
+                            payload: {
+                              ...state,
+                              currentProject: project,
+                            },
+                          });
+                        }}
+                      >
+                        {project.title}
+                      </Button>
                     </ListItem>
                   ))}
                 </List>
