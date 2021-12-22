@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useState } from "react";
 import {
-  Box,
   Dialog,
   IconButton,
   Button,
@@ -182,6 +181,16 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       [[], [], []] as [Project[], Project[], Project[]]
     );
 
+  const makeOpenProjectDashboard = (project: Project) => (): void => {
+    dispatch({
+      type: CalendarAction.OpenProjectDashboard,
+      payload: {
+        ...state,
+        currentProject: project,
+      },
+    });
+  };
+
   return (
     <Dialog
       fullScreen
@@ -300,7 +309,9 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             <List>
               {projectsWithHours.map((project) => (
                 <ListItem key={`${project.title}_list_item`}>
-                  {project.title}
+                  <Button onClick={makeOpenProjectDashboard(project)}>
+                    {project.title}
+                  </Button>
                 </ListItem>
               ))}
             </List>
@@ -312,17 +323,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 <List>
                   {projectsWithoutHours.map((project) => (
                     <ListItem key={`${project.title}_list_item`}>
-                      <Button
-                        onClick={(): void => {
-                          dispatch({
-                            type: CalendarAction.OpenProjectDashboard,
-                            payload: {
-                              ...state,
-                              currentProject: project,
-                            },
-                          });
-                        }}
-                      >
+                      <Button onClick={makeOpenProjectDashboard(project)}>
                         {project.title}
                       </Button>
                     </ListItem>
@@ -338,17 +339,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 <List>
                   {projectsWithoutGroups.map((project) => (
                     <ListItem key={`${project.title}_list_item`}>
-                      <Button
-                        onClick={(): void => {
-                          dispatch({
-                            type: CalendarAction.OpenProjectDashboard,
-                            payload: {
-                              ...state,
-                              currentProject: project,
-                            },
-                          });
-                        }}
-                      >
+                      <Button onClick={makeOpenProjectDashboard(project)}>
                         {project.title}
                       </Button>
                     </ListItem>
