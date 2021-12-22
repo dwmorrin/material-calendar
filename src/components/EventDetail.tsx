@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import {
   Dialog,
   IconButton,
@@ -28,7 +28,7 @@ import {
 import { useAuth } from "./AuthProvider";
 import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";
-import Project from "../resources/Project";
+import Project, { ProjectAllotment } from "../resources/Project";
 import Reservation from "../resources/Reservation";
 import UserGroup from "../resources/UserGroup";
 import ReservationForm from "./ReservationForm/ReservationForm";
@@ -40,12 +40,69 @@ import { addMinutes } from "date-fns/esm";
 
 const transition = makeTransition("left");
 
+type ProjectHours = {
+  id: number;
+  hours?: number;
+};
+
+const allotmentInLocationAtDate =
+  (locationId: number, date: Date) =>
+  (a: ProjectAllotment): boolean =>
+    a.locationId === locationId &&
+    isWithinInterval(date, {
+      start: parseSQLDate(a.start),
+      end: parseSQLDate(a.end),
+    });
+
 const EventDetail: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
   const { isAdmin, user } = useAuth();
   const [cancelationDialogIsOpen, setCancelationDialogIsOpen] = useState(false);
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const [usedHours, setUsedHours] = useState<ProjectHours[]>(
+    projects.map(({ id }) => ({ id }))
+  );
+
+  /**
+   * Get total hours, per project, used by everyone in this space
+   * and allotment period.
+   *
+   * This is a business logic requirement:
+   *   Each project has a set of hours allotted to it,
+   *   we'll check if we have exceeded that allotment.
+   *
+   * The server will also perform this check upon reservation creation,
+   * this is just a convenience for the user to avoid opening the
+   * reservation form when it will be rejected.
+   */
+  useEffect(() => {
+    if (!state.currentEvent || !state.currentEvent.location) return;
+    const locationId = state.currentEvent?.location.id;
+    const start = parseSQLDate(state.currentEvent.start.split(" ")[0]);
+    if (!locationId) return;
+    const urls = projects
+      .map(({ id, allotments }) => {
+        const allotment = allotments.find(
+          allotmentInLocationAtDate(locationId, start)
+        );
+        if (!allotment) return "";
+        const query = [
+          ["projectId", id],
+          ["locationId", locationId],
+          ["start", allotment.start],
+          ["end", allotment.end],
+        ]
+          .map(([key, value]) => `${key}=${value}`)
+          .join("&");
+        return `${Project.url}/used-hours?${query}`;
+      })
+      .filter(String);
+    Promise.all(urls.map((url) => fetch(url).then((r) => r.json()))).then(
+      (hours) => setUsedHours(hours as ProjectHours[])
+    );
+  }, [projects, state.currentEvent]);
 
   if (!state.currentEvent || !state.currentEvent.location || !user.username) {
     return null;
@@ -74,7 +131,6 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     Reservation.rules.refundGracePeriodMinutes
   );
 
-  const projects = state.resources[ResourceKey.Projects] as Project[];
   const currentUserWalkInProject = projects.find(
     (project) => project.title === Project.walkInTitle
   );
@@ -120,18 +176,17 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     const groupHasHours =
       project.groupAllottedHours >= group.reservedHours + thisEventHours;
     // TODO verify this is correct - try to make it fail
-    const allotment = project.allotments.find((a) => {
-      const isLocation = a.locationId === state.currentEvent?.location.id;
-      const isNow = isWithinInterval(
-        parseSQLDatetime(state.currentEvent?.start || ""),
-        { start: parseSQLDate(a.start), end: parseSQLDate(a.end) }
-      );
-      return isLocation && isNow;
-    });
+    // TODO redundant use of allotmentInLocationAtDate: can we do it once?
+    const locationId = state.currentEvent?.location.id || 0;
+    const date = parseSQLDatetime(state.currentEvent?.start || "");
+    const allotment = project.allotments.find(
+      allotmentInLocationAtDate(locationId, date)
+    );
     if (!allotment) return false;
-    // TODO total all the hours USED by ALL GROUPS
-    // this is currently just checking the planned total
-    const projectHasHoursHereAndNow = allotment.hours >= thisEventHours;
+    const projectHoursUsed =
+      usedHours.find((h) => h.id === project.id)?.hours || 0;
+    const projectHasHoursHereAndNow =
+      allotment.hours - projectHoursUsed >= thisEventHours;
     return groupHasHours && projectHasHoursHereAndNow;
   };
 
