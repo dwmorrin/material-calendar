@@ -13,11 +13,13 @@ import { CalendarUIProps, CalendarAction } from "../calendar/types";
 import CloseIcon from "@material-ui/icons/Close";
 import {
   castSQLDateToSQLDatetime,
-  isValidSQLDatetimeInterval,
-  parseAndFormatSQLDatetimeInterval,
   isBefore,
   isSameDay,
+  isValidSQLDatetimeInterval,
+  isWithinInterval,
   nowInServerTimezone,
+  parseAndFormatSQLDatetimeInterval,
+  parseSQLDate,
   parseSQLDatetime,
   sqlIntervalInHours,
   subHours,
@@ -115,16 +117,22 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   ): boolean => {
     if (!group) return false;
     const thisEventHours = sqlIntervalInHours(start, end);
-    return project.groupAllottedHours > group.reservedHours + thisEventHours;
-  };
-
-  const projectHasHoursRemaining = (project: Project): boolean => {
-    const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-      (group) => group.projectId === project.id
-    );
-    if (!group) return false;
-    const thisEventHours = sqlIntervalInHours(start, end);
-    return project.groupAllottedHours > group.reservedHours + thisEventHours;
+    const groupHasHours =
+      project.groupAllottedHours >= group.reservedHours + thisEventHours;
+    // TODO verify this is correct - try to make it fail
+    const allotment = project.allotments.find((a) => {
+      const isLocation = a.locationId === state.currentEvent?.location.id;
+      const isNow = isWithinInterval(
+        parseSQLDatetime(state.currentEvent?.start || ""),
+        { start: parseSQLDate(a.start), end: parseSQLDate(a.end) }
+      );
+      return isLocation && isNow;
+    });
+    if (!allotment) return false;
+    // TODO total all the hours USED by ALL GROUPS
+    // this is currently just checking the planned total
+    const projectHasHoursHereAndNow = allotment.hours >= thisEventHours;
+    return groupHasHours && projectHasHoursHereAndNow;
   };
 
   const walkInValid =
