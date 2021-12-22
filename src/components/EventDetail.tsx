@@ -252,7 +252,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         </section>
 
         {reservationCutoffHasNotPassed &&
-          (userOwns || (open && !!projectsActiveNow.length)) && (
+          (userOwns || (open && !!projectsWithHours.length)) && (
             <Button
               key="MakeReservation"
               style={{
