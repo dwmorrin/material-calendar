@@ -365,7 +365,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       <ReservationForm
         dispatch={dispatch}
         state={state}
-        projects={projectsActiveNow.filter(projectHasHoursRemaining)}
+        projects={projectsWithHours}
       />
       {isAdmin && (
         <Button
