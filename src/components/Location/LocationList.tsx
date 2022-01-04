@@ -1,10 +1,13 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
+import {
+  CalendarUIProps,
+  CalendarUISelectionProps,
+} from "../../calendar/types";
 import LocationListItem from "./LocationListItem";
 import LocationAccordionList from "./LocationAccordionList";
 import { AccordionSummary, Accordion } from "@material-ui/core";
-import { ResourceKey } from "../resources/types";
-import Location from "../resources/Location";
+import { ResourceKey } from "../../resources/types";
+import Location from "../../resources/Location";
 
 interface LocationGroups {
   [k: string]: Location[];

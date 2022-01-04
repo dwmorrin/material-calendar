@@ -1,5 +1,8 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
+import {
+  CalendarUIProps,
+  CalendarUISelectionProps,
+} from "../../calendar/types";
 import {
   Accordion,
   AccordionSummary,
@@ -10,8 +13,8 @@ import {
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import LocationListItem from "./LocationListItem";
-import Location from "../resources/Location";
-import { ResourceKey } from "../resources/types";
+import Location from "../../resources/Location";
+import { ResourceKey } from "../../resources/types";
 
 interface LocationAccordionListProps extends CalendarUIProps {
   groupId: string;

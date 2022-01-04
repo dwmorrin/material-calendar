@@ -1,12 +1,12 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUISelectionProps } from "../calendar/types";
+import { CalendarUISelectionProps } from "../../calendar/types";
 import {
   ListItem,
   ListItemText,
   Checkbox,
   FormControlLabel,
 } from "@material-ui/core";
-import Location from "../resources/Location";
+import Location from "../../resources/Location";
 
 interface LocationListItemProps {
   location: Location;

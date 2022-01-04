@@ -11,7 +11,7 @@ import {
   CalendarUIProps,
   CalendarUISelectionProps,
 } from "../../calendar/types";
-import LocationList from "../LocationList";
+import LocationList from "../Location/LocationList";
 import ProjectList from "../Project/ProjectList";
 import Location from "../../resources/Location";
 import UserGroup from "../../resources/UserGroup";
