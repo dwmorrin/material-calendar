@@ -1,5 +1,8 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
+import {
+  CalendarUIProps,
+  CalendarUISelectionProps,
+} from "../../calendar/types";
 import {
   Accordion,
   AccordionSummary,
@@ -13,9 +16,9 @@ import {
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ProjectListItem from "./ProjectListItem";
-import Project from "../resources/Project";
-import UserGroup from "../resources/UserGroup";
-import { ResourceKey } from "../resources/types";
+import Project from "../../resources/Project";
+import UserGroup from "../../resources/UserGroup";
+import { ResourceKey } from "../../resources/types";
 
 interface ProjectAccordionListProps extends CalendarUIProps {
   invitations: UserGroup[];

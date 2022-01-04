@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import { CalendarUIProps, CalendarAction } from "../../calendar/types";
 import {
   Button,
   Dialog,
@@ -12,9 +12,9 @@ import {
 } from "@material-ui/core";
 import { TextField } from "formik-material-ui";
 import CloseIcon from "@material-ui/icons/Close";
-import Location from "../resources/Location";
+import Location from "../../resources/Location";
 import { Field, Form, Formik } from "formik";
-import { ResourceKey } from "../resources/types";
+import { ResourceKey } from "../../resources/types";
 import {
   validationSchema,
   makeInitialValues,
@@ -22,7 +22,7 @@ import {
   useStyles,
   submitHandler,
   transition,
-} from "../calendar/projectForm";
+} from "../../calendar/projectForm";
 import { DatePicker } from "formik-material-ui-pickers";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";

@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import { CalendarUIProps, CalendarAction } from "../../calendar/types";
 import {
   Accordion,
   AccordionDetails,
@@ -21,19 +21,19 @@ import {
   parseAndFormatSQLDateInterval,
   parseAndFormatSQLDatetimeInterval,
   parseSQLDatetime,
-} from "../utils/date";
+} from "../../utils/date";
 import ProjectLocationHours from "./ProjectLocationHours";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
-import GroupDashboard from "./GroupDashboard/GroupDashboard";
-import { ResourceKey } from "../resources/types";
-import Event from "../resources/Event";
+import GroupDashboard from "../GroupDashboard/GroupDashboard";
+import { ResourceKey } from "../../resources/types";
+import Event from "../../resources/Event";
 import {
   useStyles,
   compareStartDates,
   transition,
-} from "../calendar/projectDashboard";
-import fetchCurrentEvent from "../calendar/fetchCurrentEvent";
-import Location from "../resources/Location";
+} from "../../calendar/projectDashboard";
+import fetchCurrentEvent from "../../calendar/fetchCurrentEvent";
+import Location from "../../resources/Location";
 
 const SessionInfo: FunctionComponent<{
   event: Event;

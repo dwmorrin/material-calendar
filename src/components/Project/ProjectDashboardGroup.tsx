@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import { CalendarUIProps, CalendarAction } from "../../calendar/types";
 import {
   Avatar,
   Badge,
@@ -8,8 +8,8 @@ import {
   LinearProgress,
   Typography,
 } from "@material-ui/core";
-import { ResourceKey } from "../resources/types";
-import UserGroup from "../resources/UserGroup";
+import { ResourceKey } from "../../resources/types";
+import UserGroup from "../../resources/UserGroup";
 import { makeStyles } from "@material-ui/core/styles";
 import { deepPurple } from "@material-ui/core/colors";
 

@@ -1,13 +1,13 @@
 import React, { useRef, useEffect, FunctionComponent } from "react";
 import * as d3 from "d3";
-import { ProjectAllotment } from "../resources/Project";
+import { ProjectAllotment } from "../../resources/Project";
 import {
   addDays,
   differenceInHoursSQLDatetime,
   nowInServerTimezone,
   parseSQLDate,
-} from "../utils/date";
-import Event from "../resources/Event";
+} from "../../utils/date";
+import Event from "../../resources/Event";
 
 const height = 90; // height of the total bar chart area in px
 const width = 300; // width of the totla bar char area in px

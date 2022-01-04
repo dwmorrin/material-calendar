@@ -24,7 +24,7 @@ import {
   parseAndFormatSQLDatetimeInterval,
   parseSQLDatetime,
 } from "../../utils/date";
-import ProjectLocationHours from "../ProjectLocationHours";
+import ProjectLocationHours from "../Project/ProjectLocationHours";
 import { ResourceKey } from "../../resources/types";
 import Event from "../../resources/Event";
 import {

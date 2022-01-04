@@ -3,7 +3,7 @@ import {
   CalendarAction,
   CalendarUIProps,
   CalendarUISelectionProps,
-} from "../calendar/types";
+} from "../../calendar/types";
 import {
   Checkbox,
   Grid,
@@ -14,7 +14,7 @@ import {
   Badge,
 } from "@material-ui/core";
 import InfoIcon from "@material-ui/icons/Info";
-import Project from "../resources/Project";
+import Project from "../../resources/Project";
 
 interface ProjectListItemProps extends CalendarUIProps {
   project: Project;

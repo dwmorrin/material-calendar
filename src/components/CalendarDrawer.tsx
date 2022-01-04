@@ -12,7 +12,7 @@ import {
   CalendarUISelectionProps,
 } from "../calendar/types";
 import LocationList from "./LocationList";
-import ProjectList from "./ProjectList";
+import ProjectList from "./Project/ProjectList";
 import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
 import { ResourceKey } from "../resources/types";

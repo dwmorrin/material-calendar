@@ -1,12 +1,15 @@
 import React, { FC } from "react";
-import { CalendarUIProps, CalendarUISelectionProps } from "../calendar/types";
+import {
+  CalendarUIProps,
+  CalendarUISelectionProps,
+} from "../../calendar/types";
 import ProjectAccordionList from "./ProjectAccordionList";
 import ProjectListItem from "./ProjectListItem";
 import { ListItem, Typography } from "@material-ui/core";
-import { ResourceKey } from "../resources/types";
-import Project from "../resources/Project";
-import Course from "../resources/Course";
-import UserGroup from "../resources/UserGroup";
+import { ResourceKey } from "../../resources/types";
+import Project from "../../resources/Project";
+import Course from "../../resources/Course";
+import UserGroup from "../../resources/UserGroup";
 
 type CourseProjects = Record<number, Project[]>;
 
