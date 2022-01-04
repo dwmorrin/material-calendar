@@ -16,11 +16,11 @@ import {
   CalendarAction,
   CalendarUISelectionProps,
   CalendarView,
-} from "../calendar/types";
-import { ResourceKey } from "../resources/types";
-import Event from "../resources/Event";
-import Location from "../resources/Location";
-import Project from "../resources/Project";
+} from "../../calendar/types";
+import { ResourceKey } from "../../resources/types";
+import Event from "../../resources/Event";
+import Location from "../../resources/Location";
+import Project from "../../resources/Project";
 import {
   addResourceId,
   compareCalendarStates,
@@ -28,14 +28,14 @@ import {
   makeResources,
   makeSelectedLocationIdSet,
   getEventsByLocationId,
-} from "../calendar/calendar";
-import { useAuth } from "./AuthProvider";
+} from "./lib";
+import { useAuth } from "../AuthProvider";
 import {
   parseFCString,
   parseAndFormatFCString,
   isWithinIntervalFP,
   parseSQLDatetime,
-} from "../utils/date";
+} from "../../utils/date";
 
 const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },

@@ -7,7 +7,7 @@ import StaticDatePicker from "./DatePicker";
 import FullCalendar from "@fullcalendar/react";
 import { useAuth } from "./AuthProvider";
 import reducer from "../calendar/reducer";
-import FullCalendarBox from "./FullCalendarBox";
+import FullCalendarBox from "./Calendar/FullCalendarBox";
 import EventDetail from "./EventDetail";
 import initialState from "../calendar/initialState";
 import ProjectDashboard from "./ProjectDashboard";

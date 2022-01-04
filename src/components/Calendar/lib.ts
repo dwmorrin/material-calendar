@@ -3,12 +3,12 @@ import {
   CalendarAction,
   CalendarUIProps,
   CalendarUISelectionProps,
-} from "../calendar/types";
-import Event from "../resources/Event";
-import Location from "../resources/Location";
-import Project from "../resources/Project";
+} from "../../calendar/types";
+import Event from "../../resources/Event";
+import Location from "../../resources/Location";
+import Project from "../../resources/Project";
 import { deepEqual } from "fast-equals";
-import fetchCurrentEvent from "./fetchCurrentEvent";
+import fetchCurrentEvent from "../../calendar/fetchCurrentEvent";
 
 export const makeEventClick =
   (dispatch: (action: Action) => void, events: Event[]) =>
@@ -33,6 +33,7 @@ const getBackgroundColor = (
   if (event.reservation) {
     // highlight user owned reservations
     // TODO: if (current user owns reservation) ...
+    // event.reservation.groupId
     // indicate someone else's reservation
     return "salmon";
   } else if (event.reservable) {
