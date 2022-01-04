@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from "react";
 import { navigate, Router } from "@reach/router";
 import { useAuth } from "./AuthProvider";
-import Calendar from "./Calendar";
+import UserRoot from "./UserRoot";
 import Dashboard from "./admin/Dashboard";
 
 /**
@@ -20,7 +20,7 @@ const Landing: FC = () => {
 
   return (
     <Router>
-      <Calendar path="/calendar" />
+      <UserRoot path="/calendar" />
       {isAdmin && <Dashboard path="/admin" />}
     </Router>
   );

@@ -28,7 +28,7 @@ import Category from "../resources/Category";
 import Reservation from "../resources/Reservation";
 import { useSocket } from "./SocketProvider";
 
-const Calendar: FunctionComponent<RouteComponentProps> = () => {
+const UserRoot: FunctionComponent<RouteComponentProps> = () => {
   const { refreshRequested } = useSocket();
   const { user } = useAuth();
   const calendarRef = useRef<FullCalendar>(null);
@@ -103,4 +103,4 @@ const Calendar: FunctionComponent<RouteComponentProps> = () => {
   );
 };
 
-export default Calendar;
+export default UserRoot;
