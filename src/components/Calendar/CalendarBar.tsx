@@ -3,7 +3,7 @@ import {
   CalendarAction,
   CalendarUIProps,
   CalendarUISelectionProps,
-} from "../calendar/types";
+} from "../../calendar/types";
 import {
   AppBar,
   IconButton,
@@ -15,11 +15,11 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import TodayIcon from "@material-ui/icons/Today";
-import ViewMenu from "./ViewMenu";
-import MoreMenu from "./MoreMenu";
+import ViewMenu from "../ViewMenu";
+import MoreMenu from "../MoreMenu";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import UserGroup from "../resources/UserGroup";
-import { ResourceKey } from "../resources/types";
+import UserGroup from "../../resources/UserGroup";
+import { ResourceKey } from "../../resources/types";
 
 const useStyles = makeStyles(() => ({
   title: {

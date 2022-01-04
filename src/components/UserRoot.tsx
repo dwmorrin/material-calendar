@@ -1,8 +1,8 @@
 import React, { FunctionComponent, useEffect, useReducer, useRef } from "react";
 import useLocalStorage from "../utils/useLocalStorage";
 import { RouteComponentProps } from "@reach/router";
-import CalendarDrawer from "./CalendarDrawer";
-import CalendarBar from "./CalendarBar";
+import CalendarDrawer from "./Calendar/CalendarDrawer";
+import CalendarBar from "./Calendar/CalendarBar";
 import StaticDatePicker from "./DatePicker";
 import FullCalendar from "@fullcalendar/react";
 import { useAuth } from "./AuthProvider";
