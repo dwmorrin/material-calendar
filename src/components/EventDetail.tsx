@@ -227,6 +227,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     nowInServerTimezone(),
     parseSQLDatetime(end)
   );
+
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
     : [];
@@ -362,7 +363,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             </Button>
           </div>
         )}
-        {open && !walkInValid && (
+        {eventHasNotEnded && open && !walkInValid && (
           <section>
             <Typography component="h3">
               {projectsWithHours.length
