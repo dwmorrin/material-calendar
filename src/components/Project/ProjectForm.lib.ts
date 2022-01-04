@@ -1,9 +1,9 @@
 import { makeStyles } from "@material-ui/core";
-import { makeTransition } from "../components/Transition";
+import { makeTransition } from "../Transition";
 import { object, string } from "yup";
 import { FormikValues } from "formik";
-import { CalendarState } from "./types";
-import Project from "../resources/Project";
+import { CalendarState } from "../../calendar/types";
+import Project from "../../resources/Project";
 
 export const useStyles = makeStyles({
   list: {

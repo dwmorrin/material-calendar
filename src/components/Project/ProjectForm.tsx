@@ -22,7 +22,7 @@ import {
   useStyles,
   submitHandler,
   transition,
-} from "../../calendar/projectForm";
+} from "./ProjectForm.lib";
 import { DatePicker } from "formik-material-ui-pickers";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
