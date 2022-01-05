@@ -12,7 +12,7 @@ import FileImport from "./bulkImport/FileImport";
 import fetchAllResources from "../../utils/fetchAllResources";
 import useLocalStorage from "../../utils/useLocalStorage";
 import Scheduler from "./Scheduler/Scheduler";
-import Backups from "./Backups";
+import Backups from "./Backups/Backups";
 import { useAuth } from "../AuthProvider";
 import { Redirect } from "@reach/router";
 import SemesterDialog from "./SemesterDialog";

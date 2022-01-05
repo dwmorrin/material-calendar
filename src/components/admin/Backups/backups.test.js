@@ -1,4 +1,4 @@
-import { prettyPrintFilename } from "./backups";
+import { prettyPrintFilename } from "./backups.lib";
 
 test("prettyPrintFilename returns formatted string", () => {
   const filename = "db_backup_2020-06-25_13:50:07.sql";

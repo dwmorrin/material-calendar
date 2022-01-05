@@ -11,9 +11,9 @@ import {
 import CloseIcon from "@material-ui/icons/Close";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import WarningIcon from "@material-ui/icons/Warning";
-import { AdminAction, AdminUIProps } from "../../admin/types";
-import { prettyPrintFilename, restore, useStyles } from "../../admin/backups";
-import { download } from "../../utils/download";
+import { AdminAction, AdminUIProps } from "../../../admin/types";
+import { prettyPrintFilename, restore, useStyles } from "./backups.lib";
+import { download } from "../../../utils/download";
 
 const Backups: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   const [backups, setBackups] = useState([] as string[]);
