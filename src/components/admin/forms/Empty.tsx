@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { List } from "@material-ui/core";
-import { FormTemplateProps } from "../../../admin/types";
+import { FormTemplateProps } from "../types";
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = () => (
   <List>

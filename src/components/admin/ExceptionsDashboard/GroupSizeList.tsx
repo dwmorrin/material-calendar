@@ -12,7 +12,7 @@ import UserGroup from "../../../resources/UserGroup";
 import Project from "../../../resources/Project";
 import { ResourceKey } from "../../../resources/types";
 import { Mail, groupTo } from "../../../utils/mail";
-import { Action, AdminAction, AdminState } from "../../../admin/types";
+import { Action, AdminAction, AdminState } from "../types";
 
 const GroupSizeList: FC<{
   groups: UserGroup[];

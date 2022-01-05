@@ -1,8 +1,8 @@
 import { AdminAction, Action, AdminState } from "./types";
-import { ResourceInstance } from "../resources/types";
-import { Resources } from "../resources/Resources";
+import { ResourceInstance } from "../../resources/types";
+import { Resources } from "../../resources/Resources";
 import { FormikValues } from "formik";
-import { ErrorType } from "../utils/error";
+import { ErrorType } from "../../utils/error";
 
 const filePickerErrorAction = {
   type: AdminAction.Error,

@@ -17,11 +17,7 @@ import {
   selectionHandler,
 } from "./lib";
 import { daysInInterval } from "../../../utils/date";
-import {
-  AdminSelectionProps,
-  AdminUIProps,
-  AdminAction,
-} from "../../../admin/types";
+import { AdminSelectionProps, AdminUIProps, AdminAction } from "../types";
 import { ResourceKey } from "../../../resources/types";
 import { Button, Fab } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";

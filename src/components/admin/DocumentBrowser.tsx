@@ -8,12 +8,12 @@ import {
   Grid,
 } from "@material-ui/core";
 import Pager, { getTotalPages } from "../Pager";
-import { AdminUIProps, AdminAction } from "../../admin/types";
+import { AdminUIProps, AdminAction } from "./types";
 import { ResourceKey, ResourceInstance } from "../../resources/types";
 import { Resources } from "../../resources/Resources";
 import Record from "./records/Record";
 import templateRouter from "./records/router";
-import { dispatchFile } from "../../admin/dispatch";
+import { dispatchFile } from "./dispatch";
 import {
   DEFAULT_RECORD_HEIGHT,
   getRecordsPerPage,

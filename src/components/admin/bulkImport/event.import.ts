@@ -1,4 +1,4 @@
-import { AdminAction } from "../../../admin/types";
+import { AdminAction } from "../types";
 import Event from "../../../resources/Event";
 import { BulkImporter } from "./router";
 import { ResourceKey } from "../../../resources/types";

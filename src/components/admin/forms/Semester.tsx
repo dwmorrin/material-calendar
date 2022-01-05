@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker } from "formik-material-ui-pickers";
-import { FormTemplateProps } from "../../../admin/types";
+import { FormTemplateProps } from "../types";
 import { List } from "@material-ui/core";
 import { isValidDateInterval } from "../../../utils/date";
 import ErrorFormLabel from "../../ErrorFormLabel";

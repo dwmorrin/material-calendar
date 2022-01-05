@@ -5,7 +5,7 @@
  *   big.
  */
 import { FunctionComponent } from "react";
-import { AdminState, FormTemplateProps } from "../../../admin/types";
+import { AdminState, FormTemplateProps } from "../types";
 import { ResourceKey, ResourceInstance } from "../../../resources/types";
 import {
   values as categoryValues,

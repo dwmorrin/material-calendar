@@ -1,9 +1,5 @@
 import React, { FC } from "react";
-import {
-  AdminAction,
-  AdminSelectionProps,
-  AdminUIProps,
-} from "../../admin/types";
+import { AdminAction, AdminSelectionProps, AdminUIProps } from "./types";
 import {
   Button,
   Dialog,

@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { Button, ButtonGroup, List, ListItem, Paper } from "@material-ui/core";
-import { AdminAction, AdminUIProps } from "../../../admin/types";
+import { AdminAction, AdminUIProps } from "../types";
 import Event from "../../../resources/Event";
 import Reservation from "../../../resources/Reservation";
 import UserGroup from "../../../resources/UserGroup";

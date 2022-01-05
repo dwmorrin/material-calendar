@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField } from "formik-material-ui";
-import { FormTemplateProps } from "../../../admin/types";
+import { FormTemplateProps } from "../types";
 import { List } from "@material-ui/core";
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = () => (

@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useEffect, useReducer, useRef } from "react";
 import { RouteComponentProps } from "@reach/router";
-import { AdminAction, AdminSelections } from "../../admin/types";
+import { AdminAction, AdminSelections } from "./types";
 import { Resources } from "../../resources/Resources";
-import reducer from "../../admin/reducer";
-import initialState from "../../admin/initialState";
+import reducer from "./reducer";
+import initialState from "./initialState";
 import Bar from "./Bar";
 import NavigationDrawer from "./NavigationDrawer";
 import DocumentBrowser from "./DocumentBrowser";

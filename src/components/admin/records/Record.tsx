@@ -6,7 +6,7 @@ import {
   ListItem,
   makeStyles,
 } from "@material-ui/core";
-import { AdminAction, AdminUIProps } from "../../../admin/types";
+import { AdminAction, AdminUIProps } from "../types";
 import { ResourceInstance } from "../../../resources/types";
 
 const useStyles = makeStyles({

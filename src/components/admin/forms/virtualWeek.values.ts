@@ -1,5 +1,5 @@
 import VirtualWeek from "../../../resources/VirtualWeek";
-import { AdminState } from "../../../admin/types";
+import { AdminState } from "../types";
 
 export const values = (state: AdminState): Record<string, unknown> => {
   const virtualWeek = state.resourceInstance as VirtualWeek;

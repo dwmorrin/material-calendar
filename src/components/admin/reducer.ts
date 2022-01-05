@@ -1,8 +1,8 @@
 import { Action, AdminState, AdminAction } from "./types";
-import { ResourceKey } from "../resources/types";
-import { enqueue, dequeue } from "../utils/queue";
-import { ErrorType } from "../utils/error";
-import Project from "../resources/Project";
+import { ResourceKey } from "../../resources/types";
+import { enqueue, dequeue } from "../../utils/queue";
+import { ErrorType } from "../../utils/error";
+import Project from "../../resources/Project";
 
 type StateHandler = (state: AdminState, action: Action) => AdminState;
 

@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { Form, FormikProps } from "formik";
-import { AdminState, FormTemplateProps } from "../../../admin/types";
+import { AdminState, FormTemplateProps } from "../types";
 import { Box, DialogContent, Paper } from "@material-ui/core";
 import SaveButton from "./SaveButton";
 import DeleteButton from "./DeleteButton";

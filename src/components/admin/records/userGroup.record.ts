@@ -1,6 +1,6 @@
 import UserGroup, { GroupMember } from "../../../resources/UserGroup";
 import Project from "../../../resources/Project";
-import { AdminState } from "../../../admin/types";
+import { AdminState } from "../types";
 import { ResourceKey } from "../../../resources/types";
 import { parseAndFormatSQLDateInterval } from "../../../utils/date";
 

@@ -1,4 +1,4 @@
-import { AdminAction } from "../../../admin/types";
+import { AdminAction } from "../types";
 import Equipment from "../../../resources/Equipment";
 import Category from "../../../resources/Category";
 import { BulkImporter } from "./router";

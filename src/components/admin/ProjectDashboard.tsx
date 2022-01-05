@@ -14,7 +14,7 @@ import {
   Select,
   MenuItem,
 } from "@material-ui/core";
-import { AdminAction, AdminUIProps } from "../../admin/types";
+import { AdminAction, AdminUIProps } from "./types";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {

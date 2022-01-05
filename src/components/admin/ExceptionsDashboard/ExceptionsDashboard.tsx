@@ -11,7 +11,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import GroupSizeList from "./GroupSizeList";
 import RefundList from "./RefundList";
-import { AdminAction, AdminUIProps } from "../../../admin/types";
+import { AdminAction, AdminUIProps } from "../types";
 import Reservation from "../../../resources/Reservation";
 import UserGroup from "../../../resources/UserGroup";
 

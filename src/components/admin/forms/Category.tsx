@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField, RadioGroup } from "formik-material-ui";
-import { FormTemplateProps } from "../../../admin/types";
+import { FormTemplateProps } from "../types";
 import { FormControlLabel, FormLabel, List, Radio } from "@material-ui/core";
 import { ResourceKey } from "../../../resources/types";
 import Category from "../../../resources/Category";

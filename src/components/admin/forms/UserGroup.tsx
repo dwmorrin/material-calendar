@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { Field, FieldArray } from "formik";
 import { TextField, RadioGroup } from "formik-material-ui";
-import { FormTemplateProps } from "../../../admin/types";
+import { FormTemplateProps } from "../types";
 import {
   List,
   FormControlLabel,

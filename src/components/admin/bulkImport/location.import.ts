@@ -1,5 +1,5 @@
 import Location from "../../../resources/Location";
-import { AdminAction } from "../../../admin/types";
+import { AdminAction } from "../types";
 import { ResourceKey } from "../../../resources/types";
 import { BulkImporter } from "./router";
 

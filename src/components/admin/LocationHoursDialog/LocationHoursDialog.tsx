@@ -21,7 +21,7 @@ import {
 import DraggablePaper from "../../DraggablePaper";
 import { Field, Formik, Form, FieldArray } from "formik";
 import { TextField, Checkbox } from "formik-material-ui";
-import { AdminUIProps, AdminAction } from "../../../admin/types";
+import { AdminUIProps, AdminAction } from "../types";
 import { makeOnSubmit, LocationHoursValues } from "./lib";
 
 // how the date appears in the input: 2021-06-01 [Tue]

@@ -1,6 +1,6 @@
 import { AdminState } from "./types";
-import { ResourceKey, ResourceInstance } from "../resources/types";
-import { enumKeys } from "../utils/enumKeys";
+import { ResourceKey, ResourceInstance } from "../../resources/types";
+import { enumKeys } from "../../utils/enumKeys";
 
 /**
  * coerce the ResourceKey enum into a dictionary to hold all our resources

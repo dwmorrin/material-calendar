@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import { FormLabel, List, ListItem } from "@material-ui/core";
 import { Field } from "formik";
 import { CheckboxWithLabel, TextField } from "formik-material-ui";
-import { FormTemplateProps } from "../../../admin/types";
+import { FormTemplateProps } from "../types";
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = () => (
   <List>

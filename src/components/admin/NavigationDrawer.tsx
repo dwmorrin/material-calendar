@@ -10,11 +10,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import {
-  AdminAction,
-  AdminSelectionProps,
-  AdminUIProps,
-} from "../../admin/types";
+import { AdminAction, AdminSelectionProps, AdminUIProps } from "./types";
 import { ResourceKey } from "../../resources/types";
 import Location from "../../resources/Location";
 import { enumKeys } from "../../utils/enumKeys";

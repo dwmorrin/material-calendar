@@ -14,7 +14,7 @@ import {
 import { TextField } from "formik-material-ui";
 import DraggablePaper from "../DraggablePaper";
 import { Formik, Form, Field, FormikValues } from "formik";
-import { AdminUIProps, AdminAction } from "../../admin/types";
+import { AdminUIProps, AdminAction } from "./types";
 import {
   parseSQLDate,
   subDays,

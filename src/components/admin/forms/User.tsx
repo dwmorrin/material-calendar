@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { CheckboxWithLabel, TextField } from "formik-material-ui";
-import { FormTemplateProps } from "../../../admin/types";
+import { FormTemplateProps } from "../types";
 import { FormLabel, List } from "@material-ui/core";
 import { UserValues } from "./user.values";
 

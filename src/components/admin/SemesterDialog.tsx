@@ -10,11 +10,7 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
-import {
-  AdminUIProps,
-  AdminAction,
-  AdminSelectionProps,
-} from "../../admin/types";
+import { AdminUIProps, AdminAction, AdminSelectionProps } from "./types";
 import { ResourceKey } from "../../resources/types";
 import Semester from "../../resources/Semester";
 import { parseAndFormatSQLDateInterval } from "../../utils/date";

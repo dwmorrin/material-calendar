@@ -13,7 +13,7 @@ import tagRecord from "./tag.record";
 import userRecord from "./user.record";
 import userGroupRecord from "./userGroup.record";
 import virtualWeekRecord from "./virtualWeek.record";
-import { AdminState } from "../../../admin/types";
+import { AdminState } from "../types";
 
 type Template = (instance: ResourceInstance, state: AdminState) => string[][];
 type FilterFn = (key: string) => (instance: ResourceInstance) => boolean;

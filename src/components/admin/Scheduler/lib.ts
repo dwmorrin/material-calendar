@@ -5,7 +5,7 @@ import {
   AdminState,
   CalendarSelectionState,
   AdminSelectionProps,
-} from "../../../admin/types";
+} from "../types";
 import VirtualWeek from "../../../resources/VirtualWeek";
 import Project from "../../../resources/Project";
 import Location from "../../../resources/Location";

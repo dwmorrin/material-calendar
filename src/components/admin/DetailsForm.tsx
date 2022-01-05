@@ -2,13 +2,13 @@ import React, { FunctionComponent } from "react";
 import { Dialog, Toolbar, IconButton, Typography } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { Formik } from "formik";
-import { AdminAction, AdminUIProps } from "../../admin/types";
+import { AdminAction, AdminUIProps } from "./types";
 import { ResourceKey } from "../../resources/types";
 import ResourceForm from "./forms/ResourceForm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
 import formRouter from "./forms/router";
-import { dispatchOneResource } from "../../admin/dispatch";
+import { dispatchOneResource } from "./dispatch";
 
 const DetailsForm: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
   if (!state.resourceInstance || !state.detailIsOpen) return null;

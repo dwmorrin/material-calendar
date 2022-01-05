@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import { Field } from "formik";
 import { TextField, RadioGroup, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker } from "formik-material-ui-pickers";
-import { FormTemplateProps } from "../../../admin/types";
+import { FormTemplateProps } from "../types";
 import { FormControlLabel, FormLabel, List, Radio } from "@material-ui/core";
 import { ResourceKey } from "../../../resources/types";
 import Course from "../../../resources/Course";

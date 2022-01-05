@@ -1,5 +1,5 @@
 import Tag from "../../../resources/Tag";
-import { AdminState } from "../../../admin/types";
+import { AdminState } from "../types";
 
 export const values = (state: AdminState): Record<string, unknown> => {
   return { ...(state.resourceInstance as Tag) };

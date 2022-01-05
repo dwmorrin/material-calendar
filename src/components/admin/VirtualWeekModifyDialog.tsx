@@ -20,7 +20,7 @@ import {
   AdminAction,
   AdminSelectionProps,
   ApiResponse,
-} from "../../admin/types";
+} from "./types";
 import {
   addDays,
   areIntervalsOverlappingInclusive,

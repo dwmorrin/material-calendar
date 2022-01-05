@@ -1,6 +1,6 @@
 import Section from "../../../resources/Section";
 import Course from "../../../resources/Course";
-import { AdminState } from "../../../admin/types";
+import { AdminState } from "../types";
 import { ResourceKey } from "../../../resources/types";
 
 const template = (section: unknown, state: AdminState): string[][] => {

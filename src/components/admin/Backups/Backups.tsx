@@ -11,7 +11,7 @@ import {
 import CloseIcon from "@material-ui/icons/Close";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import WarningIcon from "@material-ui/icons/Warning";
-import { AdminAction, AdminUIProps } from "../../../admin/types";
+import { AdminAction, AdminUIProps } from "../types";
 import { prettyPrintFilename, restore, useStyles } from "./backups.lib";
 import { download } from "../../../utils/download";
 

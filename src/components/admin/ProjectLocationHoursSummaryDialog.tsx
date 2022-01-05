@@ -12,11 +12,7 @@ import {
   TableRow,
 } from "@material-ui/core";
 import DraggablePaper from "../DraggablePaper";
-import {
-  AdminUIProps,
-  AdminAction,
-  AdminSelectionProps,
-} from "../../admin/types";
+import { AdminUIProps, AdminAction, AdminSelectionProps } from "./types";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import { formatSlashed, parseSQLDate } from "../../utils/date";

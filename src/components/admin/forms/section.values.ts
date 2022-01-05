@@ -1,5 +1,5 @@
 import Section from "../../../resources/Section";
-import { AdminState } from "../../../admin/types";
+import { AdminState } from "../types";
 
 interface SectionFormValues extends Record<string, unknown> {
   id: number;

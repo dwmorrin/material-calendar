@@ -1,8 +1,8 @@
-import { ResourceKey, ResourceInstance } from "../resources/types";
-import { SnackbarState } from "../components/Snackbar";
-import Semester from "../resources/Semester";
+import { ResourceKey, ResourceInstance } from "../../resources/types";
+import { SnackbarState } from "../../components/Snackbar";
+import Semester from "../../resources/Semester";
 import FullCalendar from "@fullcalendar/react";
-import Location from "../resources/Location";
+import Location from "../../resources/Location";
 
 export interface Action {
   type: AdminAction;

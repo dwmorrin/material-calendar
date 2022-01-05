@@ -1,4 +1,4 @@
-import { AdminAction } from "../../../admin/types";
+import { AdminAction } from "../types";
 import { ResourceKey } from "../../../resources/types";
 import RosterRecord from "../../../resources/RosterRecord";
 import Course from "../../../resources/Course";

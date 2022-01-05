@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import MoreMenu from "../MoreMenu";
-import { AdminAction, AdminUIProps } from "../../admin/types";
+import { AdminAction, AdminUIProps } from "./types";
 
 const useStyles = makeStyles(() => ({
   title: {

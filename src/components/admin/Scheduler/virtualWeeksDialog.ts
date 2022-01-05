@@ -1,9 +1,4 @@
-import {
-  Action,
-  AdminAction,
-  AdminState,
-  ApiResponse,
-} from "../../../admin/types";
+import { Action, AdminAction, AdminState, ApiResponse } from "../types";
 import { ResourceKey } from "../../../resources/types";
 import VirtualWeek from "../../../resources/VirtualWeek";
 import Semester from "../../../resources/Semester";

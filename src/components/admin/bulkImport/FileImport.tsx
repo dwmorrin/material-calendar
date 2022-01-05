@@ -16,7 +16,7 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { csvParse, tsvParse } from "d3-dsv";
-import { AdminAction, AdminUIProps } from "../../../admin/types";
+import { AdminAction, AdminUIProps } from "../types";
 import { ResourceKey } from "../../../resources/types";
 import importRouter from "./router";
 
