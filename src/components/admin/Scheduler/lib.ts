@@ -26,7 +26,7 @@ import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../../../resources/Semester";
 import { deepEqual } from "fast-equals";
 import { ResourceKey } from "../../../resources/types";
-import { createVirtualWeek } from "../../../admin/virtualWeeksDialog";
+import { createVirtualWeek } from "./virtualWeeksDialog";
 
 //--- TYPES ---
 
