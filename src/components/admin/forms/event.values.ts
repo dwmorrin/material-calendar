@@ -1,8 +1,8 @@
-import Event from "../../resources/Event";
-import Location from "../../resources/Location";
-import { ResourceKey } from "../../resources/types";
-import { formatSQLDatetime, parseSQLDatetime } from "../../utils/date";
-import { AdminState } from "../types";
+import Event from "../../../resources/Event";
+import Location from "../../../resources/Location";
+import { ResourceKey } from "../../../resources/types";
+import { formatSQLDatetime, parseSQLDatetime } from "../../../utils/date";
+import { AdminState } from "../../../admin/types";
 
 interface EventValues extends Record<string, unknown> {
   id: number;

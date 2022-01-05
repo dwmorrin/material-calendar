@@ -1,5 +1,5 @@
-import Location from "../../resources/Location";
-import { AdminState } from "../types";
+import Location from "../../../resources/Location";
+import { AdminState } from "../../../admin/types";
 
 interface LocationValues extends Record<string, unknown> {
   id: number;

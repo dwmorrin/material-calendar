@@ -8,7 +8,7 @@ import { ResourceKey } from "../../../resources/types";
 import Course from "../../../resources/Course";
 import Project from "../../../resources/Project";
 import Location from "../../../resources/Location";
-import { ProjectValues } from "../../../admin/forms/project.values";
+import { ProjectValues } from "./project.values";
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = ({
   state,

@@ -1,7 +1,7 @@
-import Equipment from "../../resources/Equipment";
-import Category from "../../resources/Category";
-import Tag from "../../resources/Tag";
-import { AdminState } from "../types";
+import Equipment from "../../../resources/Equipment";
+import Category from "../../../resources/Category";
+import Tag from "../../../resources/Tag";
+import { AdminState } from "../../../admin/types";
 
 interface EquipmentValues extends Record<string, unknown> {
   id: number;

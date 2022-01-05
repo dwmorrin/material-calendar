@@ -1,5 +1,5 @@
-import Category from "../../resources/Category";
-import { AdminState } from "../types";
+import Category from "../../../resources/Category";
+import { AdminState } from "../../../admin/types";
 
 interface CategoryFormValues extends Record<string, unknown> {
   id: number;

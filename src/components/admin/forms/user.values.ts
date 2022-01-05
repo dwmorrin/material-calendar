@@ -1,5 +1,5 @@
-import User from "../../resources/User";
-import { AdminState } from "../types";
+import User from "../../../resources/User";
+import { AdminState } from "../../../admin/types";
 
 export interface UserValues extends Record<string, unknown> {
   id: number;

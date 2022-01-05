@@ -1,7 +1,7 @@
-import { ResourceKey } from "../../resources/types";
-import User from "../../resources/User";
-import UserGroup from "../../resources/UserGroup";
-import { AdminState } from "../types";
+import { ResourceKey } from "../../../resources/types";
+import User from "../../../resources/User";
+import UserGroup from "../../../resources/UserGroup";
+import { AdminState } from "../../../admin/types";
 
 interface UserGroupValues extends Record<string, unknown> {
   id: number;

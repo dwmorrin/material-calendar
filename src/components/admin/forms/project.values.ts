@@ -1,10 +1,10 @@
-import Project, { ProjectLocationHours } from "../../resources/Project";
-import Course from "../../resources/Course";
-import Section from "../../resources/Section";
-import Location from "../../resources/Location";
-import { AdminState } from "../types";
-import { formatSQLDate, parseSQLDate } from "../../utils/date";
-import { ResourceKey } from "../../resources/types";
+import Project, { ProjectLocationHours } from "../../../resources/Project";
+import Course from "../../../resources/Course";
+import Section from "../../../resources/Section";
+import Location from "../../../resources/Location";
+import { AdminState } from "../../../admin/types";
+import { formatSQLDate, parseSQLDate } from "../../../utils/date";
+import { ResourceKey } from "../../../resources/types";
 
 export interface ProjectValues extends Record<string, unknown> {
   id: number;

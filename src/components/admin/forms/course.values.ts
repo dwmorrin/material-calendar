@@ -1,5 +1,5 @@
-import Course from "../../resources/Course";
-import { AdminState } from "../types";
+import Course from "../../../resources/Course";
+import { AdminState } from "../../../admin/types";
 
 interface CourseFormValues extends Record<string, unknown> {
   id: string;

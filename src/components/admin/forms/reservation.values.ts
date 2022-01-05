@@ -1,7 +1,7 @@
 import Reservation, {
   ReservationCancelation,
-} from "../../resources/Reservation";
-import { AdminState } from "../types";
+} from "../../../resources/Reservation";
+import { AdminState } from "../../../admin/types";
 
 interface ReservationFormValues extends Record<string, unknown> {
   id: number;

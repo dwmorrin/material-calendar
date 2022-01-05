@@ -1,9 +1,9 @@
-import RosterRecord from "../../resources/RosterRecord";
-import User from "../../resources/User";
-import Course from "../../resources/Course";
-import { ResourceKey } from "../../resources/types";
-import { AdminState } from "../types";
-import Section from "../../resources/Section";
+import RosterRecord from "../../../resources/RosterRecord";
+import User from "../../../resources/User";
+import Course from "../../../resources/Course";
+import { ResourceKey } from "../../../resources/types";
+import { AdminState } from "../../../admin/types";
+import Section from "../../../resources/Section";
 
 interface RosterValues extends Record<string, unknown> {
   username: string;

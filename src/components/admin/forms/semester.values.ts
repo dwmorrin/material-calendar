@@ -1,6 +1,6 @@
-import Semester from "../../resources/Semester";
-import { AdminState } from "../types";
-import { formatSQLDate, parseSQLDate } from "../../utils/date";
+import Semester from "../../../resources/Semester";
+import { AdminState } from "../../../admin/types";
+import { formatSQLDate, parseSQLDate } from "../../../utils/date";
 
 interface SemesterValues extends Record<string, unknown> {
   id: number;

@@ -3,7 +3,7 @@ import { Field } from "formik";
 import { CheckboxWithLabel, TextField } from "formik-material-ui";
 import { FormTemplateProps } from "../../../admin/types";
 import { FormLabel, List } from "@material-ui/core";
-import { UserValues } from "../../../admin/forms/user.values";
+import { UserValues } from "./user.values";
 
 const FormTemplate: FunctionComponent<FormTemplateProps> = ({ values }) => {
   const { password } = values as UserValues;

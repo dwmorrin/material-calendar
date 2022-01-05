@@ -7,7 +7,7 @@ import { ResourceKey } from "../../resources/types";
 import ResourceForm from "./forms/ResourceForm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnUtils from "@date-io/date-fns";
-import formRouter from "../../admin/forms/router";
+import formRouter from "./forms/router";
 import { dispatchOneResource } from "../../admin/dispatch";
 
 const DetailsForm: FunctionComponent<AdminUIProps> = ({ dispatch, state }) => {
