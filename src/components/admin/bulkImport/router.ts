@@ -1,5 +1,5 @@
-import { ResourceKey } from "../../resources/types";
-import { AdminAction, AdminState } from "../types";
+import { ResourceKey } from "../../../resources/types";
+import { AdminAction, AdminState } from "../../../admin/types";
 import eventImport from "./event.import";
 import locationImport from "./location.import";
 import rosterImport from "./roster.import";

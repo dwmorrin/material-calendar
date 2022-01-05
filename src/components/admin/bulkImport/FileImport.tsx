@@ -16,9 +16,9 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { csvParse, tsvParse } from "d3-dsv";
-import { AdminAction, AdminUIProps } from "../../admin/types";
-import { ResourceKey } from "../../resources/types";
-import importRouter from "../../admin/bulkImport/router";
+import { AdminAction, AdminUIProps } from "../../../admin/types";
+import { ResourceKey } from "../../../resources/types";
+import importRouter from "./router";
 
 const useStyles = makeStyles({
   scrollable: {

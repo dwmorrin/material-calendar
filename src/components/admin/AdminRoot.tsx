@@ -8,7 +8,7 @@ import Bar from "./Bar";
 import NavigationDrawer from "./NavigationDrawer";
 import DocumentBrowser from "./DocumentBrowser";
 import DetailsForm from "./DetailsForm";
-import FileImport from "./FileImport";
+import FileImport from "./bulkImport/FileImport";
 import fetchAllResources from "../../utils/fetchAllResources";
 import useLocalStorage from "../../utils/useLocalStorage";
 import Scheduler from "./Scheduler/Scheduler";

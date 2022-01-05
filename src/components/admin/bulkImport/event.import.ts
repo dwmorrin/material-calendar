@@ -1,7 +1,7 @@
-import { AdminAction } from "../types";
-import Event from "../../resources/Event";
+import { AdminAction } from "../../../admin/types";
+import Event from "../../../resources/Event";
 import { BulkImporter } from "./router";
-import { ResourceKey } from "../../resources/types";
+import { ResourceKey } from "../../../resources/types";
 
 // this can also be accomplished in mysql with DATE(input_string),
 // but easy enough to do it in javascript and doing it twice is fine as well

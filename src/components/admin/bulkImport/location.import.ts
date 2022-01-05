@@ -1,6 +1,6 @@
-import Location from "../../resources/Location";
-import { AdminAction } from "../types";
-import { ResourceKey } from "../../resources/types";
+import Location from "../../../resources/Location";
+import { AdminAction } from "../../../admin/types";
+import { ResourceKey } from "../../../resources/types";
 import { BulkImporter } from "./router";
 
 export const headings = ["Title", "Group", "Restriction", "Allows Walk-Ins"];

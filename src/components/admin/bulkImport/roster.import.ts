@@ -1,12 +1,12 @@
-import { AdminAction } from "../types";
-import { ResourceKey } from "../../resources/types";
-import RosterRecord from "../../resources/RosterRecord";
-import Course from "../../resources/Course";
-import Project from "../../resources/Project";
-import User from "../../resources/User";
-import UserGroup from "../../resources/UserGroup";
+import { AdminAction } from "../../../admin/types";
+import { ResourceKey } from "../../../resources/types";
+import RosterRecord from "../../../resources/RosterRecord";
+import Course from "../../../resources/Course";
+import Project from "../../../resources/Project";
+import User from "../../../resources/User";
+import UserGroup from "../../../resources/UserGroup";
 import { BulkImporter } from "./router";
-import Section from "../../resources/Section";
+import Section from "../../../resources/Section";
 
 const headings = [
   "Course",

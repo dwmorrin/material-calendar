@@ -1,8 +1,8 @@
-import { AdminAction } from "../types";
-import Equipment from "../../resources/Equipment";
-import Category from "../../resources/Category";
+import { AdminAction } from "../../../admin/types";
+import Equipment from "../../../resources/Equipment";
+import Category from "../../../resources/Category";
 import { BulkImporter } from "./router";
-import { ResourceKey } from "../../resources/types";
+import { ResourceKey } from "../../../resources/types";
 
 const headings = [
   "Category",
