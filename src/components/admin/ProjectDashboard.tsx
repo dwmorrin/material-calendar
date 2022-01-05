@@ -31,7 +31,7 @@ import {
   useStyles,
   compareStartDates,
   transition,
-} from "../../calendar/projectDashboard";
+} from "../Project/ProjectDashboard.lib";
 import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";

@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarAction } from "../../calendar/types";
+import { CalendarUIProps, CalendarAction } from "../types";
 import {
   Avatar,
   Badge,

@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core";
 import { makeTransition } from "../Transition";
 import { object, string } from "yup";
 import { FormikValues } from "formik";
-import { CalendarAction } from "../../calendar/types";
+import { CalendarAction } from "../types";
 import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";
 import Reservation from "../../resources/Reservation";

@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { Button, List, ListItem } from "@material-ui/core";
-import { Action, CalendarAction } from "../../calendar/types";
+import { Action, CalendarAction } from "../types";
 import User from "../../resources/User";
 import UserGroup from "../../resources/UserGroup";
 import ButtonGroup from "@material-ui/core/ButtonGroup";

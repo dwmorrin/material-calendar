@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core";
-import { makeTransition } from "../components/Transition";
-import Event from "../resources/Event";
+import { makeTransition } from "../Transition";
+import Event from "../../resources/Event";
 
 export const useStyles = makeStyles((theme) => ({
   root: {

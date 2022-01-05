@@ -6,7 +6,7 @@ import {
   DialogActions,
   TextField,
 } from "@material-ui/core";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import { CalendarUIProps, CalendarAction } from "./types";
 import { useAuth } from "./AuthProvider";
 import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";

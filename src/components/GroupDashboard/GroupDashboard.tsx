@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { CalendarUIProps, CalendarAction } from "../../calendar/types";
+import { CalendarUIProps, CalendarAction } from "../types";
 import { makeTransition } from "../Transition";
 import { parseAndFormatSQLDateInterval } from "../../utils/date";
 import { useAuth } from "../AuthProvider";

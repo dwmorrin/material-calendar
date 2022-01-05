@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from "react";
-import { CalendarUIProps, CalendarAction } from "../../calendar/types";
+import { CalendarUIProps, CalendarAction } from "../types";
 import {
   Button,
   Dialog,
@@ -27,7 +27,7 @@ import {
   makeEquipmentValues,
 } from "./lib";
 import { useAuth } from "../AuthProvider";
-import fetchCurrentEvent from "../../calendar/fetchCurrentEvent";
+import fetchCurrentEvent from "../fetchCurrentEvent";
 import Equipment from "../../resources/Equipment";
 import Category from "../../resources/Category";
 import RadioYesNo from "../RadioYesNo";

@@ -1,4 +1,4 @@
-import { Action, ApiResponse, CalendarAction } from "../../calendar/types";
+import { Action, ApiResponse, CalendarAction } from "../types";
 import Event from "../../resources/Event";
 import Location from "../../resources/Location";
 import { FormikValues } from "formik";

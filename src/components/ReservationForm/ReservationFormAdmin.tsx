@@ -2,7 +2,7 @@
 // admin can freely assign project and group
 
 import React, { FC, useEffect, useState } from "react";
-import { Action, CalendarUIProps, CalendarAction } from "../../calendar/types";
+import { Action, CalendarUIProps, CalendarAction } from "../types";
 import {
   Button,
   Dialog,
@@ -33,7 +33,7 @@ import {
   makeEquipmentValues,
 } from "./lib";
 import { useAuth } from "../AuthProvider";
-import fetchCurrentEvent from "../../calendar/fetchCurrentEvent";
+import fetchCurrentEvent from "../fetchCurrentEvent";
 import Equipment from "../../resources/Equipment";
 import Category from "../../resources/Category";
 import User from "../../resources/User";

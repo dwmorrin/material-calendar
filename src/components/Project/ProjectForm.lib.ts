@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core";
 import { makeTransition } from "../Transition";
 import { object, string } from "yup";
 import { FormikValues } from "formik";
-import { CalendarState } from "../../calendar/types";
+import { CalendarState } from "../types";
 import Project from "../../resources/Project";
 
 export const useStyles = makeStyles({

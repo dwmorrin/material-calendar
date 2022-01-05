@@ -1,4 +1,4 @@
-import { CalendarUIProps } from "../../calendar/types";
+import { CalendarUIProps } from "../types";
 import User from "../../resources/User";
 import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";

@@ -1,4 +1,4 @@
-import { Action, CalendarAction } from "../../calendar/types";
+import { Action, CalendarAction } from "../types";
 import Project from "../../resources/Project";
 import { ResourceKey } from "../../resources/types";
 import User from "../../resources/User";

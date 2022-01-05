@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import { Box, Dialog } from "@material-ui/core";
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
-import { CalendarAction, CalendarUIProps } from "../calendar/types";
+import { CalendarAction, CalendarUIProps } from "./types";
 import DateFnUtils from "@date-io/date-fns";
 
 const StaticDatePicker: FunctionComponent<CalendarUIProps> = ({

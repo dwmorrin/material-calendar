@@ -16,7 +16,7 @@ import {
   CalendarAction,
   CalendarUISelectionProps,
   CalendarView,
-} from "../../calendar/types";
+} from "../types";
 import { ResourceKey } from "../../resources/types";
 import Event from "../../resources/Event";
 import Location from "../../resources/Location";

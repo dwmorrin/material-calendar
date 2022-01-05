@@ -9,7 +9,7 @@ import {
   List,
   Paper,
 } from "@material-ui/core";
-import { CalendarUIProps, CalendarAction } from "../calendar/types";
+import { CalendarUIProps, CalendarAction } from "./types";
 import CloseIcon from "@material-ui/icons/Close";
 import {
   castSQLDateToSQLDatetime,

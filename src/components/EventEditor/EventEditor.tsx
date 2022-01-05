@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { CalendarAction, CalendarUIProps } from "../../calendar/types";
+import { CalendarAction, CalendarUIProps } from "../types";
 import Event from "../../resources/Event";
 import Location from "../../resources/Location";
 import { Field, Formik, Form } from "formik";

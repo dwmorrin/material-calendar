@@ -15,7 +15,7 @@ import {
   CalendarUIProps,
   CalendarUISelectionProps,
   CalendarView,
-} from "../calendar/types";
+} from "./types";
 
 const options = [
   {

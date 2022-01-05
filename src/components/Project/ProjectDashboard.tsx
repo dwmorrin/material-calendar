@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUIProps, CalendarAction } from "../../calendar/types";
+import { CalendarUIProps, CalendarAction } from "../types";
 import {
   Accordion,
   AccordionDetails,
@@ -31,8 +31,8 @@ import {
   useStyles,
   compareStartDates,
   transition,
-} from "../../calendar/projectDashboard";
-import fetchCurrentEvent from "../../calendar/fetchCurrentEvent";
+} from "./ProjectDashboard.lib";
+import fetchCurrentEvent from "../fetchCurrentEvent";
 import Location from "../../resources/Location";
 
 const SessionInfo: FunctionComponent<{

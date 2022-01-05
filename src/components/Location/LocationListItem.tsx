@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { CalendarUISelectionProps } from "../../calendar/types";
+import { CalendarUISelectionProps } from "../types";
 import {
   ListItem,
   ListItemText,

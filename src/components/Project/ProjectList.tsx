@@ -1,8 +1,5 @@
 import React, { FC } from "react";
-import {
-  CalendarUIProps,
-  CalendarUISelectionProps,
-} from "../../calendar/types";
+import { CalendarUIProps, CalendarUISelectionProps } from "../types";
 import ProjectAccordionList from "./ProjectAccordionList";
 import ProjectListItem from "./ProjectListItem";
 import { ListItem, Typography } from "@material-ui/core";

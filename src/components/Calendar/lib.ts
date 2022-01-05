@@ -3,12 +3,12 @@ import {
   CalendarAction,
   CalendarUIProps,
   CalendarUISelectionProps,
-} from "../../calendar/types";
+} from "../types";
 import Event from "../../resources/Event";
 import Location from "../../resources/Location";
 import Project from "../../resources/Project";
 import { deepEqual } from "fast-equals";
-import fetchCurrentEvent from "../../calendar/fetchCurrentEvent";
+import fetchCurrentEvent from "../fetchCurrentEvent";
 
 export const makeEventClick =
   (dispatch: (action: Action) => void, events: Event[]) =>

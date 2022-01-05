@@ -1,8 +1,5 @@
 import React, { FunctionComponent } from "react";
-import {
-  CalendarUIProps,
-  CalendarUISelectionProps,
-} from "../../calendar/types";
+import { CalendarUIProps, CalendarUISelectionProps } from "../types";
 import LocationListItem from "./LocationListItem";
 import LocationAccordionList from "./LocationAccordionList";
 import { AccordionSummary, Accordion } from "@material-ui/core";

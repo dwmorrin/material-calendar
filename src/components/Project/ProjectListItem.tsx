@@ -3,7 +3,7 @@ import {
   CalendarAction,
   CalendarUIProps,
   CalendarUISelectionProps,
-} from "../../calendar/types";
+} from "../types";
 import {
   Checkbox,
   Grid,

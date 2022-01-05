@@ -10,7 +10,7 @@ import {
   CalendarAction,
   CalendarUIProps,
   CalendarUISelectionProps,
-} from "../../calendar/types";
+} from "../types";
 import LocationList from "../Location/LocationList";
 import ProjectList from "../Project/ProjectList";
 import Location from "../../resources/Location";
