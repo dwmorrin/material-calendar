@@ -17,7 +17,7 @@ import { dispatchFile } from "../../admin/dispatch";
 import {
   DEFAULT_RECORD_HEIGHT,
   getRecordsPerPage,
-} from "../../admin/documentBrowser";
+} from "./DocumentBrowser.lib";
 import splitCamelCase from "../../utils/splitCamelCase";
 
 const AdminDocumentBrowser: FunctionComponent<AdminUIProps> = ({
