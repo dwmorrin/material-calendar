@@ -2,7 +2,7 @@ import React, { FC, useEffect } from "react";
 import { navigate, Router } from "@reach/router";
 import { useAuth } from "./AuthProvider";
 import UserRoot from "./UserRoot";
-import Dashboard from "./admin/Dashboard";
+import AdminRoot from "./admin/AdminRoot";
 
 /**
  * Redirect user to the appropriate page
@@ -21,7 +21,7 @@ const Landing: FC = () => {
   return (
     <Router>
       <UserRoot path="/calendar" />
-      {isAdmin && <Dashboard path="/admin" />}
+      {isAdmin && <AdminRoot path="/admin" />}
     </Router>
   );
 };
