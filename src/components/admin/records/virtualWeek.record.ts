@@ -1,5 +1,5 @@
-import VirtualWeek from "../../resources/VirtualWeek";
-import { formatSlashed, parseSQLDate } from "../../utils/date";
+import VirtualWeek from "../../../resources/VirtualWeek";
+import { formatSlashed, parseSQLDate } from "../../../utils/date";
 
 const template = (virtualWeek: unknown): string[][] =>
   virtualWeek instanceof VirtualWeek

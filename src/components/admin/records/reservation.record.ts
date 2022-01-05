@@ -1,4 +1,4 @@
-import Reservation from "../../resources/Reservation";
+import Reservation from "../../../resources/Reservation";
 
 const template = (res: unknown): string[][] =>
   res instanceof Reservation

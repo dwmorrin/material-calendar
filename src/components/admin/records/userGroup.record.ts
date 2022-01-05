@@ -1,8 +1,8 @@
-import UserGroup, { GroupMember } from "../../resources/UserGroup";
-import Project from "../../resources/Project";
-import { AdminState } from "../types";
-import { ResourceKey } from "../../resources/types";
-import { parseAndFormatSQLDateInterval } from "../../utils/date";
+import UserGroup, { GroupMember } from "../../../resources/UserGroup";
+import Project from "../../../resources/Project";
+import { AdminState } from "../../../admin/types";
+import { ResourceKey } from "../../../resources/types";
+import { parseAndFormatSQLDateInterval } from "../../../utils/date";
 
 const nameReducer = (s: string, groupMember: GroupMember): string =>
   s ? `${s}, ${groupMember.username}` : groupMember.username;

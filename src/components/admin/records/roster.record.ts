@@ -1,4 +1,4 @@
-import RosterRecord from "../../resources/RosterRecord";
+import RosterRecord from "../../../resources/RosterRecord";
 
 const template = (rosterRecord: unknown): string[][] => {
   if (!(rosterRecord instanceof RosterRecord)) {

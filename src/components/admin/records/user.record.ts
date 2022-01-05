@@ -1,4 +1,4 @@
-import User from "../../resources/User";
+import User from "../../../resources/User";
 
 const template = (user: unknown): string[][] =>
   user instanceof User

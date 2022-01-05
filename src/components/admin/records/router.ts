@@ -1,4 +1,4 @@
-import { ResourceKey, ResourceInstance } from "../../resources/types";
+import { ResourceKey, ResourceInstance } from "../../../resources/types";
 import categoryRecord from "./category.record";
 import equipmentRecord from "./equipment.record";
 import eventRecord from "./event.record";
@@ -13,7 +13,7 @@ import tagRecord from "./tag.record";
 import userRecord from "./user.record";
 import userGroupRecord from "./userGroup.record";
 import virtualWeekRecord from "./virtualWeek.record";
-import { AdminState } from "../types";
+import { AdminState } from "../../../admin/types";
 
 type Template = (instance: ResourceInstance, state: AdminState) => string[][];
 type FilterFn = (key: string) => (instance: ResourceInstance) => boolean;

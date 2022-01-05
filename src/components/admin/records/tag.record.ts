@@ -1,4 +1,4 @@
-import Tag from "../../resources/Tag";
+import Tag from "../../../resources/Tag";
 
 const template = (tag: unknown): string[][] =>
   tag instanceof Tag

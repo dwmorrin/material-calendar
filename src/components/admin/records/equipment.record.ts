@@ -1,4 +1,4 @@
-import Equipment from "../../resources/Equipment";
+import Equipment from "../../../resources/Equipment";
 
 const template = (equip: unknown): string[][] =>
   equip instanceof Equipment

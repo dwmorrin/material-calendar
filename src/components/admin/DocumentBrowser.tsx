@@ -11,8 +11,8 @@ import Pager, { getTotalPages } from "../Pager";
 import { AdminUIProps, AdminAction } from "../../admin/types";
 import { ResourceKey, ResourceInstance } from "../../resources/types";
 import { Resources } from "../../resources/Resources";
-import Record from "./Record";
-import templateRouter from "../../admin/records/router";
+import Record from "./records/Record";
+import templateRouter from "./records/router";
 import { dispatchFile } from "../../admin/dispatch";
 import {
   DEFAULT_RECORD_HEIGHT,

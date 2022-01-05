@@ -1,9 +1,9 @@
-import Project from "../../resources/Project";
+import Project from "../../../resources/Project";
 import {
   parseSQLDate,
   formatSlashed,
   parseAndFormatSQLDateInterval,
-} from "../../utils/date";
+} from "../../../utils/date";
 
 const template = (project: unknown): string[][] =>
   project instanceof Project

@@ -6,8 +6,8 @@ import {
   ListItem,
   makeStyles,
 } from "@material-ui/core";
-import { AdminAction, AdminUIProps } from "../../admin/types";
-import { ResourceInstance } from "../../resources/types";
+import { AdminAction, AdminUIProps } from "../../../admin/types";
+import { ResourceInstance } from "../../../resources/types";
 
 const useStyles = makeStyles({
   record: {

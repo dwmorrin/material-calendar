@@ -1,5 +1,5 @@
-import Semester from "../../resources/Semester";
-import { formatSlashed, parseSQLDate } from "../../utils/date";
+import Semester from "../../../resources/Semester";
+import { formatSlashed, parseSQLDate } from "../../../utils/date";
 
 const template = (semester: unknown): string[][] =>
   semester instanceof Semester

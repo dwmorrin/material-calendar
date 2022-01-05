@@ -1,4 +1,4 @@
-import Location from "../../resources/Location";
+import Location from "../../../resources/Location";
 
 const template = (location: unknown): string[][] =>
   location instanceof Location

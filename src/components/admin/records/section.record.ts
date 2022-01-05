@@ -1,7 +1,7 @@
-import Section from "../../resources/Section";
-import Course from "../../resources/Course";
-import { AdminState } from "../types";
-import { ResourceKey } from "../../resources/types";
+import Section from "../../../resources/Section";
+import Course from "../../../resources/Course";
+import { AdminState } from "../../../admin/types";
+import { ResourceKey } from "../../../resources/types";
 
 const template = (section: unknown, state: AdminState): string[][] => {
   const courses = state.resources[ResourceKey.Courses] as Course[];

@@ -1,6 +1,6 @@
-import Category from "../../resources/Category";
-import { ResourceKey } from "../../resources/types";
-import { AdminState } from "../types";
+import Category from "../../../resources/Category";
+import { ResourceKey } from "../../../resources/types";
+import { AdminState } from "../../../admin/types";
 
 const template = (category: unknown, state: AdminState): string[][] => {
   if (category instanceof Category) {

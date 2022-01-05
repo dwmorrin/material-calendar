@@ -1,4 +1,4 @@
-import Course from "../../resources/Course";
+import Course from "../../../resources/Course";
 
 // actually showing a list of sections
 // the same course can appear multiple times

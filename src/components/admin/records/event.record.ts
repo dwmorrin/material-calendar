@@ -1,5 +1,5 @@
-import Event from "../../resources/Event";
-import { parseAndFormatSQLDatetimeInterval } from "../../utils/date";
+import Event from "../../../resources/Event";
+import { parseAndFormatSQLDatetimeInterval } from "../../../utils/date";
 
 const template = (event: unknown): string[][] =>
   event instanceof Event
