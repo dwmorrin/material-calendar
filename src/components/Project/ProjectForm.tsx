@@ -35,17 +35,12 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
   const classes = useStyles();
 
   function locationIsChecked(
-    values: {
-      [k: string]: unknown;
-    },
+    values: Record<string, unknown>,
     title: string
   ): boolean {
-    if (!values["locations"]) {
-      return false;
-    }
-    const selectedlocations: { [k: string]: boolean } =
-      (values["locations"] as { [k: string]: boolean }) || {};
-    return selectedlocations[title];
+    if ("locations" in values && typeof values["locations"] === "object")
+      return Boolean((values["locations"] as Record<string, unknown>)[title]);
+    return false;
   }
 
   return (
@@ -144,38 +139,16 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
                   component={TextField}
                   label="Hours Per Group"
                   name="groupAllottedHours"
-                  fullWidth
                   variant="filled"
                 />
                 <FormLabel className={classes.item}>Start Date</FormLabel>
-                <Field
-                  component={DatePicker}
-                  name="start"
-                  type="date"
-                  format="YYYY-MM-DD"
-                  fullWidth
-                  variant="filled"
-                />
+                <Field component={DatePicker} name="start" />
                 <FormLabel className={classes.item}>End Date</FormLabel>
-                <Field
-                  component={DatePicker}
-                  name="end"
-                  type="date"
-                  format="YYYY-MM-DD"
-                  fullWidth
-                  variant="filled"
-                />
+                <Field component={DatePicker} name="end" />
                 <FormLabel className={classes.item}>
                   Reserving time allowed starting:
                 </FormLabel>
-                <Field
-                  component={DatePicker}
-                  name="reservationStart"
-                  type="date"
-                  format="YYYY-MM-DD"
-                  fullWidth
-                  variant="filled"
-                />
+                <Field component={DatePicker} name="reservationStart" />
                 <Button
                   className={classes.item}
                   type="submit"
@@ -185,7 +158,7 @@ const ProjectForm: FunctionComponent<CalendarUIProps> = ({
                   style={{ backgroundColor: "Green", color: "white" }}
                   disabled={isSubmitting}
                 >
-                  Confirm Reservation
+                  Create Project
                 </Button>
                 <pre>{JSON.stringify(values, null, 2)}</pre>
               </Form>
