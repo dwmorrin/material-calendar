@@ -40,6 +40,7 @@ import {
 const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
   fullHeight: { minHeight: "100vh" },
+  noOverflow: { overflow: "hidden" },
 }));
 
 const SelectALocationMessage: FunctionComponent = () => {
@@ -85,6 +86,7 @@ const FullCalendarBox: FunctionComponent<
           projectLocations,
           selections.locationIds
         )}
+        resourceLabelClassNames={classes.noOverflow}
         // EVENTS
         events={({ startStr, endStr }, successCallback): void => {
           // https://fullcalendar.io/docs/events-function
@@ -150,6 +152,8 @@ const FullCalendarBox: FunctionComponent<
           })
         }
         // ETC
+        dayHeaderClassNames={classes.noOverflow}
+        eventClassNames={classes.noOverflow}
         firstDay={Number(process.env.REACT_APP_FIRST_DAY)}
         timeZone={process.env.REACT_APP_SERVER_TIMEZONE}
         height="93vh"
