@@ -4,6 +4,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  ButtonBase,
   Dialog,
   IconButton,
   List,
@@ -42,14 +43,16 @@ const SessionInfo: FunctionComponent<{
   return (
     <List onClick={onClick}>
       <ListItem>
-        <ListItemText
-          primary={
-            event.location.title +
-            " - " +
-            parseAndFormatSQLDatetimeInterval(event)
-          }
-          secondary={event.title}
-        />
+        <ButtonBase>
+          <ListItemText
+            primary={
+              event.location.title +
+              " - " +
+              parseAndFormatSQLDatetimeInterval(event)
+            }
+            secondary={event.title}
+          />
+        </ButtonBase>
       </ListItem>
     </List>
   );
@@ -84,6 +87,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   );
 
   const makeOpenEventDetail = (event: Event) => (): void => {
+    dispatch({ type: CalendarAction.CloseProjectDashboard });
     dispatch({
       type: CalendarAction.OpenEventDetail,
       payload: { currentEvent: event },
