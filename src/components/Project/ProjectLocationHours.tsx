@@ -10,14 +10,9 @@ import {
 import Event from "../../resources/Event";
 
 const height = 90; // height of the total bar chart area in px
-const width = 300; // width of the totla bar char area in px
+const width = 300; // width of the total bar char area in px
 const margin = { left: 30, right: 20, top: 20, bottom: 20 }; // for axes
 const today = nowInServerTimezone(); // for "now" indicator
-const colors = {
-  allotment: "#3F51B5", // matching color of the linear progress bar
-  event: "green",
-  now: "red",
-};
 
 interface AllotmentExtent {
   hours: number;
@@ -76,7 +71,8 @@ const getExtent = (allotments: BarableObj[]): AllotmentExtent => {
 
 const bars = (
   barables: BarableObj[],
-  scales: AllotmentScales
+  scales: AllotmentScales,
+  colors: { allotment: string; event: string; now: string }
 ): AllotmentBar[] => {
   const b = barables.map(({ start, end, hours, isEvent }) => {
     const x = scales.x(parseSQLDate(start)) as number;
@@ -102,10 +98,13 @@ const bars = (
 interface ProjectLocationHoursProps {
   allotments: ProjectAllotment[];
   events?: Event[];
+  colors: { allotment: string; event: string; now: string };
 }
+
 const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
   allotments,
   events = [] as Event[],
+  colors,
 }) => {
   const container = useRef(null);
   const xAxisRef = useRef(null);
@@ -118,7 +117,7 @@ const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
     const barableEvents = [...allotments, ...events.map(eventToBarable)];
     const extent = getExtent(barableEvents);
     const scales = getScales(extent);
-    const allotmentBars = bars(barableEvents, scales);
+    const allotmentBars = bars(barableEvents, scales, colors);
     const svg = d3.select(container.current);
     const update = svg.selectAll("rect").data(allotmentBars);
     update
@@ -135,7 +134,7 @@ const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
     const yAxis = d3.axisLeft(scales.y).ticks(3);
     d3.select(xAxisRef.current).call(xAxis as never);
     d3.select(yAxisRef.current).call(yAxis as never);
-  }, [allotments, events]);
+  }, [allotments, events, colors]);
 
   return (
     <svg width={width} height={height} ref={container}>

@@ -37,6 +37,12 @@ import UserGroup from "../../resources/UserGroup";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
 import User from "../../resources/User";
 
+const colors = {
+  allotment: "#3F51B5", // matching color of the linear progress bar
+  event: "limegreen",
+  now: "red",
+};
+
 const SessionInfo: FunctionComponent<{ event: Event }> = ({ event }) => {
   return (
     <List>
@@ -200,13 +206,13 @@ const ProjectDashboard: FunctionComponent<AdminUIProps> = ({
                 {location.title as string}
               </Typography>
               <ProjectLocationHours
-                // allotments={[]}
                 allotments={
                   currentProject?.allotments.filter(
                     (a) => a.locationId === location.id
                   ) || []
                 }
                 events={groupEvents}
+                colors={colors}
               />
             </AccordionDetails>
           ))}

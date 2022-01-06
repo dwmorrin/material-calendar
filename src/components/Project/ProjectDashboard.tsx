@@ -24,6 +24,7 @@ import {
   parseSQLDatetime,
 } from "../../utils/date";
 import ProjectLocationHours from "./ProjectLocationHours";
+import ProjectLocationHoursLegend from "./ProjectLocationHoursLegend";
 import ProjectDashboardGroup from "./ProjectDashboardGroup";
 import GroupDashboard from "../GroupDashboard/GroupDashboard";
 import { ResourceKey } from "../../resources/types";
@@ -35,6 +36,12 @@ import {
 } from "./ProjectDashboard.lib";
 import fetchCurrentEvent from "../fetchCurrentEvent";
 import Location from "../../resources/Location";
+
+const colors = {
+  allotment: "#3F51B5", // matching color of the linear progress bar
+  event: "limegreen",
+  now: "red",
+};
 
 const SessionInfo: FunctionComponent<{
   event: Event;
@@ -133,6 +140,9 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="body1">Location Hours</Typography>
           </AccordionSummary>
+          <AccordionDetails>
+            <ProjectLocationHoursLegend colors={colors} />
+          </AccordionDetails>
           {locations.map((location) => (
             <AccordionDetails
               key={`${location.id}`}
@@ -145,6 +155,8 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                     (a) => a.locationId === location.id
                   ) || []
                 }
+                events={groupEvents}
+                colors={colors}
               />
             </AccordionDetails>
           ))}
