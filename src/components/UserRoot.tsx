@@ -43,7 +43,7 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
   } as CalendarSelections);
 
   useEffect(() => {
-    if (!user.username) return;
+    if (!user.id) return;
     fetchAllResources(
       dispatch,
       CalendarAction.ReceivedAllResources,
