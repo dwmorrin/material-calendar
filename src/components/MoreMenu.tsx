@@ -4,7 +4,7 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { navigate } from "@reach/router";
 import { useAuth, AuthStatus } from "./AuthProvider";
 import User from "../resources/User";
-import { useSocket } from "./SocketProvider";
+import { useSocket, SocketMessageKind } from "./SocketProvider";
 
 const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   inAdminApp,
@@ -59,10 +59,17 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
         </MenuItem>
         <MenuItem
           onClick={(): void => {
-            broadcast("hello");
+            broadcast(SocketMessageKind.Test);
           }}
         >
-          <Typography>Test Sockets</Typography>
+          <Typography>Broadcast test message</Typography>
+        </MenuItem>
+        <MenuItem
+          onClick={(): void => {
+            broadcast(SocketMessageKind.Refresh);
+          }}
+        >
+          <Typography>Broadcast refresh request</Typography>
         </MenuItem>
         {isAdmin && (
           <MenuItem

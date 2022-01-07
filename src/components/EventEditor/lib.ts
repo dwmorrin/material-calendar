@@ -15,6 +15,7 @@ import {
   startOfDay,
 } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
+import { SocketMessageKind } from "../SocketProvider";
 
 export type NewEvent = Omit<Event, "id">;
 
@@ -156,7 +157,7 @@ export const afterConfirmed = ({
       },
       meta: ResourceKey.Events,
     });
-    broadcast("Events created");
+    broadcast(SocketMessageKind.EventsChanged);
   };
 
   const getUpdatedEvent = ({ error, data }: ApiResponse): void => {
@@ -170,7 +171,7 @@ export const afterConfirmed = ({
       },
       meta: ResourceKey.Events,
     });
-    broadcast("Events created");
+    broadcast(SocketMessageKind.EventsChanged);
   };
 
   const headers = { "Content-Type": "application/json" };

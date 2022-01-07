@@ -29,7 +29,7 @@ import Reservation from "../resources/Reservation";
 import { useSocket } from "./SocketProvider";
 
 const UserRoot: FunctionComponent<RouteComponentProps> = () => {
-  const { refreshRequested } = useSocket();
+  const { refreshRequested, eventsChanged, setSocketState } = useSocket();
   const { user } = useAuth();
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(reducer, {
@@ -42,6 +42,7 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
     calendarView: "resourceTimeGridWeek",
   } as CalendarSelections);
 
+  // initial data fetch
   useEffect(() => {
     if (!user.id) return;
     fetchAllResources(
@@ -58,6 +59,44 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
       `${Reservation.url}/user?context=${ResourceKey.Reservations}`
     );
   }, [user]);
+
+  // socket event handlers
+  useEffect(() => {
+    if (eventsChanged) {
+      // TODO: limit the number of events fetched and updated
+      // current approach is brute force - reload ALL events
+      // when the total number of events becomes large, this could be bad
+      // the socket message can include info like a range of dates,
+      // and then this can check if the calendar is currently in that range
+      fetch(Event.url)
+        .then((res) => res.json())
+        .then(({ error, data }) => {
+          if (error)
+            return dispatch({ type: CalendarAction.Error, payload: { error } });
+          if (!data)
+            return dispatch({
+              type: CalendarAction.Error,
+              payload: { error: new Error("No event data") },
+            });
+          setSocketState({ eventsChanged: false });
+          dispatch({
+            type: CalendarAction.ReceivedResource,
+            meta: ResourceKey.Events,
+            payload: {
+              resources: {
+                ...state.resources,
+                [ResourceKey.Events]: (data as Event[]).map(
+                  (event) => new Event(event)
+                ),
+              },
+            },
+          });
+        })
+        .catch((error) =>
+          dispatch({ type: CalendarAction.Error, payload: { error } })
+        );
+    }
+  }, [eventsChanged, setSocketState, state.resources]);
 
   return (
     <Box>
