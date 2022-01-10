@@ -19,8 +19,16 @@ const broadcast = (message: string, data?: unknown): void => {
   socket.emit("broadcast", message, data);
 };
 
+const getClientCount = (): void => {
+  socket.emit("get-client-count");
+};
+
 socket.on("broadcast", (...args) => {
   onBroadcast(args);
+});
+
+socket.on("client-count", (count: number) => {
+  console.log(`${count} client(s) connected`);
 });
 
 const listen = (
@@ -85,11 +93,13 @@ const reducer = (
 
 interface SocketContext extends SocketState {
   broadcast: typeof broadcast;
+  getClientCount: typeof getClientCount;
   setSocketState: (state: Partial<SocketState>) => void;
 }
 
 export const SocketContext = createContext<SocketContext>({
   broadcast,
+  getClientCount,
   setSocketState: (): void => undefined,
   ...defaultState,
 });
@@ -107,7 +117,7 @@ const SocketProvider: FC = ({ children }) => {
   listen(setSocketState);
   return (
     <SocketContext.Provider
-      value={{ broadcast, ...socketState, setSocketState }}
+      value={{ broadcast, getClientCount, ...socketState, setSocketState }}
     >
       {children}
     </SocketContext.Provider>
