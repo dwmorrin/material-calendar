@@ -69,11 +69,11 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     cancelationApprovalCutoff
   );
   const onCancelationRequest = ({ refund = false } = {}): void => {
-    const mailbox: Mail[] = [];
+    const mail: Mail[] = [];
     const refundMessage = refund
       ? " They requested that project hours be refunded. The request has been sent to the administrator."
       : " They did not request that project hours be refunded, so the hours have been forfeited.";
-    mailbox.push({
+    mail.push({
       to: groupTo(group.members),
       subject: `${myName} has ${subject}`,
       text: `You are receiving this because you are a member of ${
@@ -81,7 +81,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       }. ${myName} has ${body}.${autoApprove ? "" : refundMessage}`,
     });
     if (!autoApprove && adminEmail && refund)
-      mailbox.push({
+      mail.push({
         to: adminEmail,
         subject: "Project Hour Refund Request",
         text: `${myName} is requesting a project hour refund for their booking: ${whatWhenWhere}`,
@@ -94,38 +94,39 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
           ? {
               userId,
               refundApproved: true,
-              mailbox,
+              mail,
             }
           : refund
           ? {
               refundRequest: true,
               refundComment: message,
               userId,
-              mailbox,
+              mail,
             }
-          : { userId, mailbox }
+          : { userId, mail }
       ),
     })
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error || !data) return dispatchError(error || new Error("no data"));
-        const { event } = data as { event: Event };
-        const currentEvent = new Event(event);
-        const events = (state.resources[ResourceKey.Events] as Event[]).filter(
-          ({ id }) => id !== currentEvent.id
-        );
-        const reservations = (
-          state.resources[ResourceKey.Reservations] as Reservation[]
-        ).filter(({ id }) => id !== reservation.id);
+        const { reservations: resData, events: eventData } = data as {
+          reservations: Reservation[];
+          events: Event[];
+        };
+        const reservations = resData.map((res) => new Reservation(res));
+        const events = eventData.map((event) => new Event(event));
+        const updatedCurrentEvent: Event =
+          events.find(({ id }) => id === currentEvent.id) || new Event();
+
         setOpen(false);
         dispatch({
           type: CalendarAction.ReceivedReservationCancelation,
           payload: {
-            currentEvent,
+            currentEvent: updatedCurrentEvent,
             resources: {
               ...state.resources,
-              [ResourceKey.Events]: [...events, currentEvent],
-              [ResourceKey.Reservations]: [...reservations],
+              [ResourceKey.Events]: events,
+              [ResourceKey.Reservations]: reservations,
             },
           },
         });
