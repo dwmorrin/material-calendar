@@ -4,6 +4,8 @@ import { io } from "socket.io-client";
 // kinds avoid using literal strings directly
 export enum SocketMessageKind {
   EventsChanged = "EVENT",
+  EventLock = "EVENT_LOCK",
+  EventUnlock = "EVENT_UNLOCK",
   Refresh = "REFRESH", // catch-all, warns "app is broken until you refresh"
   Test = "TEST",
 }
@@ -25,13 +27,28 @@ const listen = (
   setSocketState: (state: Partial<SocketState>) => void
 ): void => {
   onBroadcast = (arg: unknown[]): void => {
-    // unused data could be range of events, objects, etc.
-    const [kind /*, ...data */] = arg;
+    const [kind, ...data] = arg;
     if (typeof kind === "string") {
       switch (kind) {
         case SocketMessageKind.EventsChanged:
           setSocketState({ eventsChanged: true });
           break;
+        case SocketMessageKind.EventLock: {
+          const [eventLockId] = data;
+          if (typeof eventLockId !== "number") {
+            return console.error("invalid event lock message", arg);
+          }
+          setSocketState({ eventLocked: true, eventLockId });
+          break;
+        }
+        case SocketMessageKind.EventUnlock: {
+          const [eventLockId] = data;
+          if (typeof eventLockId !== "number") {
+            return console.error("invalid event unlock message", arg);
+          }
+          setSocketState({ eventUnlocked: true, eventLockId });
+          break;
+        }
         case SocketMessageKind.Refresh:
           setSocketState({ refreshRequested: true });
           break;
@@ -44,9 +61,20 @@ const listen = (
 };
 
 interface SocketState {
-  refreshRequested: boolean;
   eventsChanged: boolean;
+  eventLocked: boolean;
+  eventUnlocked: boolean;
+  eventLockId: number;
+  refreshRequested: boolean;
 }
+
+const defaultState: SocketState = {
+  eventsChanged: false,
+  eventLocked: false,
+  eventUnlocked: false,
+  eventLockId: 0,
+  refreshRequested: false,
+};
 
 const reducer = (
   prevState: SocketState,
@@ -55,17 +83,15 @@ const reducer = (
   return { ...prevState, ...nextState };
 };
 
-interface SocketContext {
-  refreshRequested: boolean;
+interface SocketContext extends SocketState {
   broadcast: typeof broadcast;
-  eventsChanged: boolean;
   setSocketState: (state: Partial<SocketState>) => void;
 }
+
 export const SocketContext = createContext<SocketContext>({
   broadcast,
-  refreshRequested: false,
-  eventsChanged: true,
   setSocketState: (): void => undefined,
+  ...defaultState,
 });
 
 export const useSocket = (): SocketContext => {
@@ -77,10 +103,7 @@ export const useSocket = (): SocketContext => {
 };
 
 const SocketProvider: FC = ({ children }) => {
-  const [socketState, setSocketState] = useReducer(reducer, {
-    refreshRequested: false,
-    eventsChanged: false,
-  });
+  const [socketState, setSocketState] = useReducer(reducer, defaultState);
   listen(setSocketState);
   return (
     <SocketContext.Provider

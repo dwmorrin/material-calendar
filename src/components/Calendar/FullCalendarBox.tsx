@@ -147,6 +147,7 @@ const FullCalendarBox: FunctionComponent<
                 },
                 title: "",
                 reservable: false,
+                locked: false,
               }),
             },
           })

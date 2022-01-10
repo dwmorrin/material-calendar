@@ -39,6 +39,7 @@ interface Event {
   title: string;
   reservable: boolean;
   reservation?: ReservationInfo;
+  locked: boolean;
 }
 
 class Event implements Event {
@@ -51,6 +52,7 @@ class Event implements Event {
       location: { id: 0, title: "", restriction: 0, allowsWalkIns: false },
       title: "",
       reservable: false,
+      locked: false,
     }
   ) {
     Object.assign(this, event);

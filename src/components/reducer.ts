@@ -271,6 +271,54 @@ const createdInvitationReceived: StateHandler = (state, action) => {
   );
 };
 
+const eventLockHandler = (
+  kind: "lock" | "unlock",
+  state: CalendarState,
+  action: Action
+): CalendarState => {
+  const { meta } = action;
+  if (typeof meta !== "number")
+    return errorRedirect(
+      state,
+      action,
+      `No event id to ${kind}`,
+      ErrorType.MISSING_RESOURCE
+    );
+  const eventIndex = state.resources[ResourceKey.Events].findIndex(
+    (e) => e.id === meta
+  );
+  if (eventIndex < 0)
+    return errorRedirect(
+      state,
+      action,
+      "No event found",
+      ErrorType.MISSING_RESOURCE
+    );
+  const event = new Event({
+    ...(state.resources[ResourceKey.Events][eventIndex] as Event),
+    locked: kind === "lock",
+  });
+  const currentEvent =
+    event.id === state.currentEvent?.id ? event : state.currentEvent;
+  return {
+    ...state,
+    currentEvent,
+    resources: {
+      ...state.resources,
+      [ResourceKey.Events]: [
+        ...state.resources[ResourceKey.Events].slice(0, eventIndex),
+        event,
+        ...state.resources[ResourceKey.Events].slice(eventIndex + 1),
+      ],
+    },
+  };
+};
+
+const eventLock: StateHandler = (state, action) =>
+  eventLockHandler("lock", state, action);
+const eventUnlock: StateHandler = (state, action) =>
+  eventLockHandler("unlock", state, action);
+
 const foundStaleCurrentEvent: StateHandler = (state, { payload }) => {
   if (payload?.currentEvent instanceof Event) {
     const event = payload?.currentEvent as Event;
@@ -731,6 +779,8 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CreatedInvitationReceived]: createdInvitationReceived,
     [CalendarAction.DisplayMessage]: displayMessage,
     [CalendarAction.Error]: errorHandler,
+    [CalendarAction.EventLock]: eventLock,
+    [CalendarAction.EventUnlock]: eventUnlock,
     [CalendarAction.FoundStaleCurrentEvent]: foundStaleCurrentEvent,
     [CalendarAction.JoinedGroup]: joinedGroup,
     [CalendarAction.LeftGroup]: leftGroup,

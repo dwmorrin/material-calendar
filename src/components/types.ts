@@ -21,6 +21,8 @@ export enum CalendarAction {
   CreatedInvitationReceived,
   DisplayMessage,
   Error,
+  EventLock,
+  EventUnlock,
   FoundStaleCurrentEvent,
   JoinedGroup,
   LeftGroup,

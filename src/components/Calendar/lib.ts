@@ -30,6 +30,7 @@ const getBackgroundColor = (
   event: Event,
   walkInDetails = Event.walkInDetails()
 ): string => {
+  if (event.locked) return "purple";
   if (event.reservation) {
     // highlight user owned reservations
     // TODO: if (current user owns reservation) ...

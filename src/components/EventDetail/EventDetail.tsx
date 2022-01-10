@@ -1,15 +1,18 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import {
-  Dialog,
-  IconButton,
   Button,
+  ButtonGroup,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  List,
+  ListItem,
+  Paper,
   Toolbar,
   Typography,
-  ListItem,
-  List,
-  Paper,
 } from "@material-ui/core";
-import { CalendarUIProps, CalendarAction } from "./types";
+import { CalendarUIProps, CalendarAction } from "../types";
 import CloseIcon from "@material-ui/icons/Close";
 import {
   castSQLDateToSQLDatetime,
@@ -24,18 +27,19 @@ import {
   sqlIntervalInHours,
   subHours,
   subMinutes,
-} from "../utils/date";
-import { useAuth } from "./AuthProvider";
-import { makeTransition } from "./Transition";
-import { ResourceKey } from "../resources/types";
-import Project, { ProjectAllotment } from "../resources/Project";
-import Reservation from "../resources/Reservation";
-import UserGroup from "../resources/UserGroup";
-import ReservationForm from "./ReservationForm/ReservationForm";
-import ReservationFormAdmin from "./ReservationForm/ReservationFormAdmin";
+} from "../../utils/date";
+import { useAuth } from "../AuthProvider";
+import { makeTransition } from "../Transition";
+import { ResourceKey } from "../../resources/types";
+import Project, { ProjectAllotment } from "../../resources/Project";
+import Reservation from "../../resources/Reservation";
+import UserGroup from "../../resources/UserGroup";
+import ReservationForm from "../ReservationForm/ReservationForm";
+import ReservationFormAdmin from "../ReservationForm/ReservationFormAdmin";
 import ListSubheader from "@material-ui/core/ListSubheader";
-import Event from "../resources/Event";
-import CancelationDialog from "./CancelationDialog";
+import Event from "../../resources/Event";
+import CancelationDialog from "../CancelationDialog";
+import EventBookButton from "./EventBookButton";
 import { addMinutes } from "date-fns/esm";
 
 const transition = makeTransition("left");
@@ -113,8 +117,9 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     ResourceKey.Reservations
   ] as Reservation[];
 
-  const { end, location, reservable, start, title, reservation } =
+  const { end, location, locked, reservable, reservation, start, title } =
     state.currentEvent;
+
   const userCanUseLocation = user.restriction >= location.restriction;
 
   const startDate = parseSQLDatetime(start);
@@ -212,11 +217,12 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   );
 
   const open = reservable && !reservation && userCanUseLocation;
-  const userOwns =
+  const userOwns = Boolean(
     reservation &&
-    (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-      (group) => reservation.groupId === group.id
-    );
+      (state.resources[ResourceKey.Groups] as UserGroup[]).find(
+        (group) => reservation.groupId === group.id
+      )
+  );
 
   const reservationCutoffHasNotPassed = isBefore(
     nowInServerTimezone(),
@@ -256,11 +262,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   };
 
   return (
-    <Dialog
-      fullScreen
-      open={state.detailIsOpen}
-      TransitionComponent={transition}
-    >
+    <Dialog open={state.detailIsOpen} TransitionComponent={transition}>
       <Toolbar>
         <IconButton
           edge="start"
@@ -272,36 +274,15 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         >
           <CloseIcon />
         </IconButton>
+        <DialogTitle>Event Detail</DialogTitle>
       </Toolbar>
-      {!!state.currentEvent.reservation && (
-        <CancelationDialog
-          state={state}
-          dispatch={dispatch}
-          open={cancelationDialogIsOpen}
-          setOpen={setCancelationDialogIsOpen}
-          cancelationApprovalCutoff={cancelationApprovalCutoff}
-          gracePeriodCutoff={gracePeriodCutoff}
-          isWalkIn={
-            state.currentEvent.reservation.projectId ===
-            currentUserWalkInProject?.id
-          }
-        />
-      )}
-      <Paper
-        style={{
-          display: "flex",
-          flexGrow: 1,
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
-        <section>
-          <Typography variant="h6">{location.title}</Typography>
+      <DialogContent>
+        <Paper elevation={0}>
           <Typography variant="h5">{title}</Typography>
+          <Typography variant="h6">{location.title}</Typography>
           <Typography variant="body2">
             {parseAndFormatSQLDatetimeInterval({ start, end })}
           </Typography>
-
           {!!equipmentList.length && (
             <List
               subheader={
@@ -322,52 +303,59 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               to reserve this location.
             </Typography>
           )}
-        </section>
-
-        {reservationCutoffHasNotPassed &&
-          (userOwns || (open && !!projectsWithHours.length)) && (
-            <Button
-              key="MakeReservation"
-              style={{
-                backgroundColor: "Green",
-                color: "white",
-                maxWidth: "400px",
-              }}
-              onClick={(event): void => {
-                event.stopPropagation();
-                dispatch({
-                  type: CalendarAction.OpenReservationForm,
-                  payload: { currentEvent: state.currentEvent },
-                });
-              }}
-            >
-              {userOwns
-                ? "Modify Reservation"
-                : walkInValid
-                ? "Reserve Walk-In Time"
-                : "Reserve this time"}
-            </Button>
-          )}
-        {userOwns && eventHasNotEnded && (
-          <div>
-            <Button
-              key="CancelReservation"
-              style={{
-                backgroundColor: "Red",
-                color: "white",
-                maxWidth: "400px",
-              }}
-              onClick={(): void => setCancelationDialogIsOpen(true)}
-            >
-              Cancel Reservation
-            </Button>
-          </div>
-        )}
+          <ButtonGroup orientation="vertical">
+            <EventBookButton
+              reservationCutoffHasNotPassed={reservationCutoffHasNotPassed}
+              userOwns={userOwns}
+              open={open}
+              projectsAvailable={!!projectsWithHours.length}
+              dispatch={dispatch}
+              event={state.currentEvent}
+              walkInValid={walkInValid}
+            />
+            {userOwns && eventHasNotEnded && (
+              <Button
+                variant="contained"
+                color="secondary"
+                key="CancelReservation"
+                onClick={(): void => setCancelationDialogIsOpen(true)}
+              >
+                Cancel Reservation
+              </Button>
+            )}
+            {isAdmin && (
+              <Button
+                disabled={locked}
+                variant="contained"
+                onClick={(): void =>
+                  dispatch({
+                    type: CalendarAction.OpenEventEditor,
+                    payload: state,
+                  })
+                }
+              >
+                Edit this event
+              </Button>
+            )}
+            {isAdmin && (
+              <Button
+                disabled={locked}
+                variant="contained"
+                onClick={(): void =>
+                  dispatch({ type: CalendarAction.OpenReservationFormAdmin })
+                }
+              >
+                ADMIN RESERVATION FORM
+              </Button>
+            )}
+          </ButtonGroup>
+        </Paper>
         {eventHasNotEnded && open && !walkInValid && (
-          <section>
-            <Typography component="h3">
+          <Paper elevation={0}>
+            <Typography variant="h5">Project Info</Typography>
+            <Typography variant="body2">
               {projectsWithHours.length
-                ? "Available for"
+                ? "These projects are available:"
                 : "Not available to any of your projects"}
             </Typography>
             <List>
@@ -380,67 +368,56 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               ))}
             </List>
             {!!projectsWithoutHours.length && (
-              <>
-                <Typography component="h3">
-                  These projects have no hours remaining:
-                </Typography>
-                <List>
-                  {projectsWithoutHours.map((project) => (
-                    <ListItem key={`${project.title}_list_item`}>
-                      <Button onClick={makeOpenProjectDashboard(project)}>
-                        {project.title}
-                      </Button>
-                    </ListItem>
-                  ))}
-                </List>
-              </>
+              <Typography variant="body2">
+                These projects have no hours remaining:
+              </Typography>
             )}
+            <List>
+              {projectsWithoutHours.map((project) => (
+                <ListItem key={`${project.title}_list_item`}>
+                  <Button onClick={makeOpenProjectDashboard(project)}>
+                    {project.title}
+                  </Button>
+                </ListItem>
+              ))}
+            </List>
             {!!projectsWithoutGroups.length && (
-              <>
-                <Typography component="h3">
-                  Please create a group for these projects:
-                </Typography>
-                <List>
-                  {projectsWithoutGroups.map((project) => (
-                    <ListItem key={`${project.title}_list_item`}>
-                      <Button onClick={makeOpenProjectDashboard(project)}>
-                        {project.title}
-                      </Button>
-                    </ListItem>
-                  ))}
-                </List>
-              </>
+              <Typography variant="body2">
+                Please create a group for these projects:
+              </Typography>
             )}
-          </section>
+            <List>
+              {projectsWithoutGroups.map((project) => (
+                <ListItem key={`${project.title}_list_item`}>
+                  <Button onClick={makeOpenProjectDashboard(project)}>
+                    {project.title}
+                  </Button>
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
         )}
-        {isAdmin && (
-          <Button
-            onClick={(): void =>
-              dispatch({
-                type: CalendarAction.OpenEventEditor,
-                payload: state,
-              })
-            }
-          >
-            Edit this event
-          </Button>
-        )}
-      </Paper>
+      </DialogContent>
       <ReservationForm
         dispatch={dispatch}
         state={state}
         projects={projectsWithHours}
       />
-      {isAdmin && (
-        <Button
-          onClick={(): void =>
-            dispatch({ type: CalendarAction.OpenReservationFormAdmin })
-          }
-        >
-          ADMIN RESERVATION FORM
-        </Button>
-      )}
       {isAdmin && <ReservationFormAdmin dispatch={dispatch} state={state} />}
+      {!!state.currentEvent.reservation && (
+        <CancelationDialog
+          state={state}
+          dispatch={dispatch}
+          open={cancelationDialogIsOpen}
+          setOpen={setCancelationDialogIsOpen}
+          cancelationApprovalCutoff={cancelationApprovalCutoff}
+          gracePeriodCutoff={gracePeriodCutoff}
+          isWalkIn={
+            state.currentEvent.reservation.projectId ===
+            currentUserWalkInProject?.id
+          }
+        />
+      )}
     </Dialog>
   );
 };

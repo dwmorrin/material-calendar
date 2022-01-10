@@ -27,8 +27,10 @@ import {
   makeEquipmentValues,
 } from "./lib";
 import { useAuth } from "../AuthProvider";
+import { useSocket, SocketMessageKind } from "../SocketProvider";
 import fetchCurrentEvent from "../fetchCurrentEvent";
 import Equipment from "../../resources/Equipment";
+import Event from "../../resources/Event";
 import Category from "../../resources/Category";
 import RadioYesNo from "../RadioYesNo";
 
@@ -43,11 +45,9 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
 }) => {
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
   const classes = useStyles();
-  const closeForm = (): void => {
-    dispatch({ type: CalendarAction.CloseReservationForm });
-    if (state.currentEvent) fetchCurrentEvent(dispatch, state.currentEvent);
-  };
   const { user } = useAuth();
+  const { broadcast } = useSocket();
+
   const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
   const equipmentValues = makeEquipmentValues(equipment);
 
@@ -64,6 +64,21 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   );
   if (!group) return null;
   const categories = state.resources[ResourceKey.Categories] as Category[];
+
+  const closeForm = (): void => {
+    dispatch({ type: CalendarAction.CloseReservationForm });
+    if (!reservation) {
+      broadcast(SocketMessageKind.EventUnlock, currentEvent.id);
+      fetch(`${Event.url}/${currentEvent.id}/unlock`, { method: "POST" }).then(
+        () => {
+          if (state.currentEvent)
+            fetchCurrentEvent(dispatch, state.currentEvent);
+        }
+      );
+    } else {
+      if (state.currentEvent) fetchCurrentEvent(dispatch, state.currentEvent);
+    }
+  };
 
   return (
     <Dialog

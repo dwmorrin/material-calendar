@@ -8,7 +8,7 @@ import FullCalendar from "@fullcalendar/react";
 import { useAuth } from "./AuthProvider";
 import reducer from "./reducer";
 import FullCalendarBox from "./Calendar/FullCalendarBox";
-import EventDetail from "./EventDetail";
+import EventDetail from "./EventDetail/EventDetail";
 import initialState from "./initialState";
 import ProjectDashboard from "./Project/ProjectDashboard";
 import { ResourceKey } from "../resources/types";
@@ -29,7 +29,14 @@ import Reservation from "../resources/Reservation";
 import { useSocket } from "./SocketProvider";
 
 const UserRoot: FunctionComponent<RouteComponentProps> = () => {
-  const { refreshRequested, eventsChanged, setSocketState } = useSocket();
+  const {
+    eventLockId,
+    eventLocked,
+    eventUnlocked,
+    eventsChanged,
+    refreshRequested,
+    setSocketState,
+  } = useSocket();
   const { user } = useAuth();
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(reducer, {
@@ -96,7 +103,28 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
           dispatch({ type: CalendarAction.Error, payload: { error } })
         );
     }
-  }, [eventsChanged, setSocketState, state.resources]);
+    if (eventLocked) {
+      setSocketState({ eventLocked: false });
+      dispatch({
+        type: CalendarAction.EventLock,
+        meta: eventLockId,
+      });
+    }
+    if (eventUnlocked) {
+      setSocketState({ eventUnlocked: false });
+      dispatch({
+        type: CalendarAction.EventUnlock,
+        meta: eventLockId,
+      });
+    }
+  }, [
+    eventsChanged,
+    eventLockId,
+    eventLocked,
+    eventUnlocked,
+    setSocketState,
+    state.resources,
+  ]);
 
   return (
     <Box>
