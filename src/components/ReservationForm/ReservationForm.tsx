@@ -36,12 +36,14 @@ import RadioYesNo from "../RadioYesNo";
 
 interface ReservationFormProps extends CalendarUIProps {
   projects: Project[];
+  walkInValid: boolean;
 }
 
 const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   dispatch,
   state,
   projects,
+  walkInValid,
 }) => {
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
   const classes = useStyles();
@@ -54,7 +56,24 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   const { currentEvent } = state;
   if (!currentEvent) return null;
   const { reservation } = currentEvent;
-  let project = projects[0] || new Project();
+
+  // If walk-in is valid, then user MUST use the walk-in option.
+  let project: Project;
+  if (walkInValid) {
+    const maybeProject = (
+      state.resources[ResourceKey.Projects] as Project[]
+    ).find((p) => Project.walkInTitle === p.title);
+    if (!maybeProject) {
+      // impossible state: walkInValid would be false
+      // eslint-disable-next-line no-console
+      console.error(
+        "impossible state: walkInValid is true, but no walk-in project found"
+      );
+      return null;
+    }
+    project = maybeProject;
+  } else project = projects[0] || new Project();
+
   if (reservation) {
     const foundProject = projects.find((p) => p.id === reservation.projectId);
     if (foundProject) project = foundProject;
@@ -121,7 +140,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
             <Form className={classes.list} onSubmit={handleSubmit}>
               <FormLabel>Project:</FormLabel>
-              {project.title !== Project.walkInTitle ? (
+              {!walkInValid && project.title !== Project.walkInTitle ? (
                 <Field component={Select} name="projectId">
                   {projects.map((p) => (
                     <MenuItem key={p.id} value={p.id}>

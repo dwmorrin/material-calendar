@@ -402,6 +402,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         dispatch={dispatch}
         state={state}
         projects={projectsWithHours}
+        walkInValid={walkInValid}
       />
       {isAdmin && <ReservationFormAdmin dispatch={dispatch} state={state} />}
       {!!state.currentEvent.reservation && (
