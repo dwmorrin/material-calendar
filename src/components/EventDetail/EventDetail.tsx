@@ -108,6 +108,22 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     );
   }, [projects, state.currentEvent]);
 
+  // if the event is locked, try to unlock it
+  useEffect(() => {
+    if (!state.currentEvent || !state.currentEvent.locked) return;
+    fetch(`${Event.url}/${state.currentEvent.id}/unlock`, { method: "POST" })
+      .then((res) => res.json())
+      .then(({ data }) => {
+        // ignoring the 'error' key for now
+        if (!data?.event) return;
+        // event has been unlocked; update state
+        dispatch({
+          type: CalendarAction.FoundStaleCurrentEvent,
+          payload: { currentEvent: new Event(data.event as Event) },
+        });
+      });
+  }, [dispatch, state.currentEvent]);
+
   if (!state.currentEvent || !state.currentEvent.location || !user.username) {
     return null;
   }
