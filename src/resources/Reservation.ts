@@ -58,6 +58,9 @@ class Reservation implements Reservation {
     const unanswered = !approved.by && !rejected.by;
     return canceled.requestsRefund && unanswered;
   }
+  static isRefunded(res: Reservation): boolean {
+    return !!res.cancelation?.refund?.approved?.by;
+  }
   constructor(
     res = {
       id: 0,

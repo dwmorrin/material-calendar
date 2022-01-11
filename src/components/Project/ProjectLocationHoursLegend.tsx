@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import { Grid, Box, Typography } from "@material-ui/core";
+import { ProjectColors } from "./types";
 
 const LittleSquare: FC<{ color: string }> = ({ color }) => (
   <Grid item>
@@ -26,14 +27,18 @@ const Label: FC = ({ children }) => (
   </Grid>
 );
 
-const ProjectLocationHoursLegend: FC<{
-  colors: { event: string; allotment: string; now: string };
-}> = ({ colors }) => {
+const ProjectLocationHoursLegend: FC<{ colors: ProjectColors }> = ({
+  colors,
+}) => {
   return (
     <Grid container direction="column">
       <Row>
         <LittleSquare color={colors.event} />
         <Label>Your booked events</Label>
+      </Row>
+      <Row>
+        <LittleSquare color={colors.canceled} />
+        <Label>Your canceled events without refund</Label>
       </Row>
       <Row>
         <LittleSquare color={colors.allotment} />

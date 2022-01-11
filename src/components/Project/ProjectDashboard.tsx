@@ -36,32 +36,33 @@ import {
 } from "./ProjectDashboard.lib";
 import fetchCurrentEvent from "../fetchCurrentEvent";
 import Location from "../../resources/Location";
+import Reservation from "../../resources/Reservation";
+import { ProjectColors } from "./types";
 
-const colors = {
+const colors: ProjectColors = {
   allotment: "#3F51B5", // matching color of the linear progress bar
+  canceled: "purple",
   event: "limegreen",
   now: "red",
 };
 
 const SessionInfo: FunctionComponent<{
   event: Event;
-  onClick: React.MouseEventHandler<HTMLUListElement>;
+  onClick: React.MouseEventHandler;
 }> = ({ event, onClick }) => {
   return (
-    <List onClick={onClick}>
-      <ListItem>
-        <ButtonBase>
-          <ListItemText
-            primary={
-              event.location.title +
-              " - " +
-              parseAndFormatSQLDatetimeInterval(event)
-            }
-            secondary={event.title}
-          />
-        </ButtonBase>
-      </ListItem>
-    </List>
+    <ListItem>
+      <ButtonBase onClick={onClick}>
+        <ListItemText
+          primary={
+            event.location.title +
+            " - " +
+            parseAndFormatSQLDatetimeInterval(event)
+          }
+          secondary={event.title}
+        />
+      </ButtonBase>
+    </ListItem>
   );
 };
 
@@ -80,6 +81,25 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
     (location) =>
       currentProject?.allotments.find((a) => a.locationId === location.id)
   );
+  const reservations = resources[ResourceKey.Reservations] as Reservation[];
+
+  // canceled reservations are divorced from the original event
+  // so we need to pair them up to display the event info for the canceled reservation
+  const canceledNotRefundedEvents: Event[] = reservations.reduce(
+    (result, res) => {
+      if (
+        currentGroup &&
+        res.groupId === currentGroup.id &&
+        !!res.cancelation &&
+        !Reservation.isRefunded(res)
+      ) {
+        const event = events.find((e) => e.id === res.eventId);
+        if (event) result.push(event);
+      }
+      return result;
+    },
+    [] as Event[]
+  );
 
   const groupEvents = events.filter(
     (event) =>
@@ -87,6 +107,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
       currentGroup &&
       event.reservation.groupId === currentGroup.id
   );
+
   groupEvents.sort(compareStartDates);
   const now = nowInServerTimezone();
   const splitPoint = groupEvents.findIndex(({ start }) =>
@@ -105,7 +126,6 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   return (
     <Dialog
       className={classes.root}
-      fullScreen
       open={projectDashboardIsOpen}
       TransitionComponent={transition}
     >
@@ -156,6 +176,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                   ) || []
                 }
                 events={groupEvents}
+                canceledEvents={canceledNotRefundedEvents}
                 colors={colors}
               />
             </AccordionDetails>
@@ -170,21 +191,37 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           </AccordionDetails>
         </Accordion>
         <Typography>Upcoming Sessions</Typography>
-        {groupEvents.slice(0, splitPoint).map((event) => (
-          <SessionInfo
-            key={`group_event_listing_${event.id}`}
-            event={event}
-            onClick={makeOpenEventDetail(event)}
-          />
-        ))}
+        <List>
+          {groupEvents.slice(0, splitPoint).map((event) => (
+            <SessionInfo
+              key={`group_event_listing_${event.id}`}
+              event={event}
+              onClick={makeOpenEventDetail(event)}
+            />
+          ))}
+        </List>
         <Typography>Previous Sessions</Typography>
-        {groupEvents.slice(splitPoint).map((event) => (
-          <SessionInfo
-            key={`group_event_listing_${event.id}`}
-            event={event}
-            onClick={makeOpenEventDetail(event)}
-          />
-        ))}
+        <List>
+          {groupEvents.slice(splitPoint).map((event) => (
+            <SessionInfo
+              key={`group_event_listing_${event.id}`}
+              event={event}
+              onClick={makeOpenEventDetail(event)}
+            />
+          ))}
+        </List>
+        {!!canceledNotRefundedEvents.length && (
+          <Typography>Canceled Reservations Without Refund</Typography>
+        )}
+        <List>
+          {canceledNotRefundedEvents.map((event) => (
+            <SessionInfo
+              key={`group_event_listing_${event.id}`}
+              event={event}
+              onClick={makeOpenEventDetail(event)}
+            />
+          ))}
+        </List>
       </Paper>
     </Dialog>
   );

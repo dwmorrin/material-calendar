@@ -8,6 +8,7 @@ import {
   parseSQLDate,
 } from "../../utils/date";
 import Event from "../../resources/Event";
+import { ProjectColors } from "./types";
 
 const height = 90; // height of the total bar chart area in px
 const width = 300; // width of the total bar char area in px
@@ -38,6 +39,7 @@ interface BarableObj {
   end: string;
   hours: number;
   isEvent?: boolean;
+  canceled?: boolean;
 }
 
 const getScales = (extent: AllotmentExtent): AllotmentScales => {
@@ -53,12 +55,15 @@ const getScales = (extent: AllotmentExtent): AllotmentScales => {
   };
 };
 
-const eventToBarable = (event: Event): BarableObj => ({
-  start: event.start.split(" ")[0],
-  end: event.end.split(" ")[0],
-  hours: differenceInHoursSQLDatetime(event),
-  isEvent: true,
-});
+const eventToBarable =
+  (canceled: boolean) =>
+  (event: Event): BarableObj => ({
+    start: event.start.split(" ")[0],
+    end: event.end.split(" ")[0],
+    hours: differenceInHoursSQLDatetime(event),
+    isEvent: true,
+    canceled,
+  });
 
 const getExtent = (allotments: BarableObj[]): AllotmentExtent => {
   return {
@@ -69,12 +74,22 @@ const getExtent = (allotments: BarableObj[]): AllotmentExtent => {
   };
 };
 
+const getBarableColor = (
+  barable: BarableObj,
+  colors: ProjectColors
+): string => {
+  if (!barable.isEvent) return colors.allotment;
+  if (barable.canceled) return colors.canceled;
+  return colors.event;
+};
+
 const bars = (
   barables: BarableObj[],
   scales: AllotmentScales,
-  colors: { allotment: string; event: string; now: string }
+  colors: ProjectColors
 ): AllotmentBar[] => {
-  const b = barables.map(({ start, end, hours, isEvent }) => {
+  const b = barables.map((b) => {
+    const { start, end, hours } = b;
     const x = scales.x(parseSQLDate(start)) as number;
     const y = scales.y(hours) as number;
     return {
@@ -82,7 +97,7 @@ const bars = (
       y,
       width: (scales.x(addDays(parseSQLDate(end), 1)) as number) - x,
       height: (scales.y(0) as number) - y,
-      color: isEvent ? colors.event : colors.allotment,
+      color: getBarableColor(b, colors),
     };
   });
   b.push({
@@ -97,13 +112,15 @@ const bars = (
 
 interface ProjectLocationHoursProps {
   allotments: ProjectAllotment[];
-  events?: Event[];
-  colors: { allotment: string; event: string; now: string };
+  events: Event[];
+  canceledEvents: Event[];
+  colors: ProjectColors;
 }
 
 const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
   allotments,
-  events = [] as Event[],
+  events,
+  canceledEvents,
   colors,
 }) => {
   const container = useRef(null);
@@ -114,7 +131,11 @@ const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
     if (!allotments || !container.current) {
       return;
     }
-    const barableEvents = [...allotments, ...events.map(eventToBarable)];
+    const barableEvents = [
+      ...allotments,
+      ...events.map(eventToBarable(false)),
+      ...canceledEvents.map(eventToBarable(true)),
+    ];
     const extent = getExtent(barableEvents);
     const scales = getScales(extent);
     const allotmentBars = bars(barableEvents, scales, colors);
@@ -134,7 +155,7 @@ const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
     const yAxis = d3.axisLeft(scales.y).ticks(3);
     d3.select(xAxisRef.current).call(xAxis as never);
     d3.select(yAxisRef.current).call(yAxis as never);
-  }, [allotments, events, colors]);
+  }, [allotments, events, canceledEvents, colors]);
 
   return (
     <svg width={width} height={height} ref={container}>

@@ -68,11 +68,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
   );
 
   return (
-    <Dialog
-      fullScreen
-      TransitionComponent={transition}
-      open={state.groupDashboardIsOpen}
-    >
+    <Dialog TransitionComponent={transition} open={state.groupDashboardIsOpen}>
       <Toolbar>
         <IconButton
           edge="start"

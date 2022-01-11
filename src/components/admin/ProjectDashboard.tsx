@@ -41,6 +41,7 @@ const colors = {
   allotment: "#3F51B5", // matching color of the linear progress bar
   event: "limegreen",
   now: "red",
+  canceled: "purple",
 };
 
 const SessionInfo: FunctionComponent<{ event: Event }> = ({ event }) => {
@@ -212,6 +213,7 @@ const ProjectDashboard: FunctionComponent<AdminUIProps> = ({
                   ) || []
                 }
                 events={groupEvents}
+                canceledEvents={[]}
                 colors={colors}
               />
             </AccordionDetails>
