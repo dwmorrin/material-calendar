@@ -2,8 +2,11 @@ import { StateHandler } from "./types";
 import UserGroup from "../../resources/UserGroup";
 import { ResourceKey } from "../../resources/types";
 
-import { missingResource } from "./errorRedirect";
+import { impossibleState, missingResource } from "./errorRedirect";
 import { openGroupDashboard } from "./groups";
+import Project from "../../resources/Project";
+
+import arrayUpdateAt from "./arrayUpdateAt";
 
 export const closeProjectDashboard: StateHandler = (state) => ({
   ...state,
@@ -76,6 +79,25 @@ export const selectedProject: StateHandler = (state, action) => {
     resources: {
       ...state.resources,
       [ResourceKey.Projects]: payload.resources[ResourceKey.Projects],
+    },
+  };
+};
+
+export const updatedOneProject: StateHandler = (state, action) => {
+  if (!action.payload?.resources)
+    return missingResource(state, action, "no resources in update project");
+  const project = action.payload.resources[ResourceKey.Projects][0] as Project;
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const index = projects.findIndex((p) => p.id === project.id);
+  if (index === -1)
+    return impossibleState(state, action, "non-existent project");
+  return {
+    ...state,
+    currentProject:
+      state.currentProject?.id === project.id ? project : state.currentProject,
+    resources: {
+      ...state.resources,
+      [ResourceKey.Projects]: arrayUpdateAt<Project>(projects, index, project),
     },
   };
 };

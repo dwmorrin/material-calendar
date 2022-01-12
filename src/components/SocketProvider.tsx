@@ -84,7 +84,7 @@ const listen = (
   };
 };
 
-interface SocketState {
+export interface SocketState {
   eventsChanged: boolean;
   eventLocked: boolean;
   eventUnlocked: boolean;

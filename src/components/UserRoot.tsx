@@ -26,20 +26,12 @@ import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
 import Category from "../resources/Category";
 import Reservation from "../resources/Reservation";
-import Project from "../resources/Project";
 import { useSocket } from "./SocketProvider";
+import SocketCalendarEffect from "./SocketCalendarEffect";
 
 const UserRoot: FunctionComponent<RouteComponentProps> = () => {
-  const {
-    eventLockId,
-    eventLocked,
-    eventUnlocked,
-    eventsChanged,
-    refreshRequested,
-    reservationChanged,
-    reservationChangePayload,
-    setSocketState,
-  } = useSocket();
+  const socketState = useSocket();
+  const { refreshRequested } = socketState;
   const { user } = useAuth();
   const calendarRef = useRef<FullCalendar>(null);
   const [state, dispatch] = useReducer(reducer, {
@@ -71,110 +63,15 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
   }, [user]);
 
   // socket event handlers
-  useEffect(() => {
-    if (eventsChanged) {
-      // TODO: limit the number of events fetched and updated
-      // current approach is brute force - reload ALL events
-      // when the total number of events becomes large, this could be bad
-      // the socket message can include info like a range of dates,
-      // and then this can check if the calendar is currently in that range
-      fetch(Event.url)
-        .then((res) => res.json())
-        .then(({ error, data }) => {
-          if (error)
-            return dispatch({ type: CalendarAction.Error, payload: { error } });
-          if (!data)
-            return dispatch({
-              type: CalendarAction.Error,
-              payload: { error: new Error("No event data") },
-            });
-          setSocketState({ eventsChanged: false });
-          dispatch({
-            type: CalendarAction.ReceivedResource,
-            meta: ResourceKey.Events,
-            payload: {
-              resources: {
-                ...state.resources,
-                [ResourceKey.Events]: (data as Event[]).map(
-                  (event) => new Event(event)
-                ),
-              },
-            },
-          });
-        })
-        .catch((error) =>
-          dispatch({ type: CalendarAction.Error, payload: { error } })
-        );
-    }
-    if (eventLocked) {
-      setSocketState({ eventLocked: false });
-      dispatch({
-        type: CalendarAction.EventLock,
-        meta: eventLockId,
-      });
-    }
-    if (eventUnlocked) {
-      setSocketState({ eventUnlocked: false });
-      dispatch({
-        type: CalendarAction.EventUnlock,
-        meta: eventLockId,
-      });
-    }
-    if (reservationChanged) {
-      setSocketState({ reservationChanged: false });
-      const { eventId, groupId, projectId, reservationId } =
-        reservationChangePayload;
-      const projects = user.projects.filter((p) => p.id === projectId);
-      if (projects.length) {
-        // fetch and update project info
-        fetch(`${Project.url}/${projectId}`)
-          .then((res) => res.json())
-          .then(({ error, data }) => {
-            if (error)
-              return dispatch({
-                type: CalendarAction.Error,
-                payload: { error },
-              });
-            console.log("todo: update project info", { data });
-          });
-        // fetch and update group info, if user is a member of the group
-        // ... maybe this can be done in the same request as the project
-      }
-      // fetch and update event info
-      // TODO constrain to events in the current calendar view
-      fetch(`${Event.url}/${eventId}`)
-        .then((res) => res.json())
-        .then(({ error, data }) => {
-          if (error)
-            return dispatch({
-              type: CalendarAction.Error,
-              payload: { error },
-            });
-          console.log("TODO: update event info", { data });
-          // dispatch({
-          //   type: CalendarAction.ReceivedResource,
-          //   meta: ResourceKey.Events,
-          //   payload: {
-          //     resources: {
-          //       ...state.resources,
-          //       [ResourceKey.Events]: [new Event(data as Event)],
-          //     },
-          //   },
-          // });
-        });
-      // TODO reservation info? Who needs it? TBD
-    }
-  }, [
-    eventsChanged,
-    eventLockId,
-    eventLocked,
-    eventUnlocked,
-    reservationChanged,
-    reservationChangePayload,
-    setSocketState,
-    state.resources,
-    user,
-  ]);
+  useEffect(
+    SocketCalendarEffect({
+      ...socketState,
+      state,
+      dispatch,
+      user,
+    }),
+    [socketState, state.resources, user]
+  );
 
   return (
     <Box>

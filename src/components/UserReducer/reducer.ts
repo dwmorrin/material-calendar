@@ -19,6 +19,7 @@ import {
   openEventEditor,
   selectedEvent,
   updatedEventReceived,
+  updatedOneEvent,
 } from "./events";
 
 import {
@@ -43,6 +44,7 @@ import {
   openProjectDashboard,
   openProjectForm,
   selectedProject,
+  updatedOneProject,
 } from "./projects";
 
 import { receivedAllResources, receivedResource } from "./resources";
@@ -155,7 +157,9 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.SentInvitations]: sentInvitations,
     [CalendarAction.ToggleDrawer]: toggleDrawer,
     [CalendarAction.TogglePicker]: togglePicker,
-    [CalendarAction.UpdatedEventReceived]: updatedEventReceived,
+    [CalendarAction.UpdatedOneEvent]: updatedOneEvent,
+    [CalendarAction.UpdatedOneProject]: updatedOneProject,
+    [CalendarAction.UpdatedEditedEventReceived]: updatedEventReceived,
     [CalendarAction.ViewToday]: viewToday,
   }[action.type](state, action));
 

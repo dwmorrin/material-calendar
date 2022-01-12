@@ -165,7 +165,7 @@ export const afterConfirmed = ({
     if (!data) throw new Error("no data after updating event");
     const { event } = data as { event: Event };
     dispatch({
-      type: CalendarAction.UpdatedEventReceived,
+      type: CalendarAction.UpdatedEditedEventReceived,
       payload: {
         currentEvent: new Event(event),
       },
