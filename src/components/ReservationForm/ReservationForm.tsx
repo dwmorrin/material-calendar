@@ -128,6 +128,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
             project
           )}
           onSubmit={submitHandler({
+            broadcast,
             closeForm,
             dispatch,
             user,

@@ -7,6 +7,7 @@ import {
   EquipmentReservationValue,
   EquipmentTable,
 } from "../../resources/Equipment";
+import { ReservationChangePayload, SocketMessageKind } from "../SocketProvider";
 
 export interface ReservationSubmitValues {
   id: number;
@@ -39,6 +40,10 @@ export interface ReservationFormValues {
 }
 
 export type ReservationSubmitProps = Omit<CalendarUIProps, "state"> & {
+  broadcast: (
+    message: SocketMessageKind,
+    payload: ReservationChangePayload
+  ) => void;
   closeForm: () => void;
   user: User;
   event: Event;

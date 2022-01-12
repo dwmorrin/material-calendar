@@ -1,5 +1,5 @@
 import { CalendarAction, CalendarState, Action } from "./types";
-import { ResourceKey } from "../resources/types";
+import { Resource, ResourceKey } from "../resources/types";
 import UserGroup from "../resources/UserGroup";
 import { enqueue, dequeue } from "../utils/queue";
 import { ErrorType } from "../utils/error";
@@ -528,10 +528,10 @@ const receivedReservationCancelation: StateHandler = (state, { payload }) => {
 const receivedReservationUpdate: StateHandler = (state, { payload }) => {
   const resources = payload?.resources;
   if (!resources) throw new Error("missing resources");
-  const event = resources[ResourceKey.Events][0];
+  const event = resources[ResourceKey.Events][0] as Event;
   const reservation = resources[ResourceKey.Reservations][0];
   if (!event || !reservation) throw new Error("missing event or reservation");
-  const events = state.resources[ResourceKey.Events];
+  const events = state.resources[ResourceKey.Events] as Event[];
   const oldEventIndex = events.findIndex(({ id }) => id === event.id);
   events[oldEventIndex] = event;
   const reservations = state.resources[ResourceKey.Reservations];
@@ -810,4 +810,13 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.ViewToday]: viewToday,
   }[action.type](state, action));
 
-export default calendarReducer;
+const loggingReducer: StateHandler = (state, action) => {
+  console.log({
+    state,
+    action: { ...action, type: CalendarAction[action.type] },
+  });
+  return calendarReducer(state, action);
+};
+
+export default loggingReducer;
+// export default calendarReducer;

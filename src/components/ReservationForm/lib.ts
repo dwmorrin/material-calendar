@@ -20,6 +20,7 @@ import {
 } from "./types";
 import { formatDatetime, parseSQLDatetime } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
+import { SocketMessageKind } from "../SocketProvider";
 
 export const useStyles = makeStyles({
   list: {
@@ -65,6 +66,7 @@ const updater = (values: ReservationFormValues): ReservationSubmitValues => ({
 
 export const submitHandler =
   ({
+    broadcast,
     closeForm,
     dispatch,
     user,
@@ -112,6 +114,12 @@ export const submitHandler =
         const message = values.id
           ? "Your Reservation has been updated!"
           : "Your Reservation has been made!";
+        broadcast(SocketMessageKind.ReservationChanged, {
+          eventId: event.id,
+          reservationId: reservation.id,
+          groupId: group.id,
+          projectId: project.id,
+        });
         dispatch({
           type: CalendarAction.ReceivedReservationUpdate,
           payload: {

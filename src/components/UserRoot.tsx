@@ -26,6 +26,7 @@ import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
 import Category from "../resources/Category";
 import Reservation from "../resources/Reservation";
+import Project from "../resources/Project";
 import { useSocket } from "./SocketProvider";
 
 const UserRoot: FunctionComponent<RouteComponentProps> = () => {
@@ -35,6 +36,8 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
     eventUnlocked,
     eventsChanged,
     refreshRequested,
+    reservationChanged,
+    reservationChangePayload,
     setSocketState,
   } = useSocket();
   const { user } = useAuth();
@@ -117,13 +120,60 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
         meta: eventLockId,
       });
     }
+    if (reservationChanged) {
+      setSocketState({ reservationChanged: false });
+      const { eventId, groupId, projectId, reservationId } =
+        reservationChangePayload;
+      const projects = user.projects.filter((p) => p.id === projectId);
+      if (projects.length) {
+        // fetch and update project info
+        fetch(`${Project.url}/${projectId}`)
+          .then((res) => res.json())
+          .then(({ error, data }) => {
+            if (error)
+              return dispatch({
+                type: CalendarAction.Error,
+                payload: { error },
+              });
+            console.log("todo: update project info", { data });
+          });
+        // fetch and update group info, if user is a member of the group
+        // ... maybe this can be done in the same request as the project
+      }
+      // fetch and update event info
+      // TODO constrain to events in the current calendar view
+      fetch(`${Event.url}/${eventId}`)
+        .then((res) => res.json())
+        .then(({ error, data }) => {
+          if (error)
+            return dispatch({
+              type: CalendarAction.Error,
+              payload: { error },
+            });
+          console.log("TODO: update event info", { data });
+          // dispatch({
+          //   type: CalendarAction.ReceivedResource,
+          //   meta: ResourceKey.Events,
+          //   payload: {
+          //     resources: {
+          //       ...state.resources,
+          //       [ResourceKey.Events]: [new Event(data as Event)],
+          //     },
+          //   },
+          // });
+        });
+      // TODO reservation info? Who needs it? TBD
+    }
   }, [
     eventsChanged,
     eventLockId,
     eventLocked,
     eventUnlocked,
+    reservationChanged,
+    reservationChangePayload,
     setSocketState,
     state.resources,
+    user,
   ]);
 
   return (

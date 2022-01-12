@@ -38,6 +38,7 @@ import Equipment from "../../resources/Equipment";
 import Category from "../../resources/Category";
 import User from "../../resources/User";
 import RadioYesNo from "../RadioYesNo";
+import { useSocket } from "../SocketProvider";
 
 const cancelReservation = ({
   dispatch,
@@ -96,6 +97,7 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
     if (state.currentEvent) fetchCurrentEvent(dispatch, state.currentEvent);
   };
   const { user } = useAuth();
+  const { broadcast } = useSocket();
   const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
   const equipmentValues = makeEquipmentValues(equipment);
 
@@ -157,6 +159,7 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
             project
           )}
           onSubmit={submitHandler({
+            broadcast,
             closeForm,
             dispatch,
             user,

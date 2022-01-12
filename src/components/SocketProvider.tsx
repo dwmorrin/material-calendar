@@ -7,8 +7,16 @@ export enum SocketMessageKind {
   EventLock = "EVENT_LOCK",
   EventUnlock = "EVENT_UNLOCK",
   Refresh = "REFRESH", // catch-all, warns "app is broken until you refresh"
+  ReservationChanged = "RESERVATION",
   Test = "TEST",
 }
+
+export type ReservationChangePayload = {
+  eventId: number;
+  groupId: number;
+  projectId: number;
+  reservationId: number;
+};
 
 const socket = io();
 
@@ -60,6 +68,14 @@ const listen = (
         case SocketMessageKind.Refresh:
           setSocketState({ refreshRequested: true });
           break;
+        case SocketMessageKind.ReservationChanged: {
+          const { eventId, groupId, projectId, reservationId } =
+            data[0] as ReservationChangePayload;
+          if (!eventId || !groupId || !projectId || !reservationId) {
+            return console.error("invalid reservation change message", arg);
+          }
+          break;
+        }
         case SocketMessageKind.Test:
           console.log("Socket test message received");
           break;
@@ -74,6 +90,8 @@ interface SocketState {
   eventUnlocked: boolean;
   eventLockId: number;
   refreshRequested: boolean;
+  reservationChanged: boolean;
+  reservationChangePayload: ReservationChangePayload;
 }
 
 const defaultState: SocketState = {
@@ -82,6 +100,13 @@ const defaultState: SocketState = {
   eventUnlocked: false,
   eventLockId: 0,
   refreshRequested: false,
+  reservationChanged: false,
+  reservationChangePayload: {
+    eventId: 0,
+    groupId: 0,
+    projectId: 0,
+    reservationId: 0,
+  },
 };
 
 const reducer = (
