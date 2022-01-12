@@ -1,32 +1,36 @@
 import { EffectCallback } from "react";
 import { ResourceKey } from "../resources/types";
 import { CalendarAction, CalendarState, Action } from "./types";
+import { SocketState } from "./SocketProvider";
 import User from "../resources/User";
 import Event from "../resources/Event";
 import Project from "../resources/Project";
-import { SocketState } from "./SocketProvider";
+import UserGroup from "../resources/UserGroup";
+import Reservation from "../resources/Reservation";
 
 interface SocketCalendarEffectProps extends SocketState {
   dispatch: (action: Action) => void;
-  state: CalendarState;
   setSocketState: (state: Record<string, unknown>) => void;
+  state: CalendarState;
   user: User;
 }
 
 const SocketCalendarEffect =
   ({
-    eventsChanged,
     dispatch,
-    state,
-    setSocketState,
-    user,
+    eventLockId,
     eventLocked,
     eventUnlocked,
-    eventLockId,
+    eventsChanged,
     reservationChangePayload,
     reservationChanged,
+    setSocketState,
+    state,
+    user,
   }: SocketCalendarEffectProps) =>
   (): ReturnType<EffectCallback> => {
+    const onError = (error: Error): void =>
+      dispatch({ type: CalendarAction.Error, payload: { error } });
     if (eventsChanged) {
       // TODO: limit the number of events fetched and updated
       // current approach is brute force - reload ALL events
@@ -36,13 +40,8 @@ const SocketCalendarEffect =
       fetch(Event.url)
         .then((res) => res.json())
         .then(({ error, data }) => {
-          if (error)
-            return dispatch({ type: CalendarAction.Error, payload: { error } });
-          if (!data)
-            return dispatch({
-              type: CalendarAction.Error,
-              payload: { error: new Error("No event data") },
-            });
+          if (error) return onError(error);
+          if (!data) return onError(new Error("No event data"));
           setSocketState({ eventsChanged: false });
           dispatch({
             type: CalendarAction.ReceivedResource,
@@ -57,9 +56,7 @@ const SocketCalendarEffect =
             },
           });
         })
-        .catch((error) =>
-          dispatch({ type: CalendarAction.Error, payload: { error } })
-        );
+        .catch(onError);
     }
     if (eventLocked) {
       setSocketState({ eventLocked: false });
@@ -85,16 +82,8 @@ const SocketCalendarEffect =
         fetch(`${Project.url}/${projectId}`)
           .then((res) => res.json())
           .then(({ error, data }) => {
-            if (error)
-              return dispatch({
-                type: CalendarAction.Error,
-                payload: { error },
-              });
-            if (!data)
-              return dispatch({
-                type: CalendarAction.Error,
-                payload: { error: new Error("No project data") },
-              });
+            if (error) return onError(error);
+            if (!data) return onError(new Error("No project data"));
             dispatch({
               type: CalendarAction.UpdatedOneProject,
               payload: {
@@ -104,27 +93,35 @@ const SocketCalendarEffect =
               },
             });
           })
-          .catch((error) =>
-            dispatch({ type: CalendarAction.Error, payload: { error } })
-          );
-        // fetch and update group info, if user is a member of the group
-        // ... maybe this can be done in the same request as the project
+          .catch(onError);
+        const group = (
+          state.resources[ResourceKey.Groups] as UserGroup[]
+        ).filter((g) => g.id === groupId);
+        if (group) {
+          fetch(`${UserGroup.url}/${groupId}`)
+            .then((res) => res.json())
+            .then(({ error, data }) => {
+              if (error) return onError(error);
+              if (!data) return onError(new Error("No group data"));
+              dispatch({
+                type: CalendarAction.UpdatedOneGroup,
+                payload: {
+                  resources: {
+                    [ResourceKey.Groups]: [new UserGroup(data as UserGroup)],
+                  },
+                },
+              });
+            })
+            .catch(onError);
+        }
       }
       // fetch and update event info
       // TODO constrain to events in the current calendar view
       fetch(`${Event.url}/${eventId}`)
         .then((res) => res.json())
         .then(({ error, data }) => {
-          if (error)
-            return dispatch({
-              type: CalendarAction.Error,
-              payload: { error },
-            });
-          if (!data)
-            return dispatch({
-              type: CalendarAction.Error,
-              payload: { error: new Error("no updated event data received") },
-            });
+          if (error) return onError(error);
+          if (!data) return onError(new Error("No event data"));
           dispatch({
             type: CalendarAction.UpdatedOneEvent,
             payload: {
@@ -134,10 +131,31 @@ const SocketCalendarEffect =
             },
           });
         })
-        .catch((error) =>
-          dispatch({ type: CalendarAction.Error, payload: { error } })
-        );
-      // TODO reservation info? Who needs it? TBD
+        .catch(onError);
+      // fetch and update reservation info
+      const reservations = state.resources[
+        ResourceKey.Reservations
+      ] as Reservation[];
+      const reservation = reservations.find((r) => r.id === reservationId);
+      if (reservation) {
+        fetch(`${Reservation.url}/${reservationId}`)
+          .then((res) => res.json())
+          .then(({ error, data }) => {
+            if (error) return onError(error);
+            if (!data) return onError(new Error("No reservation data"));
+            dispatch({
+              type: CalendarAction.UpdatedOneReservation,
+              payload: {
+                resources: {
+                  [ResourceKey.Reservations]: [
+                    new Reservation(data as Reservation),
+                  ],
+                },
+              },
+            });
+          })
+          .catch(onError);
+      }
     }
   };
 

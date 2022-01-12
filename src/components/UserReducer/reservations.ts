@@ -3,6 +3,11 @@ import { StateHandler } from "./types";
 import displayMessage from "./displayMessage";
 import { ResourceKey } from "../../resources/types";
 import Event from "../../resources/Event";
+import Project from "../../resources/Project";
+import UserGroup from "../../resources/UserGroup";
+import { impossibleState, missingResource } from "./errorRedirect";
+import Reservation from "../../resources/Reservation";
+import arrayUpdateAt from "./arrayUpdateAt";
 
 export const canceledReservation: StateHandler = (state, { payload }) => {
   return displayMessage(
@@ -67,28 +72,62 @@ export const receivedReservationCancelation: StateHandler = (
   );
 };
 
-export const receivedReservationUpdate: StateHandler = (state, { payload }) => {
+export const receivedReservationUpdate: StateHandler = (state, action) => {
+  const { payload } = action;
   const resources = payload?.resources;
-  if (!resources) throw new Error("missing resources");
+  if (!resources)
+    return missingResource(
+      state,
+      action,
+      "missing resources after reservation update"
+    );
+
+  // unpack all the updated resources
   const event = resources[ResourceKey.Events][0] as Event;
   const reservation = resources[ResourceKey.Reservations][0];
-  if (!event || !reservation) throw new Error("missing event or reservation");
+  const group = resources[ResourceKey.Groups][0] as UserGroup;
+  const project = resources[ResourceKey.Projects][0] as Project;
+  if (!event || !reservation || !group || !project)
+    return missingResource(
+      state,
+      action,
+      "missing event, reservation, group, or project"
+    );
+
   const events = state.resources[ResourceKey.Events] as Event[];
-  const oldEventIndex = events.findIndex(({ id }) => id === event.id);
-  events[oldEventIndex] = event;
+  const eventIndex = events.findIndex(({ id }) => id === event.id);
+  if (eventIndex === -1)
+    return impossibleState(state, action, "missing reservation event");
+
   const reservations = state.resources[ResourceKey.Reservations];
-  const oldReservationIndex = reservations.findIndex(
+  const reservationIndex = reservations.findIndex(
     ({ id }) => id === reservation.id
   );
-  if (oldReservationIndex === -1) reservations.push(reservation);
-  else reservations[oldReservationIndex] = reservation;
+  // if the reservation is not found, it's a new reservation
+
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const projectIndex = projects.findIndex(({ id }) => id === project.id);
+  if (projectIndex === -1)
+    return impossibleState(state, action, "missing reservation project");
+
+  const groups = state.resources[ResourceKey.Groups] as UserGroup[];
+  const groupIndex = groups.findIndex(({ id }) => id === group.id);
+  if (groupIndex === -1)
+    return impossibleState(state, action, "missing reservation group");
+
   return displayMessage(
     {
       ...state,
       resources: {
         ...state.resources,
-        [ResourceKey.Events]: events,
-        [ResourceKey.Reservations]: reservations,
+        [ResourceKey.Events]: arrayUpdateAt(events, eventIndex, event),
+        [ResourceKey.Reservations]: arrayUpdateAt(
+          reservations,
+          reservationIndex,
+          reservation
+        ),
+        [ResourceKey.Groups]: arrayUpdateAt(groups, groupIndex, group),
+        [ResourceKey.Projects]: arrayUpdateAt(projects, projectIndex, project),
       },
       detailIsOpen: false,
       reservationFormIsOpen: false,
@@ -100,4 +139,26 @@ export const receivedReservationUpdate: StateHandler = (state, { payload }) => {
       },
     }
   );
+};
+
+export const updatedOneReservation: StateHandler = (state, action) => {
+  if (!action.payload?.resources)
+    return missingResource(state, action, "no resources");
+  const reservation = action.payload.resources[
+    ResourceKey.Reservations
+  ][0] as Reservation;
+  const reservations = state.resources[ResourceKey.Reservations];
+  const index = reservations.findIndex(({ id }) => id === reservation.id);
+  if (index === -1) impossibleState(state, action, "reservation not found");
+  return {
+    ...state,
+    resources: {
+      ...state.resources,
+      [ResourceKey.Reservations]: arrayUpdateAt(
+        reservations,
+        index,
+        reservation
+      ),
+    },
+  };
 };

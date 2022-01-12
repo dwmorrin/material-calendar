@@ -28,6 +28,7 @@ import {
   leftGroup,
   openGroupDashboard,
   selectedGroup,
+  updatedOneGroup,
 } from "./groups";
 
 import {
@@ -57,6 +58,7 @@ import {
   openReservationFormAdmin,
   receivedReservationCancelation,
   receivedReservationUpdate,
+  updatedOneReservation,
 } from "./reservations";
 
 const closeEquipmentForm: StateHandler = (state) => ({
@@ -158,7 +160,9 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.ToggleDrawer]: toggleDrawer,
     [CalendarAction.TogglePicker]: togglePicker,
     [CalendarAction.UpdatedOneEvent]: updatedOneEvent,
+    [CalendarAction.UpdatedOneGroup]: updatedOneGroup,
     [CalendarAction.UpdatedOneProject]: updatedOneProject,
+    [CalendarAction.UpdatedOneReservation]: updatedOneReservation,
     [CalendarAction.UpdatedEditedEventReceived]: updatedEventReceived,
     [CalendarAction.ViewToday]: viewToday,
   }[action.type](state, action));

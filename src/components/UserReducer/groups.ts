@@ -1,10 +1,14 @@
 import { CalendarAction } from "../types";
 import { StateHandler } from "./types";
+import { ResourceKey } from "../../resources/types";
+import UserGroup from "../../resources/UserGroup";
 
-import { missingResource } from "./errorRedirect";
+import { impossibleState, missingResource } from "./errorRedirect";
 import displayMessage from "./displayMessage";
 
 import { closeProjectDashboard } from "./projects";
+
+import arrayUpdateAt from "./arrayUpdateAt";
 
 export const closeGroupDashboard: StateHandler = (state, action) => {
   if (state.currentGroup == undefined) {
@@ -82,4 +86,22 @@ export const selectedGroup: StateHandler = (state, action) => {
     return missingResource(state, action, "no group in selected group");
   }
   return { ...state, currentGroup: payload.currentGroup };
+};
+
+export const updatedOneGroup: StateHandler = (state, action) => {
+  if (!action.payload?.resources)
+    return missingResource(state, action, "no resources in updated group");
+  const group = action.payload.resources[ResourceKey.Groups][0] as UserGroup;
+  const groups = state.resources[ResourceKey.Groups] as UserGroup[];
+  const index = groups.findIndex((g) => g.id === group.id);
+  if (index === -1) return impossibleState(state, action, "group not found");
+  return {
+    ...state,
+    currentGroup:
+      state.currentGroup?.id === group.id ? group : state.currentGroup,
+    resources: {
+      ...state.resources,
+      [ResourceKey.Groups]: arrayUpdateAt(groups, index, group),
+    },
+  };
 };

@@ -108,9 +108,11 @@ export const submitHandler =
       .then(({ error, data }) => {
         if (error) throw error;
         if (!data) throw new Error("No data returned");
-        const { event, reservation } = data;
+        const { event, reservation, group, project } = data;
         if (!event) throw new Error("No updated event returned");
         if (!reservation) throw new Error("No updated reservation returned");
+        if (!group) throw new Error("No updated group returned");
+        if (!project) throw new Error("No updated project returned");
         const message = values.id
           ? "Your Reservation has been updated!"
           : "Your Reservation has been made!";
@@ -126,6 +128,8 @@ export const submitHandler =
             resources: {
               [ResourceKey.Events]: [new Event(event)],
               [ResourceKey.Reservations]: [new Reservation(reservation)],
+              [ResourceKey.Groups]: [new UserGroup(group)],
+              [ResourceKey.Projects]: [new Project(project)],
             },
             message,
           },

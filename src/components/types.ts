@@ -49,7 +49,9 @@ export enum CalendarAction {
   TogglePicker,
   UpdatedEditedEventReceived,
   UpdatedOneEvent,
+  UpdatedOneGroup,
   UpdatedOneProject,
+  UpdatedOneReservation,
   ViewToday,
 }
 
