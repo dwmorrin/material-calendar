@@ -38,6 +38,10 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
 
   if (!currentProject || isNaN(currentProject.groupAllottedHours)) return null;
 
+  const pluralCheck = (n: number): string => (n === 1 ? "" : "s");
+  const pluralize = (n: number, word: string): string =>
+    `${n} ${word}${pluralCheck(n)}`;
+
   return (
     <Grid container direction="column" spacing={3}>
       <Grid item>
@@ -50,15 +54,24 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
             currentGroup.reservedHours
           )}
         />
-        Reserved {currentGroup.reservedHours} hours of{" "}
-        {currentProject.groupAllottedHours} hours available
+        <Typography variant="caption">
+          Group max: {pluralize(currentProject.groupAllottedHours, "hour")}.
+          Reserved: {pluralize(currentGroup.reservedHours, "hour")}. (
+          {Math.trunc(
+            availableHoursAsPercent(
+              currentProject.groupAllottedHours,
+              currentGroup.reservedHours
+            )
+          )}
+          %)
+        </Typography>
       </Grid>
       <Grid item>
         <Typography variant="body2">Members</Typography>
         <Grid container direction="row">
           {currentGroup.members.map(({ name }, index) => (
             <Avatar key={`avatar_${index}`} className={classes.purple}>
-              {`${name.first ? name.first[0] : "_"} ${
+              {`${name.first ? name.first[0] : "_"}${
                 name.last ? name.last[0] : "_"
               }`}
             </Avatar>
