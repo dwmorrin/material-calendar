@@ -75,17 +75,14 @@ export const submitHandler =
     projects,
   }: ReservationSubmitProps) =>
   (values: ReservationFormValues, actions: FormikValues): void => {
+    const onError = (error: Error): void =>
+      dispatch({ type: CalendarAction.Error, payload: { error } });
     actions.setSubmitting(true);
     const group = groups.find((group) => group.id === values.groupId);
     const project = projects.find((project) => project.id === values.projectId);
     if (!group || !project) {
       actions.setSubmitting(false);
-      return dispatch({
-        type: CalendarAction.Error,
-        payload: {
-          error: new Error("Invalid project/group in reservation form."),
-        },
-      });
+      return onError(new Error("Invalid project/group in reservation form."));
     }
 
     // sends mail to anyone in this group
@@ -99,10 +96,13 @@ export const submitHandler =
       text: `${subject} for ${project.title} on ${when} in ${event.location.title}`,
     };
 
+    // apply form values to data
+    const formToSubmit = updater(values);
+
     fetch(`${Reservation.url}${values.id ? `/${values.id}` : ""}`, {
       method: values.id ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...updater(values), mail }),
+      body: JSON.stringify({ ...formToSubmit, mail }),
     })
       .then((response) => response.json())
       .then(({ error, data }) => {
@@ -113,15 +113,40 @@ export const submitHandler =
         if (!reservation) throw new Error("No updated reservation returned");
         if (!group) throw new Error("No updated group returned");
         if (!project) throw new Error("No updated project returned");
+
         const message = values.id
           ? "Your Reservation has been updated!"
           : "Your Reservation has been made!";
+
+        // send reservation info to an external service
+        if (process.env.REACT_APP_RESERVATION_FORM_PUSH_URL) {
+          fetch(process.env.REACT_APP_RESERVATION_FORM_PUSH_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formToSubmit),
+          })
+            .then((res) => {
+              if (res.ok) return res.json();
+            })
+            .then(({ error }) => {
+              if (error)
+                throw new Error(
+                  process.env.REACT_APP_RESERVATION_FORM_PUSH_ERROR ||
+                    "Error sending push notification - check with the server administrator"
+                );
+            })
+            .catch(onError);
+        }
+
+        // send reservation info to currently connected users
         broadcast(SocketMessageKind.ReservationChanged, {
           eventId: event.id,
           reservationId: reservation.id,
           groupId: group.id,
           projectId: project.id,
         });
+
+        // update local state
         dispatch({
           type: CalendarAction.ReceivedReservationUpdate,
           payload: {
@@ -136,9 +161,7 @@ export const submitHandler =
         });
         closeForm();
       })
-      .catch((error) =>
-        dispatch({ type: CalendarAction.Error, payload: { error } })
-      )
+      .catch(onError)
       .finally(() => {
         actions.setSubmitting(false);
       });
