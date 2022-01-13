@@ -83,6 +83,16 @@ const getBarableColor = (
   return colors.event;
 };
 
+// merge events of same day
+const mergeEvents = (barables: BarableObj[]): BarableObj[] =>
+  Object.values(
+    barables.reduce((acc, curr) => {
+      if (!(curr.start in acc)) acc[curr.start] = curr;
+      else acc[curr.start].hours += curr.hours;
+      return acc;
+    }, {} as Record<string, BarableObj>)
+  );
+
 const bars = (
   barables: BarableObj[],
   scales: AllotmentScales,
@@ -133,8 +143,10 @@ const ProjectLocationHours: FunctionComponent<ProjectLocationHoursProps> = ({
     }
     const barableEvents = [
       ...allotments,
-      ...events.map(eventToBarable(false)),
-      ...canceledEvents.map(eventToBarable(true)),
+      ...mergeEvents([
+        ...events.map(eventToBarable(false)),
+        ...canceledEvents.map(eventToBarable(true)),
+      ]),
     ];
     const extent = getExtent(barableEvents);
     const scales = getScales(extent);

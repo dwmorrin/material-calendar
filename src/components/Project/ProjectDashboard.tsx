@@ -192,7 +192,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         </Accordion>
         <Typography>Upcoming Sessions</Typography>
         <List>
-          {groupEvents.slice(0, splitPoint).map((event) => (
+          {groupEvents.slice(splitPoint).map((event) => (
             <SessionInfo
               key={`group_event_listing_${event.id}`}
               event={event}
@@ -202,7 +202,7 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
         </List>
         <Typography>Previous Sessions</Typography>
         <List>
-          {groupEvents.slice(splitPoint).map((event) => (
+          {groupEvents.slice(0, splitPoint).map((event) => (
             <SessionInfo
               key={`group_event_listing_${event.id}`}
               event={event}

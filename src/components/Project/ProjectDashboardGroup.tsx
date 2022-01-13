@@ -58,12 +58,10 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
           Group max: {pluralize(currentProject.groupAllottedHours, "hour")}.
           Reserved: {pluralize(currentGroup.reservedHours, "hour")}. (
           {Math.trunc(
-            availableHoursAsPercent(
-              currentProject.groupAllottedHours,
-              currentGroup.reservedHours
-            )
+            (100 * currentGroup.reservedHours) /
+              currentProject.groupAllottedHours
           )}
-          %)
+          % used)
         </Typography>
       </Grid>
       <Grid item>
