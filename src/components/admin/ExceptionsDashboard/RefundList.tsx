@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import { Button, ButtonGroup, List, ListItem, Paper } from "@material-ui/core";
 import { AdminAction, AdminUIProps } from "../types";
 import Event from "../../../resources/Event";
+import Project from "../../../resources/Project";
 import Reservation from "../../../resources/Reservation";
 import UserGroup from "../../../resources/UserGroup";
 import { formatDatetimeSeconds, parseSQLDatetime } from "../../../utils/date";
@@ -13,6 +14,7 @@ const RefundList: FC<
     reservations: Reservation[];
   }
 > = ({ dispatch, reservations, state }) => {
+  const projects = state.resources[ResourceKey.Projects] as Project[];
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const events = state.resources[ResourceKey.Events] as Event[];
   const approveReservationCancelation = (
@@ -33,6 +35,8 @@ const RefundList: FC<
         "been refunded.",
       ].join(" "),
     };
+    const onError = (error: Error): void =>
+      dispatch({ type: AdminAction.Error, payload: { error } });
     fetch(Reservation.exceptionUrl.refund(reservation), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -42,12 +46,21 @@ const RefundList: FC<
       }),
     })
       .then((response) => response.json())
-      .then(({ error }) => {
-        if (error) throw error;
+      .then(({ error, data }) => {
+        if (error) return onError(error);
+        if (!data) return onError(new Error("No data returned"));
+        dispatch({
+          type: AdminAction.ReceivedResource,
+          meta: ResourceKey.Reservations,
+          payload: {
+            resources: {
+              ...state.resources,
+              [ResourceKey.Reservations]: [data],
+            },
+          },
+        });
       })
-      .catch((error) =>
-        dispatch({ type: AdminAction.Error, payload: { error } })
-      );
+      .catch(onError);
   };
 
   return (
@@ -57,6 +70,9 @@ const RefundList: FC<
         if (!group) return <ListItem>Error: could not find group.</ListItem>;
         const event = events.find(({ id }) => id === reservation.eventId);
         if (!event) return <ListItem>Error: could not find event.</ListItem>;
+        const project = projects.find(({ id }) => id === reservation.projectId);
+        if (!project)
+          return <ListItem>Error: could not find project.</ListItem>;
         return (
           <ListItem
             key={`reservation${reservation.id}`}
@@ -94,10 +110,10 @@ const RefundList: FC<
                 }}
               >
                 <ListItem key={`reservation-${reservation.id}-projectTitle}`}>
-                  {"Project: " + reservation.projectTitle}
+                  {"Project: " + project.title}
                 </ListItem>
                 <ListItem key={`reservation-${reservation.id}-location}`}>
-                  {"Location: " + event.location}
+                  {"Location: " + event.location.title}
                 </ListItem>
                 <ListItem
                   key={`reservation-${reservation.id}-reservationStart}`}
