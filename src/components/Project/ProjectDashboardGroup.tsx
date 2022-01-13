@@ -12,6 +12,7 @@ import { ResourceKey } from "../../resources/types";
 import UserGroup from "../../resources/UserGroup";
 import { makeStyles } from "@material-ui/core/styles";
 import { deepPurple } from "@material-ui/core/colors";
+import pluralize from "../../utils/pluralize";
 
 const useStyles = makeStyles((theme) => ({
   purple: {
@@ -37,10 +38,6 @@ const ProjectDashboardGroup: FunctionComponent<CalendarUIProps> = ({
   const invitations = groups.filter(({ pending }) => pending);
 
   if (!currentProject || isNaN(currentProject.groupAllottedHours)) return null;
-
-  const pluralCheck = (n: number): string => (n === 1 ? "" : "s");
-  const pluralize = (n: number, word: string): string =>
-    `${n} ${word}${pluralCheck(n)}`;
 
   return (
     <Grid container direction="column" spacing={3}>

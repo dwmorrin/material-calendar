@@ -39,6 +39,7 @@ import fetchCurrentEvent from "../fetchCurrentEvent";
 import Location from "../../resources/Location";
 import Reservation from "../../resources/Reservation";
 import { ProjectColors } from "./types";
+import pluralize from "../../utils/pluralize";
 
 const SessionInfo: FunctionComponent<{
   event: Event;
@@ -166,28 +167,43 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
           <AccordionDetails>
             <ProjectLocationHoursLegend colors={colors} />
           </AccordionDetails>
-          {locations.map((location) => (
-            <AccordionDetails
-              key={`${location.id}`}
-              style={{ display: "flex", flexDirection: "column" }}
-            >
-              <Typography variant="body2">{location.title}</Typography>
-              <ProjectLocationHours
-                allotments={
-                  currentProject?.allotments.filter(
-                    (a) => a.locationId === location.id
-                  ) || []
-                }
-                events={groupEvents.filter(
-                  (e) => e.location.id === location.id
-                )}
-                canceledEvents={canceledNotRefundedEvents.filter(
-                  (e) => e.location.id === location.id
-                )}
-                colors={colors}
-              />
-            </AccordionDetails>
-          ))}
+          {locations.map((location) => {
+            const locationAllotments =
+              currentProject?.allotments.filter(
+                (a) => a.locationId === location.id
+              ) || [];
+            return (
+              <AccordionDetails
+                key={`${location.id}`}
+                style={{ display: "flex", flexDirection: "column" }}
+              >
+                <Typography variant="body2">{location.title}</Typography>
+                <ProjectLocationHours
+                  allotments={locationAllotments}
+                  events={groupEvents.filter(
+                    (e) => e.location.id === location.id
+                  )}
+                  canceledEvents={canceledNotRefundedEvents.filter(
+                    (e) => e.location.id === location.id
+                  )}
+                  colors={colors}
+                />
+                <Typography variant="body2">
+                  Time periods and maximum hours for all groups in this project:
+                </Typography>
+                <List>
+                  {locationAllotments.map((a) => (
+                    <ListItem key={a.start}>
+                      <Typography variant="body2">
+                        {parseAndFormatSQLDateInterval(a)}:{" "}
+                        {pluralize(a.hours, "hour")}
+                      </Typography>
+                    </ListItem>
+                  ))}
+                </List>
+              </AccordionDetails>
+            );
+          })}
         </Accordion>
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
