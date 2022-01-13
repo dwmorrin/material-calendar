@@ -14,6 +14,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core";
+import { useTheme } from "@material-ui/core/styles";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {
@@ -38,13 +39,6 @@ import fetchCurrentEvent from "../fetchCurrentEvent";
 import Location from "../../resources/Location";
 import Reservation from "../../resources/Reservation";
 import { ProjectColors } from "./types";
-
-const colors: ProjectColors = {
-  allotment: "#3F51B5", // matching color of the linear progress bar
-  canceled: "purple",
-  event: "limegreen",
-  now: "red",
-};
 
 const SessionInfo: FunctionComponent<{
   event: Event;
@@ -71,6 +65,15 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const classes = useStyles();
+  const theme = useTheme();
+
+  const colors: ProjectColors = {
+    allotment: theme.palette.primary.main,
+    canceled: theme.palette.warning.dark,
+    event: theme.palette.primary.light,
+    now: theme.palette.secondary.main,
+  };
+
   const { currentProject, currentGroup, projectDashboardIsOpen, resources } =
     state;
 
@@ -175,8 +178,12 @@ const ProjectDashboard: FunctionComponent<CalendarUIProps> = ({
                     (a) => a.locationId === location.id
                   ) || []
                 }
-                events={groupEvents}
-                canceledEvents={canceledNotRefundedEvents}
+                events={groupEvents.filter(
+                  (e) => e.location.id === location.id
+                )}
+                canceledEvents={canceledNotRefundedEvents.filter(
+                  (e) => e.location.id === location.id
+                )}
                 colors={colors}
               />
             </AccordionDetails>
