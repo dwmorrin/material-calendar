@@ -32,7 +32,7 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
         setStatus(AuthStatus.loggedOut);
         setUser(new User());
         setLastLocation("/");
-        navigate("/");
+        navigate(process.env.REACT_APP_LOGOUT_URL || "/");
       });
   };
 
