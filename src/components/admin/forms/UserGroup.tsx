@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { Field, FieldArray } from "formik";
-import { TextField, RadioGroup } from "formik-material-ui";
+import { CheckboxWithLabel, TextField, RadioGroup } from "formik-material-ui";
 import { FormTemplateProps } from "../types";
 import {
   List,
@@ -70,6 +70,12 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({
       </Box>
       <FormLabel>Reserved hours</FormLabel>
       <p>{String(values.reservedHours)}</p>
+      <Field
+        Label={{ label: "Pending" }}
+        type="checkbox"
+        name={"pending"}
+        component={CheckboxWithLabel}
+      />
     </List>
   );
 };

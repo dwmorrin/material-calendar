@@ -38,29 +38,28 @@ export const update = (
     title,
     reservedHours,
     pending,
-    abandoned,
     exceptionalSize,
     creatorId,
   } = values as UserGroupValues;
   const users = state.resources[ResourceKey.Users] as User[];
-  const _members = members.map((_username) => {
-    const { id, username, name, email } =
-      users.find((user) => user.username === _username) || new User();
-    return {
-      id,
-      username,
-      name,
-      email,
-      invitation: { accepted: false, rejected: false },
-    };
-  });
   return {
     id,
     title,
     projectId: Number(projectId),
     creatorId: Number(creatorId),
     pending,
-    members: _members,
+    members: members.map((formUsername) => {
+      const cleanedUsername = formUsername.trim();
+      const { id, username, name, email } =
+        users.find((user) => user.username === cleanedUsername) || new User();
+      return {
+        id,
+        username,
+        name,
+        email,
+        invitation: { accepted: false, rejected: false },
+      };
+    }),
     exceptionalSize,
     reservedHours,
   };
