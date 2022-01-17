@@ -9,7 +9,6 @@ interface UserGroupValues extends Record<string, unknown> {
   projectId: string;
   creatorId: string;
   pending: boolean;
-  abandoned: boolean;
   members: string[];
   exceptionalSize: boolean;
   reservedHours: number;
@@ -23,7 +22,6 @@ export const values = (state: AdminState): Record<string, unknown> => {
     projectId: String(group.projectId),
     creatorId: String(group.creatorId),
     pending: group.pending,
-    abandoned: group.abandoned,
     members: group.members.map(({ username }) => username),
     reservedHours: group.reservedHours,
   } as UserGroupValues;
@@ -62,7 +60,6 @@ export const update = (
     projectId: Number(projectId),
     creatorId: Number(creatorId),
     pending,
-    abandoned,
     members: _members,
     exceptionalSize,
     reservedHours,
