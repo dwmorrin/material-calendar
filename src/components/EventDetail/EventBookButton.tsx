@@ -26,6 +26,7 @@ const EventBookButton: FC<EventBookButtonProps> = ({
   dispatch,
 }) => {
   const { broadcast } = useSocket();
+
   const disabled =
     event.locked ||
     !(
