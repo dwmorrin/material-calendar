@@ -62,6 +62,9 @@ class UserGroup implements UserGroup {
   static makeTitle = (
     members: { name: { first: string; last: string } }[]
   ): string => {
+    if (members.length === 0) {
+      return "";
+    }
     if (members.length === 1) {
       return User.formatName(members[0].name);
     }
