@@ -172,7 +172,7 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
             <Form className={classes.list} onSubmit={handleSubmit}>
               <FormLabel>Project:</FormLabel>
-              <Field component={Select} name="project">
+              <Field component={Select} name="projectId">
                 {projects.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
                     {p.title}
