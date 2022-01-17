@@ -38,6 +38,13 @@ const FormTemplate: FunctionComponent<FormTemplateProps> = ({ values }) => {
         Label={{ label: "User" }}
       />
       <br />
+      <Field
+        component={CheckboxWithLabel}
+        type="checkbox"
+        name={"roles.instructor"}
+        Label={{ label: "Instructor" }}
+      />
+      <br />
       <br />
       <Field
         component={CheckboxWithLabel}

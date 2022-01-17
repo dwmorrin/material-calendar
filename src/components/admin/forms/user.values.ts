@@ -25,6 +25,7 @@ export const values = (state: AdminState): Record<string, unknown> => {
     roles: {
       admin: user.roles.includes("admin"),
       user: user.roles.includes("user"),
+      instructor: user.roles.includes("instructor"),
     }, // TODO: get roles from database
     name: user.name,
     email: user.email,
