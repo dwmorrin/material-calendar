@@ -31,6 +31,9 @@ class UserGroup implements UserGroup {
     cancel(group: UserGroup): string {
       return `${UserGroup.url}/${group.id}/invitation`;
     },
+    create(): string {
+      return `${UserGroup.url}/invitation`;
+    },
     update(group: UserGroup): string {
       return `${UserGroup.url}/${group.id}/invitation`;
     },
