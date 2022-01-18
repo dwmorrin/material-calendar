@@ -27,6 +27,7 @@ export const makeEventClick =
   };
 
 const getBackgroundColor = (
+  groupIds: number[],
   event: Event,
   walkInDetails = Event.walkInDetails()
 ): string => {
@@ -35,6 +36,7 @@ const getBackgroundColor = (
     // highlight user owned reservations
     // TODO: if (current user owns reservation) ...
     // event.reservation.groupId
+    if (groupIds.includes(event.reservation.groupId)) return "orange";
     // indicate someone else's reservation
     return "salmon";
   } else if (event.reservable) {
@@ -48,11 +50,14 @@ const getBackgroundColor = (
   return "";
 };
 
-export const addResourceId =
-  (walkInDetails = Event.walkInDetails()) =>
+export const addResourceId: (
+  ids: number[],
+  details?: { now: Date; start: Date; end: Date; cutoffMinutes: number }
+) => (e: Event) => Omit<Event, "id"> =
+  (groupIds, walkInDetails = Event.walkInDetails()) =>
   (event: Event): Omit<Event, "id"> => ({
     ...event,
-    backgroundColor: getBackgroundColor(event, walkInDetails),
+    backgroundColor: getBackgroundColor(groupIds, event, walkInDetails),
     resourceId: event.location.id,
   });
 
@@ -107,6 +112,7 @@ export const makeSelectedLocationIdSet = (
 };
 
 export const getEventsByLocationId = (
+  groupIds: number[],
   events: Event[],
   projectLocationIds: Set<number>,
   locationIds: number[]
@@ -120,7 +126,7 @@ export const getEventsByLocationId = (
     )
       result.push({
         ...event,
-        backgroundColor: getBackgroundColor(event, walkInDetails),
+        backgroundColor: getBackgroundColor(groupIds, event, walkInDetails),
         id: String(event.id),
       });
   }

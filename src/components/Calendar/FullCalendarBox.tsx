@@ -21,6 +21,7 @@ import { ResourceKey } from "../../resources/types";
 import Event from "../../resources/Event";
 import Location from "../../resources/Location";
 import Project from "../../resources/Project";
+import UserGroup from "../../resources/UserGroup";
 import {
   addResourceId,
   compareCalendarStates,
@@ -69,6 +70,9 @@ const FullCalendarBox: FunctionComponent<
   );
   const events = state.resources[ResourceKey.Events] as Event[];
   const locations = state.resources[ResourceKey.Locations] as Location[];
+  const groupIds: number[] = (
+    state.resources[ResourceKey.Groups] as UserGroup[]
+  ).map(({ id }) => id);
   const classes = useStyles();
 
   if (state.initialResourcesPending)
@@ -107,11 +111,12 @@ const FullCalendarBox: FunctionComponent<
           ) {
             // FullCalendar's resource system handles locations automatically
             // so long as we provide a .resourceId prop
-            successCallback(eventsInView.map(addResourceId()));
+            successCallback(eventsInView.map(addResourceId(groupIds)));
           } else {
             // We are not using the resource system; we have to manually group locations
             successCallback(
               getEventsByLocationId(
+                groupIds,
                 eventsInView,
                 projectLocations,
                 selections.locationIds
