@@ -11,7 +11,8 @@ const filePickerErrorAction = {
 
 export const dispatchFile =
   (
-    dispatch: (action: Action) => void
+    dispatch: (action: Action) => void,
+    type = AdminAction.OpenedFile
   ): ((event: React.ChangeEvent<HTMLInputElement>) => void) =>
   (event): void => {
     const { files } = event.target;
@@ -23,7 +24,7 @@ export const dispatchFile =
     reader.onerror = (): void => dispatch(filePickerErrorAction);
     reader.onload = (): void =>
       dispatch({
-        type: AdminAction.OpenedFile,
+        type,
         payload: { resourceFile: reader.result },
       });
     reader.readAsText(files[0]);

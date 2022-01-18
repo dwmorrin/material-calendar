@@ -1,9 +1,12 @@
 import { ResourceKey } from "../../../resources/types";
 import { AdminAction, AdminState } from "../types";
+import courseImport from "./course.import";
+import equipmentImport from "./equipment.import";
 import eventImport from "./event.import";
 import locationImport from "./location.import";
 import rosterImport from "./roster.import";
-import equipmentImport from "./equipment.import";
+import sectionImport from "./section.import";
+import userImport from "./user.import";
 
 export type BulkImporter = (
   setSubmitting: (submitting: boolean) => void,
@@ -31,7 +34,7 @@ const defaultHeadingsAndDispatch: [string[], BulkImporter] = [
 const router = (key: ResourceKey): [string[], BulkImporter] =>
   ({
     [ResourceKey.Categories]: defaultHeadingsAndDispatch,
-    [ResourceKey.Courses]: defaultHeadingsAndDispatch,
+    [ResourceKey.Courses]: courseImport,
     [ResourceKey.Equipment]: equipmentImport,
     [ResourceKey.Events]: eventImport,
     [ResourceKey.Groups]: defaultHeadingsAndDispatch,
@@ -39,10 +42,10 @@ const router = (key: ResourceKey): [string[], BulkImporter] =>
     [ResourceKey.Projects]: defaultHeadingsAndDispatch,
     [ResourceKey.Reservations]: defaultHeadingsAndDispatch,
     [ResourceKey.RosterRecords]: rosterImport,
-    [ResourceKey.Sections]: defaultHeadingsAndDispatch,
+    [ResourceKey.Sections]: sectionImport,
     [ResourceKey.Semesters]: defaultHeadingsAndDispatch,
     [ResourceKey.Tags]: defaultHeadingsAndDispatch,
-    [ResourceKey.Users]: defaultHeadingsAndDispatch,
+    [ResourceKey.Users]: userImport,
     [ResourceKey.VirtualWeeks]: defaultHeadingsAndDispatch,
   }[key]);
 

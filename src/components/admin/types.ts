@@ -18,6 +18,7 @@ export enum AdminAction {
   CloseDetail,
   CloseExceptionsDashboard,
   CloseFileImport,
+  CloseImportClassMeetingDialog,
   CloseLocationHoursDialog,
   CloseProjectLocationHoursDialog,
   CloseProjectLocationHoursSummaryDialog,
@@ -34,6 +35,7 @@ export enum AdminAction {
   OpenDetailWithProjectById,
   OpenDetailWithResourceInstance,
   OpenExceptionsDashboard,
+  OpenImportClassMeetings,
   OpenLocationHoursDialog,
   OpenProjectLocationHoursDialog,
   OpenProjectLocationHoursSummaryDialog,
@@ -41,6 +43,7 @@ export enum AdminAction {
   OpenSemesterDialog,
   OpenUserGroupDashboard,
   OpenVirtualWeekModifyDialog,
+  OpenedClassMeetingsFile,
   OpenedFile,
   ReceivedAllResources,
   ReceivedResource,
@@ -67,6 +70,7 @@ export interface AdminState {
   drawerIsOpen: boolean;
   error?: Error;
   exceptionsDashboardIsOpen: boolean;
+  importClassMeetingsIsOpen: boolean;
   fileImportIsOpen: boolean;
   initialResourcesPending: boolean;
   locationHoursDialogIsOpen: boolean;

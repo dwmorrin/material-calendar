@@ -137,6 +137,12 @@ const closeFileImport: StateHandler = (state) => ({
   resourceFile: null,
 });
 
+const closeImportClassMeetingDialog: StateHandler = (state) => ({
+  ...state,
+  importClassMeetingsIsOpen: false,
+  resourceFile: null,
+});
+
 const closeLocationHoursDialog: StateHandler = (state) => ({
   ...state,
   locationHoursDialogIsOpen: false,
@@ -239,6 +245,11 @@ const openExceptionsDashboard: StateHandler = (state) => ({
   exceptionsDashboardIsOpen: true,
 });
 
+const openImportClassMeetings: StateHandler = (state) => ({
+  ...state,
+  importClassMeetingsIsOpen: true,
+});
+
 const openLocationHoursDialog: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
@@ -265,6 +276,11 @@ const openVirtualWeekSplitDialog: StateHandler = (state, { payload }) => ({
   ...state,
   ...payload,
   virtualWeekModifyDialogIsOpen: true,
+});
+
+const openedClassMeetingsFile: StateHandler = (state, { payload }) => ({
+  ...state,
+  ...payload,
 });
 
 const openedFile: StateHandler = (state, { payload }) => ({
@@ -399,6 +415,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseDetail]: closeDetail,
     [AdminAction.CloseExceptionsDashboard]: closeExceptionsDashboard,
     [AdminAction.CloseFileImport]: closeFileImport,
+    [AdminAction.CloseImportClassMeetingDialog]: closeImportClassMeetingDialog,
     [AdminAction.CloseLocationHoursDialog]: closeLocationHoursDialog,
     [AdminAction.CloseProjectLocationHoursDialog]:
       closeProjectLocationHoursDialog,
@@ -420,6 +437,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.OpenDetailWithResourceInstance]:
       openDetailWithResourceInstance,
     [AdminAction.OpenExceptionsDashboard]: openExceptionsDashboard,
+    [AdminAction.OpenImportClassMeetings]: openImportClassMeetings,
     [AdminAction.OpenLocationHoursDialog]: openLocationHoursDialog,
     [AdminAction.OpenProjectLocationHoursDialog]:
       openProjectLocationHoursDialog,
@@ -427,6 +445,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.OpenSemesterDialog]: openSemesterDialog,
     [AdminAction.OpenUserGroupDashboard]: openUserGroupDashboard,
     [AdminAction.OpenVirtualWeekModifyDialog]: openVirtualWeekSplitDialog,
+    [AdminAction.OpenedClassMeetingsFile]: openedClassMeetingsFile,
     [AdminAction.OpenedFile]: openedFile,
     [AdminAction.ReceivedAllResources]: receivedAllResources,
     [AdminAction.ReceivedResource]: receivedResource,

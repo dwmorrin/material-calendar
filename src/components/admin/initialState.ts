@@ -20,6 +20,7 @@ const initialState: AdminState = {
   detailIsOpen: false,
   drawerIsOpen: false,
   exceptionsDashboardIsOpen: false,
+  importClassMeetingsIsOpen: false,
   fileImportIsOpen: false,
   initialResourcesPending: true,
   locationHoursDialogIsOpen: false,

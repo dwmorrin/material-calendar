@@ -31,6 +31,7 @@ import Reservation from "../../resources/Reservation";
 import Semester from "../../resources/Semester";
 import UserGroup from "../../resources/UserGroup";
 import ProjectDashboard from "./ProjectDashboard";
+import ImportClassMeetings from "./ImportClassMeetings";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
@@ -132,6 +133,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       )}
       <DetailsForm dispatch={dispatch} state={state} />
       <FileImport dispatch={dispatch} state={state} />
+      <ImportClassMeetings dispatch={dispatch} state={state} />
       <ProjectDashboard dispatch={dispatch} state={state} />
       <Backups dispatch={dispatch} state={state} />
       <SemesterDialog
