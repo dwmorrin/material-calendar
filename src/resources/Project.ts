@@ -49,6 +49,7 @@ export class Project implements Project {
   static collectionKey = "projects";
   static allotmentPrefix = "allotment-";
   static walkInTitle = "Walk-in";
+  static classMeetingTitlePrefix = "Class Meetings";
   constructor(project = defaultProject) {
     Object.assign(this, project);
   }
