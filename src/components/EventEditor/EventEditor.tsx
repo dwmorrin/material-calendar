@@ -35,6 +35,7 @@ import {
 import * as Yup from "yup";
 import { ResourceKey } from "../../resources/types";
 import { useSocket } from "../SocketProvider";
+import DeleteButton from "../Forms/DeleteButton";
 
 //! TODO this correctly disables submit with invalid dates, but shows no info to user
 const schema = Yup.object().shape({
@@ -94,7 +95,7 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
           onSubmit={onSubmit}
           validationSchema={schema}
         >
-          {({ values }): unknown => (
+          {({ values, setFieldValue, handleSubmit }): unknown => (
             <Form>
               <List>
                 <ListItem>
@@ -214,6 +215,10 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
                     {event.id < 1 ? "Create event" : "Edit event"}
                   </Button>
                 </ListItem>
+                <DeleteButton
+                  setFieldValue={setFieldValue}
+                  handleSubmit={handleSubmit}
+                />
                 {process.env.NODE_ENV === "development" && (
                   <pre>{JSON.stringify(values, null, 2)}</pre>
                 )}
@@ -265,6 +270,7 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
                 dispatch,
                 generatedEvents: generated,
                 broadcast,
+                deleteOne: false,
               });
             }}
           >

@@ -123,6 +123,7 @@ interface EventValues {
   reservable: boolean;
   location: { id: number; title: string };
   __options__: typeof initialEventOptions;
+  __delete__?: boolean;
 }
 
 interface SubmitProps {
@@ -130,6 +131,7 @@ interface SubmitProps {
   dispatch: (action: Action) => void;
   generatedEvents: NewEvent[];
   broadcast: (message: string) => void;
+  deleteOne: boolean;
 }
 
 export const afterConfirmed = ({
@@ -137,10 +139,35 @@ export const afterConfirmed = ({
   dispatch,
   generatedEvents,
   broadcast,
+  deleteOne,
 }: SubmitProps): void => {
-  if (!generatedEvents.length) return;
   const dispatchError = (error: Error): void =>
     dispatch({ type: CalendarAction.Error, payload: { error } });
+
+  if (deleteOne) {
+    fetch(`${Event.url}/${eventId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: eventId }),
+    })
+      .then((res) => res.json())
+      .then(({ error }) => {
+        if (error) {
+          dispatchError(error);
+        } else {
+          dispatch({
+            type: CalendarAction.DeletedOneEvent,
+            meta: eventId,
+          });
+          // TODO broadcast
+          //broadcast(SocketMessageKind.DeleteEvent);
+        }
+      })
+      .catch(dispatchError);
+    return;
+  }
+
+  if (!generatedEvents.length) return;
 
   const getCreatedEvents = ({ error, data }: ApiResponse): void => {
     if (error) throw error;
@@ -223,6 +250,17 @@ export const makeConfirmation =
   }: ConfirmationProps) =>
   (values: EventValues, actions: FormikValues): void => {
     actions.setSubmitting(false);
+    if (values.__delete__) {
+      afterConfirmed({
+        generatedEvents: [],
+        eventId: values.id,
+        dispatch,
+        broadcast,
+        deleteOne: true,
+      });
+      return;
+    }
+
     const { repeats, on } = values.__options__;
     const days = getRepeats(on);
     const start = values.start;
@@ -297,6 +335,7 @@ export const makeConfirmation =
         eventId: values.id,
         dispatch,
         broadcast,
+        deleteOne: false,
       });
     }
   };

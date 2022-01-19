@@ -133,6 +133,26 @@ export const selectedEvent: StateHandler = (state, action) => {
   };
 };
 
+export const deletedOneEvent: StateHandler = (state, action) => {
+  if (typeof action.meta !== "number")
+    return missingResource(state, action, "no event id");
+  const events = state.resources[ResourceKey.Events] as Event[];
+  const index = events.findIndex(({ id }) => id === action.meta);
+  if (index < 0) return missingResource(state, action, "no event found");
+  return {
+    ...state,
+    currentEvent: undefined,
+    eventEditorIsOpen: false,
+    resources: {
+      ...state.resources,
+      [ResourceKey.Events]: [
+        ...events.slice(0, index),
+        ...events.slice(index + 1),
+      ],
+    },
+  };
+};
+
 export const updatedOneEvent: StateHandler = (state, action) => {
   if (!action.payload?.resources)
     return missingResource(state, action, "no payload");

@@ -19,6 +19,7 @@ export enum CalendarAction {
   CloseSnackbar,
   CreatedEventsReceived,
   CreatedInvitationReceived,
+  DeletedOneEvent,
   DisplayMessage,
   Error,
   EventLock,
