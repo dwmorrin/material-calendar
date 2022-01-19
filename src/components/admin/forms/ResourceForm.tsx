@@ -3,7 +3,7 @@ import { Form, FormikProps } from "formik";
 import { AdminState, FormTemplateProps } from "../types";
 import { Box, DialogContent, Paper } from "@material-ui/core";
 import SaveButton from "./SaveButton";
-import DeleteButton from "./DeleteButton";
+import DeleteButton from "../../Forms/DeleteButton";
 
 interface ResourceFormProps {
   FormFields: FunctionComponent<FormTemplateProps>;
