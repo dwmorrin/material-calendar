@@ -27,6 +27,7 @@ import ErrorPage from "../ErrorPage";
 import { CircularProgress } from "@material-ui/core";
 import ExceptionsDashboard from "./ExceptionsDashboard/ExceptionsDashboard";
 import { ResourceKey } from "../../resources/types";
+import Location from "../../resources/Location";
 import Reservation from "../../resources/Reservation";
 import Semester from "../../resources/Semester";
 import UserGroup from "../../resources/UserGroup";
@@ -92,6 +93,36 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
         ...makeUrlsForAllResources()
       );
   }, [isAdmin]);
+
+  // get the selected location's hours
+  useEffect(() => {
+    if (
+      state.locationHoursPending &&
+      selections.locationId &&
+      state.selectedSemester
+    ) {
+      const { start, end } = state.selectedSemester;
+      fetch(
+        `${Location.url}/${selections.locationId}/hours?start=${start}&end=${end}`
+      )
+        .then((res) => res.json())
+        .then(({ error, data }) => {
+          if (error) throw error;
+          dispatch({
+            type: AdminAction.ReceivedLocationHours,
+            payload: { locationHours: data },
+          });
+        })
+        .catch((error) => {
+          // todo: state will still be locationHoursPending=true
+          dispatch({ type: AdminAction.Error, payload: { error } });
+        });
+    }
+  }, [
+    state.locationHoursPending,
+    selections.locationId,
+    state.selectedSemester,
+  ]);
 
   if (!isAdmin) {
     return <Redirect to="/" replace={true} noThrow={true} />;
