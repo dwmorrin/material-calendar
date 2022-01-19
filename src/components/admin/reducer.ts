@@ -295,12 +295,6 @@ const receivedAllResources: StateHandler = (state, { payload }) => ({
   initialResourcesPending: false,
 });
 
-const receivedLocationHours: StateHandler = (state, { payload }) => ({
-  ...state,
-  locationHoursPending: false,
-  locationHours: payload?.locationHours || [],
-});
-
 const receivedResource: StateHandler = (state, action) => {
   const { payload, meta } = action;
   const resources = payload?.resources;
@@ -388,7 +382,6 @@ const selectedResource: StateHandler = (state, { payload }) => ({
 
 const selectedSchedulerLocation: StateHandler = (state) => ({
   ...state,
-  locationHoursPending: true,
   schedulerIsOpen: true,
 });
 
@@ -455,7 +448,6 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.OpenedClassMeetingsFile]: openedClassMeetingsFile,
     [AdminAction.OpenedFile]: openedFile,
     [AdminAction.ReceivedAllResources]: receivedAllResources,
-    [AdminAction.ReceivedLocationHours]: receivedLocationHours,
     [AdminAction.ReceivedResource]: receivedResource,
     [AdminAction.ReceivedResourcesAfterLocationHoursUpdate]:
       receivedResourcesAfterLocationHoursUpdate,

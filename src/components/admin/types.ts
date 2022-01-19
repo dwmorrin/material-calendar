@@ -50,7 +50,6 @@ export enum AdminAction {
   ReceivedResourcesAfterLocationHoursUpdate,
   ReceivedResourcesAfterProjectLocationHoursUpdate,
   ReceivedResourcesAfterVirtualWeekUpdate,
-  ReceivedLocationHours,
   SelectedDocument,
   SelectedRecordPage,
   SelectedResource,
@@ -75,7 +74,6 @@ export interface AdminState {
   fileImportIsOpen: boolean;
   initialResourcesPending: boolean;
   locationHoursDialogIsOpen: boolean;
-  locationHoursPending: boolean;
   projectLocationHoursDialogIsOpen: boolean;
   projectLocationHoursSummaryDialogIsOpen: boolean;
   recordPage: number;
@@ -88,7 +86,6 @@ export interface AdminState {
   virtualWeeksDialogIsOpen: boolean;
 
   // resources
-  locationHours: { date: string; hours: number }[];
   selectedSemester?: Semester;
   resourceFile?: string | ArrayBuffer | null;
   resourceKey: ResourceKey;

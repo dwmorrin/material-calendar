@@ -24,7 +24,6 @@ const initialState: AdminState = {
   fileImportIsOpen: false,
   initialResourcesPending: true,
   locationHoursDialogIsOpen: false,
-  locationHoursPending: true,
   recordPage: 0,
   ref: null,
   schedulerIsOpen: true,
@@ -35,7 +34,6 @@ const initialState: AdminState = {
   virtualWeekModifyDialogIsOpen: false,
 
   // resources
-  locationHours: [],
   resourceKey: ResourceKey.Users,
   resources,
 };
