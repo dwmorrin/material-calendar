@@ -12,6 +12,7 @@ export const headings = [
   "Course",
   "Section",
   "Title",
+  "Phone",
 ];
 
 const bulkImport: BulkImporter = (setSubmitting, dispatch, records): void => {
@@ -31,6 +32,7 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, records): void => {
       first: record.First,
       username: record.Username,
       email: record.Email,
+      phone: record.Phone,
     }))
   );
 
