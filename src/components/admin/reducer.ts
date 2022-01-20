@@ -464,15 +464,17 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.ToggleDrawer]: toggleDrawer,
   }[action.type](state, action));
 
-// const logger: StateHandler = (state, action) => {
-//   console.log({
-//     state,
-//     action: AdminAction[action.type],
-//     payload: action.payload,
-//   });
-//   return reducer(state, action);
-// };
+const logger: (sh: StateHandler) => StateHandler = (reducer) => {
+  if (process.env.NODE_ENV === "production") return reducer;
+  const loggingReducer: StateHandler = (state, action) => {
+    console.log({
+      state,
+      action: AdminAction[action.type],
+      payload: action.payload,
+    });
+    return reducer(state, action);
+  };
+  return loggingReducer;
+};
 
-// export default logger;
-
-export default reducer;
+export default logger(reducer);
