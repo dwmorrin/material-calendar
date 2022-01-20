@@ -47,6 +47,7 @@ export const update = (
     id: rosterRecord.id,
     student,
     course: {
+      id: course.id,
       title: courseTitle,
       section: sectionTitle,
       catalogId: course.catalogId,

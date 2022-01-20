@@ -12,6 +12,7 @@ export interface RosterRecord {
   [k: string]: unknown;
   id: number;
   course: {
+    id: number;
     title: string;
     section: string;
     catalogId: string;
@@ -25,7 +26,7 @@ export class RosterRecord implements RosterRecord {
 
   constructor(
     rosterRecord = {
-      course: { title: "", section: "", catalogId: "", instructor: "" },
+      course: { id: -1, title: "", section: "", catalogId: "", instructor: "" },
       student: {
         name: { first: "", middle: "", last: "" },
         id: -1,
