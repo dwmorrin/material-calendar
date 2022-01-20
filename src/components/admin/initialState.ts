@@ -22,6 +22,7 @@ const initialState: AdminState = {
   exceptionsDashboardIsOpen: false,
   fileImportIsOpen: false,
   importClassMeetingsIsOpen: false,
+  importRosterIsOpen: false,
   initialResourcesPending: true,
   locationHoursDialogIsOpen: false,
   recordPage: 0,

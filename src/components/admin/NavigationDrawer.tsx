@@ -202,12 +202,16 @@ const AdminNavigationDrawer: FunctionComponent<
             >
               <Grid container justify="space-between">
                 <Grid item>Import Class Meetings</Grid>
-                <Grid item xs={2}>
-                  <Badge
-                    color="secondary"
-                    badgeContent={exceptionCount}
-                  ></Badge>
-                </Grid>
+              </Grid>
+            </ListItem>
+            <ListItem
+              button
+              onClick={(): void =>
+                dispatch({ type: AdminAction.OpenImportRoster })
+              }
+            >
+              <Grid container justify="space-between">
+                <Grid item>Import Roster</Grid>
               </Grid>
             </ListItem>
           </Accordion>

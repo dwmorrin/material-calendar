@@ -143,6 +143,12 @@ const closeImportClassMeetingDialog: StateHandler = (state) => ({
   resourceFile: null,
 });
 
+const closeImportRoster: StateHandler = (state) => ({
+  ...state,
+  importRosterIsOpen: false,
+  resourceFile: null,
+});
+
 const closeLocationHoursDialog: StateHandler = (state) => ({
   ...state,
   locationHoursDialogIsOpen: false,
@@ -248,6 +254,11 @@ const openExceptionsDashboard: StateHandler = (state) => ({
 const openImportClassMeetings: StateHandler = (state) => ({
   ...state,
   importClassMeetingsIsOpen: true,
+});
+
+const openImportRoster: StateHandler = (state) => ({
+  ...state,
+  importRosterIsOpen: true,
 });
 
 const openLocationHoursDialog: StateHandler = (state, { payload }) => ({
@@ -416,6 +427,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.CloseExceptionsDashboard]: closeExceptionsDashboard,
     [AdminAction.CloseFileImport]: closeFileImport,
     [AdminAction.CloseImportClassMeetingDialog]: closeImportClassMeetingDialog,
+    [AdminAction.CloseImportRoster]: closeImportRoster,
     [AdminAction.CloseLocationHoursDialog]: closeLocationHoursDialog,
     [AdminAction.CloseProjectLocationHoursDialog]:
       closeProjectLocationHoursDialog,
@@ -438,6 +450,7 @@ const reducer: StateHandler = (state, action) =>
       openDetailWithResourceInstance,
     [AdminAction.OpenExceptionsDashboard]: openExceptionsDashboard,
     [AdminAction.OpenImportClassMeetings]: openImportClassMeetings,
+    [AdminAction.OpenImportRoster]: openImportRoster,
     [AdminAction.OpenLocationHoursDialog]: openLocationHoursDialog,
     [AdminAction.OpenProjectLocationHoursDialog]:
       openProjectLocationHoursDialog,

@@ -19,6 +19,7 @@ export enum AdminAction {
   CloseExceptionsDashboard,
   CloseFileImport,
   CloseImportClassMeetingDialog,
+  CloseImportRoster,
   CloseLocationHoursDialog,
   CloseProjectLocationHoursDialog,
   CloseProjectLocationHoursSummaryDialog,
@@ -36,6 +37,7 @@ export enum AdminAction {
   OpenDetailWithResourceInstance,
   OpenExceptionsDashboard,
   OpenImportClassMeetings,
+  OpenImportRoster,
   OpenLocationHoursDialog,
   OpenProjectLocationHoursDialog,
   OpenProjectLocationHoursSummaryDialog,
@@ -71,6 +73,7 @@ export interface AdminState {
   error?: Error;
   exceptionsDashboardIsOpen: boolean;
   importClassMeetingsIsOpen: boolean;
+  importRosterIsOpen: boolean;
   fileImportIsOpen: boolean;
   initialResourcesPending: boolean;
   locationHoursDialogIsOpen: boolean;
