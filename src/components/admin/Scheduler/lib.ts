@@ -190,7 +190,8 @@ export const makeResources = (
 export const makeAllotmentSummaryEvent = (
   p: Project,
   locationId: number,
-  total: number
+  total: number,
+  totalReservedHours: number
 ): SchedulerEventProps => ({
   id: `allotmentTotal${p.id}`,
   start: p.start,
@@ -199,25 +200,42 @@ export const makeAllotmentSummaryEvent = (
   allDay: true,
   title: `${p.title} - Allotted: ${total} - Max: ${
     p.locationHours.find(({ locationId: id }) => id === locationId)?.hours
-  }`,
+  } - Res: ${totalReservedHours}`,
   extendedProps: {
     projectId: p.id,
   },
 });
 
 export const makeAllotmentEventMap =
-  (p: Project) =>
-  (a: Allotment, index: number): SchedulerEventProps => ({
-    ...a,
-    end: addADay(a.end),
-    id: `${Project.allotmentPrefix}${p.id}-${index}`,
-    resourceId: `${Project.allotmentPrefix}${p.id}`,
-    allDay: true,
-    title: "" + a.hours,
-    extendedProps: {
-      projectId: p.id,
-    },
-  });
+  (p: Project, reservations: Event[]) =>
+  (a: Allotment, index: number): SchedulerEventProps => {
+    // get hours of reservations
+    const aStart = parseSQLDate(a.start);
+    const aEnd = parseSQLDate(a.end);
+    const hours = reservations.reduce((acc, event) => {
+      const { start, end } = event;
+      const startTime = parseSQLDatetime(start);
+      if (
+        startTime.valueOf() < aStart.valueOf() ||
+        startTime.valueOf() > aEnd.valueOf()
+      )
+        return acc;
+      const endTime = parseSQLDatetime(end);
+      return acc + differenceInMinutes(endTime, startTime) / 60;
+    }, 0);
+
+    return {
+      ...a,
+      end: addADay(a.end),
+      id: `${Project.allotmentPrefix}${p.id}-${index}`,
+      resourceId: `${Project.allotmentPrefix}${p.id}`,
+      allDay: true,
+      title: `Res:${hours}/Allot:${a.hours}`,
+      extendedProps: {
+        projectId: p.id,
+      },
+    };
+  };
 
 export const getFirstLastAndTotalFromAllotments = (
   [first, last, total]: [Allotment, Allotment, number],
@@ -237,19 +255,34 @@ export const getFirstLastAndTotalFromAllotments = (
 
 export const makeAllotments = (
   projects: Project[],
-  locationId: number
+  locationId: number,
+  locationEvents: Event[]
 ): SchedulerEventProps[] =>
   projects.reduce((allots, p) => {
+    const reservations = locationEvents.filter(
+      (e) => e.reservation && e.reservation.projectId === p.id
+    );
+    const totalReservedHours = reservations.reduce((acc, event) => {
+      const { start, end } = event;
+      const startTime = parseSQLDatetime(start);
+      const endTime = parseSQLDatetime(end);
+      return acc + differenceInMinutes(endTime, startTime) / 60;
+    }, 0);
     const ofInterest = p.allotments?.filter((a) => a.locationId === locationId);
     if (!ofInterest?.length)
-      return [...allots, makeAllotmentSummaryEvent(p, locationId, 0)];
+      return [
+        ...allots,
+        makeAllotmentSummaryEvent(p, locationId, 0, totalReservedHours),
+      ];
     const [, , total] = ofInterest.reduce(getFirstLastAndTotalFromAllotments, [
       {},
       {},
       0,
     ] as [Allotment, Allotment, number]);
-    allots.push(makeAllotmentSummaryEvent(p, locationId, total));
-    allots.push(...ofInterest.map(makeAllotmentEventMap(p)));
+    allots.push(
+      makeAllotmentSummaryEvent(p, locationId, total, totalReservedHours)
+    );
+    allots.push(...ofInterest.map(makeAllotmentEventMap(p, reservations)));
     return allots;
   }, [] as SchedulerEventProps[]);
 

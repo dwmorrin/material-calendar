@@ -97,7 +97,11 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
     eventLocationHoursFilledIn
   );
   const resources = makeResources(projects, selections.locationId, semester);
-  const allotments = makeAllotments(projects, selections.locationId);
+  const allotments = makeAllotments(
+    projects,
+    selections.locationId,
+    locationEvents
+  );
   const events = [
     ...vwEvents,
     ...allotments,
