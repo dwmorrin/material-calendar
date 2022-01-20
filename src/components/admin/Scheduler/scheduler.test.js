@@ -20,7 +20,7 @@ test("makeResources", () =>
     { id: Location.locationHoursId, title: "Daily Location Hours" },
     {
       id: VirtualWeek.hoursRemainingId,
-      title: "Hours Remaining",
+      title: "Not Allotted/Available for Booking",
       eventBackgroundColor: "grey",
     },
   ]));
@@ -120,17 +120,9 @@ test("makeAllotments", () =>
 test("makeDailyHours", () =>
   expect(
     makeDailyHours(
-      {
-        hours: [
-          {
-            date: "2020-06-18",
-            id: 0,
-            hours: 0,
-          },
-        ],
-      },
-      1,
-      { start: "2020-06-18", end: "2020-06-18" }
+      [{ date: "2020-06-18", hours: 1 }], // input array from db
+      2, // number of days... seems derivable from start and end dates
+      { start: "2020-06-18", end: "2020-06-19" } // start and end dates
     )
   ).toEqual([
     [
@@ -139,10 +131,20 @@ test("makeDailyHours", () =>
         id: `${Location.locationHoursId}-0`,
         resourceId: Location.locationHoursId,
         start: "2020-06-18",
+        title: "1",
+      },
+      {
+        allDay: true,
+        id: `${Location.locationHoursId}-1`,
+        resourceId: Location.locationHoursId,
+        start: "2020-06-19",
         title: "0",
       },
     ],
-    [{ date: "2020-06-18", hours: 0 }],
+    [
+      { date: "2020-06-18", hours: 1 },
+      { date: "2020-06-19", hours: 0 },
+    ],
   ]));
 
 test("processVirtualWeeks empty", () =>
@@ -206,7 +208,13 @@ test("processVirtualWeeksAsHoursRemaining adds a day", () =>
         },
       ],
       0,
-      [{ date: "2020-12-31", hours: 0 }]
+      [
+        {
+          start: "2020-12-31 09:00:00",
+          end: "2020-12-31 10:00:00",
+          reservation: {},
+        },
+      ]
     )
   ).toEqual([
     {
@@ -215,6 +223,6 @@ test("processVirtualWeeksAsHoursRemaining adds a day", () =>
       id: "hr0",
       resourceId: VirtualWeek.hoursRemainingId,
       allDay: true,
-      title: "0",
+      title: "0/0",
     },
   ]));

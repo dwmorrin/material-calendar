@@ -12,18 +12,18 @@ import Location from "../../../resources/Location";
 import {
   addDays,
   areIntervalsOverlappingInclusive,
-  compareAscSQLDate,
+  differenceInMinutes,
   isValidSQLDateInterval,
   formatSQLDate,
-  getDayFromNumber,
-  getDayNumberFromSQLDate,
   parseAndFormatFCString,
   parseFCString,
   parseSQLDate,
+  parseSQLDatetime,
   subDays,
 } from "../../../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
 import Semester from "../../../resources/Semester";
+import Event from "../../../resources/Event";
 import { deepEqual } from "fast-equals";
 import { ResourceKey } from "../../../resources/types";
 import { createVirtualWeek } from "./virtualWeeksDialog";
@@ -120,6 +120,25 @@ export const compareCalendarStates = (
   );
 };
 
+// would prefer this to come from the server, but wasn't able to get react to update
+// using useEffect and fetch. It was a mystery.
+export const makeLocationHours = (locationEvents: Event[]): DailyHours[] => {
+  const eventLocationHours = Object.entries(
+    locationEvents.reduce((acc, event) => {
+      const { start, end } = event;
+      const hours =
+        differenceInMinutes(parseSQLDatetime(end), parseSQLDatetime(start)) /
+        60;
+      const day = start.split(" ")[0];
+      if (!(day in acc)) acc[day] = hours;
+      else acc[day] += hours;
+      return acc;
+    }, {} as { [key: string]: number })
+  ).map(([date, hours]) => ({ date, hours }));
+  eventLocationHours.sort((a, b) => a.date.localeCompare(b.date));
+  return eventLocationHours;
+};
+
 export const makeResources = (
   projects: Project[],
   locationId: number,
@@ -162,7 +181,7 @@ export const makeResources = (
     })),
     {
       id: VirtualWeek.hoursRemainingId,
-      title: "Hours Remaining",
+      title: "Not Allotted/Available for Booking",
       eventBackgroundColor: "grey",
     },
   ];
@@ -235,26 +254,20 @@ export const makeAllotments = (
   }, [] as SchedulerEventProps[]);
 
 /**
- * Creates a row of events displaying the numbers of hours available for each date
- * in the semester.
- * Uses either hours returned from the database, or the locations default hours.
+ * sums the event hours
  */
 export const makeDailyHours = (
-  location: Location,
+  dailyHours: { date: string; hours: number }[], // must be sorted ascending
   numberOfDays: number,
   { start }: Semester
 ): [SchedulerEventProps[], DailyHours[]] => {
-  const hours = location.hours.slice();
-  hours.sort(({ date: start }, { date: end }) =>
-    compareAscSQLDate({ start, end })
-  );
   let currentDate = start;
-  let nextHours = hours.shift();
-  let dayPointer = getDayNumberFromSQLDate(currentDate);
-  const hoursAsEvents = [] as SchedulerEventProps[];
-  const hoursForCalc = [] as DailyHours[];
+  let nextHours = dailyHours.shift();
+  const hoursAsEvents: SchedulerEventProps[] = [];
+  const dailyHoursFilledIn: DailyHours[] = [];
   while (hoursAsEvents.length < numberOfDays) {
     if (nextHours && nextHours.date === currentDate) {
+      dailyHoursFilledIn.push({ ...nextHours });
       hoursAsEvents.push({
         id: `${Location.locationHoursId}-${hoursAsEvents.length}`,
         start: nextHours.date,
@@ -262,24 +275,20 @@ export const makeDailyHours = (
         title: "" + nextHours.hours,
         resourceId: Location.locationHoursId,
       });
-      hoursForCalc.push({ date: nextHours.date, hours: nextHours.hours });
-      nextHours = hours.shift();
+      nextHours = dailyHours.shift();
     } else {
-      const day = getDayFromNumber(dayPointer);
-      const hours = location.defaultHours[day];
+      dailyHoursFilledIn.push({ date: currentDate, hours: 0 });
       hoursAsEvents.push({
         id: `${Location.locationHoursId}-${hoursAsEvents.length}`,
         start: currentDate,
         allDay: true,
-        title: String(hours),
+        title: String(0),
         resourceId: Location.locationHoursId,
       });
-      hoursForCalc.push({ date: currentDate, hours });
     }
     currentDate = addADay(currentDate);
-    dayPointer = (dayPointer + 1) % 7;
   }
-  return [hoursAsEvents, hoursForCalc];
+  return [hoursAsEvents, dailyHoursFilledIn];
 };
 
 // need to calculate total hours for each week from the DailyHours
@@ -313,18 +322,54 @@ export const processVirtualWeeks = (
 
 export const processVirtualWeeksAsHoursRemaining = (
   virtualWeeks: (VirtualWeek & { totalHours: number })[],
-  locationId: number
-): SchedulerEventProps[] =>
-  virtualWeeks
+  locationId: number,
+  locationEvents: Event[]
+): SchedulerEventProps[] => {
+  const now = new Date();
+  return virtualWeeks
     .filter((vw) => vw.locationId === locationId)
-    .map((vw) => ({
-      start: vw.start,
-      end: addADay(vw.end),
-      id: `hr${vw.id}`,
-      resourceId: VirtualWeek.hoursRemainingId,
-      allDay: true,
-      title: `${vw.totalHours - vw.projectHours}`,
-    }));
+    .map((vw) => {
+      // get available reservation hours
+      const vwStartDate = parseSQLDate(vw.start);
+      const vwEndDate = parseSQLDate(vw.end);
+      // skip if the virtual week is in the past
+      const available =
+        vwEndDate.valueOf() < now.valueOf()
+          ? 0
+          : locationEvents.reduce(
+              (total, { start, end, reservation, reservable }) => {
+                // skip if not reservable or already reserved
+                if (!reservable || reservation) return total;
+                const startDate = parseSQLDatetime(start);
+                // skip if event is in the past
+                if (startDate.valueOf() < now.valueOf()) return total;
+                // skip if event is outside of the virtual week
+                if (
+                  startDate.valueOf() < vwStartDate.valueOf() ||
+                  startDate.valueOf() > vwEndDate.valueOf()
+                )
+                  return total;
+                return (
+                  total +
+                  differenceInMinutes(
+                    parseSQLDatetime(end),
+                    parseSQLDatetime(start)
+                  ) /
+                    60
+                );
+              },
+              0
+            );
+      return {
+        start: vw.start,
+        end: addADay(vw.end),
+        id: `hr${vw.id}`,
+        resourceId: VirtualWeek.hoursRemainingId,
+        allDay: true,
+        title: `${vw.totalHours - vw.projectHours}/${available}`,
+      };
+    });
+};
 
 export const mostRecent = (a: Semester, b: Semester): Semester =>
   new Date(b.start).valueOf() - new Date(a.start).valueOf() < 0 ? a : b;

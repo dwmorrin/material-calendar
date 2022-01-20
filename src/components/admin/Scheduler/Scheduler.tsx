@@ -10,17 +10,23 @@ import {
   eventClick,
   makeAllotments,
   makeDailyHours,
+  makeLocationHours,
   makeResources,
   processVirtualWeeks,
   processVirtualWeeksAsHoursRemaining,
   resourceClick,
   selectionHandler,
 } from "./lib";
-import { daysInInterval } from "../../../utils/date";
+import {
+  daysInInterval,
+  parseSQLDatetime,
+  differenceInMinutes,
+} from "../../../utils/date";
 import { AdminSelectionProps, AdminUIProps, AdminAction } from "../types";
 import { ResourceKey } from "../../../resources/types";
 import { Button, Fab } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
+import Event from "../../../resources/Event";
 
 const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
   dispatch,
@@ -74,16 +80,21 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
     setSelections({ semesterId: semester.id, locationId: location.id });
   }
 
+  const locationEvents = (
+    state.resources[ResourceKey.Events] as Event[]
+  ).filter((e) => e.location.id === location.id);
+
+  const eventLocationHours = makeLocationHours(locationEvents);
   const numberOfDays = daysInInterval(semester);
-  const [dailyHours, hoursForCalc] = makeDailyHours(
-    location,
+  const [dailyHours, eventLocationHoursFilledIn] = makeDailyHours(
+    eventLocationHours,
     numberOfDays,
     semester
   );
   const [vwEvents, vwForCalc] = processVirtualWeeks(
     virtualWeeks,
     selections.locationId,
-    hoursForCalc
+    eventLocationHoursFilledIn
   );
   const resources = makeResources(projects, selections.locationId, semester);
   const allotments = makeAllotments(projects, selections.locationId);
@@ -91,9 +102,12 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
     ...vwEvents,
     ...allotments,
     ...dailyHours,
-    ...processVirtualWeeksAsHoursRemaining(vwForCalc, selections.locationId),
+    ...processVirtualWeeksAsHoursRemaining(
+      vwForCalc,
+      selections.locationId,
+      locationEvents
+    ),
   ];
-
   return (
     <>
       <FullCalendar
