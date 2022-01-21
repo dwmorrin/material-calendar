@@ -22,11 +22,11 @@ const InvitationAccordion: FC<InvitationListProps> = ({
   user,
   setProjectMembers,
 }) => {
-  const inbox = pendingGroups.filter(({ members }) => {
+  const inbox = pendingGroups.filter(({ members, exceptionalSize }) => {
     const myself = members.find((member) => member.id === user.id);
     if (!myself) throw new Error("can't find you in your own group");
     const { accepted, rejected } = myself.invitation;
-    return !accepted && !rejected;
+    return (!accepted && !rejected) || Boolean(exceptionalSize);
   });
 
   return (
@@ -60,6 +60,7 @@ const InvitationAccordion: FC<InvitationListProps> = ({
       <ListItem>
         <Typography>Inbox</Typography>
       </ListItem>
+      {console.log(pendingGroups)}
       {inbox.map((pendingGroup, i) => (
         <InvitationInboxItem
           key={`invitation-inbox-${i}`}

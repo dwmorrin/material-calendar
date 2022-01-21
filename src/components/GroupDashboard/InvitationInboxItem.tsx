@@ -99,42 +99,44 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   const myself = pendingGroup.members.find(({ id }) => id === user.id);
   if (!myself) throw new Error("can't find you in your own group");
   const unanswered = !myself.invitation.accepted && !myself.invitation.rejected;
-
   return (
     <ListItem>
-      {unanswered && (
-        <List>
-          {pendingGroup.members.map(
-            ({ id, name, invitation: { accepted, rejected } }, i) => (
-              <InvitationMember
-                key={`invitation-${i}-invitee-${id}`}
-                name={name}
-                accepted={accepted}
-                rejected={rejected}
-              />
-            )
-          )}
-          <ButtonGroup variant="contained" color="primary">
-            <Button
-              color="primary"
-              onClick={(): void => onAcceptInvitation(true)}
-              startIcon={<ThumbUpIcon />}
-            >
-              Accept Invitation
-            </Button>
-            <Button
-              color="secondary"
-              onClick={(): void => onAcceptInvitation(false)}
-              endIcon={<ThumbDownIcon />}
-            >
-              Decline Invitation
-            </Button>
-          </ButtonGroup>
-        </List>
-      )}
-      {!unanswered && pendingGroup.exceptionalSize && (
-        <b>Group is an exceptional size and requires admin approval.</b>
-      )}
+      {unanswered ||
+        (pendingGroup.exceptionalSize && (
+          <List>
+            {pendingGroup.members.map(
+              ({ id, name, invitation: { accepted, rejected } }, i) => (
+                <InvitationMember
+                  key={`invitation-${i}-invitee-${id}`}
+                  name={name}
+                  accepted={accepted}
+                  rejected={rejected}
+                />
+              )
+            )}
+            {unanswered && (
+              <ButtonGroup variant="contained" color="primary">
+                <Button
+                  color="primary"
+                  onClick={(): void => onAcceptInvitation(true)}
+                  startIcon={<ThumbUpIcon />}
+                >
+                  Accept Invitation
+                </Button>
+                <Button
+                  color="secondary"
+                  onClick={(): void => onAcceptInvitation(false)}
+                  endIcon={<ThumbDownIcon />}
+                >
+                  Decline Invitation
+                </Button>
+              </ButtonGroup>
+            )}
+            {Boolean(pendingGroup.exceptionalSize) && (
+              <b>Group is an exceptional size and requires admin approval.</b>
+            )}
+          </List>
+        ))}
     </ListItem>
   );
 };
