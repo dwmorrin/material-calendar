@@ -22,8 +22,9 @@ import {
   subDays,
 } from "../../../utils/date";
 import { scaleOrdinal, schemeCategory10 } from "d3";
-import Semester from "../../../resources/Semester";
 import Event from "../../../resources/Event";
+import RosterRecord from "../../../resources/RosterRecord";
+import Semester from "../../../resources/Semester";
 import { deepEqual } from "fast-equals";
 import { ResourceKey } from "../../../resources/types";
 import { createVirtualWeek } from "./virtualWeeksDialog";
@@ -77,6 +78,13 @@ interface DailyHours {
   date: string;
   hours: number;
 }
+interface ProjectInfo {
+  [key: number]: {
+    students: number;
+    groupNumberEstimate: number;
+    groupHoursEstimate: number;
+  };
+}
 
 //--- MODULE CONSTANTS ---
 
@@ -120,6 +128,33 @@ export const compareCalendarStates = (
   );
 };
 
+export const getProjectInfo = (
+  projects: Project[],
+  rosterRecords: RosterRecord[]
+): ProjectInfo => {
+  // counting # of students in each project to calculate # of groups
+  // and hours required for each project
+  return projects.reduce((acc, project) => {
+    // record has course.id, course.section (title)
+    // project has course.id, course.sections (array of titles)
+    const count = rosterRecords.reduce(
+      (sum, record) =>
+        record.course.id === project.course.id &&
+        project.course.sections.includes(record.course.section)
+          ? sum + 1
+          : sum,
+      0
+    );
+    const groups = Math.ceil(count / project.groupSize);
+    acc[project.id] = {
+      students: count,
+      groupNumberEstimate: groups,
+      groupHoursEstimate: groups * project.groupAllottedHours,
+    };
+    return acc;
+  }, {} as ProjectInfo);
+};
+
 // would prefer this to come from the server, but wasn't able to get react to update
 // using useEffect and fetch. It was a mystery.
 export const makeLocationHours = (locationEvents: Event[]): DailyHours[] => {
@@ -142,8 +177,10 @@ export const makeLocationHours = (locationEvents: Event[]): DailyHours[] => {
 export const makeResources = (
   projects: Project[],
   locationId: number,
-  semester: Semester
+  semester: Semester,
+  rosterRecords: RosterRecord[]
 ): ProjectResource[] => {
+  const projectInfo = getProjectInfo(projects, rosterRecords);
   const overlapsSemester = areIntervalsOverlappingInclusive({
     start: parseSQLDate(semester.start),
     end: parseSQLDate(semester.end),
@@ -174,7 +211,9 @@ export const makeResources = (
     })),
     ...projectsOfInterest.map((project) => ({
       id: `${Project.allotmentPrefix}${project.id}`,
-      title: `Allotments (Global total: ${project.totalAllottedHours})`,
+      title: `Allotments (Global total: ${project.totalAllottedHours}/${
+        projectInfo[project.id].groupHoursEstimate
+      })`,
       parentId: project.id,
       eventBackgroundColor: getColor("" + project.id),
       extendedProps: { projectId: project.id },
@@ -191,16 +230,17 @@ export const makeAllotmentSummaryEvent = (
   p: Project,
   locationId: number,
   total: number,
-  totalReservedHours: number
+  totalReservedHours: number,
+  neededHours: number
 ): SchedulerEventProps => ({
   id: `allotmentTotal${p.id}`,
   start: p.start,
   end: addADay(p.end),
   resourceId: String(p.id),
   allDay: true,
-  title: `${p.title} - Allotted: ${total} - Max: ${
+  title: `${p.title} |A:${total}|M:${
     p.locationHours.find(({ locationId: id }) => id === locationId)?.hours
-  } - Res: ${totalReservedHours}`,
+  }|R:${totalReservedHours}|N:${neededHours}`,
   extendedProps: {
     projectId: p.id,
   },
@@ -256,9 +296,11 @@ export const getFirstLastAndTotalFromAllotments = (
 export const makeAllotments = (
   projects: Project[],
   locationId: number,
-  locationEvents: Event[]
-): SchedulerEventProps[] =>
-  projects.reduce((allots, p) => {
+  locationEvents: Event[],
+  rosterRecords: RosterRecord[]
+): SchedulerEventProps[] => {
+  const projectInfo = getProjectInfo(projects, rosterRecords);
+  return projects.reduce((allots, p) => {
     const reservations = locationEvents.filter(
       (e) => e.reservation && e.reservation.projectId === p.id
     );
@@ -272,7 +314,13 @@ export const makeAllotments = (
     if (!ofInterest?.length)
       return [
         ...allots,
-        makeAllotmentSummaryEvent(p, locationId, 0, totalReservedHours),
+        makeAllotmentSummaryEvent(
+          p,
+          locationId,
+          0,
+          totalReservedHours,
+          projectInfo[p.id].groupHoursEstimate
+        ),
       ];
     const [, , total] = ofInterest.reduce(getFirstLastAndTotalFromAllotments, [
       {},
@@ -280,11 +328,18 @@ export const makeAllotments = (
       0,
     ] as [Allotment, Allotment, number]);
     allots.push(
-      makeAllotmentSummaryEvent(p, locationId, total, totalReservedHours)
+      makeAllotmentSummaryEvent(
+        p,
+        locationId,
+        total,
+        totalReservedHours,
+        projectInfo[p.id].groupHoursEstimate
+      )
     );
     allots.push(...ofInterest.map(makeAllotmentEventMap(p, reservations)));
     return allots;
   }, [] as SchedulerEventProps[]);
+};
 
 /**
  * sums the event hours

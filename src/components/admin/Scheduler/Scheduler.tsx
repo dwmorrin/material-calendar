@@ -17,16 +17,13 @@ import {
   resourceClick,
   selectionHandler,
 } from "./lib";
-import {
-  daysInInterval,
-  parseSQLDatetime,
-  differenceInMinutes,
-} from "../../../utils/date";
+import { daysInInterval } from "../../../utils/date";
 import { AdminSelectionProps, AdminUIProps, AdminAction } from "../types";
 import { ResourceKey } from "../../../resources/types";
 import { Button, Fab } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import Event from "../../../resources/Event";
+import RosterRecord from "../../../resources/RosterRecord";
 
 const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
   dispatch,
@@ -37,6 +34,9 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
   const { ref } = state;
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const projects = state.resources[ResourceKey.Projects] as Project[];
+  const rosterRecords = state.resources[
+    ResourceKey.RosterRecords
+  ] as RosterRecord[];
   const virtualWeeks = state.resources[
     ResourceKey.VirtualWeeks
   ] as VirtualWeek[];
@@ -96,11 +96,17 @@ const Scheduler: FunctionComponent<AdminUIProps & AdminSelectionProps> = ({
     selections.locationId,
     eventLocationHoursFilledIn
   );
-  const resources = makeResources(projects, selections.locationId, semester);
+  const resources = makeResources(
+    projects,
+    selections.locationId,
+    semester,
+    rosterRecords
+  );
   const allotments = makeAllotments(
     projects,
     selections.locationId,
-    locationEvents
+    locationEvents,
+    rosterRecords
   );
   const events = [
     ...vwEvents,
