@@ -64,7 +64,7 @@ const InvitationSent: FC<InvitationItemProps> = ({
             />
           )
         )}
-        {pendingGroup.pending && pendingGroup.exceptionalSize && (
+        {pendingGroup.pending && Boolean(pendingGroup.exceptionalSize) && (
           <InvitationMember
             name={"Exceptional size: waiting on admin approval"}
             accepted={false}
