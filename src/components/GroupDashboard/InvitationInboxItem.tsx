@@ -99,10 +99,9 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
   const myself = pendingGroup.members.find(({ id }) => id === user.id);
   if (!myself) throw new Error("can't find you in your own group");
   const unanswered = !myself.invitation.accepted && !myself.invitation.rejected;
-
   return (
     <ListItem>
-      {unanswered && (
+      {(Boolean(pendingGroup.exceptionalSize) || unanswered) && (
         <List>
           {pendingGroup.members.map(
             ({ id, name, invitation: { accepted, rejected } }, i) => (
@@ -114,26 +113,28 @@ const InvitationInboxItem: FC<InvitationItemProps> = ({
               />
             )
           )}
-          <ButtonGroup variant="contained" color="primary">
-            <Button
-              color="primary"
-              onClick={(): void => onAcceptInvitation(true)}
-              startIcon={<ThumbUpIcon />}
-            >
-              Accept Invitation
-            </Button>
-            <Button
-              color="secondary"
-              onClick={(): void => onAcceptInvitation(false)}
-              endIcon={<ThumbDownIcon />}
-            >
-              Decline Invitation
-            </Button>
-          </ButtonGroup>
+          {unanswered && (
+            <ButtonGroup variant="contained" color="primary">
+              <Button
+                color="primary"
+                onClick={(): void => onAcceptInvitation(true)}
+                startIcon={<ThumbUpIcon />}
+              >
+                Accept Invitation
+              </Button>
+              <Button
+                color="secondary"
+                onClick={(): void => onAcceptInvitation(false)}
+                endIcon={<ThumbDownIcon />}
+              >
+                Decline Invitation
+              </Button>
+            </ButtonGroup>
+          )}
+          {Boolean(pendingGroup.exceptionalSize) && (
+            <b>Group is an exceptional size and requires admin approval.</b>
+          )}
         </List>
-      )}
-      {!unanswered && pendingGroup.exceptionalSize && (
-        <b>Group is an exceptional size and requires admin approval.</b>
       )}
     </ListItem>
   );
