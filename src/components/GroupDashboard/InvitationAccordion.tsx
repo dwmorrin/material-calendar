@@ -65,7 +65,6 @@ const InvitationAccordion: FC<InvitationListProps> = ({
       <ListItem>
         <Typography>Inbox</Typography>
       </ListItem>
-      {console.log(pendingGroups)}
       {inbox.map((pendingGroup, i) => (
         <InvitationInboxItem
           key={`invitation-inbox-${i}`}
