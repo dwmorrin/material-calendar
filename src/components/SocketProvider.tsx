@@ -71,9 +71,18 @@ const listen = (
         case SocketMessageKind.ReservationChanged: {
           const { eventId, groupId, projectId, reservationId } =
             data[0] as ReservationChangePayload;
-          if (!eventId || !groupId || !projectId || !reservationId) {
+          if (!eventId || !groupId || !projectId /*|| !reservationId */) {
             return console.error("invalid reservation change message", arg);
           }
+          setSocketState({
+            reservationChanged: true,
+            reservationChangePayload: {
+              eventId,
+              groupId,
+              projectId,
+              reservationId,
+            },
+          });
           break;
         }
         case SocketMessageKind.Test:

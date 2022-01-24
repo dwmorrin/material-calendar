@@ -133,6 +133,7 @@ const SocketCalendarEffect =
         })
         .catch(onError);
       // fetch and update reservation info
+      /*
       const reservations = state.resources[
         ResourceKey.Reservations
       ] as Reservation[];
@@ -156,6 +157,7 @@ const SocketCalendarEffect =
           })
           .catch(onError);
       }
+      */
     }
   };
 
