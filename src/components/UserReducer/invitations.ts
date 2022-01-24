@@ -29,6 +29,7 @@ export const createdInvitationReceived: StateHandler = (state, action) => {
   return displayMessage(
     {
       ...state,
+      currentGroup: payload.currentGroup,
       resources: {
         ...state.resources,
         ...action.payload?.resources,

@@ -60,9 +60,14 @@ const createGroup = ({
       if (!Array.isArray(members))
         throw new Error("No project member info received");
       setProjectMembers(members.map((m) => new User(m)));
+      const updatedGroups = groups.map((g) => new UserGroup(g));
+      const currentGroup = updatedGroups.find(
+        ({ projectId }) => projectId === project.id
+      );
       dispatch({
         type: CalendarAction.CreatedInvitationReceived,
         payload: {
+          currentGroup,
           resources: {
             [ResourceKey.Groups]: groups.map((g) => new UserGroup(g)),
           },
