@@ -119,24 +119,21 @@ export const submitHandler =
           : "Your Reservation has been made!";
 
         // send reservation info to an external service
-        if (process.env.REACT_APP_RESERVATION_FORM_PUSH_URL) {
-          fetch(process.env.REACT_APP_RESERVATION_FORM_PUSH_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formToSubmit),
+        fetch(Reservation.forwardUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formToSubmit),
+        })
+          .then((res) => {
+            if (res.ok) return res.json();
           })
-            .then((res) => {
-              if (res.ok) return res.json();
-            })
-            .then(({ error }) => {
-              if (error)
-                throw new Error(
-                  process.env.REACT_APP_RESERVATION_FORM_PUSH_ERROR ||
-                    "Error sending push notification - check with the server administrator"
-                );
-            })
-            .catch(onError);
-        }
+          .then(({ error }) => {
+            if (error)
+              throw new Error(
+                "Error forwarding reservation to external service"
+              );
+          })
+          .catch(onError);
 
         // send reservation info to currently connected users
         broadcast(SocketMessageKind.ReservationChanged, {
