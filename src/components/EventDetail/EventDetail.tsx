@@ -41,6 +41,7 @@ import Event from "../../resources/Event";
 import CancelationDialog from "../CancelationDialog";
 import EventBookButton from "./EventBookButton";
 import { addMinutes } from "date-fns/esm";
+import { useSocket } from "../SocketProvider";
 
 const transition = makeTransition("left");
 
@@ -63,6 +64,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   state,
 }) => {
   const { isAdmin, user } = useAuth();
+  const { broadcast } = useSocket();
   const [cancelationDialogIsOpen, setCancelationDialogIsOpen] = useState(false);
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const [usedHours, setUsedHours] = useState<ProjectHours[]>(
@@ -423,6 +425,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       {isAdmin && <ReservationFormAdmin dispatch={dispatch} state={state} />}
       {!!state.currentEvent.reservation && (
         <CancelationDialog
+          broadcast={broadcast}
           state={state}
           dispatch={dispatch}
           open={cancelationDialogIsOpen}

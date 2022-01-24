@@ -16,10 +16,15 @@ import UserGroup from "../resources/UserGroup";
 import Event from "../resources/Event";
 import { Mail, adminEmail, groupTo } from "../utils/mail";
 import { formatDatetime, isBefore, nowInServerTimezone } from "../utils/date";
+import { SocketMessageKind, ReservationChangePayload } from "./SocketProvider";
 
 const transition = makeTransition("left");
 
 interface CancelationDialogProps extends CalendarUIProps {
+  broadcast: (
+    message: SocketMessageKind,
+    payload: ReservationChangePayload
+  ) => void;
   open: boolean;
   setOpen: (state: boolean) => void;
   cancelationApprovalCutoff: Date;
@@ -28,6 +33,7 @@ interface CancelationDialogProps extends CalendarUIProps {
 }
 
 const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
+  broadcast,
   dispatch,
   state,
   open,
@@ -118,6 +124,13 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         const updatedCurrentEvent: Event =
           events.find(({ id }) => id === currentEvent.id) || new Event();
 
+        // send reservation info to currently connected users
+        broadcast(SocketMessageKind.ReservationChanged, {
+          eventId: updatedCurrentEvent.id,
+          reservationId: reservation.id,
+          groupId: group.id,
+          projectId: project.id,
+        });
         setOpen(false);
         dispatch({
           type: CalendarAction.ReceivedReservationCancelation,
