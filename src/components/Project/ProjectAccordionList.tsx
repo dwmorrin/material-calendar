@@ -29,12 +29,12 @@ const ProjectAccordionList: FunctionComponent<
   const courseProjects = projects.filter(
     (p) => p.course.title === course.title
   );
-  const checked = courseProjects.every(({ id }) =>
-    selections.projectIds.includes(id)
-  );
-  const indeterminate =
-    !checked &&
-    courseProjects.some(({ id }) => selections.projectIds.includes(id));
+  // const checked = courseProjects.every(({ id }) =>
+  //   selections.projectIds.includes(id)
+  // );
+  // const indeterminate =
+  //   !checked &&
+  //   courseProjects.some(({ id }) => selections.projectIds.includes(id));
 
   return (
     <Accordion>
@@ -48,7 +48,8 @@ const ProjectAccordionList: FunctionComponent<
       >
         <Grid container justify="space-between">
           <Grid item>
-            <FormControlLabel
+            <ListItemText primary={course.title} />
+            {/* <FormControlLabel
               aria-label="Acknowledge"
               checked={checked}
               control={<Checkbox indeterminate={indeterminate} />}
@@ -74,7 +75,7 @@ const ProjectAccordionList: FunctionComponent<
                   projectIds,
                 });
               }}
-            />
+            /> */}
           </Grid>
           <Grid item>
             <Badge

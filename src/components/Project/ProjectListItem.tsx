@@ -5,6 +5,7 @@ import {
   CalendarUISelectionProps,
 } from "../types";
 import {
+  ButtonBase,
   Checkbox,
   Grid,
   IconButton,
@@ -29,20 +30,20 @@ const ProjectListItem: FC<ProjectListItemProps & CalendarUISelectionProps> = ({
   setSelections,
   invitations,
 }) => {
-  const toggleProjectSelected = (
-    event: React.ChangeEvent<unknown>,
-    checked: boolean
-  ): void => {
-    event.stopPropagation();
-    const { projectIds } = selections;
-    if (checked && !projectIds.includes(project.id))
-      setSelections({ ...selections, projectIds: [...projectIds, project.id] });
-    else if (!checked && projectIds.includes(project.id))
-      setSelections({
-        ...selections,
-        projectIds: projectIds.filter((id) => id !== project.id),
-      });
-  };
+  // const toggleProjectSelected = (
+  //   event: React.ChangeEvent<unknown>,
+  //   checked: boolean
+  // ): void => {
+  //   event.stopPropagation();
+  //   const { projectIds } = selections;
+  //   if (checked && !projectIds.includes(project.id))
+  //     setSelections({ ...selections, projectIds: [...projectIds, project.id] });
+  //   else if (!checked && projectIds.includes(project.id))
+  //     setSelections({
+  //       ...selections,
+  //       projectIds: projectIds.filter((id) => id !== project.id),
+  //     });
+  // };
 
   const openProjectDashboard = (event: React.MouseEvent): void => {
     event.stopPropagation();
@@ -56,9 +57,15 @@ const ProjectListItem: FC<ProjectListItemProps & CalendarUISelectionProps> = ({
     <ListItem
       button
       key={project.id}
-      onClick={(event): void => event.stopPropagation()}
+      onClick={(event): void => {
+        event.stopPropagation();
+        openProjectDashboard(event);
+      }}
     >
-      <Grid container justify="space-between">
+      <Badge color="secondary" badgeContent={invitations}>
+        <ListItemText primary={project.title} />
+      </Badge>
+      {/* <Grid container justify="space-between">
         <Grid item xs={9}>
           <FormControlLabel
             checked={selections.projectIds.includes(project.id)}
@@ -75,7 +82,7 @@ const ProjectListItem: FC<ProjectListItemProps & CalendarUISelectionProps> = ({
             </Badge>
           </IconButton>
         </Grid>
-      </Grid>
+      </Grid> */}
     </ListItem>
   );
 };
