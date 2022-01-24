@@ -72,6 +72,24 @@ const closeSnackbar: StateHandler = (state) => {
   return { ...state, snackbarQueue };
 };
 
+const navigateBefore: StateHandler = (state, action) => {
+  if (!state.ref?.current) {
+    return impossibleState(state, action, "no calendar reference");
+  }
+  state.ref.current.getApi().prev();
+  const currentStart = state.ref.current.getApi().getDate();
+  return { ...state, currentStart };
+};
+
+const navigateNext: StateHandler = (state, action) => {
+  if (!state.ref?.current) {
+    return impossibleState(state, action, "no calendar reference");
+  }
+  state.ref.current.getApi().next();
+  const currentStart = state.ref.current.getApi().getDate();
+  return { ...state, currentStart };
+};
+
 const pickedDate: StateHandler = (state, action) => {
   const { payload } = action;
   if (!payload?.currentStart) {
@@ -139,6 +157,8 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.FoundStaleCurrentEvent]: foundStaleCurrentEvent,
     [CalendarAction.JoinedGroup]: joinedGroup,
     [CalendarAction.LeftGroup]: leftGroup,
+    [CalendarAction.NavigateBefore]: navigateBefore,
+    [CalendarAction.NavigateNext]: navigateNext,
     [CalendarAction.OpenEventDetail]: openEventDetail,
     [CalendarAction.OpenEventEditor]: openEventEditor,
     [CalendarAction.OpenGroupDashboard]: openGroupDashboard,

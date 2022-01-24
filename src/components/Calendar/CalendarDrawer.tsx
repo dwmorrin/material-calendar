@@ -3,6 +3,8 @@ import {
   Grid,
   List,
   ListItem,
+  ListItemIcon,
+  ListItemText,
   SwipeableDrawer,
   Typography,
 } from "@material-ui/core";
@@ -16,6 +18,7 @@ import ProjectList from "../Project/ProjectList";
 import Location from "../../resources/Location";
 import UserGroup from "../../resources/UserGroup";
 import { ResourceKey } from "../../resources/types";
+import MeetingRoomIcon from "@material-ui/icons/MeetingRoom";
 
 const CalendarDrawer: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
@@ -71,7 +74,11 @@ const CalendarDrawer: FunctionComponent<
           setSelections={setSelections}
         />
         <ListItem>
-          <Typography variant="body1">Rooms</Typography>
+          <ListItemIcon>
+            <MeetingRoomIcon />
+          </ListItemIcon>
+          <ListItemText primary="Locations" />
+          {/* <Typography variant="body1">Rooms</Typography> */}
         </ListItem>
         <LocationList
           dispatch={dispatch}

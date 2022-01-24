@@ -2,12 +2,18 @@ import React, { FC } from "react";
 import { CalendarUIProps, CalendarUISelectionProps } from "../types";
 import ProjectAccordionList from "./ProjectAccordionList";
 import ProjectListItem from "./ProjectListItem";
-import { ListItem, Typography } from "@material-ui/core";
+import {
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@material-ui/core";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import Course from "../../resources/Course";
 import UserGroup from "../../resources/UserGroup";
 import { useAuth } from "../AuthProvider";
+import SchoolIcon from "@material-ui/icons/School";
 
 type CourseProjects = Record<number, Project[]>;
 
@@ -50,7 +56,11 @@ const ProjectList: FC<
     <div>
       {projects.length ? (
         <ListItem>
-          <Typography variant="body1">Courses</Typography>
+          <ListItemIcon>
+            <SchoolIcon />
+          </ListItemIcon>
+          {/* <Typography variant="h4">Courses</Typography> */}
+          <ListItemText primary="Courses" />
         </ListItem>
       ) : (
         ""

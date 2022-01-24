@@ -13,6 +13,8 @@ import {
   makeStyles,
   Badge,
 } from "@material-ui/core";
+import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
+import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import MenuIcon from "@material-ui/icons/Menu";
 import TodayIcon from "@material-ui/icons/Today";
 import ViewMenu from "../ViewMenu";
@@ -50,6 +52,15 @@ const CalendarBar: FunctionComponent<
             <MenuIcon />
           </Badge>
         </IconButton>
+        {/* NAVIGATE BEFORE ISSUE: LOSES SYNC WITH STATE.CURRENTDATE */}
+        {/* <IconButton
+          color="inherit"
+          onClick={(): void => {
+            dispatch({ type: CalendarAction.NavigateBefore });
+          }}
+        >
+          <NavigateBeforeIcon />
+        </IconButton> */}
         <Button
           endIcon={<ExpandMoreIcon />}
           className={classes.title}
@@ -64,6 +75,15 @@ const CalendarBar: FunctionComponent<
             })}
           </Typography>
         </Button>
+        {/* NAVIGATE NEXT ISSUE: LOSES SYNC WITH STATE.CURRENTDATE */}
+        {/* <IconButton
+          color="inherit"
+          onClick={(): void => {
+            dispatch({ type: CalendarAction.NavigateNext });
+          }}
+        >
+          <NavigateNextIcon />
+        </IconButton> */}
 
         <IconButton
           color="inherit"

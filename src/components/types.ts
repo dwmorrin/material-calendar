@@ -27,6 +27,8 @@ export enum CalendarAction {
   FoundStaleCurrentEvent,
   JoinedGroup,
   LeftGroup,
+  NavigateBefore,
+  NavigateNext,
   OpenEventDetail,
   OpenEventEditor,
   OpenGroupDashboard,
