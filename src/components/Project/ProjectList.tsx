@@ -15,7 +15,7 @@ import UserGroup from "../../resources/UserGroup";
 import { useAuth } from "../AuthProvider";
 import SchoolIcon from "@material-ui/icons/School";
 
-type CourseProjects = Record<number, Project[]>;
+type CourseProjects = Record<number, Project[] | undefined>;
 
 const ProjectList: FC<
   CalendarUIProps & CalendarUISelectionProps & { invitations: UserGroup[] }
@@ -36,6 +36,7 @@ const ProjectList: FC<
   let courseProjects: CourseProjects = {};
 
   //! TEMPORARY HACK - needs to fix display of course/project to instructors
+  // adding checks for undefined, but this needs a review
   if (isInstructor) {
     courseProjects = courses.reduce((acc, c) => {
       if (classMeetingProject) acc[c.id] = [classMeetingProject];
@@ -47,7 +48,9 @@ const ProjectList: FC<
         course: { id },
       } = p;
       if (!(id in acc)) acc[id] = [p];
-      else acc[id].push(p);
+      else if (Array.isArray(acc[id])) {
+        (acc[id] as Project[]).push(p);
+      }
       return acc;
     }, {} as CourseProjects);
   }
@@ -67,7 +70,9 @@ const ProjectList: FC<
       )}
       {courses &&
         courses.map((course, index) => {
-          if (courseProjects[course.id].length > 1)
+          const tbd = courseProjects[course.id];
+          if (!Array.isArray(tbd) || !tbd.length) return null;
+          if (tbd.length > 1)
             return (
               <ProjectAccordionList
                 key={`${index}_exp_list`}
@@ -79,7 +84,7 @@ const ProjectList: FC<
                 setSelections={setSelections}
               />
             );
-          const project = courseProjects[course.id][0];
+          const project = tbd[0];
           return (
             <ProjectListItem
               key={project.id}
