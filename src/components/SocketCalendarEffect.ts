@@ -31,7 +31,9 @@ const SocketCalendarEffect =
   (): ReturnType<EffectCallback> => {
     const onError = (error: Error): void =>
       dispatch({ type: CalendarAction.Error, payload: { error } });
+
     if (eventsChanged) {
+      setSocketState({ eventsChanged: false });
       // TODO: limit the number of events fetched and updated
       // current approach is brute force - reload ALL events
       // when the total number of events becomes large, this could be bad
@@ -42,7 +44,6 @@ const SocketCalendarEffect =
         .then(({ error, data }) => {
           if (error) return onError(error);
           if (!data) return onError(new Error("No event data"));
-          setSocketState({ eventsChanged: false });
           dispatch({
             type: CalendarAction.ReceivedResource,
             meta: ResourceKey.Events,
@@ -58,6 +59,7 @@ const SocketCalendarEffect =
         })
         .catch(onError);
     }
+
     if (eventLocked) {
       setSocketState({ eventLocked: false });
       dispatch({
@@ -65,6 +67,7 @@ const SocketCalendarEffect =
         meta: eventLockId,
       });
     }
+
     if (eventUnlocked) {
       setSocketState({ eventUnlocked: false });
       dispatch({
@@ -72,11 +75,13 @@ const SocketCalendarEffect =
         meta: eventLockId,
       });
     }
+
     if (reservationChanged) {
       setSocketState({ reservationChanged: false });
       const { eventId, groupId, projectId, reservationId } =
         reservationChangePayload;
       const projects = user.projects.filter((p) => p.id === projectId);
+      // Only update the project if the user is a member of the project
       if (projects.length) {
         // fetch and update project info
         fetch(`${Project.url}/${projectId}`)
@@ -97,6 +102,7 @@ const SocketCalendarEffect =
         const group = (
           state.resources[ResourceKey.Groups] as UserGroup[]
         ).filter((g) => g.id === groupId);
+        // only update the group if the user is a member of the group
         if (group) {
           fetch(`${UserGroup.url}/${groupId}`)
             .then((res) => res.json())
@@ -116,22 +122,27 @@ const SocketCalendarEffect =
         }
       }
       // fetch and update event info
-      // TODO constrain to events in the current calendar view
-      fetch(`${Event.url}/${eventId}`)
-        .then((res) => res.json())
-        .then(({ error, data }) => {
-          if (error) return onError(error);
-          if (!data) return onError(new Error("No event data"));
-          dispatch({
-            type: CalendarAction.UpdatedOneEvent,
-            payload: {
-              resources: {
-                [ResourceKey.Events]: [new Event(data as Event)],
+      const event = (state.resources[ResourceKey.Events] as Event[]).find(
+        (e) => e.id === eventId
+      );
+      // only if the user has the event in their current state
+      if (event) {
+        fetch(`${Event.url}/${eventId}`)
+          .then((res) => res.json())
+          .then(({ error, data }) => {
+            if (error) return onError(error);
+            if (!data) return onError(new Error("No event data"));
+            dispatch({
+              type: CalendarAction.UpdatedOneEvent,
+              payload: {
+                resources: {
+                  [ResourceKey.Events]: [new Event(data as Event)],
+                },
               },
-            },
-          });
-        })
-        .catch(onError);
+            });
+          })
+          .catch(onError);
+      }
       // fetch and update reservation info
       /*
       const reservations = state.resources[

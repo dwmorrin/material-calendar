@@ -89,15 +89,13 @@ export const updatedOneProject: StateHandler = (state, action) => {
   const project = action.payload.resources[ResourceKey.Projects][0] as Project;
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const index = projects.findIndex((p) => p.id === project.id);
-  if (index === -1)
-    return impossibleState(state, action, "non-existent project");
   return {
     ...state,
     currentProject:
       state.currentProject?.id === project.id ? project : state.currentProject,
     resources: {
       ...state.resources,
-      [ResourceKey.Projects]: arrayUpdateAt<Project>(projects, index, project),
+      [ResourceKey.Projects]: arrayUpdateAt(projects, index, project),
     },
   };
 };

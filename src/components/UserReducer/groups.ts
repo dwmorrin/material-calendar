@@ -3,7 +3,7 @@ import { StateHandler } from "./types";
 import { ResourceKey } from "../../resources/types";
 import UserGroup from "../../resources/UserGroup";
 
-import { impossibleState, missingResource } from "./errorRedirect";
+import { missingResource } from "./errorRedirect";
 import displayMessage from "./displayMessage";
 
 import { closeProjectDashboard } from "./projects";
@@ -94,7 +94,6 @@ export const updatedOneGroup: StateHandler = (state, action) => {
   const group = action.payload.resources[ResourceKey.Groups][0] as UserGroup;
   const groups = state.resources[ResourceKey.Groups] as UserGroup[];
   const index = groups.findIndex((g) => g.id === group.id);
-  if (index === -1) return impossibleState(state, action, "group not found");
   return {
     ...state,
     currentGroup:

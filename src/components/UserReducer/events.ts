@@ -4,32 +4,9 @@ import { StateHandler } from "./types";
 
 import Event from "../../resources/Event";
 
-import { impossibleState, missingResource } from "./errorRedirect";
+import { missingResource } from "./errorRedirect";
 import { receivedResource } from "./resources";
 import arrayUpdateAt from "./arrayUpdateAt";
-
-//***** HELPER FUNCTIONS
-
-const mergeEvents = (events: Event[], event: Event, index: number): Event[] =>
-  arrayUpdateAt<Event>(events, index, event);
-
-const getEventIndex: (s: CalendarState, e: Event) => number = (state, e) => {
-  const events = state.resources[ResourceKey.Events] as Event[];
-  return events.findIndex(({ id }) => id === e.id);
-};
-
-// returns [error, event[]]: check for error
-const getMergedEvents: (s: CalendarState, e: Event) => [boolean, Event[]] = (
-  state,
-  e
-) => {
-  const events = state.resources[ResourceKey.Events] as Event[];
-  const index = getEventIndex(state, e);
-  if (index < 0) return [true, events];
-  return [false, mergeEvents(events, e, index)];
-};
-
-//***** END HELPER FUNCTIONS
 
 export const closeEventDetail: StateHandler = (state) => ({
   ...state,
@@ -70,7 +47,7 @@ const eventLockHandler = (
     currentEvent,
     resources: {
       ...state.resources,
-      [ResourceKey.Events]: mergeEvents(events, event, eventIndex),
+      [ResourceKey.Events]: arrayUpdateAt(events, eventIndex, event),
     },
   };
 };
@@ -90,7 +67,7 @@ export const foundStaleCurrentEvent: StateHandler = (state, { payload }) => {
       currentEvent: event,
       resources: {
         ...state.resources,
-        [ResourceKey.Events]: mergeEvents(events, event, index),
+        [ResourceKey.Events]: arrayUpdateAt(events, index, event),
       },
     };
   }
@@ -160,15 +137,15 @@ export const updatedOneEvent: StateHandler = (state, action) => {
   if (!action.payload?.resources)
     return missingResource(state, action, "no payload");
   const event = action.payload.resources[ResourceKey.Events][0] as Event;
-  const [err, events] = getMergedEvents(state, event);
-  if (err) return impossibleState(state, action, "non-existent event");
+  const events = state.resources[ResourceKey.Events] as Event[];
+  const index = events.findIndex(({ id }) => id === event.id);
   return {
     ...state,
     currentEvent:
       state.currentEvent?.id === event.id ? event : state.currentEvent,
     resources: {
       ...state.resources,
-      [ResourceKey.Events]: events,
+      [ResourceKey.Events]: arrayUpdateAt(events, index, event),
     },
   };
 };
@@ -179,8 +156,8 @@ export const updatedEventReceived: StateHandler = (state, action) => {
   const { currentEvent } = payload;
   if (!currentEvent)
     return missingResource(state, action, "no event after update");
-  const [err, mergedEvents] = getMergedEvents(state, currentEvent);
-  if (err) return impossibleState(state, action, "non-existent event");
+  const events = state.resources[ResourceKey.Events] as Event[];
+  const index = events.findIndex(({ id }) => id === currentEvent.id);
   return closeEventEditor(
     selectedEvent(
       {
@@ -188,7 +165,7 @@ export const updatedEventReceived: StateHandler = (state, action) => {
           ...action,
           payload: {
             resources: {
-              [ResourceKey.Events]: mergedEvents,
+              [ResourceKey.Events]: arrayUpdateAt(events, index, currentEvent),
             },
           },
         }),
