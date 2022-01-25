@@ -55,7 +55,10 @@ const eventLockHandler = (
     return missingResource(state, action, `No event id to ${kind}`);
   const events = state.resources[ResourceKey.Events] as Event[];
   const eventIndex = events.findIndex((e) => e.id === meta);
-  if (eventIndex < 0) return missingResource(state, action, "No event found");
+  if (eventIndex < 0) {
+    // nothing to update
+    return state;
+  }
   const event = new Event({
     ...events[eventIndex],
     locked: kind === "lock",
