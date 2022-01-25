@@ -16,6 +16,8 @@ import { AdminUIProps, AdminAction, AdminSelectionProps } from "./types";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import { formatSlashed, parseSQLDate } from "../../utils/date";
+import { getProjectInfo } from "./Scheduler/lib";
+import RosterRecord from "../../resources/RosterRecord";
 
 const ProjectLocationHoursSummaryDialog: FC<
   AdminUIProps & AdminSelectionProps
@@ -27,10 +29,15 @@ const ProjectLocationHoursSummaryDialog: FC<
   );
   if (projectId < 0) return null;
 
-  const project = (state.resources[ResourceKey.Projects] as Project[]).find(
-    ({ id }) => id === projectId
-  );
+  const projects = state.resources[ResourceKey.Projects] as Project[];
+  const rosterRecords = state.resources[
+    ResourceKey.RosterRecords
+  ] as RosterRecord[];
+
+  const project = projects.find(({ id }) => id === projectId);
   if (!project) return null;
+
+  const projectInfo = getProjectInfo(projects, rosterRecords)[projectId];
 
   const locationHours = project.locationHours.find(
     ({ locationId }) => locationId === selections.locationId
@@ -88,8 +95,20 @@ const ProjectLocationHoursSummaryDialog: FC<
               <TableCell>{project.groupAllottedHours}</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>Students</TableCell>
+              <TableCell>{projectInfo.students}</TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>Group size</TableCell>
               <TableCell>{project.groupSize}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Group hours neded</TableCell>
+              <TableCell>{projectInfo.groupHoursEstimate}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Group number estimate</TableCell>
+              <TableCell>{projectInfo.groupNumberEstimate}</TableCell>
             </TableRow>
           </Table>
         </TableContainer>
