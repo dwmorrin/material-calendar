@@ -4,12 +4,10 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { navigate } from "@reach/router";
 import { useAuth, AuthStatus } from "./AuthProvider";
 import User from "../resources/User";
-import { useSocket, SocketMessageKind } from "./SocketProvider";
 
 const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
   inAdminApp,
 }) => {
-  const { broadcast, getClientCount } = useSocket();
   const { isAdmin, setUser, setStatus, setLastLocation } = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = !!anchorEl;
@@ -57,33 +55,6 @@ const MoreMenu: FunctionComponent<{ inAdminApp?: boolean }> = ({
         <MenuItem onClick={logout}>
           <Typography>Logout</Typography>
         </MenuItem>
-        {isAdmin && (
-          <MenuItem
-            onClick={(): void => {
-              broadcast(SocketMessageKind.Test);
-            }}
-          >
-            <Typography>Broadcast test message</Typography>
-          </MenuItem>
-        )}
-        {isAdmin && (
-          <MenuItem
-            onClick={(): void => {
-              getClientCount();
-            }}
-          >
-            <Typography>Get client count</Typography>
-          </MenuItem>
-        )}
-        {isAdmin && (
-          <MenuItem
-            onClick={(): void => {
-              broadcast(SocketMessageKind.Refresh);
-            }}
-          >
-            <Typography>Broadcast refresh request</Typography>
-          </MenuItem>
-        )}
         {isAdmin && (
           <MenuItem
             onClick={(): void => {
