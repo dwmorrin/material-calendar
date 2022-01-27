@@ -98,9 +98,10 @@ export const submitHandler =
 
     // apply form values to data
     const formToSubmit = updater(values);
+    const method = values.id ? "PUT" : "POST";
 
     fetch(`${Reservation.url}${values.id ? `/${values.id}` : ""}`, {
-      method: values.id ? "PUT" : "POST",
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...formToSubmit, mail }),
     })
@@ -122,7 +123,10 @@ export const submitHandler =
         fetch(Reservation.forwardUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formToSubmit),
+          body: JSON.stringify({
+            method,
+            reservation: { ...formToSubmit, id: reservation.id },
+          }),
         })
           .then((res) => {
             if (res.ok) return res.json();
@@ -130,7 +134,8 @@ export const submitHandler =
           .then(({ error }) => {
             if (error)
               throw new Error(
-                "Error forwarding reservation to external service"
+                process.env.REACT_APP_FORWARD_URL_ERROR_MSG ||
+                  "Error forwarding reservation to external service"
               );
           })
           .catch(onError);
