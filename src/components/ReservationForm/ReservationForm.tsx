@@ -51,15 +51,24 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   const { broadcast } = useSocket();
 
   const equipment = state.resources[ResourceKey.Equipment] as Equipment[];
+  const allProjects = state.resources[ResourceKey.Projects] as Project[];
   const equipmentValues = makeEquipmentValues(equipment);
 
   const { currentEvent } = state;
   if (!currentEvent) return null;
   const { reservation } = currentEvent;
 
+  let project: Project | null = null;
+
+  if (reservation) {
+    const foundProject = allProjects.find(
+      (p) => p.id === reservation.projectId
+    );
+    if (foundProject) project = foundProject;
+  }
+
   // If walk-in is valid, then user MUST use the walk-in option.
-  let project: Project;
-  if (walkInValid) {
+  if (!project && walkInValid) {
     const maybeProject = (
       state.resources[ResourceKey.Projects] as Project[]
     ).find((p) => Project.walkInTitle === p.title);
@@ -72,16 +81,13 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
       return null;
     }
     project = maybeProject;
-  } else project = projects[0] || new Project();
+  } else if (!project) project = projects[0] || new Project();
 
-  if (reservation) {
-    const foundProject = projects.find((p) => p.id === reservation.projectId);
-    if (foundProject) project = foundProject;
-  }
   const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-    ({ projectId }) => projectId === project.id
+    ({ projectId }) => projectId === project?.id
   );
   if (!group) return null;
+
   const categories = state.resources[ResourceKey.Categories] as Category[];
 
   const closeForm = (): void => {
@@ -141,7 +147,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
             <Form className={classes.list} onSubmit={handleSubmit}>
               <FormLabel>Project:</FormLabel>
-              {!walkInValid && project.title !== Project.walkInTitle ? (
+              {!walkInValid && project?.title !== Project.walkInTitle ? (
                 <Field component={Select} name="projectId">
                   {projects.map((p) => (
                     <MenuItem key={p.id} value={p.id}>
