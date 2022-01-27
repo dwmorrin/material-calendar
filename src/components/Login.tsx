@@ -90,6 +90,24 @@ const Login: FunctionComponent<RouteComponentProps> = () => {
     login(username, password, setUser, setStatus, setErrors);
   };
 
+  // if app does not have a username/password login
+  if (process.env.REACT_APP_NO_LOGIN) {
+    const helpText =
+      process.env.REACT_APP_NO_LOGIN_HELP_TEXT ||
+      "Please contact the system administrator to register your account.";
+    return (
+      <>
+        <Typography variant="h4">
+          We were unable to find you in our records...
+        </Typography>
+        <Typography variant="h4">
+          <a href={process.env.REACT_APP_HELP_URL}>{helpText}</a>
+        </Typography>
+      </>
+    );
+  }
+
+  // else show a login form
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
