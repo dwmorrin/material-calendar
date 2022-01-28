@@ -17,6 +17,7 @@ import Event from "../resources/Event";
 import { Mail, adminEmail, groupTo } from "../utils/mail";
 import { formatDatetime, isBefore, nowInServerTimezone } from "../utils/date";
 import { SocketMessageKind, ReservationChangePayload } from "./SocketProvider";
+import forward from "./ReservationForm/forward";
 
 const transition = makeTransition("left");
 
@@ -124,6 +125,12 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         const updatedCurrentEvent: Event =
           events.find(({ id }) => id === currentEvent.id) || new Event();
 
+        forward({
+          reservationId: reservation.id,
+          method: "DELETE",
+          onError: dispatchError,
+        });
+
         // send reservation info to currently connected users
         broadcast(SocketMessageKind.ReservationChanged, {
           eventId: updatedCurrentEvent.id,
@@ -143,7 +150,8 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
             },
           },
         });
-      });
+      })
+      .catch(dispatchError);
   };
   return (
     <Dialog TransitionComponent={transition} open={open}>

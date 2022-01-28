@@ -21,6 +21,7 @@ import {
 import { formatDatetime, parseSQLDatetime } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 import { SocketMessageKind } from "../SocketProvider";
+import forward from "./forward";
 
 export const useStyles = makeStyles({
   list: {
@@ -119,26 +120,12 @@ export const submitHandler =
           ? "Your Reservation has been updated!"
           : "Your Reservation has been made!";
 
-        // send reservation info to an external service
-        fetch(Reservation.forwardUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            method,
-            reservation: { ...formToSubmit, id: reservation.id },
-          }),
-        })
-          .then((res) => {
-            if (res.ok) return res.json();
-          })
-          .then(({ error }) => {
-            if (error)
-              throw new Error(
-                process.env.REACT_APP_FORWARD_URL_ERROR_MSG ||
-                  "Error forwarding reservation to external service"
-              );
-          })
-          .catch(onError);
+        forward({
+          reservation: formToSubmit,
+          reservationId: reservation.id,
+          method,
+          onError,
+        });
 
         // send reservation info to currently connected users
         broadcast(SocketMessageKind.ReservationChanged, {
