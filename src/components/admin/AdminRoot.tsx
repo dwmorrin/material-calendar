@@ -33,6 +33,7 @@ import UserGroup from "../../resources/UserGroup";
 import ProjectDashboard from "./ProjectDashboard";
 import ImportClassMeetings from "./ImportClassMeetings";
 import ImportRoster from "./ImportRoster";
+import AppInspectionDialog from "./AppInspectionDialog";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
@@ -171,6 +172,7 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
         selections={selections}
         setSelections={setSelections}
       />
+      <AppInspectionDialog dispatch={dispatch} state={state} />
       <ErrorPage open={state.appIsBroken} error={state.error} />
       <Snackbar
         dispatch={dispatch}

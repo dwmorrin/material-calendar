@@ -105,6 +105,11 @@ const closeAddProjectToLocation: StateHandler = (state) => ({
   addProjectToLocationIsOpen: false,
 });
 
+const closeAppInspection: StateHandler = (state) => ({
+  ...state,
+  appInspectionIsOpen: false,
+});
+
 const closeProjectLocationHoursDialog: StateHandler = (state) => ({
   ...state,
   projectLocationHoursDialogIsOpen: false,
@@ -194,6 +199,11 @@ const fileImportSuccess: StateHandler = (state, { payload }) => ({
 const openAddProjectToLocation: StateHandler = (state) => ({
   ...state,
   addProjectToLocationIsOpen: true,
+});
+
+const openAppInspection: StateHandler = (state) => ({
+  ...state,
+  appInspectionIsOpen: true,
 });
 
 const openProjectLocationHoursDialog: StateHandler = (state, { payload }) => ({
@@ -422,6 +432,7 @@ const reducer: StateHandler = (state, action) =>
   ({
     [AdminAction.AddProjectToLocationSuccess]: addProjectToLocationSuccess,
     [AdminAction.CloseAddProjectToLocation]: closeAddProjectToLocation,
+    [AdminAction.CloseAppInspection]: closeAppInspection,
     [AdminAction.CloseBackups]: closeBackups,
     [AdminAction.CloseDetail]: closeDetail,
     [AdminAction.CloseExceptionsDashboard]: closeExceptionsDashboard,
@@ -441,6 +452,7 @@ const reducer: StateHandler = (state, action) =>
     [AdminAction.Error]: errorHandler,
     [AdminAction.FileImportSuccess]: fileImportSuccess,
     [AdminAction.OpenAddProjectToLocation]: openAddProjectToLocation,
+    [AdminAction.OpenAppInspection]: openAppInspection,
     [AdminAction.OpenProjectLocationHoursSummaryDialog]:
       openProjectLocationHoursSummaryDialog,
     [AdminAction.OpenBackups]: openBackups,

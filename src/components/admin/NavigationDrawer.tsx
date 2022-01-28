@@ -214,6 +214,16 @@ const AdminNavigationDrawer: FunctionComponent<
                 <Grid item>Import Roster</Grid>
               </Grid>
             </ListItem>
+            <ListItem
+              button
+              onClick={(): void =>
+                dispatch({ type: AdminAction.OpenAppInspection })
+              }
+            >
+              <Grid container justify="space-between">
+                <Grid item>App Inspection</Grid>
+              </Grid>
+            </ListItem>
           </Accordion>
         </List>
       </Fragment>

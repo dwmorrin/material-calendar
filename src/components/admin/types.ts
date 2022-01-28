@@ -14,6 +14,7 @@ export interface Action {
 export enum AdminAction {
   AddProjectToLocationSuccess,
   CloseAddProjectToLocation,
+  CloseAppInspection,
   CloseBackups,
   CloseDetail,
   CloseExceptionsDashboard,
@@ -31,6 +32,7 @@ export enum AdminAction {
   Error,
   FileImportSuccess,
   OpenAddProjectToLocation,
+  OpenAppInspection,
   OpenBackups,
   OpenDetail,
   OpenDetailWithProjectById,
@@ -64,6 +66,7 @@ export enum AdminAction {
 export interface AdminState {
   // UI state
   addProjectToLocationIsOpen: boolean;
+  appInspectionIsOpen: boolean;
   appIsBroken: boolean;
   backupsIsOpen: boolean;
   calendarEventClickState?: CalendarEventClickState;
