@@ -33,6 +33,28 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+const dateFormat = (sqlDate: string): string => {
+  // ignore year, long month, day without pad
+  const [, month, day] = sqlDate.split("-");
+  return `${
+    [
+      "",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ][Number(month)]
+  } ${Number(day)}`;
+};
+
 const CalendarBar: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
 > = ({ dispatch, state, selections, setSelections }) => {
@@ -52,15 +74,14 @@ const CalendarBar: FunctionComponent<
             <MenuIcon />
           </Badge>
         </IconButton>
-        {/* NAVIGATE BEFORE ISSUE: LOSES SYNC WITH STATE.CURRENTDATE */}
-        {/* <IconButton
+        <IconButton
           color="inherit"
           onClick={(): void => {
             dispatch({ type: CalendarAction.NavigateBefore });
           }}
         >
           <NavigateBeforeIcon />
-        </IconButton> */}
+        </IconButton>
         <Button
           endIcon={<ExpandMoreIcon />}
           className={classes.title}
@@ -69,21 +90,17 @@ const CalendarBar: FunctionComponent<
           }}
         >
           <Typography component="h6">
-            {state.currentStart.toLocaleString("default", {
-              month: "long",
-              day: "numeric",
-            })}
+            {dateFormat(state.currentStart)}
           </Typography>
         </Button>
-        {/* NAVIGATE NEXT ISSUE: LOSES SYNC WITH STATE.CURRENTDATE */}
-        {/* <IconButton
+        <IconButton
           color="inherit"
           onClick={(): void => {
             dispatch({ type: CalendarAction.NavigateNext });
           }}
         >
           <NavigateNextIcon />
-        </IconButton> */}
+        </IconButton>
 
         <IconButton
           color="inherit"

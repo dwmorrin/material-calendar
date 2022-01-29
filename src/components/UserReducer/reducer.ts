@@ -7,6 +7,8 @@ import displayMessage from "./displayMessage";
 import errorHandler from "./errorHandler";
 import { missingResource, impossibleState } from "./errorRedirect";
 import logger from "./logger";
+import getFCDateFromState from "../Calendar/getFCDateFromState";
+import { formatSQLDate } from "../../utils/date";
 
 import {
   closeEventDetail,
@@ -77,7 +79,7 @@ const navigateBefore: StateHandler = (state, action) => {
     return impossibleState(state, action, "no calendar reference");
   }
   state.ref.current.getApi().prev();
-  const currentStart = state.ref.current.getApi().getDate();
+  const currentStart = formatSQLDate(getFCDateFromState(state));
   return { ...state, currentStart };
 };
 
@@ -86,7 +88,7 @@ const navigateNext: StateHandler = (state, action) => {
     return impossibleState(state, action, "no calendar reference");
   }
   state.ref.current.getApi().next();
-  const currentStart = state.ref.current.getApi().getDate();
+  const currentStart = formatSQLDate(getFCDateFromState(state));
   return { ...state, currentStart };
 };
 
@@ -131,7 +133,7 @@ const viewToday: StateHandler = (state, action) => {
     return impossibleState(state, action, "no calendar reference");
   }
   state.ref.current.getApi().today();
-  return { ...state, currentStart: new Date() };
+  return { ...state, currentStart: formatSQLDate() };
 };
 
 const calendarReducer: StateHandler = (state, action) =>

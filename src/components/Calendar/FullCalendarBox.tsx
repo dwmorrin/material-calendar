@@ -126,7 +126,6 @@ const FullCalendarBox: FunctionComponent<
         }}
         eventClick={makeEventClick(dispatch, events)}
         // VISIBLE DATE RANGE
-        initialDate={state.currentStart}
         initialView={selections.calendarView}
         // HEADER CONFIG
         headerToolbar={false}

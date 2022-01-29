@@ -1,5 +1,6 @@
 import { CalendarState } from "./types";
 import { enumKeys } from "../utils/enumKeys";
+import { formatSQLDate } from "../utils/date";
 import { ResourceKey, ResourceInstance } from "../resources/types";
 
 /**
@@ -12,7 +13,7 @@ const resources = {
 
 export const initialCalendarState: CalendarState = {
   appIsBroken: false,
-  currentStart: new Date(),
+  currentStart: formatSQLDate(),
   detailIsOpen: false,
   drawerIsOpen: false,
   eventEditorIsOpen: false,
