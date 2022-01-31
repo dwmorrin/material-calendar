@@ -12,8 +12,8 @@ function getFCDateFromState(state: CalendarState): Date {
   }
   // assumes FC is configured to use "UTC-coercion" mode,
   // i.e. the timezone is set to a named timezone and no plugin is used
-  // this converts to SQL date format, no timezone info
-  const parsed: string = res.toISOString().replace("T", " ").split(".")[0];
+  // this converts to SQL date format, no timezone info, with "T" for Safari
+  const parsed: string = res.toISOString().split(".")[0];
   // parsing this SQL string will return a date object in the local timezone
   return new Date(parsed);
 }
