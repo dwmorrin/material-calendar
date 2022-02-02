@@ -190,6 +190,21 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                 name="hasGuests"
                 className={classes.item}
               />
+              {values.hasGuests === "yes" &&
+                !!process.env.REACT_APP_GUEST_FORM_TEXT &&
+                !!process.env.REACT_APP_GUEST_FORM_LINK_TEXT &&
+                !!process.env.REACT_APP_GUEST_FORM_LINK_URL && (
+                  <div>
+                    {process.env.REACT_APP_GUEST_FORM_TEXT}{" "}
+                    <a
+                      href={process.env.REACT_APP_GUEST_FORM_LINK_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {process.env.REACT_APP_GUEST_FORM_LINK_TEXT}
+                    </a>
+                  </div>
+                )}
               {values.hasGuests === "yes" && (
                 <Field
                   component={TextField}
