@@ -96,6 +96,9 @@ const addADay = (s: string): string => {
   return formatSQLDate(addDays(parseSQLDate(s), 1));
 };
 
+// to display numbers in 0, 1, or 2 decimal places automatically
+const round = (n: number): number => Math.round(n * 100) / 100;
+
 //--- EXPORTED FUNCTIONS ---
 
 /**
@@ -240,7 +243,7 @@ export const makeAllotmentSummaryEvent = (
   allDay: true,
   title: `${p.title} |A:${total}|M:${
     p.locationHours.find(({ locationId: id }) => id === locationId)?.hours
-  }|R:${totalReservedHours}|N:${neededHours}`,
+  }|R:${round(totalReservedHours)}|N:${round(neededHours)}`,
   extendedProps: {
     projectId: p.id,
   },
@@ -270,7 +273,7 @@ export const makeAllotmentEventMap =
       id: `${Project.allotmentPrefix}${p.id}-${index}`,
       resourceId: `${Project.allotmentPrefix}${p.id}`,
       allDay: true,
-      title: `Res:${hours}/Allot:${a.hours}`,
+      title: `Res:${round(hours)}/Allot:${a.hours}`,
       extendedProps: {
         projectId: p.id,
       },
@@ -360,7 +363,7 @@ export const makeDailyHours = (
         id: `${Location.locationHoursId}-${hoursAsEvents.length}`,
         start: nextHours.date,
         allDay: true,
-        title: "" + nextHours.hours,
+        title: "" + round(nextHours.hours),
         resourceId: Location.locationHoursId,
       });
       nextHours = dailyHours.shift();
@@ -402,7 +405,7 @@ export const processVirtualWeeks = (
         id: `${VirtualWeek.eventPrefix}${vw.id}`,
         resourceId: VirtualWeek.resourceId,
         allDay: true,
-        title: String(totalHours),
+        title: String(round(totalHours)),
       };
     });
   return [vwEvents, res];
@@ -454,7 +457,7 @@ export const processVirtualWeeksAsHoursRemaining = (
         id: `hr${vw.id}`,
         resourceId: VirtualWeek.hoursRemainingId,
         allDay: true,
-        title: `${vw.totalHours - vw.projectHours}/${available}`,
+        title: `${round(vw.totalHours - vw.projectHours)}/${available}`,
       };
     });
 };
