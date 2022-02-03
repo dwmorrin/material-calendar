@@ -110,6 +110,7 @@ export interface FormTemplateProps {
 }
 
 export interface CalendarSelectionState {
+  title?: string;
   start: string;
   end: string;
   location: Location;

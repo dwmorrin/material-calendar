@@ -47,7 +47,7 @@ const DialogWrapper: FC<AdminUIProps & { onClose: () => void }> = ({
 const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
   const [formErrors, setFormErrors] = useState(initialErrors);
   if (!state.calendarSelectionState) return null;
-  const { location, resource } = state.calendarSelectionState;
+  const { location, resource, title } = state.calendarSelectionState;
   const start = parseSQLDate(state.calendarSelectionState.start);
   const end = subDays(parseSQLDate(state.calendarSelectionState.end), 1);
 
@@ -182,6 +182,10 @@ const ProjectLocationHoursDialog: FC<AdminUIProps> = ({ dispatch, state }) => {
       <DialogContent>
         <TableContainer component={Paper}>
           <Table>
+            <TableRow>
+              <TableCell>Info</TableCell>
+              <TableCell>{title || "?"}</TableCell>
+            </TableRow>
             <TableRow>
               <TableCell>Location</TableCell>
               <TableCell>{location.title}</TableCell>

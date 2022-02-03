@@ -575,6 +575,7 @@ export const eventClick =
         type: AdminAction.OpenProjectLocationHoursDialog,
         payload: {
           calendarSelectionState: {
+            title,
             start: startStr,
             end: endStr,
             location,

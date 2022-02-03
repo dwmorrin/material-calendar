@@ -29,6 +29,8 @@ const ProjectLocationHoursSummaryDialog: FC<
   );
   if (projectId < 0) return null;
 
+  const title = state.calendarEventClickState.title || "?";
+
   const projects = state.resources[ResourceKey.Projects] as Project[];
   const rosterRecords = state.resources[
     ResourceKey.RosterRecords
@@ -76,6 +78,10 @@ const ProjectLocationHoursSummaryDialog: FC<
       <DialogContent>
         <TableContainer component={Paper}>
           <Table>
+            <TableRow>
+              <TableCell>Info</TableCell>
+              <TableCell>{title}</TableCell>
+            </TableRow>
             <TableRow>
               <TableCell>Reservations start</TableCell>
               <TableCell>
