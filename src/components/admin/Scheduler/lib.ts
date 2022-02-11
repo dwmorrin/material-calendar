@@ -424,6 +424,9 @@ export const processVirtualWeeksAsHoursRemaining = (
       const vwStartDate = parseSQLDate(vw.start);
       const vwEndDate = parseSQLDate(vw.end);
       // skip if the virtual week is in the past
+      //! BUG: not comparing correctly
+      //! cannot compare dates with datetimes directly
+      //! convert datetime to date before comparing
       const available =
         vwEndDate.valueOf() < now.valueOf()
           ? 0
