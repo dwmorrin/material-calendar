@@ -29,20 +29,13 @@ const ProjectList: FC<
     ({ title }) => title !== Project.walkInTitle
   );
 
-  const classMeetingProject = projects.find((p) =>
-    p.title.startsWith(Project.classMeetingTitlePrefix)
-  );
-
   let courseProjects: CourseProjects = {};
 
   //! TEMPORARY HACK - needs to fix display of course/project to instructors
+  // TODO - give instructors a way to view courses/projects
+  // instructors just get no course projects for now
   // adding checks for undefined, but this needs a review
-  if (isInstructor) {
-    courseProjects = courses.reduce((acc, c) => {
-      if (classMeetingProject) acc[c.id] = [classMeetingProject];
-      return acc;
-    }, {} as CourseProjects);
-  } else {
+  if (!isInstructor) {
     courseProjects = projects.reduce((acc, p) => {
       const {
         course: { id },
