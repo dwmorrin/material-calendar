@@ -1,6 +1,5 @@
 import { makeStyles } from "@material-ui/core";
 import { makeTransition } from "../Transition";
-import { object, string } from "yup";
 import { FormikValues } from "formik";
 import { CalendarAction } from "../types";
 import Project from "../../resources/Project";
@@ -39,15 +38,6 @@ export const useStyles = makeStyles({
 });
 
 export const transition = makeTransition("left");
-
-export const validationSchema = object().shape({
-  phone: string().required("Please Enter a Phone Number"),
-  description: string().required("Please Enter a description"),
-  guests: string().when("hasGuests", {
-    is: "yes",
-    then: string().required("Please enter the names of your guests"),
-  }),
-});
 
 const updater = (values: ReservationFormValues): ReservationSubmitValues => ({
   id: values.id,

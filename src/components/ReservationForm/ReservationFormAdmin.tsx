@@ -25,7 +25,6 @@ import Project from "../../resources/Project";
 import Event, { ReservationInfo } from "../../resources/Event";
 import Reservation from "../../resources/Reservation";
 import {
-  validationSchema,
   makeInitialValues,
   useStyles,
   submitHandler,
@@ -167,7 +166,6 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
             groups,
             projects,
           })}
-          validationSchema={validationSchema}
         >
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
             <Form className={classes.list} onSubmit={handleSubmit}>

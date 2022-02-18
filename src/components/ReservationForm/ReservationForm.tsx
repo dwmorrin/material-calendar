@@ -19,7 +19,6 @@ import QuantityList from "./EquipmentForm/QuantityList";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import {
-  validationSchema,
   makeInitialValues,
   useStyles,
   submitHandler,
@@ -105,6 +104,11 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
     }
   };
 
+  const isNotWalkIn = !walkInValid && project?.title !== Project.walkInTitle;
+  // TODO: this is a hack to ensure the project gets included into the available projects
+  // TODO: review the logic that determines the 'projects' array
+  if (!projects.find((p) => p.id === project?.id)) projects.push(project);
+
   return (
     <Dialog
       fullScreen
@@ -142,12 +146,11 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
             groups: state.resources[ResourceKey.Groups] as UserGroup[],
             projects: state.resources[ResourceKey.Projects] as Project[],
           })}
-          validationSchema={validationSchema}
         >
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
             <Form className={classes.list} onSubmit={handleSubmit}>
               <FormLabel>Project:</FormLabel>
-              {!walkInValid && project?.title !== Project.walkInTitle ? (
+              {isNotWalkIn ? (
                 <Field component={Select} name="projectId">
                   {projects.map((p) => (
                     <MenuItem key={p.id} value={p.id}>
@@ -159,11 +162,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                 <Typography variant="subtitle1">Walk-In</Typography>
               )}
               <FormLabel className={classes.item}>Group:</FormLabel>
-              {group.members.map(({ username, name }) => (
-                <Typography key={username}>
-                  {`${name.first} ${name.last}`}
-                </Typography>
-              ))}
+              {group.title}
               <FormLabel className={classes.item}>Description</FormLabel>
               <Field
                 component={TextField}
