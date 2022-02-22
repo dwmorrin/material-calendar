@@ -220,8 +220,10 @@ export const isValidSQLDatetimeInterval = ({
     end: parseSQLDatetime(end),
   });
 
-export const castSQLDateToSQLDatetime = (date: string): string =>
-  `${date} 00:00:00`;
+export const castSQLDateToSQLDatetime = (
+  date: string,
+  timeStr = "00:00:00"
+): string => `${date} ${timeStr}`;
 
 export const castSQLDatetimeToSQLDate = (datetime: string): string =>
   datetime.split(" ")[0];

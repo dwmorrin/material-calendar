@@ -55,8 +55,8 @@ const allotmentInLocationAtDate =
   (a: ProjectAllotment): boolean =>
     a.locationId === locationId &&
     isWithinInterval(date, {
-      start: parseSQLDate(a.start),
-      end: parseSQLDate(a.end),
+      start: parseSQLDatetime(castSQLDateToSQLDatetime(a.start)),
+      end: parseSQLDatetime(castSQLDateToSQLDatetime(a.end, "23:59:59")),
     });
 
 const EventDetail: FunctionComponent<CalendarUIProps> = ({
@@ -228,8 +228,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             end: start,
           }) &&
           isValidSQLDatetimeInterval({
-            start: end,
-            end: castSQLDateToSQLDatetime(a.end),
+            start,
+            end: castSQLDateToSQLDatetime(a.end, "23:59:59"),
           })
       )
   );
