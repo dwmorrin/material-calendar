@@ -106,12 +106,26 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
         state={state}
         action={{ type: CalendarAction.CloseSnackbar }}
       />
+      {/* Admin can broadcast "please refresh" message */}
       <Snackbar
         open={refreshRequested}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         onClose={(): void => undefined}
       >
         <SnackbarContent message="Please refresh the page to continue." />
+      </Snackbar>
+      {/* Socket.io error message */}
+      <Snackbar
+        open={!!socketState.error}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={(): void => undefined}
+      >
+        <SnackbarContent
+          message={`Connection error: ${
+            socketState.error?.message ||
+            "no message was provided. You may need to refresh the page."
+          }`}
+        />
       </Snackbar>
     </Box>
   );

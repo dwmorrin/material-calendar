@@ -20,8 +20,10 @@ export type ReservationChangePayload = {
 
 const socket = io();
 
-// SocketProvider replaces this with a function to update state
+// SocketProvider replaces these with functions to update state
 let onBroadcast = (_: unknown[]): void => undefined;
+let onError = (_: Error): void => undefined;
+let onConnect = (): void => undefined;
 
 const broadcast = (message: string, data?: unknown): void => {
   socket.emit("broadcast", message, data);
@@ -39,9 +41,23 @@ socket.on("client-count", (count: number) => {
   console.log(`${count} client(s) connected`);
 });
 
+// connect clears the error state
+socket.on("connect", () => onConnect());
+socket.on("connect_error", (error) => onError(error));
+socket.io.on("error", (error) => onError(error));
+
 const listen = (
   setSocketState: (state: Partial<SocketState>) => void
 ): void => {
+  onConnect = (): void => {
+    setSocketState({ error: undefined });
+  };
+
+  onError = (error: Error): void => {
+    console.error("socket error", error);
+    setSocketState({ error });
+  };
+
   onBroadcast = (arg: unknown[]): void => {
     const [kind, ...data] = arg;
     if (typeof kind === "string") {
@@ -94,6 +110,7 @@ const listen = (
 };
 
 export interface SocketState {
+  error?: Error;
   eventsChanged: boolean;
   eventLocked: boolean;
   eventUnlocked: boolean;
