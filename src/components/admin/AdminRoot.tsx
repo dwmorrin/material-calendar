@@ -4,6 +4,7 @@ import { AdminAction, AdminSelections } from "./types";
 import { Resources } from "../../resources/Resources";
 import reducer from "./reducer";
 import initialState from "./initialState";
+import { Snackbar, SnackbarContent } from "@material-ui/core";
 import Bar from "./Bar";
 import NavigationDrawer from "./NavigationDrawer";
 import DocumentBrowser from "./DocumentBrowser";
@@ -21,7 +22,7 @@ import ProjectLocationHoursDialog from "./ProjectLocationHoursDialog";
 import ProjectLocationHoursSummaryDialog from "./ProjectLocationHoursSummaryDialog";
 import LocationHoursDialog from "./LocationHoursDialog/LocationHoursDialog";
 import VirtualWeekModifyDialog from "./VirtualWeekModifyDialog";
-import Snackbar from "../Snackbar";
+import MessageSnackbar from "../Snackbar";
 import FullCalendar from "@fullcalendar/react";
 import ErrorPage from "../ErrorPage";
 import { CircularProgress } from "@material-ui/core";
@@ -34,6 +35,7 @@ import ProjectDashboard from "./ProjectDashboard";
 import ImportClassMeetings from "./ImportClassMeetings";
 import ImportRoster from "./ImportRoster";
 import AppInspectionDialog from "./AppInspectionDialog";
+import { useSocket } from "../SocketProvider";
 
 const makeUrlsForAllResources = (): string[] =>
   Resources.map((resource, index) => `${resource.url}?context=${index}`);
@@ -42,6 +44,7 @@ const mostRecent = (a: Semester, b: Semester): Semester =>
   new Date(b.start).valueOf() - new Date(a.start).valueOf() < 0 ? a : b;
 
 const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
+  const socketState = useSocket();
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
     ref: useRef<FullCalendar>(null),
@@ -112,7 +115,23 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
   const exceptionCount =
     exceptions.groupSize.length + exceptions.refunds.length;
 
-  if (state.initialResourcesPending) return <CircularProgress />;
+  if (state.initialResourcesPending) {
+    if (state.appIsBroken)
+      return <ErrorPage open={state.appIsBroken} error={state.error} />;
+    return (
+      <>
+        {/* Socket error might be transitory... */}
+        {!!socketState.error && (
+          <>
+            <h1>Socket error. If this persists, try refreshing the page.</h1>
+            <pre>{JSON.stringify(socketState.error, null, 2)}</pre>
+          </>
+        )}
+        <CircularProgress />
+      </>
+    );
+  }
+
   return (
     <div>
       <Bar dispatch={dispatch} state={state} exceptionCount={exceptionCount} />
@@ -174,11 +193,24 @@ const AdminDashboard: FunctionComponent<RouteComponentProps> = () => {
       />
       <AppInspectionDialog dispatch={dispatch} state={state} />
       <ErrorPage open={state.appIsBroken} error={state.error} />
-      <Snackbar
+      <MessageSnackbar
         dispatch={dispatch}
         state={state}
         action={{ type: AdminAction.CloseSnackbar }}
       />
+      {/* Socket.io error message */}
+      <Snackbar
+        open={!!socketState.error}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={(): void => undefined}
+      >
+        <SnackbarContent
+          message={`Connection error: ${
+            socketState.error?.message ||
+            "no message was provided. You may need to refresh the page."
+          }`}
+        />
+      </Snackbar>
     </div>
   );
 };

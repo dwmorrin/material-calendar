@@ -120,12 +120,7 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         onClose={(): void => undefined}
       >
-        <SnackbarContent
-          message={`Connection error: ${
-            socketState.error?.message ||
-            "no message was provided. You may need to refresh the page."
-          }`}
-        />
+        <SnackbarContent message="Connection was lost. Retrying... (try refreshing if this does not go away)" />
       </Snackbar>
     </Box>
   );
