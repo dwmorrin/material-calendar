@@ -17,6 +17,7 @@ export const initialCalendarState: CalendarState = {
   detailIsOpen: false,
   drawerIsOpen: false,
   eventEditorIsOpen: false,
+  helpDialogIsOpen: false,
   groupDashboardIsOpen: false,
   initialResourcesPending: true,
   message: "",

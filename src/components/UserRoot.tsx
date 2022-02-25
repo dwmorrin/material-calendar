@@ -16,6 +16,7 @@ import fetchAllResources from "../utils/fetchAllResources";
 import { CalendarAction, CalendarSelections } from "./types";
 import { Box, Snackbar, SnackbarContent } from "@material-ui/core";
 import EventEditor from "./EventEditor/EventEditor";
+import HelpDialog from "./HelpDialog";
 import ProjectForm from "./Project/ProjectForm";
 import MessageSnackbar from "./Snackbar";
 import ErrorPage from "./ErrorPage";
@@ -76,6 +77,7 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
   return (
     <Box>
       <ErrorPage open={state.appIsBroken} error={state.error} />
+      <HelpDialog dispatch={dispatch} state={state} />
       <ProjectDashboard dispatch={dispatch} state={state} />
       <CalendarDrawer
         dispatch={dispatch}

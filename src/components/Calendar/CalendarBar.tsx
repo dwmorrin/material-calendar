@@ -116,7 +116,9 @@ const CalendarBar: FunctionComponent<
           selections={selections}
           setSelections={setSelections}
         />
-        <MoreMenu />
+        <MoreMenu
+          help={(): void => dispatch({ type: CalendarAction.OpenHelpDialog })}
+        />
       </Toolbar>
     </AppBar>
   );

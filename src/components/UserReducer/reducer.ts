@@ -69,10 +69,20 @@ const closeEquipmentForm: StateHandler = (state) => ({
   equipmentFormIsOpen: false,
 });
 
+const closeHelpDialog: StateHandler = (state) => ({
+  ...state,
+  helpDialogIsOpen: false,
+});
+
 const closeSnackbar: StateHandler = (state) => {
   const [snackbarQueue] = dequeue(state.snackbarQueue);
   return { ...state, snackbarQueue };
 };
+
+const openHelpDialog: StateHandler = (state) => ({
+  ...state,
+  helpDialogIsOpen: true,
+});
 
 const navigateBefore: StateHandler = (state, action) => {
   if (!state.ref?.current) {
@@ -144,6 +154,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CloseEventDetail]: closeEventDetail,
     [CalendarAction.CloseEventEditor]: closeEventEditor,
     [CalendarAction.CloseGroupDashboard]: closeGroupDashboard,
+    [CalendarAction.CloseHelpDialog]: closeHelpDialog,
     [CalendarAction.CloseProjectDashboard]: closeProjectDashboard,
     [CalendarAction.CloseProjectForm]: closeProjectForm,
     [CalendarAction.CloseReservationForm]: closeReservationForm,
@@ -164,6 +175,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.OpenEventDetail]: openEventDetail,
     [CalendarAction.OpenEventEditor]: openEventEditor,
     [CalendarAction.OpenGroupDashboard]: openGroupDashboard,
+    [CalendarAction.OpenHelpDialog]: openHelpDialog,
     [CalendarAction.OpenProjectDashboard]: openProjectDashboard,
     [CalendarAction.OpenProjectForm]: openProjectForm,
     [CalendarAction.OpenReservationForm]: openReservationForm,

@@ -12,6 +12,7 @@ export enum CalendarAction {
   CloseEventDetail,
   CloseEventEditor,
   CloseGroupDashboard,
+  CloseHelpDialog,
   CloseProjectDashboard,
   CloseProjectForm,
   CloseReservationForm,
@@ -32,6 +33,7 @@ export enum CalendarAction {
   OpenEventDetail,
   OpenEventEditor,
   OpenGroupDashboard,
+  OpenHelpDialog,
   OpenProjectDashboard,
   OpenProjectForm,
   OpenReservationForm,
@@ -72,6 +74,7 @@ export interface CalendarState {
   drawerIsOpen: boolean;
   eventEditorIsOpen: boolean;
   error?: Error;
+  helpDialogIsOpen: boolean;
   message: string;
   groupDashboardIsOpen: boolean;
   initialResourcesPending: boolean;
