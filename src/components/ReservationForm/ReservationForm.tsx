@@ -36,6 +36,7 @@ import RadioYesNo from "../RadioYesNo";
 interface ReservationFormProps extends CalendarUIProps {
   projects: Project[];
   walkInValid: boolean;
+  allowsEquipment: boolean;
 }
 
 const ReservationForm: FunctionComponent<ReservationFormProps> = ({
@@ -43,6 +44,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   state,
   projects,
   walkInValid,
+  allowsEquipment,
 }) => {
   const [equipmentFormIsOpen, setEquipmentFormIsOpen] = useState(false);
   const classes = useStyles();
@@ -229,11 +231,15 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                   variant="filled"
                 />
               )}
-              <RadioYesNo
-                label="Would you like to reserve any equipment now?"
-                name="hasEquipment"
-                className={classes.item}
-              />
+              {allowsEquipment ? (
+                <RadioYesNo
+                  label="Would you like to reserve any equipment now?"
+                  name="hasEquipment"
+                  className={classes.item}
+                />
+              ) : (
+                "Equipment cannot be reserved for this location."
+              )}
               {values.hasEquipment === "yes" && (
                 <section className={classes.list}>
                   <QuantityList selectedEquipment={values.equipment} />
@@ -242,10 +248,16 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                     size="small"
                     variant="contained"
                     disableElevation
-                    disabled={isSubmitting}
+                    disabled={!allowsEquipment || isSubmitting}
                     onClick={(): void => setEquipmentFormIsOpen(true)}
                   >
-                    Open equipment shopping cart
+                    {allowsEquipment ? (
+                      "Open equipment shopping cart"
+                    ) : (
+                      <FormLabel component="legend">
+                        Equipment cannot be reserved in this location
+                      </FormLabel>
+                    )}
                   </Button>
                 </section>
               )}

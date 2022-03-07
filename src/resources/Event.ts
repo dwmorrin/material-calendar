@@ -35,6 +35,7 @@ interface Event {
     title: string;
     restriction: number;
     allowsWalkIns: boolean;
+    allowsEquipment: boolean;
   };
   title: string;
   reservable: boolean;

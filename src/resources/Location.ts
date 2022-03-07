@@ -23,6 +23,7 @@ interface Location {
   hours: LocationHours[];
   restriction: number;
   allowsWalkIns: boolean;
+  allowsEquipment: boolean;
   defaultHours: {
     monday: number;
     tuesday: number;
@@ -45,6 +46,7 @@ class Location implements Location {
       hours: [] as LocationHours[],
       restriction: 0,
       allowsWalkIns: false,
+      allowsEquipment: false,
       defaultHours: {
         monday: 0,
         tuesday: 0,
