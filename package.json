@@ -24,7 +24,7 @@
     "formik": "^2.1.4",
     "formik-material-ui": "^2.0.0-beta.1",
     "formik-material-ui-pickers": "0.0.8",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.3",
