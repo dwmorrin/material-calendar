@@ -1,11 +1,5 @@
 import React, { FunctionComponent, memo } from "react";
-import {
-  CircularProgress,
-  makeStyles,
-  Box,
-  Grid,
-  Typography,
-} from "@material-ui/core";
+import { CircularProgress, makeStyles, Box } from "@material-ui/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
@@ -32,9 +26,9 @@ import {
 } from "./lib";
 import { useAuth } from "../AuthProvider";
 import {
-  parseFCString,
-  parseAndFormatFCString,
   isWithinIntervalFP,
+  parseAndFormatFCString,
+  parseFCString,
   parseSQLDatetime,
 } from "../../utils/date";
 
@@ -43,21 +37,6 @@ const useStyles = makeStyles((theme) => ({
   fullHeight: { minHeight: "100vh" },
   noOverflow: { overflow: "hidden" },
 }));
-
-const SelectALocationMessage: FunctionComponent = () => {
-  const classes = useStyles();
-  return (
-    <Grid
-      container
-      direction="column"
-      justify="center"
-      alignItems="center"
-      className={classes.fullHeight}
-    >
-      <Typography variant="h3">Select a location to view a calendar</Typography>
-    </Grid>
-  );
-};
 
 const FullCalendarBox: FunctionComponent<
   CalendarUIProps & CalendarUISelectionProps
@@ -75,10 +54,11 @@ const FullCalendarBox: FunctionComponent<
   ).map(({ id }) => id);
   const classes = useStyles();
 
+  const dispatchError = (error: Error): void =>
+    dispatch({ type: CalendarAction.Error, payload: { error } });
+
   if (state.initialResourcesPending)
     return <CircularProgress size="90%" thickness={1} />;
-  if (!selections.locationIds.some((id) => locations.find((l) => l.id === id)))
-    return <SelectALocationMessage />;
   return (
     <Box>
       <Box className={classes.toolbarSpacer} />
@@ -94,6 +74,7 @@ const FullCalendarBox: FunctionComponent<
         // EVENTS
         events={({ startStr, endStr }, successCallback): void => {
           // https://fullcalendar.io/docs/events-function
+          // startStr and endStr format: "2022-05-13T00:00:00"
           const inView = isWithinIntervalFP({
             start: parseFCString(startStr),
             end: parseFCString(endStr),
@@ -104,6 +85,24 @@ const FullCalendarBox: FunctionComponent<
                 inView(parseSQLDatetime(event.end))
             )
           );
+          // query paramters start and end take SQL date strings
+          // const q = Object.entries({
+          //   start: startStr.split("T")[0],
+          //   end: endStr.split("T")[0],
+          // })
+          //   .map(([k, v]) => `${k}=${v}`)
+          //   .join("&");
+
+          // fetch(`${Event.url}/range?${q}`)
+          //   .then((res) => {
+          //     if (res.ok) return res.json();
+          //     throw new Error(res.statusText);
+          //   })
+          //   .then(({ data, error }) => {
+          //     if (error) return dispatchError(error);
+          //     const eventsInView: Event[] = (data as Event[]).map(
+          //       (e) => new Event(e)
+          //     );
           if (
             (
               ["resourceTimeGridDay", "resourceTimeGridWeek"] as CalendarView[]
@@ -123,6 +122,8 @@ const FullCalendarBox: FunctionComponent<
               )
             );
           }
+          // })
+          // .catch(dispatchError);
         }}
         eventClick={makeEventClick(dispatch, events)}
         // VISIBLE DATE RANGE
