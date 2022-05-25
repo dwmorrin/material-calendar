@@ -9,7 +9,7 @@ export const headings = [
   "First",
   "Username",
   "Email",
-  "Course",
+  "Course", // catalog ID - should be unique key for course
   "Section",
   "Title",
 ];
