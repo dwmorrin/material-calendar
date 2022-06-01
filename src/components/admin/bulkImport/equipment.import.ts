@@ -12,8 +12,6 @@ const headings = [
   "SKU",
   "Serial",
   "Barcode",
-  "Quantity",
-  "Notes",
   "Restriction",
 ];
 
@@ -41,8 +39,6 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, events) => {
           SKU,
           Serial,
           Barcode,
-          Quantity,
-          Notes,
           Restriction,
         }) => ({
           category: Category,
@@ -52,8 +48,8 @@ const bulkImport: BulkImporter = (setSubmitting, dispatch, events) => {
           sku: SKU,
           serial: Serial,
           barcode: Barcode,
-          quantity: Quantity,
-          notes: Notes,
+          quantity: 1,
+          notes: "",
           restriction: Restriction,
         })
       )
