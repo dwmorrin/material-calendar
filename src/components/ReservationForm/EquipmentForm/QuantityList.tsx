@@ -5,7 +5,7 @@ import { EquipmentTable } from "../../../resources/Equipment";
 interface QuantityListProps {
   selectedEquipment: EquipmentTable;
 }
-const FilterList: FunctionComponent<QuantityListProps> = ({
+const QuantityList: FunctionComponent<QuantityListProps> = ({
   selectedEquipment,
 }) => {
   const selectedItems = Object.keys(selectedEquipment).filter(function (
@@ -46,4 +46,4 @@ const FilterList: FunctionComponent<QuantityListProps> = ({
   );
 };
 
-export default FilterList;
+export default QuantityList;

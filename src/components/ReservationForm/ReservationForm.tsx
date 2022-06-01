@@ -14,8 +14,8 @@ import { Select, TextField } from "formik-material-ui";
 import CloseIcon from "@material-ui/icons/Close";
 import UserGroup from "../../resources/UserGroup";
 import { Field, Form, Formik } from "formik";
+import EquipmentCart from "./EquipmentForm/EquipmentCart";
 import EquipmentForm from "./EquipmentForm/EquipmentForm";
-import QuantityList from "./EquipmentForm/QuantityList";
 import { ResourceKey } from "../../resources/types";
 import Project from "../../resources/Project";
 import {
@@ -242,17 +242,18 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
               )}
               {values.hasEquipment === "yes" && (
                 <section className={classes.list}>
-                  <QuantityList selectedEquipment={values.equipment} />
+                  <EquipmentCart
+                    selectedEquipment={values.equipment}
+                    setFieldValue={setFieldValue}
+                  />
                   <Button
-                    className={classes.addEquipment}
                     size="small"
                     variant="contained"
-                    disableElevation
                     disabled={!allowsEquipment || isSubmitting}
                     onClick={(): void => setEquipmentFormIsOpen(true)}
                   >
                     {allowsEquipment ? (
-                      "Open equipment shopping cart"
+                      "Select equipment"
                     ) : (
                       <FormLabel component="legend">
                         Equipment cannot be reserved in this location
@@ -263,11 +264,10 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
               )}
               <Button
                 className={classes.item}
+                color="primary"
                 type="submit"
                 size="small"
                 variant="contained"
-                disableElevation
-                style={{ backgroundColor: "Green", color: "white" }}
                 disabled={isSubmitting}
               >
                 {state.currentEvent?.reservation

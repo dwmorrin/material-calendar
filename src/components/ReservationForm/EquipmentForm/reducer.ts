@@ -5,7 +5,7 @@ import Tag from "../../../resources/Tag";
 export const initialState = {
   filterDrawerIsOpen: false,
   equipmentCartIsOpen: false,
-  categoryDrawerView: false,
+  // categoryDrawerView: false,
   searchString: "",
   tags: [] as Tag[],
   categories: [] as Category[],
@@ -101,17 +101,11 @@ const toggleFilterDrawer: StateHandler = (state) => ({
   filterDrawerIsOpen: !state.filterDrawerIsOpen,
 });
 
-const toggleEquipmentViewMode: StateHandler = (state) => ({
-  ...state,
-  selectedCategory: null,
-  categoryPath: [],
-  categoryDrawerView: !state.categoryDrawerView,
-});
-
 const toggleEquipmentCart: StateHandler = (state) => ({
   ...state,
   equipmentCartIsOpen: !state.equipmentCartIsOpen,
 });
+
 const reducer: StateHandler = (state, action) =>
   ({
     [EquipmentActionTypes.ChangedSearchString]: changedSearchString,
@@ -121,7 +115,6 @@ const reducer: StateHandler = (state, action) =>
     [EquipmentActionTypes.ViewCategory]: viewCategory,
     [EquipmentActionTypes.SelectedFilter]: selectedFilter,
     [EquipmentActionTypes.ToggleFilterDrawer]: toggleFilterDrawer,
-    [EquipmentActionTypes.ToggleEquipmentViewMode]: toggleEquipmentViewMode,
     [EquipmentActionTypes.ToggleEquipmentCart]: toggleEquipmentCart,
   }[action.type](state, action));
 

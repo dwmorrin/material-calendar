@@ -7,7 +7,7 @@ type EquipmentFormValue = string | number | boolean | EquipmentValue;
 export interface EquipmentState {
   filterDrawerIsOpen: boolean;
   equipmentCartIsOpen: boolean;
-  categoryDrawerView: boolean;
+  // categoryDrawerView: boolean;
   searchString: string;
   tags: Tag[];
   selectedTags: Record<string, boolean>;
@@ -25,7 +25,6 @@ export enum EquipmentActionTypes {
   SelectedFilter,
   ToggleFilterDrawer,
   ToggleEquipmentCart,
-  ToggleEquipmentViewMode,
 }
 
 export interface EquipmentAction {
@@ -45,9 +44,6 @@ export interface EquipmentFormProps {
 }
 
 export interface EquipmentCartProps {
-  state: EquipmentState;
-  onClose: () => void;
-  onOpen: () => void;
   selectedEquipment: EquipmentTable;
   setFieldValue: (field: string, value: EquipmentFormValue) => void;
 }

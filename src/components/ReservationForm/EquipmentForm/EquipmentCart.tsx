@@ -1,14 +1,10 @@
 import React, { FunctionComponent } from "react";
-import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import { EquipmentCartProps } from "./types";
 import MenuItem from "@material-ui/core/MenuItem";
 import { List, ListItem, ListItemText, Typography } from "@material-ui/core";
 import Select from "@material-ui/core/Select";
 
 const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
-  state,
-  onClose,
-  onOpen,
   selectedEquipment,
   setFieldValue,
 }) => {
@@ -19,12 +15,7 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
   });
 
   return (
-    <SwipeableDrawer
-      open={state.equipmentCartIsOpen}
-      anchor="top"
-      onClose={onClose}
-      onOpen={onOpen}
-    >
+    <div>
       <Typography variant="subtitle2" style={{ textAlign: "center" }}>
         Equipment in your cart
       </Typography>
@@ -59,7 +50,7 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
                   <Select
                     labelId={key + "Quantity Select"}
                     name={"equipment[" + key + "]"}
-                    value={selectedEquipment[key]}
+                    value={selectedEquipment[key].quantity}
                     onChange={(event): void =>
                       setFieldValue("equipment[" + key + "]", {
                         ...selectedEquipment[key],
@@ -77,7 +68,7 @@ const EquipmentCart: FunctionComponent<EquipmentCartProps> = ({
       ) : (
         <div>Cart is empty.</div>
       )}
-    </SwipeableDrawer>
+    </div>
   );
 };
 

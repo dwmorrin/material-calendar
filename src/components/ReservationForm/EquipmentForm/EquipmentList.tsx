@@ -49,25 +49,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
         return (
           <Accordion key={branch.id} expanded={expanded}>
             <AccordionSummary
-              expandIcon={
-                state.categoryDrawerView ? (
-                  branch.children && branch.children.length > 0 ? (
-                    <ExpandMoreIcon
-                      onClick={(event): void => {
-                        event.stopPropagation();
-                        dispatch({
-                          type: EquipmentActionTypes.ViewCategory,
-                          payload: {
-                            selectedCategory: branch,
-                          },
-                        });
-                      }}
-                    />
-                  ) : null
-                ) : (
-                  <ExpandMoreIcon />
-                )
-              }
+              expandIcon={<ExpandMoreIcon />}
               aria-controls={branch.title + "Accordion"}
               id={branch.title + "Accordion"}
               onClick={(): void =>
@@ -88,7 +70,7 @@ const EquipmentList: FunctionComponent<EquipmentListProps> = ({
               >
                 {branch.children?.map((twig) => climb(twig))}
 
-                {!state.categoryDrawerView && expanded && (
+                {expanded && (
                   <EquipmentStandardList
                     equipment={contents}
                     selectedEquipment={selectedEquipment}

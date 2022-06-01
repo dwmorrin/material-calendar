@@ -31,10 +31,6 @@ export const useStyles = makeStyles({
   item: {
     marginTop: 30,
   },
-  addEquipment: {
-    backgroundColor: "yellow",
-    color: "black",
-  },
 });
 
 export const transition = makeTransition("left");

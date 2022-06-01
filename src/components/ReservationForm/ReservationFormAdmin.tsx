@@ -247,7 +247,6 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
                 <section className={classes.list}>
                   <QuantityList selectedEquipment={values.equipment} />
                   <Button
-                    className={classes.addEquipment}
                     size="small"
                     variant="contained"
                     disableElevation
