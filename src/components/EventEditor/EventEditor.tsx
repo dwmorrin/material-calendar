@@ -145,6 +145,23 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
                     <List>
                       <FormLabel>Repeats on these days:</FormLabel>
                       <ListItem>
+                        <Button
+                          onClick={(): void =>
+                            setFieldValue("__options__.on", {
+                              monday: true,
+                              tuesday: true,
+                              wednesday: true,
+                              thursday: true,
+                              friday: true,
+                              saturday: true,
+                              sunday: true,
+                            })
+                          }
+                        >
+                          Select all
+                        </Button>
+                      </ListItem>
+                      <ListItem>
                         <Field
                           component={CheckboxWithLabel}
                           type="checkbox"
