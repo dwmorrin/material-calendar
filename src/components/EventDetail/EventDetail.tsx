@@ -256,14 +256,20 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     ? Object.entries(reservation.equipment)
     : [];
 
+  enum ProjectSorterIndex {
+    withHours = 0,
+    withoutHours = 1,
+    withoutGroups = 2,
+  }
   const [projectsWithHours, projectsWithoutHours, projectsWithoutGroups] =
     projectsActiveNow.reduce(
       (projectsByHours, p) => {
         const group = getProjectGroup(p);
-        if (!group) projectsByHours[2].push(p);
+        if (!group || group.pending)
+          projectsByHours[ProjectSorterIndex.withoutGroups].push(p);
         else if (projectGroupHasHoursRemaining(p, group))
-          projectsByHours[0].push(p);
-        else projectsByHours[1].push(p);
+          projectsByHours[ProjectSorterIndex.withHours].push(p);
+        else projectsByHours[ProjectSorterIndex.withoutHours].push(p);
         return projectsByHours;
       },
       [[], [], []] as [Project[], Project[], Project[]]
