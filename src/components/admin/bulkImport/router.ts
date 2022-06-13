@@ -5,7 +5,6 @@ import equipmentImport from "./equipment.import";
 import eventImport from "./event.import";
 import locationImport from "./location.import";
 import projectImport from "./project.import";
-import rosterImport from "./roster.import";
 import sectionImport from "./section.import";
 import userImport from "./user.import";
 
@@ -42,7 +41,7 @@ const router = (key: ResourceKey): [string[], BulkImporter] =>
     [ResourceKey.Locations]: locationImport,
     [ResourceKey.Projects]: projectImport,
     [ResourceKey.Reservations]: defaultHeadingsAndDispatch,
-    [ResourceKey.RosterRecords]: rosterImport,
+    [ResourceKey.RosterRecords]: defaultHeadingsAndDispatch,
     [ResourceKey.Sections]: sectionImport,
     [ResourceKey.Semesters]: defaultHeadingsAndDispatch,
     [ResourceKey.Tags]: defaultHeadingsAndDispatch,

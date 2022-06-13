@@ -1,3 +1,15 @@
+/**
+ * WARNING WARNING WARNING WARNING WARNING
+ *
+ * NOT IN USE
+ *
+ * Remove this comment section if it is brought back
+ *
+ *
+ *
+ * WARNING WARNING WARNING WARNING WARNING
+ */
+
 import { AdminAction } from "../types";
 import { ResourceKey } from "../../../resources/types";
 import RosterRecord from "../../../resources/RosterRecord";
