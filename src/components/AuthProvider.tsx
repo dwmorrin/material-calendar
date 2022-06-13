@@ -102,7 +102,10 @@ const AuthProvider: FunctionComponent = ({ children }) => {
       ) : value.isAuthenticated ? (
         children
       ) : (
-        <ErrorPage open error={new Error("Server appears to be down")} />
+        <ErrorPage
+          open
+          error={new Error("No response from server (are you logged in?)")}
+        />
       )}
     </AuthContext.Provider>
   );
