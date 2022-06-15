@@ -37,6 +37,7 @@ export interface ReservationFormValues {
   equipment: EquipmentTable;
   __equipment__: EquipmentTable;
   hasEquipment: string;
+  sendEmail: string;
 }
 
 export type ReservationSubmitProps = Omit<CalendarUIProps, "state"> & {
@@ -49,4 +50,5 @@ export type ReservationSubmitProps = Omit<CalendarUIProps, "state"> & {
   event: Event;
   groups: UserGroup[];
   projects: Project[];
+  isAdmin?: boolean;
 };

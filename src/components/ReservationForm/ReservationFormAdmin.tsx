@@ -165,6 +165,7 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
             event: currentEvent,
             groups,
             projects,
+            isAdmin: true,
           })}
         >
           {({ values, isSubmitting, setFieldValue, handleSubmit }): unknown => (
@@ -187,6 +188,11 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
                     </MenuItem>
                   ))}
               </Field>
+              <RadioYesNo
+                label="Send email?"
+                name="sendEmail"
+                className={classes.item}
+              />
               <FormLabel className={classes.item}>Description</FormLabel>
               <Field
                 component={TextField}

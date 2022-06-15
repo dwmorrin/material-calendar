@@ -39,6 +39,7 @@ export enum CalendarAction {
   OpenReservationForm,
   OpenReservationFormAdmin,
   PickedDate,
+  ReceivedAdminReservationUpdate,
   ReceivedAllResources,
   ReceivedInvitations,
   ReceivedReservationCancelation,

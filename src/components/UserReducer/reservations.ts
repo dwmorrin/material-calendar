@@ -48,6 +48,63 @@ export const openReservationFormAdmin: StateHandler = (state) => ({
   reservationFormAdminIsOpen: true,
 });
 
+export const receivedAdminReservationUpdate: StateHandler = (state, action) => {
+  const { payload } = action;
+  const resources = payload?.resources;
+  if (!resources)
+    return missingResource(
+      state,
+      action,
+      "missing resources after reservation update"
+    );
+
+  // unpack all the updated resources
+  const event = resources[ResourceKey.Events][0] as Event;
+  const reservation = resources[ResourceKey.Reservations][0];
+  const group = resources[ResourceKey.Groups][0] as UserGroup;
+  const project = resources[ResourceKey.Projects][0] as Project;
+  if (!event || !reservation || !group || !project)
+    return missingResource(
+      state,
+      action,
+      "missing event, reservation, group, or project"
+    );
+
+  const events = state.resources[ResourceKey.Events] as Event[];
+  const eventIndex = events.findIndex(({ id }) => id === event.id);
+  if (eventIndex === -1)
+    return impossibleState(state, action, "missing reservation event");
+
+  const reservations = state.resources[ResourceKey.Reservations];
+  const reservationIndex = reservations.findIndex(
+    ({ id }) => id === reservation.id
+  );
+  // if the reservation is not found, it's a new reservation
+
+  return displayMessage(
+    {
+      ...state,
+      resources: {
+        ...state.resources,
+        [ResourceKey.Events]: arrayUpdateAt(events, eventIndex, event),
+        [ResourceKey.Reservations]: arrayUpdateAt(
+          reservations,
+          reservationIndex,
+          reservation
+        ),
+      },
+      detailIsOpen: false,
+      reservationFormIsOpen: false,
+    },
+    {
+      type: CalendarAction.DisplayMessage,
+      payload: {
+        message: payload?.message,
+      },
+    }
+  );
+};
+
 export const receivedReservationCancelation: StateHandler = (
   state,
   { payload }

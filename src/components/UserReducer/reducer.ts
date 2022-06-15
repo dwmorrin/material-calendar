@@ -59,6 +59,7 @@ import {
   closeReservationFormAdmin,
   openReservationForm,
   openReservationFormAdmin,
+  receivedAdminReservationUpdate,
   receivedReservationCancelation,
   receivedReservationUpdate,
   updatedOneReservation,
@@ -181,6 +182,8 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.OpenReservationForm]: openReservationForm,
     [CalendarAction.OpenReservationFormAdmin]: openReservationFormAdmin,
     [CalendarAction.PickedDate]: pickedDate,
+    [CalendarAction.ReceivedAdminReservationUpdate]:
+      receivedAdminReservationUpdate,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,
     [CalendarAction.ReceivedInvitations]: receivedInvitations,
     [CalendarAction.ReceivedReservationCancelation]:

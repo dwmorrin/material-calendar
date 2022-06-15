@@ -60,6 +60,7 @@ export const submitHandler =
     event,
     groups,
     projects,
+    isAdmin = false,
   }: ReservationSubmitProps) =>
   (values: ReservationFormValues, actions: FormikValues): void => {
     const onError = (error: Error): void =>
@@ -77,11 +78,14 @@ export const submitHandler =
       values.id ? "modified" : "created"
     } a reservation for your group`;
     const when = formatDatetime(parseSQLDatetime(event.start));
-    const mail: Mail = {
-      to: groupTo(group.members),
-      subject,
-      text: `${subject} for ${project.title} on ${when} in ${event.location.title}`,
-    };
+    const mail: Mail | Mail[] =
+      values.sendEmail === "yes"
+        ? {
+            to: groupTo(group.members),
+            subject,
+            text: `${subject} for ${project.title} on ${when} in ${event.location.title}`,
+          }
+        : [];
 
     // apply form values to data
     const formToSubmit = updater(values);
@@ -90,13 +94,13 @@ export const submitHandler =
     fetch(`${Reservation.url}${values.id ? `/${values.id}` : ""}`, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...formToSubmit, mail }),
+      body: JSON.stringify({ ...formToSubmit, mail, isAdmin }),
     })
       .then((response) => response.json())
       .then(({ error, data }) => {
         if (error) throw error;
         if (!data) throw new Error("No data returned");
-        const { event, reservation, group, project } = data;
+        const { event, reservation, group, project, isAdmin } = data;
         if (!event) throw new Error("No updated event returned");
         if (!reservation) throw new Error("No updated reservation returned");
         if (!group) throw new Error("No updated group returned");
@@ -122,18 +126,33 @@ export const submitHandler =
         });
 
         // update local state
-        dispatch({
-          type: CalendarAction.ReceivedReservationUpdate,
-          payload: {
-            resources: {
-              [ResourceKey.Events]: [new Event(event)],
-              [ResourceKey.Reservations]: [new Reservation(reservation)],
-              [ResourceKey.Groups]: [new UserGroup(group)],
-              [ResourceKey.Projects]: [new Project(project)],
+        if (isAdmin) {
+          dispatch({
+            type: CalendarAction.ReceivedAdminReservationUpdate,
+            payload: {
+              resources: {
+                [ResourceKey.Events]: [new Event(event)],
+                [ResourceKey.Reservations]: [new Reservation(reservation)],
+                [ResourceKey.Groups]: [new UserGroup(group)],
+                [ResourceKey.Projects]: [new Project(project)],
+              },
+              message: "Reservation made.",
             },
-            message,
-          },
-        });
+          });
+        } else {
+          dispatch({
+            type: CalendarAction.ReceivedReservationUpdate,
+            payload: {
+              resources: {
+                [ResourceKey.Events]: [new Event(event)],
+                [ResourceKey.Reservations]: [new Reservation(reservation)],
+                [ResourceKey.Groups]: [new UserGroup(group)],
+                [ResourceKey.Projects]: [new Project(project)],
+              },
+              message,
+            },
+          });
+        }
         closeForm();
       })
       .catch(onError)
@@ -180,6 +199,7 @@ export const makeInitialValues = (
     hasEquipment: "no",
     equipment: {},
     __equipment__: equipment,
+    sendEmail: "yes",
   };
 
   if (reservation) {
