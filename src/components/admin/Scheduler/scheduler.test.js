@@ -47,22 +47,7 @@ test("makeAllotmentSummaryEvent", () =>
     start: "2020-06-18",
     end: "2020-06-19",
     resourceId: "0",
-    title: "PROJECT TITLE - Allotted: 0 - Max: 10",
-  }));
-
-test("makeAllotmentEventMap", () =>
-  expect(
-    makeAllotmentEventMap({ id: 0 })({ end: "2020-06-18", hours: 0 }, 0)
-  ).toEqual({
-    end: "2020-06-19",
-    extendedProps: {
-      projectId: 0,
-    },
-    hours: 0,
-    id: Project.allotmentPrefix + "0-0",
-    resourceId: Project.allotmentPrefix + "0",
-    allDay: true,
-    title: "0",
+    title: "PROJECT TITLE |A:0|M:10|R:NaN|N:NaN",
   }));
 
 test("getFirstLastAndTotalFromAllotments initial", () =>
@@ -72,50 +57,6 @@ test("getFirstLastAndTotalFromAllotments initial", () =>
 
 test("makeAllotments with [] returns []", () =>
   expect(makeAllotments([], 0)).toEqual([]));
-
-test("makeAllotments", () =>
-  expect(
-    makeAllotments(
-      [
-        {
-          title: "PROJECT TITLE",
-          id: 0,
-          start: "2020-06-18",
-          end: "2020-06-18",
-          allotments: [
-            { start: "2020-06-18", end: "2020-06-18", locationId: 0, hours: 0 },
-          ],
-          locationHours: [{ locationId: 0, hours: 10 }],
-        },
-      ],
-      0
-    )
-  ).toEqual([
-    {
-      allDay: true,
-      end: "2020-06-19",
-      extendedProps: {
-        projectId: 0,
-      },
-      id: "allotmentTotal0",
-      resourceId: "0",
-      start: "2020-06-18",
-      title: "PROJECT TITLE - Allotted: 0 - Max: 10",
-    },
-    {
-      allDay: true,
-      end: "2020-06-19",
-      extendedProps: {
-        projectId: 0,
-      },
-      hours: 0,
-      id: Project.allotmentPrefix + "0-0",
-      locationId: 0,
-      resourceId: Project.allotmentPrefix + "0",
-      start: "2020-06-18",
-      title: "0",
-    },
-  ]));
 
 test("makeDailyHours", () =>
   expect(
