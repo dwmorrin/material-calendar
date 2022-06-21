@@ -78,14 +78,22 @@ export const submitHandler =
       values.id ? "modified" : "created"
     } a reservation for your group`;
     const when = formatDatetime(parseSQLDatetime(event.start));
-    const mail: Mail | Mail[] =
-      values.sendEmail === "yes"
-        ? {
-            to: groupTo(group.members),
-            subject,
-            text: `${subject} for ${project.title} on ${when} in ${event.location.title}`,
-          }
-        : [];
+    const mail: Mail[] = [];
+    if (values.sendEmail === "yes")
+      mail.push({
+        to: groupTo(group.members),
+        subject,
+        text: `${subject} for ${project.title} on ${when} in ${event.location.title}`,
+      });
+    if (project.title.startsWith(Project.classMeetingTitlePrefix))
+      mail.push({
+        to: String(process.env.REACT_APP_ADMIN_EMAIL),
+        subject: "Update to class meeting",
+        text: [
+          `${group.title} has updated for ${when} in ${event.location.title}.`,
+          `Requesting equipment? ${values.hasEquipment}.`,
+        ].join("\n"),
+      });
 
     // apply form values to data
     const formToSubmit = updater(values);
