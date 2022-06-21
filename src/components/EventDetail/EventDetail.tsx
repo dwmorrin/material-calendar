@@ -15,6 +15,7 @@ import {
 import { CalendarUIProps, CalendarAction } from "../types";
 import CloseIcon from "@material-ui/icons/Close";
 import {
+  addHours,
   castSQLDateToSQLDatetime,
   isBefore,
   isSameDay,
@@ -163,26 +164,40 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     (group) => group.projectId === currentUserWalkInProject?.id
   );
 
-  // returns true if there is no walk-in project
-  const hasReachedTheWalkInLimit = (event: Event): boolean => {
-    if (!currentUserWalkInProjectGroup) return true;
-    const now = nowInServerTimezone();
-    const myReservations = reservations.filter(
-      (reservation) =>
-        !reservation.cancelation?.refund.approved.by &&
-        reservation.groupId === currentUserWalkInProjectGroup.id &&
-        events.find((e) => e.id === reservation.eventId)?.location.groupId ===
-          event.location.groupId &&
-        isSameDay(
-          parseSQLDatetime(
-            events.find((event) => event.id === reservation.eventId)?.start ||
-              ""
-          ),
-          now
+  const now = nowInServerTimezone();
+  const walkInReservationsToday: Reservation[] =
+    state.currentEvent && currentUserWalkInProjectGroup
+      ? reservations.filter(
+          (reservation) =>
+            // ignore refunded
+            Reservation.isNotRefunded(reservation) &&
+            // ignore non-walk-in reservations
+            reservation.groupId === currentUserWalkInProjectGroup.id &&
+            // ignore other location groups
+            events.find((e) => e.id === reservation.eventId)?.location
+              .groupId === state.currentEvent?.location.groupId &&
+            // ignore other days
+            isSameDay(
+              parseSQLDatetime(
+                events.find((event) => event.id === reservation.eventId)
+                  ?.start || "1900-01-01 00:00:00"
+              ),
+              now
+            )
         )
-    );
-    return Reservation.rules.maxWalkInsPerLocation <= myReservations.length;
-  };
+      : [];
+  const hotReservations: Reservation[] = walkInReservationsToday.filter(
+    (reservation) =>
+      isBefore(
+        now,
+        addHours(
+          parseSQLDatetime(reservation.created),
+          Number(process.env.REACT_APP_WALK_IN_COOLING_OFF_HOURS || 2)
+        )
+      )
+  );
+  const hasReachedTheWalkInLimit =
+    Reservation.rules.maxWalkInsPerLocation <= hotReservations.length;
 
   const getProjectGroup = (project: Project): UserGroup | undefined => {
     return (state.resources[ResourceKey.Groups] as UserGroup[]).find(
@@ -214,8 +229,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   };
 
   const walkInValid =
-    Event.isAvailableForWalkIn(state.currentEvent) &&
-    !hasReachedTheWalkInLimit(state.currentEvent);
+    Event.isAvailableForWalkIn(state.currentEvent) && !hasReachedTheWalkInLimit;
 
   const projectsActiveNow = projects.filter(
     ({ title, allotments }) =>
@@ -336,6 +350,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               dispatch={dispatch}
               event={state.currentEvent}
               walkInValid={walkInValid}
+              hotReservations={hotReservations}
             />
             {userOwns && eventHasNotEnded && (
               <Button
