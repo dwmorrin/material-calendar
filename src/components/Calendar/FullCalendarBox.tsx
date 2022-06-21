@@ -54,8 +54,8 @@ const FullCalendarBox: FunctionComponent<
   ).map(({ id }) => id);
   const classes = useStyles();
 
-  const dispatchError = (error: Error): void =>
-    dispatch({ type: CalendarAction.Error, payload: { error } });
+  // const dispatchError = (error: Error): void =>
+  //   dispatch({ type: CalendarAction.Error, payload: { error } });
 
   if (state.initialResourcesPending)
     return <CircularProgress size="90%" thickness={1} />;

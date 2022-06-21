@@ -42,7 +42,7 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
   const [selections, setSelections] = useLocalStorage("calendar-selections", {
     locationIds: [],
     projectIds: [],
-    calendarView: "resourceTimeGridWeek",
+    calendarView: "resourceTimeGridDay",
   } as CalendarSelections);
 
   // initial data fetch
