@@ -5,9 +5,10 @@ import { EquipmentTable, EquipmentValue } from "../../../resources/Equipment";
 
 type EquipmentFormValue = string | number | boolean | EquipmentValue;
 export interface EquipmentState {
+  equipment: EquipmentTable;
+  filteredEquipment: EquipmentTable;
   filterDrawerIsOpen: boolean;
   equipmentCartIsOpen: boolean;
-  // categoryDrawerView: boolean;
   searchString: string;
   tags: Tag[];
   selectedTags: Record<string, boolean>;

@@ -3,9 +3,10 @@ import Category from "../../../resources/Category";
 import Tag from "../../../resources/Tag";
 
 export const initialState = {
+  equipment: {},
+  filteredEquipment: {},
   filterDrawerIsOpen: false,
   equipmentCartIsOpen: false,
-  // categoryDrawerView: false,
   searchString: "",
   tags: [] as Tag[],
   categories: [] as Category[],
@@ -19,10 +20,22 @@ type StateHandler = (
   action: EquipmentAction
 ) => EquipmentState;
 
-const changedSearchString: StateHandler = (state, { payload }) => ({
-  ...state,
-  ...payload,
-});
+const changedSearchString: StateHandler = (state, { payload }) => {
+  const { searchString = "" } = payload;
+  const { equipment } = state;
+  const lcSearchString = searchString.toLowerCase();
+  const filteredEquipment = Object.fromEntries(
+    Object.entries(equipment).filter(([nameHash]) =>
+      nameHash.toLowerCase().includes(lcSearchString)
+    )
+  );
+
+  return {
+    ...state,
+    searchString,
+    filteredEquipment,
+  };
+};
 
 const receivedResource: StateHandler = (state, { payload }) => ({
   ...state,
