@@ -37,7 +37,11 @@ const AdminBar: FunctionComponent<AdminUIProps & { exceptionCount: number }> =
               <MenuIcon />
             </Badge>
           </IconButton>
-          <Typography className={classes.title}>Calendar Admin</Typography>
+          <Typography className={classes.title}>
+            {process.env.NODE_ENV === "production"
+              ? "Calendar Admin"
+              : "YOU ARE ON THE DEVELOPMENT SITE"}
+          </Typography>
           <MoreMenu inAdminApp />
         </Toolbar>
       </AppBar>
