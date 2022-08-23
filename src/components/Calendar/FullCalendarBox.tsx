@@ -116,6 +116,13 @@ const FullCalendarBox: FunctionComponent<
                   )
                 );
               }
+              dispatch({
+                type: CalendarAction.ReceivedResource,
+                payload: {
+                  resources: { [ResourceKey.Events]: eventsInView },
+                },
+                meta: ResourceKey.Events,
+              });
             })
             .catch(dispatchError);
         }}
