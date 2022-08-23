@@ -30,6 +30,7 @@ import {
 import DateFnsUtils from "@date-io/date-fns";
 import {
   parseAndFormatSQLDatetimeInterval,
+  parseSQLDate,
   parseSQLDatetime,
 } from "../../utils/date";
 import * as Yup from "yup";
@@ -57,12 +58,14 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
   if (!location) return null; // should be impossible to get here
 
   const events = state.resources[ResourceKey.Events] as Event[];
+  const semesterEnd = state.currentSemester?.end;
+  const until = semesterEnd ? parseSQLDate(semesterEnd) : new Date();
 
   const initialValues = {
     ...event,
     start: parseSQLDatetime(event.start),
     end: parseSQLDatetime(event.end),
-    __options__: initialEventOptions,
+    __options__: { ...initialEventOptions, until },
   };
   const onSubmit = makeConfirmation({
     dispatch,

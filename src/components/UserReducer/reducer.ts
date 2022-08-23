@@ -115,6 +115,17 @@ const pickedDate: StateHandler = (state, action) => {
   return { ...state, currentStart, pickerShowing: !state.pickerShowing };
 };
 
+const receivedCurrentSemester: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload?.currentSemester) {
+    return missingResource(state, action, "current semester not found");
+  }
+  return {
+    ...state,
+    currentSemester: payload.currentSemester,
+  };
+};
+
 const selectedLocation: StateHandler = (state, action) => {
   const { payload } = action;
   if (!payload?.resources || !payload.resources[ResourceKey.Locations]) {
@@ -185,6 +196,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.ReceivedAdminReservationUpdate]:
       receivedAdminReservationUpdate,
     [CalendarAction.ReceivedAllResources]: receivedAllResources,
+    [CalendarAction.ReceivedCurrentSemester]: receivedCurrentSemester,
     [CalendarAction.ReceivedInvitations]: receivedInvitations,
     [CalendarAction.ReceivedReservationCancelation]:
       receivedReservationCancelation,

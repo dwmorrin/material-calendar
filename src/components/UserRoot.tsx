@@ -27,6 +27,7 @@ import Location from "../resources/Location";
 import UserGroup from "../resources/UserGroup";
 import Category from "../resources/Category";
 import Reservation from "../resources/Reservation";
+import Semester from "../resources/Semester";
 import { useSocket } from "./SocketProvider";
 import SocketCalendarEffect from "./SocketCalendarEffect";
 
@@ -62,6 +63,23 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
       `${Reservation.url}/user?context=${ResourceKey.Reservations}`
     );
   }, [user]);
+
+  // separate fetch for current semester
+  useEffect(() => {
+    fetch(`${Semester.url}/current`)
+      .then((res) => {
+        if (res.ok) return res.json();
+        // this particular call is not currently important, so failure is OK here.
+      })
+      .then(({ data, error }) => {
+        if (error) return;
+        // failure here is OK.
+        dispatch({
+          type: CalendarAction.ReceivedCurrentSemester,
+          payload: { currentSemester: data },
+        });
+      });
+  }, []);
 
   // socket event handlers
   useEffect(

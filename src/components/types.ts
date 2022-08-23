@@ -2,6 +2,7 @@ import Event from "../resources/Event";
 import Project from "../resources/Project";
 import FullCalendar from "@fullcalendar/react";
 import UserGroup from "../resources/UserGroup";
+import Semester from "../resources/Semester";
 import { ResourceKey, ResourceInstance } from "../resources/types";
 import { SnackbarState } from "../components/Snackbar";
 
@@ -41,6 +42,7 @@ export enum CalendarAction {
   PickedDate,
   ReceivedAdminReservationUpdate,
   ReceivedAllResources,
+  ReceivedCurrentSemester,
   ReceivedInvitations,
   ReceivedReservationCancelation,
   ReceivedReservationUpdate,
@@ -93,6 +95,7 @@ export interface CalendarState {
   currentGroup?: UserGroup;
   currentProject?: Project;
   currentCourse?: { id: number; title: string };
+  currentSemester?: Semester;
 }
 
 export type PartialCalendarState = Partial<Omit<CalendarState, "resources">> & {
