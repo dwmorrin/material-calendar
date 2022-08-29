@@ -2,6 +2,7 @@ import Project, { ProjectLocationHours } from "../../../resources/Project";
 import Course from "../../../resources/Course";
 import Section from "../../../resources/Section";
 import Location from "../../../resources/Location";
+import Semester from "../../../resources/Semester";
 import { AdminState } from "../types";
 import { formatSQLDate, parseSQLDate } from "../../../utils/date";
 import { ResourceKey } from "../../../resources/types";
@@ -21,12 +22,15 @@ export interface ProjectValues extends Record<string, unknown> {
 }
 
 export const values = (state: AdminState): Record<string, unknown> => {
+  const semesters = state.resources[ResourceKey.Semesters] as Semester[];
+  const activeSemester = semesters.find((s) => s.active);
+  const activeSemesterId = activeSemester ? activeSemester.id : 0;
   const project = state.resourceInstance as Project;
   const courses = state.resources[ResourceKey.Courses] as Course[];
   const course = courses.find((c) => c.id === project.course.id);
   const sections = state.resources[ResourceKey.Sections] as Section[];
   const courseSections = sections.reduce((dict, section) => {
-    if (!section.title) return dict;
+    if (!section.title || section.semesterId !== activeSemesterId) return dict;
     const course = courses.find((course) => course.id === section.courseId);
     if (!course) return dict;
     if (!dict[course.id]) {

@@ -28,5 +28,6 @@ export const update = (
     courseId: Number(courseId),
     instructor,
     title,
+    semesterId: 0, // !this assumes 'current semester' is overriding somewhere
   };
 };
