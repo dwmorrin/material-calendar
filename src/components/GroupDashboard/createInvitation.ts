@@ -37,7 +37,10 @@ const createGroup = ({
   const mail: Mail = {
     to: groupTo(invitees),
     subject: "You have been invited to a group",
-    text: `${name} has invited you to join their group for ${project.title}`,
+    text: [
+      `${name} has invited you to join their group for ${project.title}.`,
+      `To accept the invitation, go to ${window.location.origin}`,
+    ].join(" "),
   };
   const request: CreateGroupRequest = {
     title: UserGroup.makeTitle(invitees),
