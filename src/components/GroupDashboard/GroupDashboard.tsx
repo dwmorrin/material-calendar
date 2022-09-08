@@ -117,7 +117,7 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
               )}
               {!myInvitation && (
                 <CreateNewGroupAccordion
-                  defaultExpanded={!invitations}
+                  defaultExpanded={!invitations.length}
                   project={currentProject}
                   openConfirmationDialog={openConfirmationDialog}
                   dispatch={dispatch}
@@ -128,8 +128,9 @@ const GroupDashboard: FC<CalendarUIProps> = ({ state, dispatch }) => {
                   setProjectMembers={setProjectMembers}
                 />
               )}
-              <ProjectMembers projectMembers={projectMembers} />
             </List>
+            <Typography>Project members and status</Typography>
+            <ProjectMembers projectMembers={projectMembers} />
             <ConfirmationDialog
               dispatch={dispatch}
               open={confirmationDialogIsOpen}
