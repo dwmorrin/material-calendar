@@ -59,17 +59,17 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
   if (!currentEvent) return null;
   const { reservation } = currentEvent;
 
-  let project: Project | null = null;
+  let initialProject: Project | null = null;
 
   if (reservation) {
     const foundProject = allProjects.find(
       (p) => p.id === reservation.projectId
     );
-    if (foundProject) project = foundProject;
+    if (foundProject) initialProject = foundProject;
   }
 
   // If walk-in is valid, then user MUST use the walk-in option.
-  if (!project && walkInValid) {
+  if (!initialProject && walkInValid) {
     const maybeProject = (
       state.resources[ResourceKey.Projects] as Project[]
     ).find((p) => Project.walkInTitle === p.title);
@@ -81,13 +81,16 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
       );
       return null;
     }
-    project = maybeProject;
-  } else if (!project) project = projects[0] || new Project();
+    initialProject = maybeProject;
+  } else if (!initialProject) initialProject = projects[0] || new Project();
 
-  const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-    ({ projectId }) => projectId === project?.id
-  );
-  if (!group) return null;
+  const getGroupByProjectId = (projectId: number): UserGroup | undefined =>
+    (state.resources[ResourceKey.Groups] as UserGroup[]).find(
+      (g) => g.projectId === projectId
+    );
+
+  const initialGroup = getGroupByProjectId(initialProject?.id || 0);
+  if (!initialGroup) return null;
 
   const categories = state.resources[ResourceKey.Categories] as Category[];
 
@@ -106,10 +109,12 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
     }
   };
 
-  const isNotWalkIn = !walkInValid && project?.title !== Project.walkInTitle;
+  const isNotWalkIn =
+    !walkInValid && initialProject?.title !== Project.walkInTitle;
   // TODO: this is a hack to ensure the project gets included into the available projects
   // TODO: review the logic that determines the 'projects' array
-  if (!projects.find((p) => p.id === project?.id)) projects.push(project);
+  if (!projects.find((p) => p.id === initialProject?.id))
+    projects.push(initialProject);
 
   return (
     <Dialog
@@ -135,9 +140,9 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
         <Formik
           initialValues={makeInitialValues(
             currentEvent,
-            group,
+            initialGroup,
             equipmentValues,
-            project
+            initialProject
           )}
           onSubmit={submitHandler({
             broadcast,
@@ -164,7 +169,8 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
                 <Typography variant="subtitle1">Walk-In</Typography>
               )}
               <FormLabel className={classes.item}>Group:</FormLabel>
-              {group.title}
+              {getGroupByProjectId(values.projectId)?.title ||
+                "Error: no group found!"}
               <FormLabel className={classes.item}>Description</FormLabel>
               <Field
                 component={TextField}

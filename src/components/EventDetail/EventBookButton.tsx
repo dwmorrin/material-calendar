@@ -54,8 +54,13 @@ const EventBookButton: FC<EventBookButtonProps> = ({
   hotReservations,
 }) => {
   const { broadcast } = useSocket();
+  const maxResPerLocationGroup = Number(
+    process.env.REACT_APP_WALK_IN_RESERVATIONS_PER_LOCATION || 2
+  );
+  const hasReachedLimit = hotReservations.length >= maxResPerLocationGroup;
 
   const disabled =
+    hasReachedLimit ||
     event.locked ||
     !(
       reservationCutoffHasNotPassed &&
@@ -66,7 +71,7 @@ const EventBookButton: FC<EventBookButtonProps> = ({
     if (event.locked) return "Someone else has the reservation form open";
     if (userOwns) return "Modify your reservation";
     if (walkInValid) return "Reserve Walk-In Time";
-    if (hotReservations.length) return getCoolDownTime(hotReservations);
+    if (hasReachedLimit) return getCoolDownTime(hotReservations);
     return "Reserve this time";
   };
 
