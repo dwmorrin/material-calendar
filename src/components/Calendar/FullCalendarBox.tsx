@@ -26,10 +26,10 @@ import {
 } from "./lib";
 import { useAuth } from "../AuthProvider";
 import {
-  // isWithinIntervalFP,
+  isWithinIntervalFP,
   parseAndFormatFCString,
-  // parseFCString,
-  // parseSQLDatetime,
+  parseFCString,
+  parseSQLDatetime,
 } from "../../utils/date";
 
 const useStyles = makeStyles((theme) => ({
@@ -54,9 +54,6 @@ const FullCalendarBox: FunctionComponent<
   ).map(({ id }) => id);
   const classes = useStyles();
 
-  const dispatchError = (error: Error): void =>
-    dispatch({ type: CalendarAction.Error, payload: { error } });
-
   if (state.initialResourcesPending)
     return <CircularProgress size="90%" thickness={1} />;
   return (
@@ -75,56 +72,35 @@ const FullCalendarBox: FunctionComponent<
         events={({ startStr, endStr }, successCallback): void => {
           // https://fullcalendar.io/docs/events-function
           // startStr and endStr format: "2022-05-13T00:00:00"
-
-          // API query parameters start and end take SQL date strings
-          const queryParams = Object.entries({
-            start: startStr.split("T")[0],
-            end: endStr.split("T")[0],
-          })
-            .map(([k, v]) => `${k}=${v}`)
-            .join("&");
-
-          fetch(`${Event.url}/range?${queryParams}`)
-            .then((res) => {
-              if (res.ok) return res.json();
-              throw new Error(res.statusText);
-            })
-            .then(({ data, error }) => {
-              if (error) return dispatchError(error);
-              const eventsInView: Event[] = (data as Event[]).map(
-                (e) => new Event(e)
-              );
-              if (
-                (
-                  [
-                    "resourceTimeGridDay",
-                    "resourceTimeGridWeek",
-                  ] as CalendarView[]
-                ).includes(selections.calendarView)
-              ) {
-                // FullCalendar's resource system handles locations automatically
-                // so long as we provide a .resourceId prop
-                successCallback(eventsInView.map(addResourceId(groupIds)));
-              } else {
-                // We are not using the resource system; we have to manually group locations
-                successCallback(
-                  getEventsByLocationId(
-                    groupIds,
-                    eventsInView,
-                    projectLocations,
-                    selections.locationIds
-                  )
-                );
-              }
-              dispatch({
-                type: CalendarAction.ReceivedResource,
-                payload: {
-                  resources: { [ResourceKey.Events]: eventsInView },
-                },
-                meta: ResourceKey.Events,
-              });
-            })
-            .catch(dispatchError);
+          const inView = isWithinIntervalFP({
+            start: parseFCString(startStr),
+            end: parseFCString(endStr),
+          });
+          const eventsInView = events.filter((event) =>
+            inView(
+              parseSQLDatetime(event.start) ||
+                inView(parseSQLDatetime(event.end))
+            )
+          );
+          if (
+            (
+              ["resourceTimeGridDay", "resourceTimeGridWeek"] as CalendarView[]
+            ).includes(selections.calendarView)
+          ) {
+            // FullCalendar's resource system handles locations automatically
+            // so long as we provide a .resourceId prop
+            successCallback(eventsInView.map(addResourceId(groupIds)));
+          } else {
+            // We are not using the resource system; we have to manually group locations
+            successCallback(
+              getEventsByLocationId(
+                groupIds,
+                eventsInView,
+                projectLocations,
+                selections.locationIds
+              )
+            );
+          }
         }}
         eventClick={makeEventClick(dispatch, events)}
         // VISIBLE DATE RANGE
