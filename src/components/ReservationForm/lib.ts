@@ -35,14 +35,11 @@ export const useStyles = makeStyles({
 
 export const transition = makeTransition("left");
 
-const updater = (
-  values: ReservationFormValues,
-  groupId: number
-): ReservationSubmitValues => ({
+const updater = (values: ReservationFormValues): ReservationSubmitValues => ({
   id: values.id,
   eventId: values.eventId,
   projectId: values.projectId,
-  groupId,
+  groupId: values.groupId,
   description: values.description,
   guests: values.hasGuests ? values.guests : "",
   liveRoom: values.liveRoom === "yes",
@@ -70,7 +67,7 @@ export const submitHandler =
       dispatch({ type: CalendarAction.Error, payload: { error } });
     actions.setSubmitting(true);
     const project = projects.find((project) => project.id === values.projectId);
-    const group = groups.find((group) => group.projectId === project?.id);
+    const group = groups.find((group) => group.id === values.groupId);
     if (!group || !project) {
       actions.setSubmitting(false);
       return onError(new Error("Invalid project/group in reservation form."));
@@ -99,7 +96,7 @@ export const submitHandler =
       });
 
     // apply form values to data
-    const formToSubmit = updater(values, group.id);
+    const formToSubmit = updater(values);
     const method = values.id ? "PUT" : "POST";
 
     fetch(`${Reservation.url}${values.id ? `/${values.id}` : ""}`, {

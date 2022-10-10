@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import { CalendarUIProps, CalendarAction } from "../types";
 import {
   Button,
@@ -13,7 +13,7 @@ import {
 import { Select, TextField } from "formik-material-ui";
 import CloseIcon from "@material-ui/icons/Close";
 import UserGroup from "../../resources/UserGroup";
-import { Field, Form, Formik } from "formik";
+import { Field, Form, Formik, useFormikContext } from "formik";
 import EquipmentCart from "./EquipmentForm/EquipmentCart";
 import EquipmentForm from "./EquipmentForm/EquipmentForm";
 import { ResourceKey } from "../../resources/types";
@@ -32,6 +32,30 @@ import Equipment from "../../resources/Equipment";
 import Event from "../../resources/Event";
 import Category from "../../resources/Category";
 import RadioYesNo from "../RadioYesNo";
+
+interface GroupFieldProps {
+  getId: (id: number) => number;
+}
+
+/**
+ * Hidden helper field to track the group ID number as different projects
+ * are selected
+ */
+const GroupField: FunctionComponent<GroupFieldProps> = ({ getId }) => {
+  const { values, setFieldValue } = useFormikContext();
+  useEffect(() => {
+    const id = getId((values as { projectId: number }).projectId);
+    setFieldValue("groupId", id);
+  }, [getId, setFieldValue, values]);
+
+  return (
+    <Field
+      type="hidden"
+      name="groupId"
+      value={getId((values as { projectId: number }).projectId)}
+    />
+  );
+};
 
 interface ReservationFormProps extends CalendarUIProps {
   projects: Project[];
@@ -88,6 +112,9 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
     (state.resources[ResourceKey.Groups] as UserGroup[]).find(
       (g) => g.projectId === projectId
     );
+
+  const getGroupIdByProjectId = (projectId: number): number =>
+    getGroupByProjectId(projectId)?.id || 0;
 
   const initialGroup = getGroupByProjectId(initialProject?.id || 0);
   if (!initialGroup) return null;
@@ -168,6 +195,7 @@ const ReservationForm: FunctionComponent<ReservationFormProps> = ({
               ) : (
                 <Typography variant="subtitle1">Walk-In</Typography>
               )}
+              <GroupField getId={getGroupIdByProjectId} />
               <FormLabel className={classes.item}>Group:</FormLabel>
               {getGroupByProjectId(values.projectId)?.title ||
                 "Error: no group found!"}

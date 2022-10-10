@@ -126,8 +126,8 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
       .catch(dispatchError);
   }, [dispatch]);
 
-  const group = groups[0] || new UserGroup();
-  const project = projects[0] || new Project();
+  const initialGroup = groups[0] || new UserGroup();
+  const initialProject = projects[0] || new Project();
 
   return (
     <Dialog
@@ -153,9 +153,9 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
         <Formik
           initialValues={makeInitialValues(
             currentEvent,
-            group,
+            initialGroup,
             equipmentValues,
-            project
+            initialProject
           )}
           onSubmit={submitHandler({
             broadcast,
