@@ -60,7 +60,7 @@ const EventBookButton: FC<EventBookButtonProps> = ({
   const hasReachedLimit = hotReservations.length >= maxResPerLocationGroup;
 
   const disabled =
-    hasReachedLimit ||
+    (!userOwns && hasReachedLimit) ||
     event.locked ||
     !(
       reservationCutoffHasNotPassed &&
