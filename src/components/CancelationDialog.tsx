@@ -1,11 +1,11 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent } from "react";
 import {
   Dialog,
   Button,
   DialogContent,
   DialogActions,
-  TextField,
 } from "@material-ui/core";
+import { TextField } from "formik-material-ui";
 import { CalendarUIProps, CalendarAction } from "./types";
 import { useAuth } from "./AuthProvider";
 import { makeTransition } from "./Transition";
@@ -18,6 +18,12 @@ import { Mail, adminEmail, groupTo } from "../utils/mail";
 import { formatDatetime, isBefore, nowInServerTimezone } from "../utils/date";
 import { SocketMessageKind, ReservationChangePayload } from "./SocketProvider";
 import forward from "./ReservationForm/forward";
+import { Formik, Form, Field } from "formik";
+
+interface FormValues {
+  refundMessage: string;
+  refundRequested: boolean;
+}
 
 const transition = makeTransition("left");
 
@@ -43,12 +49,13 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   gracePeriodCutoff,
   isWalkIn,
 }) => {
-  const dispatchError = (error: Error, meta?: unknown): void =>
+  const dispatchError = (error: Error, meta?: unknown): void => {
+    setOpen(false);
     dispatch({ type: CalendarAction.Error, payload: { error }, meta });
+  };
   const { user } = useAuth();
   const myName = `${user.name.first} ${user.name.last}`;
   const userId = user.id;
-  const [message, setMessage] = useState("");
 
   const { currentEvent } = state;
   if (!currentEvent) return null;
@@ -75,9 +82,10 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   const cancelationApprovalCutoffString = formatDatetime(
     cancelationApprovalCutoff
   );
-  const onCancelationRequest = ({ refund = false } = {}): void => {
+  const onCancelationRequest = (values: FormValues): void => {
+    const { refundRequested, refundMessage: message } = values;
     const mail: Mail[] = [];
-    const refundMessage = refund
+    const refundMessage = refundRequested
       ? " They requested that project hours be refunded. The request has been sent to the administrator."
       : " They did not request that project hours be refunded, so the hours have been forfeited.";
     mail.push({
@@ -87,7 +95,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         group.title
       }. ${myName} has ${body}.${autoApprove ? "" : refundMessage}`,
     });
-    if (!autoApprove && adminEmail && refund)
+    if (!autoApprove && adminEmail && refundRequested)
       mail.push({
         to: adminEmail,
         subject: "Project Hour Refund Request",
@@ -103,7 +111,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
               refundApproved: true,
               mail,
             }
-          : refund
+          : refundRequested
           ? {
               refundRequest: true,
               refundComment: message,
@@ -115,7 +123,10 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     })
       .then((response) => response.json())
       .then(({ error, data }) => {
-        if (error || !data) return dispatchError(error || new Error("no data"));
+        if (error || !data)
+          return dispatchError(
+            error || new Error("Hmm... no confirmation sent from the server")
+          );
         const { reservations: resData, events: eventData } = data as {
           reservations: Reservation[];
           events: Event[];
@@ -153,82 +164,113 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       })
       .catch(dispatchError);
   };
+
   return (
     <Dialog TransitionComponent={transition} open={open}>
-      {autoApprove || isWalkIn ? (
-        <DialogContent>Are you sure you want to cancel?</DialogContent>
-      ) : (
-        <DialogContent>
-          <p>
-            You can still cancel, but your time will not be automatically
-            refunded.
-          </p>
-          <p>
-            (You needed to cancel{" "}
-            {Reservation.rules.refundCutoffHours.toString()} hours before the
-            start of your reservation, which was at{" "}
-            {cancelationApprovalCutoffString}.)
-          </p>
-          <p>
-            You can send a message to the administrator using the text box
-            below.
-          </p>
-          <TextField
-            id="filled-basic"
-            label="You can type a message here"
-            variant="filled"
-            fullWidth
-            onChange={(event): void => {
-              event.stopPropagation();
-              setMessage(event.target.value);
-            }}
-          />
-        </DialogContent>
-      )}
-      {autoApprove ? (
-        <DialogActions>
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={(): void => onCancelationRequest({ refund: true })}
-          >
-            Cancel reservation
-          </Button>
-          <Button onClick={(): void => setOpen(false)}>Go Back</Button>
-        </DialogActions>
-      ) : isWalkIn ? (
-        <DialogActions>
-          <Button
-            color="secondary"
-            variant="contained"
-            // style={{ backgroundColor: "salmon", color: "white" }}
-            onClick={(): void => onCancelationRequest()}
-          >
-            Cancel Reservation
-          </Button>
-          <Button onClick={(): void => setOpen(false)}>Go Back</Button>
-        </DialogActions>
-      ) : (
-        <DialogActions>
-          <Button
-            color="primary"
-            variant="contained"
-            // style={{ backgroundColor: "yellow", color: "black" }}
-            onClick={(): void => onCancelationRequest({ refund: true })}
-          >
-            Cancel Reservation and request refund
-          </Button>
-          <Button
-            color="secondary"
-            variant="contained"
-            // style={{ backgroundColor: "salmon", color: "white" }}
-            onClick={(): void => onCancelationRequest()}
-          >
-            Cancel Reservation without refund
-          </Button>
-          <Button onClick={(): void => setOpen(false)}>Go Back</Button>
-        </DialogActions>
-      )}
+      <Formik
+        initialValues={{
+          refundMessage: "",
+          refundRequested: false,
+        }}
+        onSubmit={onCancelationRequest}
+      >
+        {({ isSubmitting, handleSubmit, setFieldValue }): unknown => (
+          <Form onSubmit={handleSubmit}>
+            {autoApprove || isWalkIn ? (
+              <DialogContent>Are you sure you want to cancel?</DialogContent>
+            ) : (
+              <DialogContent>
+                <p>
+                  You can still cancel, but your time will not be automatically
+                  refunded.
+                </p>
+                <p>
+                  (You needed to cancel{" "}
+                  {Reservation.rules.refundCutoffHours.toString()} hours before
+                  the start of your reservation, which was at{" "}
+                  {cancelationApprovalCutoffString}.)
+                </p>
+                <p>
+                  You can send a message to the administrator using the text box
+                  below.
+                </p>
+                <Field
+                  component={TextField}
+                  label="You can type a message here"
+                  name="refundMessage"
+                  variant="filled"
+                  fullWidth
+                />
+              </DialogContent>
+            )}
+            {autoApprove ? (
+              <DialogActions>
+                <Button
+                  type="submit"
+                  color="secondary"
+                  variant="contained"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Sending..." : "Cancel reservation"}
+                </Button>
+                <Button
+                  disabled={isSubmitting}
+                  onClick={(): void => setOpen(false)}
+                >
+                  Go Back
+                </Button>
+              </DialogActions>
+            ) : isWalkIn ? (
+              <DialogActions>
+                <Button
+                  type="submit"
+                  color="secondary"
+                  variant="contained"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Sending..." : "Cancel reservation"}
+                </Button>
+                <Button
+                  disabled={isSubmitting}
+                  onClick={(): void => setOpen(false)}
+                >
+                  Go Back
+                </Button>
+              </DialogActions>
+            ) : (
+              <DialogActions>
+                <Button
+                  type="submit"
+                  color="primary"
+                  variant="contained"
+                  disabled={isSubmitting}
+                  onClick={(): void => setFieldValue("refundRequested", true)}
+                >
+                  {isSubmitting
+                    ? "Sending..."
+                    : "Cancel reservation and request refund"}
+                </Button>
+                <Button
+                  type="submit"
+                  color="secondary"
+                  variant="contained"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? "Sending..."
+                    : "Cancel reservation without refund"}
+                </Button>
+                <Button
+                  disabled={isSubmitting}
+                  onClick={(): void => setOpen(false)}
+                >
+                  Go Back
+                </Button>
+              </DialogActions>
+            )}
+          </Form>
+        )}
+      </Formik>
     </Dialog>
   );
 };
