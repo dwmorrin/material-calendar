@@ -408,7 +408,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             </List>
             {!!projectsWithoutHours.length && (
               <Typography variant="body2">
-                These projects have no hours remaining:
+                These projects are unavailable in this location at this time:
+                (open project page for more info)
               </Typography>
             )}
             <List>
