@@ -44,11 +44,13 @@ const cancelReservation = ({
   refund,
   reservation,
   user,
+  cleanup,
 }: {
   dispatch: (action: Action) => void;
   refund: boolean;
   reservation?: ReservationInfo;
   user: User;
+  cleanup: () => void;
 }): void => {
   if (!reservation) return;
   const body = {
@@ -82,7 +84,8 @@ const cancelReservation = ({
     })
     .catch((error) =>
       dispatch({ type: CalendarAction.Error, payload: { error } })
-    );
+    )
+    .finally(() => cleanup());
 };
 
 const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
@@ -90,6 +93,7 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
   const [groups, setGroups] = useState<UserGroup[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [cancelDialogIsOpen, setCancelDialogIsOpen] = useState<boolean>(false);
+  const [cancelIsSubmitting, setCancelIsSubmitting] = useState<boolean>(false);
   const classes = useStyles();
   const closeForm = (): void => {
     dispatch({ type: CalendarAction.CloseReservationFormAdmin });
@@ -279,6 +283,7 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
                   color="secondary"
                   variant="contained"
                   onClick={(): void => setCancelDialogIsOpen(true)}
+                  disabled={isSubmitting}
                 >
                   Cancel Reservation
                 </Button>
@@ -306,34 +311,39 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
         <DialogContent>Cancel this reservation?</DialogContent>
         <DialogActions>
           <Button
+            disabled={cancelIsSubmitting}
             variant="contained"
             onClick={(): void => {
+              setCancelIsSubmitting(true);
               cancelReservation({
                 dispatch,
                 refund: false,
                 reservation: currentEvent.reservation,
                 user,
+                cleanup: () => setCancelDialogIsOpen(false),
               });
-              setCancelDialogIsOpen(false);
             }}
           >
-            Yes, Cancel without refund
+            {cancelIsSubmitting ? "Sending..." : "Yes, Cancel without refund"}
           </Button>
           <Button
+            disabled={cancelIsSubmitting}
             variant="contained"
             onClick={(): void => {
+              setCancelIsSubmitting(true);
               cancelReservation({
                 dispatch,
                 refund: true,
                 reservation: currentEvent.reservation,
                 user,
+                cleanup: () => setCancelDialogIsOpen(false),
               });
-              setCancelDialogIsOpen(false);
             }}
           >
-            Yes, Cancel and refund hours
+            {cancelIsSubmitting ? "Sending..." : "Yes, Cancel and refund hours"}
           </Button>
           <Button
+            disabled={cancelIsSubmitting}
             variant="contained"
             onClick={(): void => setCancelDialogIsOpen(false)}
           >

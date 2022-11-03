@@ -18,6 +18,8 @@ export const canceledReservation: StateHandler = (state, { payload }) => {
         ...payload?.resources,
       },
       detailIsOpen: false,
+      reservationFormAdminIsOpen: false,
+      reservationFormIsOpen: false,
     },
     {
       type: CalendarAction.DisplayMessage,
