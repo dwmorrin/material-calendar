@@ -98,7 +98,7 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
           onSubmit={onSubmit}
           validationSchema={schema}
         >
-          {({ values, setFieldValue, handleSubmit }): unknown => (
+          {({ values, setFieldValue, handleSubmit, isSubmitting }): unknown => (
             <Form>
               <List>
                 <ListItem>
@@ -231,13 +231,19 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
                   </ListItem>
                 )}
                 <ListItem>
-                  <Button variant="contained" color="primary" type="submit">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
                     {event.id < 1 ? "Create event" : "Edit event"}
                   </Button>
                 </ListItem>
                 <DeleteButton
                   setFieldValue={setFieldValue}
                   handleSubmit={handleSubmit}
+                  disabled={isSubmitting}
                 />
                 {process.env.NODE_ENV === "development" && (
                   <pre>{JSON.stringify(values, null, 2)}</pre>

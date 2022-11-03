@@ -12,7 +12,14 @@ interface ResourceFormProps {
 
 const ResourceForm: FunctionComponent<
   FormikProps<Record<string, unknown>> & ResourceFormProps
-> = ({ FormFields, handleSubmit, setFieldValue, values, state }) => (
+> = ({
+  FormFields,
+  handleSubmit,
+  setFieldValue,
+  values,
+  state,
+  isSubmitting,
+}) => (
   <DialogContent>
     <Paper>
       <Form onSubmit={handleSubmit}>
@@ -35,6 +42,7 @@ const ResourceForm: FunctionComponent<
             <DeleteButton
               handleSubmit={handleSubmit}
               setFieldValue={setFieldValue}
+              disabled={isSubmitting}
             />
           </div>
           {process.env.NODE_ENV === "development" ? (

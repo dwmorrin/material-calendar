@@ -1,7 +1,6 @@
 import { Action, ApiResponse, CalendarAction } from "../types";
 import Event from "../../resources/Event";
 import Location from "../../resources/Location";
-import { FormikValues } from "formik";
 import {
   addDays,
   compareAscSQLDate,
@@ -26,10 +25,10 @@ interface DateInterval {
 interface EventGeneratorProps extends DateInterval {
   until: Date;
   days: number[];
-  hasHoursAvailable: (di: DateInterval) => InvervalHoursInfo;
+  hasHoursAvailable: (di: DateInterval) => IntervalHoursInfo;
 }
 
-interface InvervalHoursInfo {
+interface IntervalHoursInfo {
   max: number;
   existing: number;
 }
@@ -38,7 +37,7 @@ export interface GeneratedInterval {
   start: string;
   end: string;
   skipped: boolean;
-  hours: InvervalHoursInfo & { requested: number };
+  hours: IntervalHoursInfo & { requested: number };
 }
 
 const eventGenerator = ({
@@ -248,8 +247,7 @@ export const makeConfirmation =
     setConfirmationDialogIsOpen,
     broadcast,
   }: ConfirmationProps) =>
-  (values: EventValues, actions: FormikValues): void => {
-    actions.setSubmitting(false);
+  (values: EventValues): void => {
     if (values.__delete__) {
       afterConfirmed({
         generatedEvents: [],
@@ -293,7 +291,7 @@ export const makeConfirmation =
       return acc;
     }, {} as Record<string, number>);
 
-    const hasHoursAvailable = ({ start }: DateInterval): InvervalHoursInfo => {
+    const hasHoursAvailable = ({ start }: DateInterval): IntervalHoursInfo => {
       const dateString = formatSQLDate(start);
       return {
         existing: dailyUsage[dateString] || 0,

@@ -9,6 +9,7 @@ interface DeleteButtonProps {
     value: unknown,
     shouldValidate?: boolean | undefined
   ) => void;
+  disabled: boolean;
 }
 
 /**
@@ -18,6 +19,7 @@ interface DeleteButtonProps {
 const DeleteButton: FunctionComponent<DeleteButtonProps> = ({
   handleSubmit,
   setFieldValue,
+  disabled,
 }) => (
   <IconButton
     aria-label="delete"
@@ -26,6 +28,7 @@ const DeleteButton: FunctionComponent<DeleteButtonProps> = ({
       setFieldValue("__delete__", true);
       handleSubmit();
     }}
+    disabled={disabled}
   >
     <DeleteIcon />
   </IconButton>
