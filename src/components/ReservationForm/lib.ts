@@ -85,15 +85,31 @@ export const submitHandler =
         subject,
         text: `${subject} for ${project.title} on ${when} in ${event.location.title}`,
       });
-    if (project.title.startsWith(Project.classMeetingTitlePrefix))
+    if (project.title.startsWith(Project.classMeetingTitlePrefix)) {
       mail.push({
         to: String(process.env.REACT_APP_ADMIN_EMAIL),
         subject: "Update to class meeting",
         text: [
           `${group.title} has updated for ${when} in ${event.location.title}.`,
           `Requesting equipment? ${values.hasEquipment}.`,
+          "Notes:",
+          values.notes || "(no notes)",
         ].join("\n"),
       });
+    } else if (values.hasNotes && String(values.notes)) {
+      mail.push({
+        to: String(process.env.REACT_APP_ADMIN_EMAIL),
+        subject: `Booking notes: ${group.title}, ${when}, ${event.location.title}`,
+        text: [
+          `Group: ${group.title}`,
+          `When: ${when}`,
+          `Where: ${event.location.title}`,
+          `Requesting equipment? ${values.hasEquipment}.`,
+          "Notes:",
+          values.notes,
+        ].join("\n"),
+      });
+    }
 
     // apply form values to data
     const formToSubmit = updater(values);
