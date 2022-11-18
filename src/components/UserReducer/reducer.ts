@@ -8,7 +8,7 @@ import errorHandler from "./errorHandler";
 import { missingResource, impossibleState } from "./errorRedirect";
 import logger from "./logger";
 import getFCDateFromState from "../Calendar/getFCDateFromState";
-import { formatSQLDate } from "../../utils/date";
+import { addDays, formatSQLDate, parseSQLDate } from "../../utils/date";
 
 import {
   closeEventDetail,
@@ -80,6 +80,10 @@ const closeSnackbar: StateHandler = (state) => {
   return { ...state, snackbarQueue };
 };
 
+const loading: StateHandler = (state) => {
+  return { ...state, loading: true };
+};
+
 const openHelpDialog: StateHandler = (state) => ({
   ...state,
   helpDialogIsOpen: true,
@@ -120,9 +124,14 @@ const receivedCurrentSemester: StateHandler = (state, action) => {
   if (!payload?.currentSemester) {
     return missingResource(state, action, "current semester not found");
   }
+  const currentSemester = payload.currentSemester;
   return {
     ...state,
-    currentSemester: payload.currentSemester,
+    currentSemester,
+    eventRange: {
+      start: parseSQLDate(currentSemester.start),
+      end: addDays(parseSQLDate(currentSemester.end), 1),
+    },
   };
 };
 
@@ -179,6 +188,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.Error]: errorHandler,
     [CalendarAction.EventLock]: eventLock,
     [CalendarAction.EventUnlock]: eventUnlock,
+    [CalendarAction.Loading]: loading,
     [CalendarAction.FoundStaleCurrentEvent]: foundStaleCurrentEvent,
     [CalendarAction.JoinedGroup]: joinedGroup,
     [CalendarAction.LeftGroup]: leftGroup,

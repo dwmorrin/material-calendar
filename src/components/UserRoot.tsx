@@ -60,7 +60,8 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
       `${User.url}/${user.id}/projects?context=${ResourceKey.Projects}`,
       `${Equipment.url}?context=${ResourceKey.Equipment}`,
       `${Category.url}?context=${ResourceKey.Categories}`,
-      `${Reservation.url}/user?context=${ResourceKey.Reservations}`
+      `${Reservation.url}/user?context=${ResourceKey.Reservations}`,
+      `${Semester.url}/active?context=${ResourceKey.Semesters}`
     );
   }, [user]);
 

@@ -29,6 +29,7 @@ export enum CalendarAction {
   FoundStaleCurrentEvent,
   JoinedGroup,
   LeftGroup,
+  Loading,
   NavigateBefore,
   NavigateNext,
   OpenEventDetail,
@@ -76,11 +77,13 @@ export interface CalendarState {
   detailIsOpen: boolean;
   drawerIsOpen: boolean;
   eventEditorIsOpen: boolean;
+  eventRange: { start: Date; end: Date };
   error?: Error;
   helpDialogIsOpen: boolean;
   message: string;
   groupDashboardIsOpen: boolean;
   initialResourcesPending: boolean;
+  loading: boolean;
   pickerShowing: boolean;
   projectDashboardIsOpen: boolean;
   reservationFormIsOpen: boolean;
