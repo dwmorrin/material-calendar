@@ -74,12 +74,12 @@ const getEvents = (
   const expandingLeft = reqStart.valueOf() < state.eventRange.start.valueOf();
   const expandingRight = reqEnd.valueOf() > state.eventRange.end.valueOf();
 
-  if (!expandingLeft && !expandingRight) {
-    // If the requested range is already downloaded, proceed as before.
-    const inView = isWithinIntervalFP({
-      start: reqStart,
-      end: reqEnd,
-    });
+  const inView = isWithinIntervalFP({
+    start: reqStart,
+    end: reqEnd,
+  });
+
+  const updateFullCalendar = (events: Event[]): void => {
     const eventsInView = events.filter((event) =>
       inView(
         parseSQLDatetime(event.start) || inView(parseSQLDatetime(event.end))
@@ -104,13 +104,17 @@ const getEvents = (
         )
       );
     }
+  };
+
+  if (!expandingLeft && !expandingRight) {
+    // If the requested range is already downloaded, proceed as before.
+    updateFullCalendar(events);
   } else {
     // figure out which way we are expanding
     const left = expandingLeft ? reqStart : state.eventRange.end;
     const newLeft = expandingLeft ? reqStart : state.eventRange.start;
     const right = expandingRight ? reqEnd : state.eventRange.start;
     const newRight = expandingRight ? reqEnd : state.eventRange.end;
-    dispatch({ type: CalendarAction.Loading });
     fetch(
       `${Event.url}/range?start=${formatSQLDate(left)}&end=${formatSQLDate(
         addDays(right, 1)
@@ -124,12 +128,13 @@ const getEvents = (
         if (error) return dispatchError(error);
         if (!Array.isArray(data))
           return dispatchError(new Error("data is not an array"));
+        const expandedEvents = [...events, ...data.map((e) => new Event(e))];
         dispatch({
           type: CalendarAction.ReceivedResource,
           payload: {
             eventRange: { start: newLeft, end: newRight },
             resources: {
-              [ResourceKey.Events]: data.map((e) => new Event(e)),
+              [ResourceKey.Events]: expandedEvents,
             },
           },
           meta: ResourceKey.Events,
@@ -153,7 +158,7 @@ const FullCalendarBox: FunctionComponent<
   const locations = state.resources[ResourceKey.Locations] as Location[];
   const classes = useStyles();
 
-  if (state.initialResourcesPending || state.loading)
+  if (state.initialResourcesPending)
     return <CircularProgress size="90%" thickness={1} />;
   return (
     <Box>

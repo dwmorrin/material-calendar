@@ -21,7 +21,6 @@ export const initialCalendarState: CalendarState = {
   helpDialogIsOpen: false,
   groupDashboardIsOpen: false,
   initialResourcesPending: true,
-  loading: false,
   message: "",
   pickerShowing: false,
   projectDashboardIsOpen: false,

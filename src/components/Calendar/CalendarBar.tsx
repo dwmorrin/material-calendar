@@ -22,6 +22,7 @@ import MoreMenu from "../MoreMenu";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import UserGroup from "../../resources/UserGroup";
 import { ResourceKey } from "../../resources/types";
+import getFCDateFromState from "./getFCDateFromState";
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -77,7 +78,22 @@ const CalendarBar: FunctionComponent<
         <IconButton
           color="inherit"
           onClick={(): void => {
-            dispatch({ type: CalendarAction.NavigateBefore });
+            if (state.ref?.current) {
+              state.ref.current.getApi().prev();
+              dispatch({
+                type: CalendarAction.NavigateBefore,
+                payload: {
+                  currentStart: getFCDateFromState(state),
+                },
+              });
+            } else
+              dispatch({
+                type: CalendarAction.Error,
+                error: true,
+                payload: {
+                  error: new Error("Calendar library is unreachable"),
+                },
+              });
           }}
         >
           <NavigateBeforeIcon />
@@ -96,7 +112,22 @@ const CalendarBar: FunctionComponent<
         <IconButton
           color="inherit"
           onClick={(): void => {
-            dispatch({ type: CalendarAction.NavigateNext });
+            if (state.ref?.current) {
+              state.ref.current.getApi().next();
+              dispatch({
+                type: CalendarAction.NavigateNext,
+                payload: {
+                  currentStart: getFCDateFromState(state),
+                },
+              });
+            } else
+              dispatch({
+                type: CalendarAction.Error,
+                error: true,
+                payload: {
+                  error: new Error("Calendar library is unreachable"),
+                },
+              });
           }}
         >
           <NavigateNextIcon />
@@ -105,7 +136,19 @@ const CalendarBar: FunctionComponent<
         <IconButton
           color="inherit"
           onClick={(): void => {
-            dispatch({ type: CalendarAction.ViewToday });
+            if (!state.ref?.current)
+              return dispatch({
+                type: CalendarAction.Error,
+                error: true,
+                payload: {
+                  error: new Error("Calendar library is unreachable"),
+                },
+              });
+            state.ref.current.getApi().today();
+            dispatch({
+              type: CalendarAction.ViewToday,
+              payload: { currentStart: getFCDateFromState(state) },
+            });
           }}
         >
           <TodayIcon />

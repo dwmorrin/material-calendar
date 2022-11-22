@@ -5,10 +5,9 @@ import { StateHandler } from "./types";
 
 import displayMessage from "./displayMessage";
 import errorHandler from "./errorHandler";
-import { missingResource, impossibleState } from "./errorRedirect";
+import { missingResource } from "./errorRedirect";
 import logger from "./logger";
-import getFCDateFromState from "../Calendar/getFCDateFromState";
-import { addDays, formatSQLDate, parseSQLDate } from "../../utils/date";
+import { addDays, parseSQLDate } from "../../utils/date";
 
 import {
   closeEventDetail,
@@ -80,31 +79,17 @@ const closeSnackbar: StateHandler = (state) => {
   return { ...state, snackbarQueue };
 };
 
-const loading: StateHandler = (state) => {
-  return { ...state, loading: true };
-};
-
 const openHelpDialog: StateHandler = (state) => ({
   ...state,
   helpDialogIsOpen: true,
 });
 
-const navigateBefore: StateHandler = (state, action) => {
-  if (!state.ref?.current) {
-    return impossibleState(state, action, "no calendar reference");
+const navigate: StateHandler = (state, action) => {
+  const { payload } = action;
+  if (!payload?.currentStart) {
+    return missingResource(state, action, "no date returned from navigation");
   }
-  state.ref.current.getApi().prev();
-  const currentStart = formatSQLDate(getFCDateFromState(state));
-  return { ...state, currentStart };
-};
-
-const navigateNext: StateHandler = (state, action) => {
-  if (!state.ref?.current) {
-    return impossibleState(state, action, "no calendar reference");
-  }
-  state.ref.current.getApi().next();
-  const currentStart = formatSQLDate(getFCDateFromState(state));
-  return { ...state, currentStart };
+  return { ...state, currentStart: payload.currentStart };
 };
 
 const pickedDate: StateHandler = (state, action) => {
@@ -113,10 +98,7 @@ const pickedDate: StateHandler = (state, action) => {
     return missingResource(state, action, "no date returned from picker");
   }
   const currentStart = payload.currentStart;
-  if (state.ref?.current) {
-    state.ref.current.getApi().gotoDate(currentStart);
-  }
-  return { ...state, currentStart, pickerShowing: !state.pickerShowing };
+  return { ...state, currentStart, pickerShowing: false };
 };
 
 const receivedCurrentSemester: StateHandler = (state, action) => {
@@ -159,14 +141,6 @@ const togglePicker: StateHandler = (state) => ({
   pickerShowing: !state.pickerShowing,
 });
 
-const viewToday: StateHandler = (state, action) => {
-  if (!state.ref?.current) {
-    return impossibleState(state, action, "no calendar reference");
-  }
-  state.ref.current.getApi().today();
-  return { ...state, currentStart: formatSQLDate() };
-};
-
 const calendarReducer: StateHandler = (state, action) =>
   ({
     [CalendarAction.CanceledInvitationReceived]: canceledInvitationReceived,
@@ -188,12 +162,11 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.Error]: errorHandler,
     [CalendarAction.EventLock]: eventLock,
     [CalendarAction.EventUnlock]: eventUnlock,
-    [CalendarAction.Loading]: loading,
     [CalendarAction.FoundStaleCurrentEvent]: foundStaleCurrentEvent,
     [CalendarAction.JoinedGroup]: joinedGroup,
     [CalendarAction.LeftGroup]: leftGroup,
-    [CalendarAction.NavigateBefore]: navigateBefore,
-    [CalendarAction.NavigateNext]: navigateNext,
+    [CalendarAction.NavigateBefore]: navigate,
+    [CalendarAction.NavigateNext]: navigate,
     [CalendarAction.OpenEventDetail]: openEventDetail,
     [CalendarAction.OpenEventEditor]: openEventEditor,
     [CalendarAction.OpenGroupDashboard]: openGroupDashboard,
@@ -225,7 +198,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.UpdatedOneProject]: updatedOneProject,
     [CalendarAction.UpdatedOneReservation]: updatedOneReservation,
     [CalendarAction.UpdatedEditedEventReceived]: updatedEventReceived,
-    [CalendarAction.ViewToday]: viewToday,
+    [CalendarAction.ViewToday]: navigate,
   }[action.type](state, action));
 
 export default logger(calendarReducer);

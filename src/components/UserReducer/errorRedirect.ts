@@ -12,18 +12,15 @@ const errorRedirect = (
   message: string,
   meta?: unknown
 ): CalendarState =>
-  errorHandler(
-    { ...state, loading: false },
-    {
-      ...action,
-      meta: meta || action.meta,
-      type: CalendarAction.Error,
-      payload: {
-        ...action.payload,
-        error: new Error(message),
-      },
-    }
-  );
+  errorHandler(state, {
+    ...action,
+    meta: meta || action.meta,
+    type: CalendarAction.Error,
+    payload: {
+      ...action.payload,
+      error: new Error(message),
+    },
+  });
 
 export const impossibleState = (
   state: CalendarState,

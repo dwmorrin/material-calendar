@@ -4,8 +4,7 @@ import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 import { CalendarAction, CalendarUIProps } from "./types";
 import DateFnUtils from "@date-io/date-fns";
-import getFCDateFromState from "./Calendar/getFCDateFromState";
-import { formatSQLDate } from "../utils/date";
+import { formatSQLDate, parseSQLDate } from "../utils/date";
 
 const StaticDatePicker: FunctionComponent<CalendarUIProps> = ({
   dispatch,
@@ -21,11 +20,14 @@ const StaticDatePicker: FunctionComponent<CalendarUIProps> = ({
       <Box>
         <MuiPickersUtilsProvider utils={DateFnUtils}>
           <DatePicker
-            value={getFCDateFromState(state)}
+            value={parseSQLDate(state.currentStart)}
             onChange={(date: MaterialUiPickersDate): void => {
+              const currentStart = formatSQLDate(date || new Date());
+              if (state.ref?.current)
+                state.ref.current.getApi().gotoDate(currentStart);
               dispatch({
                 type: CalendarAction.PickedDate,
-                payload: { currentStart: formatSQLDate(date || new Date()) },
+                payload: { currentStart },
               });
             }}
             variant="static"

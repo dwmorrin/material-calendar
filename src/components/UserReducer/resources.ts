@@ -27,7 +27,6 @@ export const receivedAllResources: StateHandler = (state, action) => {
 };
 
 export const receivedResource: StateHandler = (state, action) => {
-  console.log("HERE!");
   const { payload, meta } = action;
   const resources = payload?.resources;
   if (!resources) {
@@ -44,7 +43,6 @@ export const receivedResource: StateHandler = (state, action) => {
       : state.eventRange;
   return {
     ...state,
-    loading: false,
     eventRange,
     resources: {
       ...state.resources,
