@@ -96,7 +96,10 @@ export const submitHandler =
           values.notes || "(no notes)",
         ].join("\n"),
       });
-    } else if (values.hasNotes && Boolean(values.notes.trim())) {
+    } else if (
+      values.hasNotes === "yes" &&
+      Boolean(String(values.notes).trim())
+    ) {
       mail.push({
         to: String(process.env.REACT_APP_ADMIN_EMAIL),
         subject: `Booking notes: ${group.title}, ${when}, ${event.location.title}`,
