@@ -37,7 +37,8 @@ const forward = ({
     .then((res) => {
       if (res.ok) return res.json();
     })
-    .then(({ error }) => {
+    // ignoring an empty result by assigning an empty object if undefined
+    .then(({ error } = {}) => {
       if (error)
         throw new Error(
           process.env.REACT_APP_FORWARD_URL_ERROR_MSG ||
