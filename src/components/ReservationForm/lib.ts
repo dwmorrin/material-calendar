@@ -78,13 +78,20 @@ export const submitHandler =
       values.id ? "modified" : "created"
     } a reservation for your group`;
     const when = formatDatetime(parseSQLDatetime(event.start));
+    const adminEmail = String(process.env.REACT_APP_ADMIN_EMAIL);
+
     const mail: Mail[] = [];
     if (values.sendEmail === "yes")
       mail.push({
         to: groupTo(group.members),
         subject,
-        text: `${subject} for ${project.title} on ${when} in ${event.location.title}`,
+        text: [
+          `${subject} for ${project.title} on ${when} in ${event.location.title}.`,
+          `\nRunning late or other issues? Please send an email to ${adminEmail}`,
+          `\nView your bookings at ${location.origin}`,
+        ].join("\n"),
       });
+
     if (project.title.startsWith(Project.classMeetingTitlePrefix)) {
       mail.push({
         to: String(process.env.REACT_APP_ADMIN_EMAIL),
@@ -101,7 +108,7 @@ export const submitHandler =
       Boolean(String(values.notes).trim())
     ) {
       mail.push({
-        to: String(process.env.REACT_APP_ADMIN_EMAIL),
+        to: adminEmail,
         subject: `Booking notes: ${group.title}, ${when}, ${event.location.title}`,
         text: [
           `Group: ${group.title}`,
