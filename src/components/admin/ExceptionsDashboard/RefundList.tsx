@@ -49,13 +49,18 @@ const RefundList: FC<
       .then(({ error, data }) => {
         if (error) return onError(error);
         if (!data) return onError(new Error("No data returned"));
+        const { reservations } = data;
+        if (!Array.isArray(reservations))
+          return onError(new Error("No data returned"));
         dispatch({
           type: AdminAction.ReceivedResource,
           meta: ResourceKey.Reservations,
           payload: {
             resources: {
               ...state.resources,
-              [ResourceKey.Reservations]: [data],
+              [ResourceKey.Reservations]: reservations.map(
+                (r) => new Reservation(r)
+              ),
             },
           },
         });
