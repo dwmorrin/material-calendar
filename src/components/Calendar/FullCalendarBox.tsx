@@ -128,7 +128,17 @@ const getEvents = (
         if (error) return dispatchError(error);
         if (!Array.isArray(data))
           return dispatchError(new Error("data is not an array"));
-        const expandedEvents = [...events, ...data.map((e) => new Event(e))];
+        const eventIds = new Set();
+        const expandedEvents = [
+          ...events,
+          ...data.map((e) => new Event(e)),
+        ].reduce((events, e) => {
+          // extra insurance that only unique events appear
+          if (eventIds.has(e.id)) return events;
+          eventIds.add(e.id);
+          events.push(e);
+          return events;
+        }, [] as Event[]);
         dispatch({
           type: CalendarAction.ReceivedResource,
           payload: {
