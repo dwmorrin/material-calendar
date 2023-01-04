@@ -64,7 +64,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   dispatch,
   state,
 }) => {
-  const { isAdmin, user } = useAuth();
+  const { isAdmin, isStaff, user } = useAuth();
   const { broadcast } = useSocket();
   const [cancelationDialogIsOpen, setCancelationDialogIsOpen] = useState(false);
   const projects = state.resources[ResourceKey.Projects] as Project[];
@@ -362,6 +362,34 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 Cancel Reservation
               </Button>
             )}
+            {isAdmin || isStaff ? (
+              reservation &&
+              (reservation.checkIn ? (
+                <Typography variant="body2">
+                  Checked-in at{" "}
+                  {parseSQLDatetime(reservation.checkIn).toLocaleString()}
+                </Typography>
+              ) : eventHasNotEnded ? (
+                <Button
+                  disabled={locked}
+                  variant="contained"
+                  onClick={(): void =>
+                    dispatch({ type: CalendarAction.OpenStaffReservationForm })
+                  }
+                >
+                  Check-In
+                </Button>
+              ) : (
+                <Typography variant="body2">
+                  (There is no check in time)
+                </Typography>
+              ))
+            ) : userOwns && reservation && reservation.checkIn ? (
+              <Typography variant="body2">
+                Checked-in at{" "}
+                {parseSQLDatetime(reservation.checkIn).toLocaleString()}
+              </Typography>
+            ) : null}
             {isAdmin && (
               <Button
                 disabled={locked}

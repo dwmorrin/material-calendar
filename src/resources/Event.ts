@@ -21,6 +21,8 @@ export interface ReservationInfo {
   notes: string;
   contact: string;
   created: string;
+  checkIn: string | null;
+  checkOut: string | null;
   equipment?: EquipmentTable;
 }
 
@@ -57,6 +59,9 @@ class Event implements Event {
     }
   ) {
     Object.assign(this, event);
+    // mysql sends reservation.liveRoom over as a number, 0 or 1
+    if (this.reservation)
+      this.reservation.liveRoom = Boolean(this.reservation.liveRoom);
   }
 
   // 2nd argument should be memoized for best performance if iterating

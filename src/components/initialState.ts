@@ -30,5 +30,6 @@ export const initialCalendarState: CalendarState = {
   reservationFormAdminIsOpen: false,
   resources,
   snackbarQueue: [],
+  staffReservationFormIsOpen: false,
 };
 export default initialCalendarState;

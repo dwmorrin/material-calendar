@@ -26,6 +26,8 @@ interface Reservation {
   created: string;
   cancelation: ReservationCancelation | null;
   equipment: Equipment[];
+  checkIn: string | null;
+  checkOut: string | null;
 }
 
 class Reservation implements Reservation {
@@ -76,6 +78,8 @@ class Reservation implements Reservation {
       created: formatSQLDatetime(),
       cancelation: null as ReservationCancelation | null,
       equipment: [] as Equipment[],
+      checkIn: null as string | null,
+      checkOut: null as string | null,
     }
   ) {
     Object.assign(this, res);

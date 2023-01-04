@@ -29,6 +29,7 @@ interface AuthContext {
   lastLocation: string;
   setLastLocation: React.Dispatch<SetStateAction<string>>;
   isAdmin: boolean;
+  isStaff: boolean;
   isPending: boolean;
   isAuthenticated: boolean;
   isNotAuthenticated: boolean;
@@ -44,6 +45,7 @@ export const useAuth = (): AuthContext => {
   return {
     ...state,
     isAdmin: state.user?.roles.includes("admin"),
+    isStaff: state.user?.roles.includes("staff"),
     isPending: state?.status === AuthStatus.pending,
     isAuthenticated: state?.status === AuthStatus.authenticated,
     isNotAuthenticated: state?.status === AuthStatus.notAuthenticated,
@@ -56,7 +58,7 @@ const AuthProvider: FunctionComponent = ({ children }) => {
   const [status, setStatus] = useState<AuthStatus>(AuthStatus.pending);
   const [user, setUser] = useState<User>(new User());
   const [lastLocation, setLastLocation] = useLocalStorage("lastLocation", "/");
-  const value = {
+  const value: AuthContext = {
     user,
     setUser,
     status,
@@ -64,6 +66,7 @@ const AuthProvider: FunctionComponent = ({ children }) => {
     lastLocation,
     setLastLocation,
     isAdmin: false,
+    isStaff: false,
     isPending: status === AuthStatus.pending,
     isAuthenticated: status === AuthStatus.authenticated,
     isNotAuthenticated: status === AuthStatus.notAuthenticated,

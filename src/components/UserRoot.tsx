@@ -30,6 +30,7 @@ import Reservation from "../resources/Reservation";
 import Semester from "../resources/Semester";
 import { useSocket } from "./SocketProvider";
 import SocketCalendarEffect from "./SocketCalendarEffect";
+import StaffReservationForm from "./StaffReservationForm/StaffReservationForm";
 
 const UserRoot: FunctionComponent<RouteComponentProps> = () => {
   const socketState = useSocket();
@@ -105,6 +106,7 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
         setSelections={setSelections}
       />
       <EventDetail dispatch={dispatch} state={state} />
+      <StaffReservationForm dispatch={dispatch} state={state} />
       <ProjectForm dispatch={dispatch} state={state} />
       <EventEditor dispatch={dispatch} state={state} />
       <CalendarBar

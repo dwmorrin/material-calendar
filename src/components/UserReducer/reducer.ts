@@ -79,9 +79,18 @@ const closeSnackbar: StateHandler = (state) => {
   return { ...state, snackbarQueue };
 };
 
+const closeStaffReservationForm: StateHandler = (state) => {
+  return { ...state, staffReservationFormIsOpen: false };
+};
+
 const openHelpDialog: StateHandler = (state) => ({
   ...state,
   helpDialogIsOpen: true,
+});
+
+const openStaffReservationForm: StateHandler = (state) => ({
+  ...state,
+  staffReservationFormIsOpen: true,
 });
 
 const navigate: StateHandler = (state, action) => {
@@ -155,6 +164,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.CloseReservationForm]: closeReservationForm,
     [CalendarAction.CloseReservationFormAdmin]: closeReservationFormAdmin,
     [CalendarAction.CloseSnackbar]: closeSnackbar,
+    [CalendarAction.CloseStaffReservationForm]: closeStaffReservationForm,
     [CalendarAction.CreatedEventsReceived]: createdEventsReceived,
     [CalendarAction.CreatedInvitationReceived]: createdInvitationReceived,
     [CalendarAction.DeletedOneEvent]: deletedOneEvent,
@@ -175,6 +185,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.OpenProjectForm]: openProjectForm,
     [CalendarAction.OpenReservationForm]: openReservationForm,
     [CalendarAction.OpenReservationFormAdmin]: openReservationFormAdmin,
+    [CalendarAction.OpenStaffReservationForm]: openStaffReservationForm,
     [CalendarAction.PickedDate]: pickedDate,
     [CalendarAction.ReceivedAdminReservationUpdate]:
       receivedAdminReservationUpdate,
