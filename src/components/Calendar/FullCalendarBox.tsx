@@ -28,11 +28,10 @@ import { useAuth } from "../AuthProvider";
 import {
   addDays,
   formatSQLDate,
-  isWithinIntervalFP,
   parseAndFormatFCString,
   parseFCString,
-  parseSQLDatetime,
 } from "../../utils/date";
+import { addEvents, getRange } from "../../resources/EventsByDate";
 
 const useStyles = makeStyles((theme) => ({
   toolbarSpacer: { ...theme.mixins.toolbar, position: "sticky" },
@@ -62,7 +61,8 @@ const getEvents = (
     projects,
     selections.projectIds
   );
-  const events = state.resources[ResourceKey.Events] as Event[];
+  const eventArray = state.resources[ResourceKey.Events] as Event[];
+  const events = state.events;
   const groupIds: number[] = (
     state.resources[ResourceKey.Groups] as UserGroup[]
   ).map(({ id }) => id);
@@ -74,17 +74,17 @@ const getEvents = (
   const expandingLeft = reqStart.valueOf() < state.eventRange.start.valueOf();
   const expandingRight = reqEnd.valueOf() > state.eventRange.end.valueOf();
 
-  const inView = isWithinIntervalFP({
-    start: reqStart,
-    end: reqEnd,
-  });
+  const rangeStart = startStr.split("T")[0];
+  const rangeEnd = endStr.split("T")[0];
 
-  const updateFullCalendar = (events: Event[]): void => {
-    const eventsInView = events.filter((event) =>
-      inView(
-        parseSQLDatetime(event.start) || inView(parseSQLDatetime(event.end))
-      )
-    );
+  const selectedEvents = getRange(
+    events,
+    selections.locationIds,
+    rangeStart,
+    rangeEnd
+  );
+
+  const updateFullCalendar = (eventsInView: Event[]): void => {
     if (
       (
         ["resourceTimeGridDay", "resourceTimeGridWeek"] as CalendarView[]
@@ -108,7 +108,7 @@ const getEvents = (
 
   if (!expandingLeft && !expandingRight) {
     // If the requested range is already downloaded, proceed as before.
-    updateFullCalendar(events);
+    updateFullCalendar(selectedEvents);
   } else {
     // figure out which way we are expanding
     const left = expandingLeft ? reqStart : state.eventRange.end;
@@ -129,19 +129,22 @@ const getEvents = (
         if (!Array.isArray(data))
           return dispatchError(new Error("data is not an array"));
         const eventIds = new Set();
-        const expandedEvents = [
-          ...events,
-          ...data.map((e) => new Event(e)),
-        ].reduce((events, e) => {
-          // extra insurance that only unique events appear
-          if (eventIds.has(e.id)) return events;
-          eventIds.add(e.id);
-          events.push(e);
-          return events;
-        }, [] as Event[]);
+        const newEvents = data.map((e) => new Event(e));
+        const expandedEvents = [...eventArray, ...newEvents].reduce(
+          (events, e) => {
+            // extra insurance that only unique events appear
+            if (eventIds.has(e.id)) return events;
+            eventIds.add(e.id);
+            events.push(e);
+            return events;
+          },
+          [] as Event[]
+        );
+        const newEventsByDate = addEvents(state.events, newEvents);
         dispatch({
           type: CalendarAction.ReceivedResource,
           payload: {
+            events: newEventsByDate,
             eventRange: { start: newLeft, end: newRight },
             resources: {
               [ResourceKey.Events]: expandedEvents,
@@ -149,6 +152,14 @@ const getEvents = (
           },
           meta: ResourceKey.Events,
         });
+        updateFullCalendar(
+          getRange(
+            newEventsByDate,
+            selections.locationIds,
+            rangeStart,
+            rangeEnd
+          )
+        );
       })
       .catch(dispatchError);
   }

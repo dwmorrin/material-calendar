@@ -7,6 +7,7 @@ import Event from "../../resources/Event";
 import { missingResource } from "./errorRedirect";
 import { receivedResource } from "./resources";
 import arrayUpdateAt from "./arrayUpdateAt";
+import { addEvents } from "../../resources/EventsByDate";
 
 export const closeEventDetail: StateHandler = (state) => ({
   ...state,
@@ -42,6 +43,7 @@ const eventLockHandler = (
   });
   const currentEvent =
     event.id === state.currentEvent?.id ? event : state.currentEvent;
+  addEvents(state.events, [event]);
   return {
     ...state,
     currentEvent,
@@ -60,14 +62,15 @@ export const eventUnlock: StateHandler = (state, action) =>
 export const foundStaleCurrentEvent: StateHandler = (state, { payload }) => {
   if (payload?.currentEvent instanceof Event) {
     const event = payload?.currentEvent as Event;
-    const events = state.resources[ResourceKey.Events] as Event[];
-    const index = events.findIndex(({ id }) => id === event.id);
+    const eventArray = state.resources[ResourceKey.Events] as Event[];
+    const index = eventArray.findIndex(({ id }) => id === event.id);
+    addEvents(state.events, [event]);
     return {
       ...state,
       currentEvent: event,
       resources: {
         ...state.resources,
-        [ResourceKey.Events]: arrayUpdateAt(events, index, event),
+        [ResourceKey.Events]: arrayUpdateAt(eventArray, index, event),
       },
     };
   }

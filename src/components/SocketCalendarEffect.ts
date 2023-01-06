@@ -6,7 +6,6 @@ import User from "../resources/User";
 import Event from "../resources/Event";
 import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
-import Reservation from "../resources/Reservation";
 
 interface SocketCalendarEffectProps extends SocketState {
   dispatch: (action: Action) => void;

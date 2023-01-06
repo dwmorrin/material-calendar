@@ -5,6 +5,7 @@ import UserGroup from "../resources/UserGroup";
 import Semester from "../resources/Semester";
 import { ResourceKey, ResourceInstance } from "../resources/types";
 import { SnackbarState } from "../components/Snackbar";
+import EventsByDate from "../resources/EventsByDate";
 
 export enum CalendarAction {
   CanceledInvitationReceived,
@@ -95,6 +96,7 @@ export interface CalendarState {
 
   // Resources
   resources: { [k in ResourceKey]: ResourceInstance[] };
+  events: EventsByDate;
   currentEvent?: Event;
   currentGroup?: UserGroup;
   currentProject?: Project;

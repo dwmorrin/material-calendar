@@ -271,3 +271,16 @@ export const differenceInHoursSQLDatetime = ({
   end,
 }: DateStringInterval): number =>
   differenceInMinutes(parseSQLDatetime(end), parseSQLDatetime(start)) / 60;
+
+// get an inclusive range of consecutive SQL date strings [start, ..., end]
+export const sqlDateRange = (start: string, end: string): string[] => {
+  const cursor = parseSQLDate(start);
+  const endDate = parseSQLDate(end);
+  if (endDate.valueOf() < cursor.valueOf()) return [];
+  const result = [start];
+  while (cursor.valueOf() < endDate.valueOf()) {
+    cursor.setDate(cursor.getDate() + 1);
+    result.push(formatSQLDate(cursor));
+  }
+  return result;
+};
