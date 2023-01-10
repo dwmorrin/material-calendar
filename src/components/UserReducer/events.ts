@@ -20,7 +20,31 @@ export const closeEventEditor: StateHandler = (state) => ({
 });
 
 export const createdEventsReceived: StateHandler = (state, action) => {
-  return closeEventEditor(receivedResource(state, action), action);
+  const { payload } = action;
+  if (!payload)
+    return missingResource(state, action, "no created events received");
+  const { resources } = payload;
+  if (!(resources && Array.isArray(resources[ResourceKey.Events])))
+    return missingResource(state, action, "no created events received");
+  const e = resources[ResourceKey.Events] as Event[];
+  //! this new array may have duplicates
+  const newEventArray = [
+    ...state.resources[ResourceKey.Events],
+    ...resources[ResourceKey.Events],
+  ];
+  // newEvents will not have duplicates
+  const newEvents = addEvents(state.events, e);
+  return closeEventEditor(
+    {
+      ...state,
+      events: newEvents,
+      resources: {
+        ...state.resources,
+        [ResourceKey.Events]: newEventArray,
+      },
+    },
+    action
+  );
 };
 
 const eventLockHandler = (

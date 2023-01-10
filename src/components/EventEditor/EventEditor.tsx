@@ -1,10 +1,7 @@
-import React, { FC, useState } from "react";
+import React, { FC } from "react";
 import {
   Button,
   Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormLabel,
   IconButton,
   List,
@@ -20,19 +17,9 @@ import { Field, Formik, Form } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { DatePicker, DateTimePicker } from "formik-material-ui-pickers";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import {
-  GeneratedInterval,
-  NewEvent,
-  afterConfirmed,
-  initialEventOptions,
-  makeConfirmation,
-} from "./lib";
+import { initialEventOptions, makeConfirmation } from "./lib";
 import DateFnsUtils from "@date-io/date-fns";
-import {
-  parseAndFormatSQLDatetimeInterval,
-  parseSQLDate,
-  parseSQLDatetime,
-} from "../../utils/date";
+import { parseSQLDate, parseSQLDatetime } from "../../utils/date";
 import * as Yup from "yup";
 import { ResourceKey } from "../../resources/types";
 import { useSocket } from "../SocketProvider";
@@ -46,9 +33,6 @@ const schema = Yup.object().shape({
 });
 
 const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
-  const [confirmationDialogOpen, setConfirmationDialogIsOpen] = useState(false);
-  const [skipped, setSkipped] = useState<GeneratedInterval[]>([]);
-  const [generated, setGenerated] = useState<NewEvent[]>([]);
   const { broadcast } = useSocket();
 
   const event = state.currentEvent || new Event();
@@ -71,9 +55,6 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
     dispatch,
     location,
     events,
-    setConfirmationDialogIsOpen,
-    setSkipped,
-    setGenerated,
     broadcast,
   });
 
@@ -253,57 +234,6 @@ const EventEditor: FC<CalendarUIProps> = ({ dispatch, state }) => {
           )}
         </Formik>
       </MuiPickersUtilsProvider>
-      <Dialog open={confirmationDialogOpen}>
-        <DialogTitle>Skip these events?</DialogTitle>
-        <DialogContent>
-          <p>
-            The maximum number of daily hours would be exceeded if the following
-            events were created.
-          </p>
-          <p>
-            You can proceed by skipping these events now, or cancel and adjust
-            the daily hours as needed.
-          </p>
-          <List>
-            {skipped.map((event, index) => (
-              <ListItem key={`skipped-list-${index}`}>
-                {parseAndFormatSQLDatetimeInterval(event)} (Max:{" "}
-                {event.hours.max}, Existing: {event.hours.existing}, Requested:{" "}
-                {event.hours.requested})
-              </ListItem>
-            ))}
-          </List>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={(): void => {
-              setSkipped([]);
-              setGenerated([]);
-              setConfirmationDialogIsOpen(false);
-            }}
-          >
-            Cancel, something is not right
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={(): void => {
-              setConfirmationDialogIsOpen(false);
-              afterConfirmed({
-                eventId: event.id,
-                dispatch,
-                generatedEvents: generated,
-                broadcast,
-                deleteOne: false,
-              });
-            }}
-          >
-            Yes, skip these events
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Dialog>
   );
 };

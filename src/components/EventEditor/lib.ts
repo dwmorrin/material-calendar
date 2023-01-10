@@ -4,7 +4,6 @@ import Location from "../../resources/Location";
 import {
   addDays,
   compareAscSQLDate,
-  differenceInMinutes,
   differenceInHoursSQLDatetime,
   endOfDay,
   formatSQLDate,
@@ -15,6 +14,7 @@ import {
 } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 import { SocketMessageKind } from "../SocketProvider";
+import EventsByDate from "../../resources/EventsByDate";
 
 export type NewEvent = Omit<Event, "id">;
 
@@ -36,8 +36,6 @@ interface IntervalHoursInfo {
 export interface GeneratedInterval {
   start: string;
   end: string;
-  skipped: boolean;
-  hours: IntervalHoursInfo & { requested: number };
 }
 
 const eventGenerator = ({
@@ -45,7 +43,6 @@ const eventGenerator = ({
   end,
   until,
   days,
-  hasHoursAvailable,
 }: EventGeneratorProps): {
   [Symbol.iterator](): Generator<GeneratedInterval>;
 } => ({
@@ -53,17 +50,9 @@ const eventGenerator = ({
     const untilValue = until.valueOf();
     while (untilValue >= start.valueOf()) {
       if (!days.length || days.includes(start.getUTCDay())) {
-        const { max, existing } = hasHoursAvailable({ start, end });
-        const requested = differenceInMinutes(end, start) / 60;
         yield {
           start: formatSQLDatetime(start),
           end: formatSQLDatetime(end),
-          skipped: existing + requested >= max,
-          hours: {
-            max,
-            existing,
-            requested,
-          },
         };
       }
       start = addDays(start, 1);
@@ -126,6 +115,7 @@ interface EventValues {
 }
 
 interface SubmitProps {
+  range: { start: string; end: string };
   eventId: number;
   dispatch: (action: Action) => void;
   generatedEvents: NewEvent[];
@@ -134,6 +124,7 @@ interface SubmitProps {
 }
 
 export const afterConfirmed = ({
+  range,
   eventId,
   dispatch,
   generatedEvents,
@@ -174,11 +165,13 @@ export const afterConfirmed = ({
     const { events } = data as { events: Event[] };
     if (!Array.isArray(events))
       throw new Error("no events after creating events");
+    const eventArray = events.map((e: Event) => new Event(e));
     dispatch({
       type: CalendarAction.CreatedEventsReceived,
       payload: {
+        events: new EventsByDate(events),
         resources: {
-          [ResourceKey.Events]: events.map((e: Event) => new Event(e)),
+          [ResourceKey.Events]: eventArray,
         },
       },
       meta: ResourceKey.Events,
@@ -206,7 +199,7 @@ export const afterConfirmed = ({
     // creating
     fetch(`${Event.url}/bulk`, {
       method: "POST",
-      body: JSON.stringify(generatedEvents),
+      body: JSON.stringify({ events: generatedEvents, range }),
       headers,
     })
       .then((response) => response.json())
@@ -228,9 +221,6 @@ interface ConfirmationProps {
   dispatch: (action: Action) => void;
   location: Location;
   events: Event[];
-  setSkipped: (skipped: GeneratedInterval[]) => void;
-  setGenerated: (generated: NewEvent[]) => void;
-  setConfirmationDialogIsOpen: (open: boolean) => void;
   broadcast: (message: string) => void;
 }
 
@@ -238,18 +228,21 @@ interface ConfirmationProps {
  * locationEvents are not guaranteed to be in order
  */
 export const makeConfirmation =
-  ({
-    dispatch,
-    location,
-    events,
-    setSkipped,
-    setGenerated,
-    setConfirmationDialogIsOpen,
-    broadcast,
-  }: ConfirmationProps) =>
+  ({ dispatch, location, events, broadcast }: ConfirmationProps) =>
   (values: EventValues): void => {
+    const { repeats, on } = values.__options__;
+    const days = getRepeats(on);
+    const start = values.start;
+    const end = values.end;
+    const until = repeats ? values.__options__.until : start;
+    const range = {
+      start: formatSQLDate(start),
+      end: formatSQLDate(until),
+    };
+
     if (values.__delete__) {
       afterConfirmed({
+        range,
         generatedEvents: [],
         eventId: values.id,
         dispatch,
@@ -259,16 +252,7 @@ export const makeConfirmation =
       return;
     }
 
-    const { repeats, on } = values.__options__;
-    const days = getRepeats(on);
-    const start = values.start;
-    const end = values.end;
-    const until = repeats ? values.__options__.until : start;
-
-    const hours = Location.getHours(location, {
-      start: formatSQLDate(start),
-      end: formatSQLDate(until),
-    });
+    const hours = Location.getHours(location, range);
 
     const isWithinGenerator = isWithinIntervalFP({
       start: startOfDay(start),
@@ -308,27 +292,19 @@ export const makeConfirmation =
         hasHoursAvailable,
       }),
     ];
-    const newEvents = generatedIntervals
-      .filter(({ skipped }) => !skipped)
-      .map(
-        ({ start, end }): NewEvent => ({
-          start,
-          end,
-          locationId: values.location.id,
-          reservable: values.reservable,
-          title: values.title,
-        })
-      );
-    setGenerated(newEvents);
+    const newEvents = generatedIntervals.map(
+      ({ start, end }): NewEvent => ({
+        start,
+        end,
+        locationId: values.location.id,
+        reservable: values.reservable,
+        title: values.title,
+      })
+    );
 
-    const skippedEvents = generatedIntervals.filter(({ skipped }) => skipped);
-    if (skippedEvents.length) {
-      setSkipped(skippedEvents);
-      setConfirmationDialogIsOpen(true);
-    }
-
-    if (newEvents.length && !skippedEvents.length) {
+    if (newEvents.length) {
       afterConfirmed({
+        range,
         generatedEvents: newEvents,
         eventId: values.id,
         dispatch,
