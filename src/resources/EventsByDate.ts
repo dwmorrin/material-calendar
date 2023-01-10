@@ -1,6 +1,37 @@
 import Event from "./Event";
 import { sqlDateRange } from "../utils/date";
 
+const sortByStart = (a: Event, b: Event): number =>
+  a.start > b.start ? 1 : a.start < b.start ? -1 : 0;
+
+export const combineSameLocationEvents = (events: Event[]): Event[] => {
+  events.sort(sortByStart);
+  const result: Event[] = [];
+  let i = 0;
+  while (i < events.length) {
+    const e = new Event(events[i]);
+    result.push(e);
+    if (e.reservation) {
+      while (i < events.length && events[i + 1] && events[i + 1].reservation) {
+        ++i;
+        const nextEvent = new Event(events[i]);
+        if (nextEvent.reservation?.groupId === e.reservation.groupId) {
+          e.end = nextEvent.end;
+          if (e.reservation.equipment && nextEvent.reservation?.equipment)
+            Object.assign(
+              e.reservation.equipment,
+              nextEvent.reservation.equipment
+            );
+          else if (!e.reservation.equipment && nextEvent.reservation?.equipment)
+            e.reservation.equipment = nextEvent.reservation.equipment;
+        }
+      }
+    }
+    ++i;
+  }
+  return result;
+};
+
 export const addEvents = (
   events: EventsByDate,
   eventArray: Event[]
@@ -39,7 +70,9 @@ export const getRange = (
     if (date in events) {
       for (const locationId of locationIds)
         if (locationId in events[date])
-          selectedEvents.push(...events[date][locationId]);
+          selectedEvents.push(
+            ...combineSameLocationEvents(events[date][locationId])
+          );
     }
   }
   return selectedEvents;
