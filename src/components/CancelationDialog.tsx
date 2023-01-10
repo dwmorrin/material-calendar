@@ -19,6 +19,7 @@ import { formatDatetime, isBefore, nowInServerTimezone } from "../utils/date";
 import { SocketMessageKind, ReservationChangePayload } from "./SocketProvider";
 import forward from "./ReservationForm/forward";
 import { Formik, Form, Field } from "formik";
+import { addEvents } from "../resources/EventsByDate";
 
 interface FormValues {
   refundMessage: string;
@@ -154,6 +155,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
           type: CalendarAction.ReceivedReservationCancelation,
           payload: {
             currentEvent: updatedCurrentEvent,
+            events: addEvents(state.events, events),
             resources: {
               ...state.resources,
               [ResourceKey.Events]: events,
