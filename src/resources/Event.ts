@@ -43,6 +43,7 @@ interface Event {
   reservable: boolean;
   reservation?: ReservationInfo;
   locked: boolean;
+  next?: Event;
 }
 
 class Event implements Event {

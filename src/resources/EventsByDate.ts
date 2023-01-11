@@ -1,5 +1,5 @@
 import Event from "./Event";
-import { sqlDateRange } from "../utils/date";
+import { castSQLDatetimeToSQLDate, sqlDateRange } from "../utils/date";
 
 const sortByStart = (a: Event, b: Event): number =>
   a.start > b.start ? 1 : a.start < b.start ? -1 : 0;
@@ -16,6 +16,7 @@ export const combineSameLocationEvents = (events: Event[]): Event[] => {
         ++i;
         const nextEvent = new Event(events[i]);
         if (nextEvent.reservation?.groupId === e.reservation.groupId) {
+          e.next = nextEvent;
           e.end = nextEvent.end;
           if (e.reservation.equipment && nextEvent.reservation?.equipment)
             Object.assign(
@@ -64,7 +65,10 @@ export const getRange = (
   start: string,
   end: string
 ): Event[] => {
-  const dateRange = sqlDateRange(start, end);
+  const dateRange = sqlDateRange(
+    castSQLDatetimeToSQLDate(start),
+    castSQLDatetimeToSQLDate(end)
+  );
   const selectedEvents: Event[] = [];
   for (const date of dateRange) {
     if (date in events) {

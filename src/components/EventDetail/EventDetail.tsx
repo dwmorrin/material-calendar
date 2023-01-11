@@ -43,6 +43,7 @@ import CancelationDialog from "../CancelationDialog";
 import EventBookButton from "./EventBookButton";
 import { addMinutes } from "date-fns/esm";
 import { useSocket } from "../SocketProvider";
+import { getRange } from "../../resources/EventsByDate";
 
 const transition = makeTransition("left");
 
@@ -131,13 +132,24 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     return null;
   }
 
+  const currentEvent: Event = state.currentEvent;
+
   const events = state.resources[ResourceKey.Events] as Event[];
   const reservations = state.resources[
     ResourceKey.Reservations
   ] as Reservation[];
 
   const { end, location, locked, reservable, reservation, start, title } =
-    state.currentEvent;
+    currentEvent;
+
+  const eventsByDate = getRange(state.events, [location.id], start, end);
+  const aggregateEvent = eventsByDate.find((e) => e.id === currentEvent.id);
+  const subEvents: Event[] = [currentEvent];
+  let cursor = aggregateEvent;
+  while (cursor && cursor.next) {
+    subEvents.push(cursor.next);
+    cursor = cursor.next;
+  }
 
   const userCanUseLocation = user.restriction >= location.restriction;
 
@@ -318,9 +330,17 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         <Paper elevation={0}>
           <Typography variant="h5">{title}</Typography>
           <Typography variant="h6">{location.title}</Typography>
-          <Typography variant="body2">
-            {parseAndFormatSQLDatetimeInterval({ start, end })}
-          </Typography>
+          {subEvents.length ? (
+            subEvents.map(({ start, end, id }) => (
+              <Typography key={`sub-event-${id}`} variant="body2">
+                {parseAndFormatSQLDatetimeInterval({ start, end })}
+              </Typography>
+            ))
+          ) : (
+            <Typography variant="body2">
+              {parseAndFormatSQLDatetimeInterval({ start, end })}
+            </Typography>
+          )}
           {!!equipmentList.length && (
             <List
               subheader={
