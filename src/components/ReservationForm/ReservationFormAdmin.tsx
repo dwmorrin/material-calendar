@@ -71,7 +71,7 @@ const cancelReservation = ({
           "No update was returned from server after cancelation request"
         );
       dispatch({
-        type: CalendarAction.CanceledReservation,
+        type: CalendarAction.CanceledReservationAdmin,
         payload: {
           resources: {
             [ResourceKey.Events]: (events as Event[]).map((e) => new Event(e)),

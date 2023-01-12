@@ -9,7 +9,7 @@ import EventsByDate from "../resources/EventsByDate";
 
 export enum CalendarAction {
   CanceledInvitationReceived,
-  CanceledReservation,
+  CanceledReservationAdmin,
   CloseEquipmentForm,
   CloseEventDetail,
   CloseEventEditor,
@@ -62,7 +62,6 @@ export enum CalendarAction {
   UpdatedOneEvent,
   UpdatedOneGroup,
   UpdatedOneProject,
-  UpdatedOneReservation,
   ViewToday,
 }
 

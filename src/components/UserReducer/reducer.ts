@@ -53,7 +53,7 @@ import {
 import { receivedAllResources, receivedResource } from "./resources";
 
 import {
-  canceledReservation,
+  canceledReservationAdmin,
   closeReservationForm,
   closeReservationFormAdmin,
   openReservationForm,
@@ -61,7 +61,6 @@ import {
   receivedAdminReservationUpdate,
   receivedReservationCancelation,
   receivedReservationUpdate,
-  updatedOneReservation,
 } from "./reservations";
 
 const closeEquipmentForm: StateHandler = (state) => ({
@@ -153,7 +152,7 @@ const togglePicker: StateHandler = (state) => ({
 const calendarReducer: StateHandler = (state, action) =>
   ({
     [CalendarAction.CanceledInvitationReceived]: canceledInvitationReceived,
-    [CalendarAction.CanceledReservation]: canceledReservation,
+    [CalendarAction.CanceledReservationAdmin]: canceledReservationAdmin,
     [CalendarAction.CloseEquipmentForm]: closeEquipmentForm,
     [CalendarAction.CloseEventDetail]: closeEventDetail,
     [CalendarAction.CloseEventEditor]: closeEventEditor,
@@ -207,7 +206,6 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.UpdatedOneEvent]: updatedOneEvent,
     [CalendarAction.UpdatedOneGroup]: updatedOneGroup,
     [CalendarAction.UpdatedOneProject]: updatedOneProject,
-    [CalendarAction.UpdatedOneReservation]: updatedOneReservation,
     [CalendarAction.UpdatedEditedEventReceived]: updatedEventReceived,
     [CalendarAction.ViewToday]: navigate,
   }[action.type](state, action));

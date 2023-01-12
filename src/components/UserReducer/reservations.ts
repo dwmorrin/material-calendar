@@ -6,10 +6,9 @@ import Event from "../../resources/Event";
 import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";
 import { impossibleState, missingResource } from "./errorRedirect";
-import Reservation from "../../resources/Reservation";
 import arrayUpdateAt from "./arrayUpdateAt";
 
-export const canceledReservation: StateHandler = (state, { payload }) => {
+export const canceledReservationAdmin: StateHandler = (state, { payload }) => {
   return displayMessage(
     {
       ...state,
@@ -198,26 +197,4 @@ export const receivedReservationUpdate: StateHandler = (state, action) => {
       },
     }
   );
-};
-
-export const updatedOneReservation: StateHandler = (state, action) => {
-  if (!action.payload?.resources)
-    return missingResource(state, action, "no resources");
-  const reservation = action.payload.resources[
-    ResourceKey.Reservations
-  ][0] as Reservation;
-  const reservations = state.resources[ResourceKey.Reservations];
-  const index = reservations.findIndex(({ id }) => id === reservation.id);
-  if (index === -1) impossibleState(state, action, "reservation not found");
-  return {
-    ...state,
-    resources: {
-      ...state.resources,
-      [ResourceKey.Reservations]: arrayUpdateAt(
-        reservations,
-        index,
-        reservation
-      ),
-    },
-  };
 };
