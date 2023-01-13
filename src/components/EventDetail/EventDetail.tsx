@@ -144,12 +144,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   const eventsByDate = getRange(state.events, [location.id], start, end);
   const aggregateEvent = eventsByDate.find((e) => e.id === currentEvent.id);
-  const subEvents: Event[] = [currentEvent];
-  let cursor = aggregateEvent;
-  while (cursor && cursor.next) {
-    subEvents.push(cursor.next);
-    cursor = cursor.next;
-  }
+  const subEvents = Event.subEvents(aggregateEvent);
 
   const userCanUseLocation = user.restriction >= location.restriction;
 
@@ -311,6 +306,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     });
   };
 
+  console.log({ subEvents });
+
   return (
     <Dialog open={state.detailIsOpen} TransitionComponent={transition}>
       <Toolbar>
@@ -330,17 +327,11 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         <Paper elevation={0}>
           <Typography variant="h5">{title}</Typography>
           <Typography variant="h6">{location.title}</Typography>
-          {subEvents.length ? (
-            subEvents.map(({ start, end, id }) => (
-              <Typography key={`sub-event-${id}`} variant="body2">
-                {parseAndFormatSQLDatetimeInterval({ start, end })}
-              </Typography>
-            ))
-          ) : (
-            <Typography variant="body2">
-              {parseAndFormatSQLDatetimeInterval({ start, end })}
+          {subEvents.map(({ start, originalEnd, id }) => (
+            <Typography key={`sub-event-${id}`} variant="body2">
+              {parseAndFormatSQLDatetimeInterval({ start, end: originalEnd })}
             </Typography>
-          )}
+          ))}
           {!!equipmentList.length && (
             <List
               subheader={
@@ -507,6 +498,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             state.currentEvent.reservation.projectId ===
             currentUserWalkInProject?.id
           }
+          subEvents={subEvents}
         />
       )}
     </Dialog>

@@ -31,6 +31,7 @@ interface Event {
   id: number;
   start: string;
   end: string;
+  originalEnd: string;
   location: {
     id: number;
     groupId: string;
@@ -60,6 +61,7 @@ class Event implements Event {
     }
   ) {
     Object.assign(this, event);
+    if (!this.originalEnd) this.originalEnd = this.end;
     // mysql sends reservation.liveRoom over as a number, 0 or 1
     if (this.reservation)
       this.reservation.liveRoom = Boolean(this.reservation.liveRoom);
@@ -102,6 +104,17 @@ class Event implements Event {
         process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF_MINUTES
       ),
     };
+  }
+
+  static subEvents(event?: Event): Event[] {
+    if (!event) return [new Event()];
+    const result = [event];
+    let cursor = event;
+    while (cursor && cursor.next) {
+      result.push(cursor.next);
+      cursor = cursor.next;
+    }
+    return result;
   }
 }
 

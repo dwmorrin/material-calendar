@@ -115,6 +115,7 @@ export const receivedReservationCancelation: StateHandler = (
   return displayMessage(
     {
       ...state,
+      events: payload?.events || {},
       currentEvent: payload?.currentEvent,
       resources: {
         ...state.resources,

@@ -13,22 +13,27 @@ export const combineSameLocationEvents = (events: Event[]): Event[] => {
     result.push(e);
     if (e.reservation) {
       // check for additional events that should be combined into one event
+      let cursor = e;
       while (
         i < events.length &&
         events[i + 1] &&
         events[i + 1].reservation &&
-        events[i + 1].reservation?.groupId === e.reservation.groupId
+        events[i + 1].reservation?.groupId === cursor.reservation?.groupId
       ) {
         const nextEvent = new Event(events[++i]);
-        e.next = nextEvent;
-        e.end = nextEvent.end;
-        if (e.reservation.equipment && nextEvent.reservation?.equipment)
+        cursor.next = nextEvent;
+        cursor.end = nextEvent.end;
+        if (cursor.reservation?.equipment && nextEvent.reservation?.equipment)
           Object.assign(
-            e.reservation.equipment,
+            cursor.reservation.equipment,
             nextEvent.reservation.equipment
           );
-        else if (!e.reservation.equipment && nextEvent.reservation?.equipment)
-          e.reservation.equipment = nextEvent.reservation.equipment;
+        else if (
+          !cursor.reservation?.equipment &&
+          nextEvent.reservation?.equipment
+        )
+          cursor.reservation = nextEvent.reservation;
+        cursor = nextEvent;
       }
     }
     ++i;
