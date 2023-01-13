@@ -7,6 +7,7 @@ import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";
 import { impossibleState, missingResource } from "./errorRedirect";
 import arrayUpdateAt from "./arrayUpdateAt";
+import { addEvents } from "../../resources/EventsByDate";
 
 export const canceledReservationAdmin: StateHandler = (state, { payload }) => {
   return displayMessage(
@@ -85,6 +86,7 @@ export const receivedAdminReservationUpdate: StateHandler = (state, action) => {
   return displayMessage(
     {
       ...state,
+      events: addEvents(state.events, [event]),
       resources: {
         ...state.resources,
         [ResourceKey.Events]: arrayUpdateAt(events, eventIndex, event),
@@ -176,6 +178,7 @@ export const receivedReservationUpdate: StateHandler = (state, action) => {
   return displayMessage(
     {
       ...state,
+      events: addEvents(state.events, [event]),
       resources: {
         ...state.resources,
         [ResourceKey.Events]: arrayUpdateAt(events, eventIndex, event),

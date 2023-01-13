@@ -170,6 +170,7 @@ export const updatedOneEvent: StateHandler = (state, action) => {
     ...state,
     currentEvent:
       state.currentEvent?.id === event.id ? event : state.currentEvent,
+    events: addEvents(state.events, [event]),
     resources: {
       ...state.resources,
       [ResourceKey.Events]: arrayUpdateAt(events, index, event),
