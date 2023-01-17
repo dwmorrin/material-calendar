@@ -107,25 +107,42 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
         return `${Project.url}/used-hours?${query}`;
       })
       .filter(String);
-    Promise.all(urls.map((url) => fetch(url).then((r) => r.json()))).then(
-      (hours) => setUsedHours(hours as ProjectHours[])
-    );
-  }, [projects, state.currentEvent]);
+    Promise.all(urls.map((url) => fetch(url).then((r) => r.json())))
+      .then((hours) => setUsedHours(hours as ProjectHours[]))
+      .catch((error) =>
+        dispatch({ type: CalendarAction.Error, payload: { error } })
+      )
+      .catch((error) =>
+        dispatch({ type: CalendarAction.Error, payload: { error } })
+      );
+  }, [dispatch, projects, state.currentEvent]);
 
   // if the event is locked, try to unlock it
   useEffect(() => {
     if (!state.currentEvent || !state.currentEvent.locked) return;
     fetch(`${Event.url}/${state.currentEvent.id}/unlock`, { method: "POST" })
       .then((res) => res.json())
-      .then(({ data }) => {
-        // ignoring the 'error' key for now
-        if (!data?.event) return;
+      .then(({ error, data }) => {
+        if (error)
+          return dispatch({ type: CalendarAction.Error, payload: { error } });
+        if (!data?.event)
+          return dispatch({
+            type: CalendarAction.Error,
+            payload: {
+              error: new Error(
+                "Something went wrong in trying to access the event on the server."
+              ),
+            },
+          });
         // event has been unlocked; update state
         dispatch({
           type: CalendarAction.FoundStaleCurrentEvent,
           payload: { currentEvent: new Event(data.event as Event) },
         });
-      });
+      })
+      .catch((error) =>
+        dispatch({ type: CalendarAction.Error, payload: { error } })
+      );
   }, [dispatch, state.currentEvent]);
 
   if (!state.currentEvent || !state.currentEvent.location || !user.username) {
@@ -305,8 +322,6 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       },
     });
   };
-
-  console.log({ subEvents });
 
   return (
     <Dialog open={state.detailIsOpen} TransitionComponent={transition}>
