@@ -59,6 +59,19 @@ export const addEvents = (
   return events;
 };
 
+export const removeEvent = (
+  events: EventsByDate,
+  event: Event
+): EventsByDate => {
+  const date = event.start.split(" ")[0];
+  if (date in events && events[date][event.location.id]) {
+    events[date][event.location.id] = [
+      ...events[date][event.location.id].filter(({ id }) => id !== event.id),
+    ];
+  }
+  return events;
+};
+
 class EventsByDate {
   [date: string]: { [locationId: number]: Event[] };
 

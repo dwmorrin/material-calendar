@@ -7,7 +7,7 @@ import Event from "../../resources/Event";
 import { missingResource } from "./errorRedirect";
 import { receivedResource } from "./resources";
 import arrayUpdateAt from "./arrayUpdateAt";
-import { addEvents } from "../../resources/EventsByDate";
+import { addEvents, removeEvent } from "../../resources/EventsByDate";
 
 export const closeEventDetail: StateHandler = (state) => ({
   ...state,
@@ -67,9 +67,9 @@ const eventLockHandler = (
   });
   const currentEvent =
     event.id === state.currentEvent?.id ? event : state.currentEvent;
-  addEvents(state.events, [event]);
   return {
     ...state,
+    events: addEvents(state.events, [event]),
     currentEvent,
     resources: {
       ...state.resources,
@@ -88,9 +88,9 @@ export const foundStaleCurrentEvent: StateHandler = (state, { payload }) => {
     const event = payload?.currentEvent as Event;
     const eventArray = state.resources[ResourceKey.Events] as Event[];
     const index = eventArray.findIndex(({ id }) => id === event.id);
-    addEvents(state.events, [event]);
     return {
       ...state,
+      events: addEvents(state.events, [event]),
       currentEvent: event,
       resources: {
         ...state.resources,
@@ -148,6 +148,7 @@ export const deletedOneEvent: StateHandler = (state, action) => {
   if (index < 0) return missingResource(state, action, "no event found");
   return {
     ...state,
+    events: removeEvent(state.events, events[index]),
     currentEvent: undefined,
     eventEditorIsOpen: false,
     resources: {
@@ -192,6 +193,7 @@ export const updatedEventReceived: StateHandler = (state, action) => {
         ...receivedResource(state, {
           ...action,
           payload: {
+            events: addEvents(state.events, [currentEvent]),
             resources: {
               [ResourceKey.Events]: arrayUpdateAt(events, index, currentEvent),
             },

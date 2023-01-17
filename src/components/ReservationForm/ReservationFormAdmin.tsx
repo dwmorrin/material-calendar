@@ -2,7 +2,12 @@
 // admin can freely assign project and group
 
 import React, { FC, useEffect, useState } from "react";
-import { Action, CalendarUIProps, CalendarAction } from "../types";
+import {
+  Action,
+  CalendarUIProps,
+  CalendarAction,
+  CalendarState,
+} from "../types";
 import {
   Button,
   Dialog,
@@ -38,14 +43,19 @@ import Category from "../../resources/Category";
 import User from "../../resources/User";
 import RadioYesNo from "../RadioYesNo";
 import { useSocket } from "../SocketProvider";
+import { addEvents } from "../../resources/EventsByDate";
 
 const cancelReservation = ({
+  eventId,
+  state,
   dispatch,
   refund,
   reservation,
   user,
   cleanup,
 }: {
+  eventId: number;
+  state: CalendarState;
   dispatch: (action: Action) => void;
   refund: boolean;
   reservation?: ReservationInfo;
@@ -54,6 +64,7 @@ const cancelReservation = ({
 }): void => {
   if (!reservation) return;
   const body = {
+    eventIds: [eventId],
     userId: user.id,
     refundApproved: refund,
   };
@@ -70,11 +81,19 @@ const cancelReservation = ({
         throw new Error(
           "No update was returned from server after cancelation request"
         );
+      const updatedEvents = events.map((e) => new Event(e));
+      const eventsFromState = state.resources[ResourceKey.Events] as Event[];
+      for (const event of updatedEvents) {
+        const i = eventsFromState.findIndex((e) => e.id === event.id);
+        if (i === -1) eventsFromState.push(event);
+        else eventsFromState[i] = event;
+      }
       dispatch({
         type: CalendarAction.CanceledReservationAdmin,
         payload: {
+          events: addEvents(state.events, updatedEvents),
           resources: {
-            [ResourceKey.Events]: (events as Event[]).map((e) => new Event(e)),
+            [ResourceKey.Events]: eventsFromState,
             [ResourceKey.Reservations]: (reservations as Reservation[]).map(
               (r) => new Reservation(r)
             ),
@@ -316,6 +335,8 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
             onClick={(): void => {
               setCancelIsSubmitting(true);
               cancelReservation({
+                eventId: currentEvent.id,
+                state,
                 dispatch,
                 refund: false,
                 reservation: currentEvent.reservation,
@@ -332,6 +353,8 @@ const ReservationForm: FC<CalendarUIProps> = ({ dispatch, state }) => {
             onClick={(): void => {
               setCancelIsSubmitting(true);
               cancelReservation({
+                eventId: currentEvent.id,
+                state,
                 dispatch,
                 refund: true,
                 reservation: currentEvent.reservation,
