@@ -53,7 +53,10 @@ const errorHandler: StateHandler = (state, { payload, meta }) => {
         ...state,
         snackbarQueue: enqueue(state.snackbarQueue, {
           type: "failure",
-          message: payload.error.message || defaultErrorMessage,
+          message:
+            payload.error.message === "Failed to fetch"
+              ? "Could not complete the request. You may be offline or logged out."
+              : payload.error.message || defaultErrorMessage,
           autoHideDuration: null,
         }),
       };
