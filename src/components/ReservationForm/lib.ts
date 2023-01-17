@@ -141,8 +141,8 @@ export const submitHandler =
         if (!project) throw new Error("No updated project returned");
 
         const message = values.id
-          ? "Your Reservation has been updated!"
-          : "Your Reservation has been made!";
+          ? "Your reservation has been updated!"
+          : "Your reservation has been made!";
 
         forward({
           reservation: formToSubmit,

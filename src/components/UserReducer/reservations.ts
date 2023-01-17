@@ -127,7 +127,7 @@ export const receivedReservationCancelation: StateHandler = (
     {
       type: CalendarAction.DisplayMessage,
       payload: {
-        message: "Your Reservation has been Canceled",
+        message: "Your reservation has been canceled",
       },
     }
   );
