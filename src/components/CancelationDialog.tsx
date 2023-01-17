@@ -189,8 +189,8 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       <Formik
         initialValues={{
           eventIds: subEvents.reduce(
-            (dict, { id }) => ({ ...dict, [id]: true }),
-            {}
+            (dict, { id }) => ({ ...dict, [String(id)]: true }),
+            {} as Record<string, boolean>
           ),
           refundMessage: "",
           refundRequested: false,
@@ -208,10 +208,15 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
                       <ListItem key={`cancel-list-${id}`}>
                         <Field
                           Label={{
-                            label: parseAndFormatSQLDatetimeInterval({
-                              start,
-                              end: originalEnd,
-                            }),
+                            label:
+                              parseAndFormatSQLDatetimeInterval({
+                                start,
+                                end: originalEnd,
+                              }) +
+                              ": " +
+                              (values.eventIds[String(id)]
+                                ? "YES CANCEL"
+                                : "NOT CANCEL"),
                           }}
                           type="checkbox"
                           name={`eventIds[${id}]`}
