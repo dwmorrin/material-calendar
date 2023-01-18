@@ -118,9 +118,12 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   }, [dispatch, projects, state.currentEvent]);
 
   // if the event is locked, try to unlock it
+  // pull the values out of the object to avoid useEffect infinite loop
+  const eventId = state.currentEvent?.id || 0;
+  const eventIsLocked = state.currentEvent?.locked || false;
   useEffect(() => {
-    if (!state.currentEvent || !state.currentEvent.locked) return;
-    fetch(`${Event.url}/${state.currentEvent.id}/unlock`, { method: "POST" })
+    if (!eventIsLocked) return;
+    fetch(`${Event.url}/${eventId}/unlock`, { method: "POST" })
       .then((res) => res.json())
       .then(({ error, data }) => {
         if (error)
@@ -143,7 +146,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
       .catch((error) =>
         dispatch({ type: CalendarAction.Error, payload: { error } })
       );
-  }, [dispatch, state.currentEvent]);
+  }, [dispatch, eventIsLocked, eventId]);
 
   if (!state.currentEvent || !state.currentEvent.location || !user.username) {
     return null;
