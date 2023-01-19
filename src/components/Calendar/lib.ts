@@ -1,13 +1,7 @@
-import {
-  Action,
-  CalendarAction,
-  CalendarUIProps,
-  CalendarUISelectionProps,
-} from "../types";
+import { Action, CalendarAction } from "../types";
 import Event from "../../resources/Event";
 import Location from "../../resources/Location";
 import Project from "../../resources/Project";
-import { deepEqual } from "fast-equals";
 import fetchCurrentEvent from "../fetchCurrentEvent";
 
 export const makeEventClick =
@@ -60,28 +54,6 @@ export const addResourceId: (
     backgroundColor: getBackgroundColor(groupIds, event, walkInDetails),
     resourceId: event.location.id,
   });
-
-/**
- * 2nd argument to React.memo
- * explicitly declare what state FullCalendar depends on for rendering
- * ignore state.currentView: change is handled via the exposed API, not state
- */
-export const compareCalendarStates = (
-  prevProps: CalendarUIProps & CalendarUISelectionProps,
-  nextProps: CalendarUIProps & CalendarUISelectionProps
-): boolean => {
-  const prevState = prevProps.state;
-  const nextState = nextProps.state;
-  const prevSelections = prevProps.selections;
-  const nextSelections = nextProps.selections;
-  return (
-    prevState.ref === nextState.ref &&
-    prevState.currentStart === nextState.currentStart &&
-    prevState.initialResourcesPending === nextState.initialResourcesPending &&
-    deepEqual(prevState.resources, nextState.resources) &&
-    deepEqual(prevSelections, nextSelections)
-  );
-};
 
 export const makeResources = (
   locations: Location[],

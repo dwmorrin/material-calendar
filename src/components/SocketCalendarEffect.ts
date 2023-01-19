@@ -6,6 +6,7 @@ import User from "../resources/User";
 import Event from "../resources/Event";
 import Project from "../resources/Project";
 import UserGroup from "../resources/UserGroup";
+import { addEvents } from "../resources/EventsByDate";
 
 interface SocketCalendarEffectProps extends SocketState {
   dispatch: (action: Action) => void;
@@ -21,153 +22,116 @@ const SocketCalendarEffect =
     eventLocked,
     eventUnlocked,
     eventsChanged,
+    eventsChangedIds,
     reservationChangePayload,
     reservationChanged,
     setSocketState,
     state,
-    user,
   }: SocketCalendarEffectProps) =>
   (): ReturnType<EffectCallback> => {
     const onError = (error: Error): void =>
       dispatch({ type: CalendarAction.Error, payload: { error } });
 
     if (eventsChanged) {
-      setSocketState({ eventsChanged: false });
-      // TODO: limit the number of events fetched and updated
-      // current approach is brute force - reload ALL events
-      // when the total number of events becomes large, this could be bad
-      // the socket message can include info like a range of dates,
-      // and then this can check if the calendar is currently in that range
-      fetch(Event.url)
+      const eventIds = [...eventsChangedIds];
+      setSocketState({ eventsChanged: false, eventsChangedIds: [] });
+      fetch(`${Event.url}/getIds`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventIds }),
+      })
         .then((res) => res.json())
         .then(({ error, data }) => {
           if (error) return onError(error);
           if (!data) return onError(new Error("No event data"));
+          const updatedEvents = (data.events as Event[]).map(
+            (event) => new Event(event)
+          );
+          const events = state.resources[ResourceKey.Events] as Event[];
+          for (const event of updatedEvents) {
+            const index = events.findIndex((e) => e.id === event.id);
+            if (index === -1) events.push(event);
+            else events[index] = event;
+          }
           dispatch({
             type: CalendarAction.ReceivedResource,
             meta: ResourceKey.Events,
             payload: {
+              events: addEvents(state.events, updatedEvents),
               resources: {
                 ...state.resources,
-                [ResourceKey.Events]: (data as Event[]).map(
-                  (event) => new Event(event)
-                ),
+                [ResourceKey.Events]: events,
               },
             },
           });
         })
         .catch(onError);
-    }
-
-    if (eventLocked) {
+    } else if (eventLocked) {
       setSocketState({ eventLocked: false });
       dispatch({
         type: CalendarAction.EventLock,
         meta: eventLockId,
       });
-    }
-
-    if (eventUnlocked) {
+    } else if (eventUnlocked) {
       setSocketState({ eventUnlocked: false });
       dispatch({
         type: CalendarAction.EventUnlock,
         meta: eventLockId,
       });
-    }
-
-    if (reservationChanged) {
+    } else if (reservationChanged) {
       setSocketState({ reservationChanged: false });
-      const { eventId, groupId, projectId, reservationId } =
-        reservationChangePayload;
-      const projects = user.projects.filter((p) => p.id === projectId);
-      // Only update the project if the user is a member of the project
-      if (projects.length) {
-        // fetch and update project info
-        fetch(`${Project.url}/${projectId}`)
-          .then((res) => res.json())
-          .then(({ error, data }) => {
-            if (error) return onError(error);
-            if (!data) return onError(new Error("No project data"));
-            dispatch({
-              type: CalendarAction.UpdatedOneProject,
-              payload: {
-                resources: {
-                  [ResourceKey.Projects]: [new Project(data as Project)],
-                },
-              },
-            });
-          })
-          .catch(onError);
-        const group = (
-          state.resources[ResourceKey.Groups] as UserGroup[]
-        ).filter((g) => g.id === groupId);
-        // only update the group if the user is a member of the group
-        if (group) {
-          fetch(`${UserGroup.url}/${groupId}`)
-            .then((res) => res.json())
-            .then(({ error, data }) => {
-              if (error) return onError(error);
-              if (!data) return onError(new Error("No group data"));
-              dispatch({
-                type: CalendarAction.UpdatedOneGroup,
-                payload: {
-                  resources: {
-                    [ResourceKey.Groups]: [new UserGroup(data as UserGroup)],
+      const { eventIds, groupId, projectId } = reservationChangePayload;
+      const projectFetch = fetch(`${Project.url}/${projectId}`);
+      const groupFetch = fetch(`${UserGroup.url}/${groupId}`);
+      const eventFetch = fetch(`${Event.url}/getIds`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventIds }),
+      });
+      const genericError = (): void =>
+        onError(
+          new Error("Server had a problem. You may want to refresh the page.")
+        );
+
+      Promise.all([eventFetch, projectFetch, groupFetch])
+        .then((responses) => {
+          if (responses.some(({ ok }) => !ok)) genericError();
+          else
+            Promise.all(responses.map((response) => response.json()))
+              .then((resArray) => {
+                if (!resArray.every((res) => !!res.data)) return genericError();
+                const [eventRes, projectRes, groupRes] = resArray;
+                const events = (eventRes.data.events as Event[]).map(
+                  (e) => new Event(e)
+                );
+                const project = projectRes.data as Project;
+                const group = groupRes.data as UserGroup;
+                const projects = state.resources[
+                  ResourceKey.Projects
+                ] as Project[];
+                const groups = state.resources[
+                  ResourceKey.Groups
+                ] as UserGroup[];
+                const projectIndex = projects.findIndex(
+                  (p) => p.id === project.id
+                );
+                const groupIndex = groups.findIndex((g) => g.id === group.id);
+                if (projectIndex > 0) projects[projectIndex] = project;
+                if (groupIndex > 0) groups[groupIndex] = group;
+                dispatch({
+                  type: CalendarAction.UpdatedReservationEvents,
+                  payload: {
+                    resources: {
+                      [ResourceKey.Events]: events,
+                      [ResourceKey.Groups]: groups,
+                      [ResourceKey.Projects]: projects,
+                    },
                   },
-                },
-              });
-            })
-            .catch(onError);
-        }
-      }
-      // fetch and update event info
-      const event = (state.resources[ResourceKey.Events] as Event[]).find(
-        (e) => e.id === eventId
-      );
-      // only if the user has the event in their current state
-      if (event) {
-        fetch(`${Event.url}/${eventId}`)
-          .then((res) => res.json())
-          .then(({ error, data }) => {
-            if (error) return onError(error);
-            if (!data) return onError(new Error("No event data"));
-            dispatch({
-              type: CalendarAction.UpdatedOneEvent,
-              payload: {
-                resources: {
-                  [ResourceKey.Events]: [new Event(data as Event)],
-                },
-              },
-            });
-          })
-          .catch(onError);
-      }
-      // fetch and update reservation info
-      /*
-      const reservations = state.resources[
-        ResourceKey.Reservations
-      ] as Reservation[];
-      const reservation = reservations.find((r) => r.id === reservationId);
-      if (reservation) {
-        fetch(`${Reservation.url}/${reservationId}`)
-          .then((res) => res.json())
-          .then(({ error, data }) => {
-            if (error) return onError(error);
-            if (!data) return onError(new Error("No reservation data"));
-            dispatch({
-              type: CalendarAction.UpdatedOneReservation,
-              payload: {
-                resources: {
-                  [ResourceKey.Reservations]: [
-                    new Reservation(data as Reservation),
-                  ],
-                },
-              },
-            });
-          })
-          .catch(onError);
-      }
-      */
+                });
+              })
+              .catch(onError);
+        })
+        .catch(onError);
     }
   };
 

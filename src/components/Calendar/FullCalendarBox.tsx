@@ -1,4 +1,4 @@
-import React, { FunctionComponent, memo } from "react";
+import React, { FunctionComponent } from "react";
 import { CircularProgress, makeStyles, Box } from "@material-ui/core";
 import FullCalendar, { EventInput } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -18,7 +18,6 @@ import Project from "../../resources/Project";
 import UserGroup from "../../resources/UserGroup";
 import {
   addResourceId,
-  compareCalendarStates,
   makeEventClick,
   makeResources,
   makeSelectedLocationIdSet,
@@ -248,4 +247,4 @@ const FullCalendarBox: FunctionComponent<
   );
 };
 
-export default memo(FullCalendarBox, compareCalendarStates);
+export default FullCalendarBox;

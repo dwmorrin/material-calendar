@@ -12,7 +12,7 @@ export enum SocketMessageKind {
 }
 
 export type ReservationChangePayload = {
-  eventId: number;
+  eventIds: number[];
   groupId: number;
   projectId: number;
   reservationId: number;
@@ -62,9 +62,13 @@ const listen = (
     const [kind, ...data] = arg;
     if (typeof kind === "string") {
       switch (kind) {
-        case SocketMessageKind.EventsChanged:
-          setSocketState({ eventsChanged: true });
+        case SocketMessageKind.EventsChanged: {
+          const eventsChangedIds = data[0];
+          if (Array.isArray(eventsChangedIds))
+            setSocketState({ eventsChanged: true, eventsChangedIds });
+          else return console.error("events changed message without IDs");
           break;
+        }
         case SocketMessageKind.EventLock: {
           const [eventLockId] = data;
           if (typeof eventLockId !== "number") {
@@ -85,15 +89,15 @@ const listen = (
           setSocketState({ refreshRequested: true });
           break;
         case SocketMessageKind.ReservationChanged: {
-          const { eventId, groupId, projectId, reservationId } =
+          const { eventIds, groupId, projectId, reservationId } =
             data[0] as ReservationChangePayload;
-          if (!eventId || !groupId || !projectId /*|| !reservationId */) {
+          if (!Array.isArray(eventIds) || !groupId || !projectId) {
             return console.error("invalid reservation change message", arg);
           }
           setSocketState({
             reservationChanged: true,
             reservationChangePayload: {
-              eventId,
+              eventIds,
               groupId,
               projectId,
               reservationId,
@@ -112,6 +116,7 @@ const listen = (
 export interface SocketState {
   error?: Error;
   eventsChanged: boolean;
+  eventsChangedIds: number[];
   eventLocked: boolean;
   eventUnlocked: boolean;
   eventLockId: number;
@@ -122,13 +127,14 @@ export interface SocketState {
 
 const defaultState: SocketState = {
   eventsChanged: false,
+  eventsChangedIds: [],
   eventLocked: false,
   eventUnlocked: false,
   eventLockId: 0,
   refreshRequested: false,
   reservationChanged: false,
   reservationChangePayload: {
-    eventId: 0,
+    eventIds: [],
     groupId: 0,
     projectId: 0,
     reservationId: 0,

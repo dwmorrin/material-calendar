@@ -118,11 +118,13 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         subject: "Project Hour Refund Request",
         text: `${myName} is requesting a project hour refund for their booking: ${whatWhenWhere}`,
       });
+
+    const eventIds = selectedEvents.map(({ id }) => id);
     fetch(`${Reservation.url}/cancel`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        eventIds: selectedEvents.map(({ id }) => id),
+        eventIds,
         reservationIds: selectedEvents.map((e) => e.reservation?.id || 0),
         groupId: selectedEvents[0].reservation?.groupId || 0,
         projectId: selectedEvents[0].reservation?.projectId || 0,
@@ -162,7 +164,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
 
         // send reservation info to currently connected users
         broadcast(SocketMessageKind.ReservationChanged, {
-          eventId: updatedCurrentEvent.id,
+          eventIds,
           reservationId: reservation.id,
           groupId: group.id,
           projectId: project.id,

@@ -84,6 +84,8 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
   }, []);
 
   // socket event handlers
+  const { reservationChanged, eventUnlocked, eventLocked, eventsChanged } =
+    socketState;
   useEffect(
     SocketCalendarEffect({
       ...socketState,
@@ -91,7 +93,7 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
       dispatch,
       user,
     }),
-    [socketState, state.resources, user]
+    [reservationChanged, eventUnlocked, eventLocked, eventsChanged]
   );
 
   return (

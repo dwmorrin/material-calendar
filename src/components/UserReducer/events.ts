@@ -161,20 +161,29 @@ export const deletedOneEvent: StateHandler = (state, action) => {
   };
 };
 
-export const updatedOneEvent: StateHandler = (state, action) => {
+export const updatedReservationEvents: StateHandler = (state, action) => {
   if (!action.payload?.resources)
     return missingResource(state, action, "no payload");
-  const event = action.payload.resources[ResourceKey.Events][0] as Event;
+  const updatedEvents = action.payload.resources[ResourceKey.Events] as Event[];
   const events = state.resources[ResourceKey.Events] as Event[];
-  const index = events.findIndex(({ id }) => id === event.id);
+  const eventIdMap: Record<number, Event> = {};
+  for (const event of updatedEvents) {
+    const index = events.findIndex(({ id }) => id === event.id);
+    if (index === -1) events.push(event);
+    else events[index] = event;
+    eventIdMap[event.id] = event;
+  }
+  let currentEvent = state.currentEvent;
+  if (currentEvent && currentEvent.id in eventIdMap)
+    currentEvent = eventIdMap[currentEvent.id];
   return {
     ...state,
-    currentEvent:
-      state.currentEvent?.id === event.id ? event : state.currentEvent,
-    events: addEvents(state.events, [event]),
+    currentEvent,
+    events: addEvents(state.events, updatedEvents),
     resources: {
       ...state.resources,
-      [ResourceKey.Events]: arrayUpdateAt(events, index, event),
+      ...action.payload.resources, // projects, groups
+      [ResourceKey.Events]: [...events],
     },
   };
 };

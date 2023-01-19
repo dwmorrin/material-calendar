@@ -21,7 +21,7 @@ import {
   openEventEditor,
   selectedEvent,
   updatedEventReceived,
-  updatedOneEvent,
+  updatedReservationEvents,
 } from "./events";
 
 import {
@@ -203,10 +203,10 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.SentInvitations]: sentInvitations,
     [CalendarAction.ToggleDrawer]: toggleDrawer,
     [CalendarAction.TogglePicker]: togglePicker,
-    [CalendarAction.UpdatedOneEvent]: updatedOneEvent,
+    [CalendarAction.UpdatedEditedEventReceived]: updatedEventReceived,
     [CalendarAction.UpdatedOneGroup]: updatedOneGroup,
     [CalendarAction.UpdatedOneProject]: updatedOneProject,
-    [CalendarAction.UpdatedEditedEventReceived]: updatedEventReceived,
+    [CalendarAction.UpdatedReservationEvents]: updatedReservationEvents,
     [CalendarAction.ViewToday]: navigate,
   }[action.type](state, action));
 

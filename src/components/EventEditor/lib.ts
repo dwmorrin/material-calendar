@@ -119,7 +119,7 @@ interface SubmitProps {
   eventId: number;
   dispatch: (action: Action) => void;
   generatedEvents: NewEvent[];
-  broadcast: (message: string) => void;
+  broadcast: (message: string, eventIds: number[]) => void;
   deleteOne: boolean;
 }
 
@@ -176,7 +176,10 @@ export const afterConfirmed = ({
       },
       meta: ResourceKey.Events,
     });
-    broadcast(SocketMessageKind.EventsChanged);
+    broadcast(
+      SocketMessageKind.EventsChanged,
+      events.map(({ id }) => id)
+    );
   };
 
   const getUpdatedEvent = ({ error, data }: ApiResponse): void => {
@@ -190,7 +193,7 @@ export const afterConfirmed = ({
       },
       meta: ResourceKey.Events,
     });
-    broadcast(SocketMessageKind.EventsChanged);
+    broadcast(SocketMessageKind.EventsChanged, [event.id]);
   };
 
   const headers = { "Content-Type": "application/json" };

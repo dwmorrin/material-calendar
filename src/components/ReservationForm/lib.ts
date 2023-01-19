@@ -153,7 +153,7 @@ export const submitHandler =
 
         // send reservation info to currently connected users
         broadcast(SocketMessageKind.ReservationChanged, {
-          eventId: event.id,
+          eventIds: [event.id],
           reservationId: reservation.id,
           groupId: group.id,
           projectId: project.id,
