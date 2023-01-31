@@ -21,7 +21,7 @@ export const combineSameLocationEvents = (events: Event[]): Event[] => {
         events[i + 1].reservation?.groupId === cursor.reservation?.groupId
       ) {
         const nextEvent = new Event(events[++i]);
-        cursor.next = nextEvent;
+        initialEvent.next = nextEvent;
         initialEvent.end = nextEvent.end;
         if (
           initialEvent.reservation?.equipment &&
