@@ -143,6 +143,7 @@ export const getProjectInfo = (
     const count = rosterRecords.reduce(
       (sum, record) =>
         record.course.id === project.course.id &&
+        record.semesterId === project.course.semesterId &&
         project.course.sections.includes(record.course.section)
           ? sum + 1
           : sum,
