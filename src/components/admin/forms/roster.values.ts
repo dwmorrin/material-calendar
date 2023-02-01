@@ -45,6 +45,7 @@ export const update = (
     ) || new Section();
   return {
     id: rosterRecord.id,
+    semesterId: rosterRecord.semesterId,
     student,
     course: {
       id: course.id,

@@ -19,6 +19,7 @@ export interface RosterRecord {
     instructor: string;
   };
   student: Student;
+  semesterId: number;
 }
 
 export class RosterRecord implements RosterRecord {
@@ -32,6 +33,7 @@ export class RosterRecord implements RosterRecord {
         id: -1,
         username: "",
       },
+      semesterId: 0,
     }
   ) {
     Object.assign(this, rosterRecord);
