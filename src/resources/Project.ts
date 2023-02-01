@@ -52,6 +52,16 @@ export class Project implements Project {
   static classMeetingTitlePrefix = "Class Meetings";
   constructor(project = defaultProject) {
     Object.assign(this, project);
+    // fixing issue where sections were fetched as a string
+    if (!Array.isArray(this.course.sections)) {
+      if (typeof this.course.sections === "string") {
+        try {
+          this.course.sections = JSON.parse(this.course.sections);
+        } catch (e) {
+          console.error("project without sections");
+        }
+      }
+    }
   }
 }
 
