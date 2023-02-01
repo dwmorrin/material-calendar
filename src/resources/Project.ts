@@ -17,7 +17,7 @@ export interface Project {
   [k: string]: unknown;
   id: number;
   title: string;
-  course: { id: number; title: string; sections: string[] };
+  course: { id: number; title: string; sections: string[]; semesterId: number };
   start: string;
   end: string;
   reservationStart: string;
@@ -32,7 +32,7 @@ export interface Project {
 const defaultProject = {
   id: 0,
   title: "",
-  course: { title: "", id: -1, sections: [] as string[] },
+  course: { title: "", id: -1, sections: [] as string[], semesterId: 0 },
   start: formatSQLDate(),
   end: formatSQLDate(),
   reservationStart: formatSQLDate(),

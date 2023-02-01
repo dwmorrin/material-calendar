@@ -134,6 +134,7 @@ export const update = (
       id: selectedCourse.id,
       title: selectedCourse.title,
       sections,
+      semesterId: project.course.semesterId,
     },
     locationHours,
   };
