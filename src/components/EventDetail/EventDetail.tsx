@@ -288,10 +288,12 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
     subMinutes(endDate, Reservation.rules.inProgressCutoffMinutes)
   );
 
-  const eventHasNotEnded = isBefore(
-    nowInServerTimezone(),
-    parseSQLDatetime(end)
-  );
+  const eventHasNotEnded = isBefore(nowInServerTimezone(), endDate);
+
+  const eventHasNotStarted = isBefore(nowInServerTimezone(), startDate);
+
+  const notStartedOrInGracePeriod =
+    eventHasNotStarted || isBefore(nowInServerTimezone(), gracePeriodCutoff);
 
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
@@ -381,7 +383,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               walkInValid={walkInValid}
               hotReservations={hotReservations}
             />
-            {userOwns && eventHasNotEnded && (
+            {userOwns && notStartedOrInGracePeriod && (
               <Button
                 variant="contained"
                 color="secondary"
