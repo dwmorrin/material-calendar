@@ -72,6 +72,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const [usedHours, setUsedHours] = useState<ProjectHours[]>(
     projects.map(({ id }) => ({ id }))
   );
+  const [checkingIn, setCheckingIn] = useState(false);
 
   /**
    * Get total hours, per project, used by everyone in this space
@@ -165,6 +166,53 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
   const eventsByDate = getRange(state.events, [location.id], start, end);
   const aggregateEvent = eventsByDate.find((e) => e.id === currentEvent.id);
   const subEvents = Event.subEvents(aggregateEvent);
+
+  const checkIn = (): void => {
+    if (!(isAdmin || isStaff)) return;
+    if (!reservation || !reservation.id) return;
+    setCheckingIn(true);
+    fetch(Reservation.checkInUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        primaryReservationId: reservation.id,
+        reservationIds: subEvents
+          .filter(({ reservation }) => reservation && reservation.id)
+          .map(({ reservation }) => reservation?.id),
+      }),
+    })
+      .then((res) => res.json())
+      .then(({ error, data }) => {
+        if (error)
+          return dispatch({ type: CalendarAction.Error, payload: { error } });
+        if (!data || !Array.isArray(data.events))
+          return dispatch({
+            type: CalendarAction.Error,
+            payload: { error: new Error("Updated events not returned") },
+          });
+        const updatedEvents = (data.events as Event[]).map((e) => new Event(e));
+        const updatedCurrentEvent = updatedEvents.find(
+          (e) => e.id === currentEvent.id
+        );
+        dispatch({
+          type: CalendarAction.ReceivedReservationCheckIn,
+          payload: {
+            currentEvent: updatedCurrentEvent,
+            resources: {
+              [ResourceKey.Events]: updatedEvents,
+            },
+          },
+        });
+      })
+      .catch((error) =>
+        dispatch({ type: CalendarAction.Error, payload: { error } })
+      )
+      .finally(() => setCheckingIn(false));
+  };
+
+  const reCheckIn = (): void => {
+    if (window.confirm(process.env.REACT_APP_STR_RESUBMIT_CHECK_IN)) checkIn();
+  };
 
   const userCanUseLocation = user.restriction >= location.restriction;
 
@@ -396,28 +444,32 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
             {isAdmin || isStaff ? (
               reservation &&
               (reservation.checkIn ? (
-                <Typography variant="body2">
-                  Checked-in at{" "}
+                <Button
+                  disabled={locked || checkingIn}
+                  variant="contained"
+                  onClick={(): void => reCheckIn()}
+                >
+                  {process.env.REACT_APP_STR_YES_CHECK_IN} on{" "}
                   {parseSQLDatetime(reservation.checkIn).toLocaleString()}
-                </Typography>
+                </Button>
               ) : eventHasNotEnded ? (
                 <Button
-                  disabled={locked}
+                  disabled={locked || checkingIn}
                   variant="contained"
-                  onClick={(): void =>
-                    dispatch({ type: CalendarAction.OpenStaffReservationForm })
-                  }
+                  onClick={(): void => checkIn()}
                 >
-                  Check-In
+                  {checkingIn
+                    ? process.env.REACT_APP_STR_CHECK_IN_BTN_WAIT
+                    : process.env.REACT_APP_STR_CHECK_IN_BTN}
                 </Button>
               ) : (
                 <Typography variant="body2">
-                  (There is no check in time)
+                  {process.env.REACT_APP_STR_NO_CHECK_IN}
                 </Typography>
               ))
             ) : userOwns && reservation && reservation.checkIn ? (
               <Typography variant="body2">
-                Checked-in at{" "}
+                {process.env.REACT_APP_STR_YES_CHECK_IN} on{" "}
                 {parseSQLDatetime(reservation.checkIn).toLocaleString()}
               </Typography>
             ) : null}

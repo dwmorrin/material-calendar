@@ -60,6 +60,7 @@ import {
   openReservationFormAdmin,
   receivedAdminReservationUpdate,
   receivedReservationCancelation,
+  receivedReservationCheckIn,
   receivedReservationUpdate,
 } from "./reservations";
 
@@ -193,6 +194,7 @@ const calendarReducer: StateHandler = (state, action) =>
     [CalendarAction.ReceivedInvitations]: receivedInvitations,
     [CalendarAction.ReceivedReservationCancelation]:
       receivedReservationCancelation,
+    [CalendarAction.ReceivedReservationCheckIn]: receivedReservationCheckIn,
     [CalendarAction.ReceivedReservationUpdate]: receivedReservationUpdate,
     [CalendarAction.ReceivedResource]: receivedResource,
     [CalendarAction.RejectedGroupInvitation]: rejectedGroupInvitation,

@@ -37,7 +37,7 @@ class Reservation implements Reservation {
       return `${Reservation.url}/admin/exceptions/refund/${res.id}`;
     },
   };
-  static forwardUrl = `${Reservation.url}/forward`;
+  static checkInUrl = `${Reservation.url}/check-in`;
   static rules = {
     inProgressCutoffMinutes: Number(
       process.env.REACT_APP_EVENT_IN_PROGRESS_CUTOFF_MINUTES || "30"

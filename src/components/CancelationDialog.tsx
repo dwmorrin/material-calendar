@@ -24,7 +24,6 @@ import {
   parseAndFormatSQLDatetimeInterval,
 } from "../utils/date";
 import { SocketMessageKind, ReservationChangePayload } from "./SocketProvider";
-import forward from "./ReservationForm/forward";
 import { Formik, Form, Field } from "formik";
 import { addEvents } from "../resources/EventsByDate";
 
@@ -155,12 +154,6 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         const updatedCurrentEvent: Event =
           updateEventArray.find(({ id }) => id === currentEvent.id) ||
           new Event();
-
-        forward({
-          reservationId: reservation.id,
-          method: "DELETE",
-          onError: dispatchError,
-        });
 
         // send reservation info to currently connected users
         broadcast(SocketMessageKind.ReservationChanged, {

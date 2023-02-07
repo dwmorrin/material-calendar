@@ -133,6 +133,40 @@ export const receivedReservationCancelation: StateHandler = (
   );
 };
 
+export const receivedReservationCheckIn: StateHandler = (state, action) => {
+  // server returns an array of updated events in case the check-in applies
+  // to multiple events & reservations, but the current event is definitely
+  // affected since the event detail must be open to access the check-in button
+  const { payload } = action;
+  if (
+    !payload ||
+    !payload.currentEvent ||
+    !payload.resources ||
+    !payload.currentEvent
+  )
+    return impossibleState(
+      state,
+      action,
+      "Missing updated events after check-in"
+    );
+  const updatedEvents = payload.resources[ResourceKey.Events] as Event[];
+  const events = state.resources[ResourceKey.Events] as Event[];
+  let newEvents: Event[] = [];
+  for (const event of updatedEvents) {
+    const index = events.findIndex(({ id }) => id === event.id);
+    newEvents = arrayUpdateAt(events, index, event);
+  }
+  return {
+    ...state,
+    currentEvent: payload.currentEvent,
+    events: addEvents(state.events, updatedEvents),
+    resources: {
+      ...state.resources,
+      [ResourceKey.Events]: newEvents,
+    },
+  };
+};
+
 export const receivedReservationUpdate: StateHandler = (state, action) => {
   const { payload } = action;
   const resources = payload?.resources;

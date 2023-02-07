@@ -20,7 +20,6 @@ import {
 import { formatDatetime, parseSQLDatetime } from "../../utils/date";
 import { ResourceKey } from "../../resources/types";
 import { SocketMessageKind } from "../SocketProvider";
-import forward from "./forward";
 
 export const useStyles = makeStyles({
   list: {
@@ -143,13 +142,6 @@ export const submitHandler =
         const message = values.id
           ? "Your reservation has been updated!"
           : "Your reservation has been made!";
-
-        forward({
-          reservation: formToSubmit,
-          reservationId: reservation.id,
-          method,
-          onError,
-        });
 
         // send reservation info to currently connected users
         broadcast(SocketMessageKind.ReservationChanged, {
