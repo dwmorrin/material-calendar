@@ -441,6 +441,12 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
                 Cancel Reservation
               </Button>
             )}
+            {reservation && (isAdmin || isStaff) && (
+              <p>
+                Reservation created on:{" "}
+                {parseSQLDatetime(reservation.created).toLocaleString()}
+              </p>
+            )}
             {isAdmin || isStaff ? (
               reservation &&
               (reservation.checkIn ? (
