@@ -71,16 +71,18 @@ const UserRoot: FunctionComponent<RouteComponentProps> = () => {
     fetch(`${Semester.url}/current`)
       .then((res) => {
         if (res.ok) return res.json();
-        // this particular call is not currently important, so failure is OK here.
+        else throw new Error("No semester data returned from server");
       })
       .then(({ data, error }) => {
-        if (error) return;
-        // failure here is OK.
+        if (error) throw error;
         dispatch({
           type: CalendarAction.ReceivedCurrentSemester,
           payload: { currentSemester: data },
         });
-      });
+      })
+      .catch((error) =>
+        dispatch({ type: CalendarAction.Error, payload: { error } })
+      );
   }, []);
 
   // socket event handlers
