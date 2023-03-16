@@ -1,14 +1,18 @@
 import {
+  addMinutes,
   formatSQLDatetime,
+  isBefore,
   isSameDay,
   isValidDateInterval,
   isWithinInterval,
   nowInServerTimezone,
   parseSQLDatetime,
+  subHours,
   subMinutes,
   todayInServerTimezoneAtHour,
 } from "../utils/date";
 
+import Reservation from "./Reservation";
 import { EquipmentTable } from "./Equipment";
 
 export interface ReservationInfo {
@@ -115,6 +119,42 @@ class Event implements Event {
       cursor = cursor.next;
     }
     return result;
+  }
+
+  static notStarted(event: Event): boolean {
+    return isBefore(nowInServerTimezone(), parseSQLDatetime(event.start));
+  }
+
+  static inGracePeriod(event: Event): boolean {
+    if (!event.reservation) return false;
+    const created = parseSQLDatetime(event.reservation.created);
+    const graceCutoff = addMinutes(
+      created,
+      Reservation.rules.refundGracePeriodMinutes
+    );
+    return isBefore(nowInServerTimezone(), graceCutoff);
+  }
+
+  static canCancel(event: Event): boolean {
+    if (!event.reservation) return false;
+    return Event.inGracePeriod(event) || Event.notStarted(event);
+  }
+
+  static cancelationApprovalCutoff(event: Event): Date | null {
+    if (!event.reservation) return null;
+    return subHours(
+      parseSQLDatetime(event.start),
+      Reservation.rules.refundCutoffHours
+    );
+  }
+
+  static canAutoRefund(event: Event): boolean {
+    if (!event.reservation) return false;
+    const cancelationApprovalCutoff = Event.cancelationApprovalCutoff(event);
+    return cancelationApprovalCutoff
+      ? Event.inGracePeriod(event) ||
+          isBefore(nowInServerTimezone(), cancelationApprovalCutoff)
+      : false;
   }
 }
 

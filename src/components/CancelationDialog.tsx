@@ -12,15 +12,10 @@ import { CalendarUIProps, CalendarAction } from "./types";
 import { useAuth } from "./AuthProvider";
 import { makeTransition } from "./Transition";
 import { ResourceKey } from "../resources/types";
-import Project from "../resources/Project";
 import Reservation from "../resources/Reservation";
-import UserGroup from "../resources/UserGroup";
 import Event from "../resources/Event";
-import { Mail, adminEmail, groupTo } from "../utils/mail";
 import {
   formatDatetime,
-  isBefore,
-  nowInServerTimezone,
   parseAndFormatSQLDatetimeInterval,
 } from "../utils/date";
 import { SocketMessageKind, ReservationChangePayload } from "./SocketProvider";
@@ -42,8 +37,6 @@ interface CancelationDialogProps extends CalendarUIProps {
   ) => void;
   open: boolean;
   setOpen: (state: boolean) => void;
-  cancelationApprovalCutoff: Date;
-  gracePeriodCutoff: Date;
   isWalkIn: boolean;
   subEvents: Event[];
 }
@@ -54,8 +47,6 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
   state,
   open,
   setOpen,
-  cancelationApprovalCutoff,
-  gracePeriodCutoff,
   isWalkIn,
   subEvents,
 }) => {
@@ -63,34 +54,13 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     setOpen(false);
     dispatch({ type: CalendarAction.Error, payload: { error }, meta });
   };
-  const { user } = useAuth();
-  const myName = `${user.name.first} ${user.name.last}`;
+  const { isAdmin } = useAuth();
 
   const { currentEvent } = state;
   if (!currentEvent) return null;
-  const { reservation } = currentEvent;
-  if (!reservation) return null;
-  const group = (state.resources[ResourceKey.Groups] as UserGroup[]).find(
-    ({ id }) => id === reservation.groupId
-  );
-  if (!group) return null;
-  const project = (state.resources[ResourceKey.Projects] as Project[]).find(
-    ({ id }) => id === group.projectId
-  );
-  if (!project) return null;
 
-  const now = nowInServerTimezone();
-  const autoApprove =
-    isBefore(now, cancelationApprovalCutoff) ||
-    isBefore(now, gracePeriodCutoff);
-  const subject = "canceled a reservation for your group";
-  const location = currentEvent.location.title;
-  const whatWhenWhere = `${project.title} on ${currentEvent.start} in ${location}`;
-  const body = `${subject} for ${whatWhenWhere}`;
+  const autoApprove = subEvents.every(Event.canAutoRefund);
 
-  const cancelationApprovalCutoffString = formatDatetime(
-    cancelationApprovalCutoff
-  );
   const onCancelationRequest = (values: FormValues): void => {
     const { refundRequested, refundMessage: message } = values;
     const selectedEvents: Event[] = Object.entries(values.eventIds).reduce(
@@ -100,23 +70,6 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
           : ids,
       [] as Event[]
     );
-    const mail: Mail[] = [];
-    const refundMessage = refundRequested
-      ? " They requested that project hours be refunded. The request has been sent to the administrator."
-      : " They did not request that project hours be refunded, so the hours have been forfeited.";
-    mail.push({
-      to: groupTo(group.members),
-      subject: `${myName} has ${subject}`,
-      text: `You are receiving this because you are a member of ${
-        group.title
-      }. ${myName} has ${body}.${autoApprove ? "" : refundMessage}`,
-    });
-    if (!autoApprove && adminEmail && refundRequested)
-      mail.push({
-        to: adminEmail,
-        subject: "Project Hour Refund Request",
-        text: `${myName} is requesting a project hour refund for their booking: ${whatWhenWhere}`,
-      });
 
     const eventIds = selectedEvents.map(({ id }) => id);
     fetch(`${Reservation.url}/cancel`, {
@@ -128,7 +81,6 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
         groupId: selectedEvents[0].reservation?.groupId || 0,
         projectId: selectedEvents[0].reservation?.projectId || 0,
         refundApproved: autoApprove,
-        mail,
         refundRequest: refundRequested,
         refundComment: message,
       }),
@@ -156,12 +108,12 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
           new Event();
 
         // send reservation info to currently connected users
-        broadcast(SocketMessageKind.ReservationChanged, {
-          eventIds,
-          reservationId: reservation.id,
-          groupId: group.id,
-          projectId: project.id,
-        });
+        // broadcast(SocketMessageKind.ReservationChanged, {
+        //   eventIds,
+        //   reservationId: reservation.id,
+        //   groupId: group.id,
+        //   projectId: project.id,
+        // });
         setOpen(false);
         dispatch({
           type: CalendarAction.ReceivedReservationCancelation,
@@ -184,7 +136,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
       <Formik
         initialValues={{
           eventIds: subEvents.reduce(
-            (dict, { id }) => ({ ...dict, [String(id)]: true }),
+            (dict, e) => ({ ...dict, [String(e.id)]: Event.canCancel(e) }),
             {} as Record<string, boolean>
           ),
           refundMessage: "",
@@ -199,23 +151,24 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
                 <>
                   <p>Select all the reservations you want to cancel</p>
                   <List>
-                    {subEvents.map(({ id, start, originalEnd }) => (
-                      <ListItem key={`cancel-list-${id}`}>
+                    {subEvents.map((e) => (
+                      <ListItem key={`cancel-list-${e.id}`}>
                         <Field
                           Label={{
                             label:
                               parseAndFormatSQLDatetimeInterval({
-                                start,
-                                end: originalEnd,
+                                start: e.start,
+                                end: e.originalEnd,
                               }) +
                               ": " +
-                              (values.eventIds[String(id)]
+                              (values.eventIds[String(e.id)]
                                 ? "YES CANCEL"
                                 : "NOT CANCEL"),
                           }}
                           type="checkbox"
-                          name={`eventIds[${id}]`}
+                          name={`eventIds[${e.id}]`}
                           component={CheckboxWithLabel}
+                          disabled={!(isAdmin || Event.canCancel(e))}
                         />
                       </ListItem>
                     ))}
@@ -234,7 +187,19 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
                     (You needed to cancel{" "}
                     {Reservation.rules.refundCutoffHours.toString()} hours
                     before the start of your reservation, which was at{" "}
-                    {cancelationApprovalCutoffString}.)
+                    {subEvents
+                      .map((e) => {
+                        const approvalCutoff =
+                          Event.cancelationApprovalCutoff(e);
+                        const cutoffString = approvalCutoff
+                          ? formatDatetime(approvalCutoff)
+                          : "(Something went wrong)";
+                        return `${cutoffString} for ${parseAndFormatSQLDatetimeInterval(
+                          e
+                        )}`;
+                      })
+                      .join(", ")}
+                    .)
                   </p>
                   <p>
                     You can send a message to the administrator using the text

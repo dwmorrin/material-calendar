@@ -16,6 +16,7 @@ import {
 export {
   addDays,
   addHours,
+  addMinutes,
   differenceInMinutes,
   eachDayOfInterval,
   endOfDay,

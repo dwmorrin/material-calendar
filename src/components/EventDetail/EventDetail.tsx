@@ -41,7 +41,6 @@ import ListSubheader from "@material-ui/core/ListSubheader";
 import Event from "../../resources/Event";
 import CancelationDialog from "../CancelationDialog";
 import EventBookButton from "./EventBookButton";
-import { addMinutes } from "date-fns/esm";
 import { useSocket } from "../SocketProvider";
 import { getRange } from "../../resources/EventsByDate";
 
@@ -165,6 +164,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   const eventsByDate = getRange(state.events, [location.id], start, end);
   const aggregateEvent = eventsByDate.find((e) => e.id === currentEvent.id);
+  if (!aggregateEvent) return null;
   const subEvents = Event.subEvents(aggregateEvent);
 
   const checkIn = (): void => {
@@ -216,19 +216,7 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   const userCanUseLocation = user.restriction >= location.restriction;
 
-  const startDate = parseSQLDatetime(start);
   const endDate = parseSQLDatetime(end);
-  const reservationCreated = parseSQLDatetime(reservation?.created || "");
-
-  const cancelationApprovalCutoff = subHours(
-    startDate,
-    Reservation.rules.refundCutoffHours
-  );
-
-  const gracePeriodCutoff = addMinutes(
-    reservationCreated,
-    Reservation.rules.refundGracePeriodMinutes
-  );
 
   const currentUserWalkInProject = projects.find(
     (project) => project.title === Project.walkInTitle
@@ -338,10 +326,15 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
 
   const eventHasNotEnded = isBefore(nowInServerTimezone(), endDate);
 
-  const eventHasNotStarted = isBefore(nowInServerTimezone(), startDate);
+  const reservationHasNotEnded = isBefore(
+    nowInServerTimezone(),
+    parseSQLDatetime(aggregateEvent.end)
+  );
+  const someEventsNotStarted = subEvents.some((e) => Event.notStarted(e));
+  const someEventsInGracePeriod = subEvents.some((e) => Event.inGracePeriod(e));
 
   const notStartedOrInGracePeriod =
-    eventHasNotStarted || isBefore(nowInServerTimezone(), gracePeriodCutoff);
+    someEventsNotStarted || someEventsInGracePeriod;
 
   const equipmentList = reservation?.equipment
     ? Object.entries(reservation.equipment)
@@ -431,7 +424,8 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
               walkInValid={walkInValid}
               hotReservations={hotReservations}
             />
-            {userOwns && notStartedOrInGracePeriod && (
+            {((isAdmin && reservation && reservationHasNotEnded) ||
+              (userOwns && notStartedOrInGracePeriod)) && (
               <Button
                 variant="contained"
                 color="secondary"
@@ -570,8 +564,6 @@ const EventDetail: FunctionComponent<CalendarUIProps> = ({
           dispatch={dispatch}
           open={cancelationDialogIsOpen}
           setOpen={setCancelationDialogIsOpen}
-          cancelationApprovalCutoff={cancelationApprovalCutoff}
-          gracePeriodCutoff={gracePeriodCutoff}
           isWalkIn={
             state.currentEvent.reservation.projectId ===
             currentUserWalkInProject?.id
