@@ -63,6 +63,7 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
 
   const onCancelationRequest = (values: FormValues): void => {
     const { refundRequested, refundMessage: message } = values;
+    const allEventIds: string[] = Object.keys(values.eventIds);
     const selectedEvents: Event[] = Object.entries(values.eventIds).reduce(
       (ids, [id, selected]) =>
         selected
@@ -72,14 +73,17 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
     );
 
     const eventIds = selectedEvents.map(({ id }) => id);
+    const groupId = selectedEvents[0].reservation?.groupId || 0;
+    const projectId = selectedEvents[0].reservation?.projectId || 0;
+    const reservationIds = selectedEvents.map((e) => e.reservation?.id || 0);
     fetch(`${Reservation.url}/cancel`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         eventIds,
-        reservationIds: selectedEvents.map((e) => e.reservation?.id || 0),
-        groupId: selectedEvents[0].reservation?.groupId || 0,
-        projectId: selectedEvents[0].reservation?.projectId || 0,
+        reservationIds,
+        groupId,
+        projectId,
         refundApproved: autoApprove,
         refundRequest: refundRequested,
         refundComment: message,
@@ -103,17 +107,23 @@ const CancelationDialog: FunctionComponent<CancelationDialogProps> = ({
           if (i < 0) eventsFromState.push(event);
           else eventsFromState[i] = event;
         }
+        for (const id of allEventIds) {
+          const i = updateEventArray.findIndex((e) => e.id === +id);
+          if (i == -1) {
+            const e = eventsFromState.find((ee) => +id === ee.id);
+            if (e) updateEventArray.push(e);
+          }
+        }
         const updatedCurrentEvent: Event =
-          updateEventArray.find(({ id }) => id === currentEvent.id) ||
+          eventsFromState.find(({ id }) => id === currentEvent.id) ||
           new Event();
 
         // send reservation info to currently connected users
-        // broadcast(SocketMessageKind.ReservationChanged, {
-        //   eventIds,
-        //   reservationId: reservation.id,
-        //   groupId: group.id,
-        //   projectId: project.id,
-        // });
+        broadcast(SocketMessageKind.ReservationChanged, {
+          eventIds,
+          groupId: groupId,
+          projectId: projectId,
+        });
         setOpen(false);
         dispatch({
           type: CalendarAction.ReceivedReservationCancelation,

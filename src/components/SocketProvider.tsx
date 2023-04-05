@@ -15,7 +15,6 @@ export type ReservationChangePayload = {
   eventIds: number[];
   groupId: number;
   projectId: number;
-  reservationId: number;
 };
 
 const socket = io();
@@ -89,7 +88,7 @@ const listen = (
           setSocketState({ refreshRequested: true });
           break;
         case SocketMessageKind.ReservationChanged: {
-          const { eventIds, groupId, projectId, reservationId } =
+          const { eventIds, groupId, projectId } =
             data[0] as ReservationChangePayload;
           if (!Array.isArray(eventIds) || !groupId || !projectId) {
             return console.error("invalid reservation change message", arg);
@@ -100,7 +99,6 @@ const listen = (
               eventIds,
               groupId,
               projectId,
-              reservationId,
             },
           });
           break;
@@ -137,7 +135,6 @@ const defaultState: SocketState = {
     eventIds: [],
     groupId: 0,
     projectId: 0,
-    reservationId: 0,
   },
 };
 
